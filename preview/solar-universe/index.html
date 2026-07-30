@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="7719 Universe 3D experiment preview — each interest becomes an explorable planet in a responsive solar system.">
+  <title>7719 Solar Universe · 3D Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/7719Drinkin/7719Drinkin.github.io@e8fdc60912a92b7b8168d2471f3af5b1097d1a3d/css/solar-universe.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main id="solar-stage" class="solar-stage" aria-label="3D 兴趣太阳系">
+    <div class="space-vignette" aria-hidden="true"></div>
+    <div class="space-grain" aria-hidden="true"></div>
+
+    <header class="solar-header">
+      <a class="solar-brand" href="/">
+        <span>7719</span>
+        <small>SOLAR UNIVERSE / PREVIEW</small>
+      </a>
+      <nav class="solar-nav" aria-label="3D 首页控制">
+        <a href="/">MAIN SITE</a>
+        <a href="https://github.com/7719Drinkin/7719Drinkin.github.io/tree/experiment/3d-solar-universe">SOURCE</a>
+        <button id="reset-view" type="button">RESET VIEW</button>
+      </nav>
+    </header>
+
+    <section class="system-intro" aria-labelledby="system-title">
+      <p class="system-kicker">INTERACTIVE MODEL / PERSONAL INTEREST SYSTEM</p>
+      <h1 id="system-title"><span>EXPLORE</span>MY UNIVERSE</h1>
+      <p>在这个实验版本里，每个爱好是一颗可以接近和探索的行星。新的爱好会成为新的行星，并自动扩展整个系统。</p>
+    </section>
+
+    <aside class="system-readout" aria-label="3D 系统状态">
+      <div><span>REGISTERED PLANETS</span><strong id="readout-count">03</strong></div>
+      <div><span>RENDER MODE</span><strong id="readout-mode">AUTO</strong></div>
+      <div><span>MODEL SCALE</span><strong>SYMBOLIC</strong></div>
+      <div><span>WEBGL</span><strong>2.0</strong></div>
+    </aside>
+
+    <button id="performance-mode" class="performance-button" type="button">MODE / AUTO</button>
+    <div id="planet-labels" class="planet-label-layer" aria-hidden="true"></div>
+
+    <aside id="planet-panel" class="planet-panel" aria-hidden="true">
+      <button id="planet-panel-close" class="planet-panel-close" type="button" aria-label="关闭行星信息">×</button>
+      <div class="planet-panel-meta">
+        <span id="planet-panel-index">PLANET --</span>
+        <span id="planet-panel-status">SYSTEM</span>
+      </div>
+      <h2 id="planet-panel-title">Interest</h2>
+      <p id="planet-panel-description"></p>
+      <a id="planet-panel-link" class="planet-panel-link" href="/">
+        <span>ENTER INTEREST</span>
+        <strong>↗</strong>
+      </a>
+    </aside>
+
+    <div class="solar-instructions" aria-hidden="true">
+      <span><strong>DRAG</strong> ROTATE</span>
+      <span><strong>SCROLL</strong> ZOOM</span>
+      <span><strong>CLICK</strong> INSPECT</span>
+      <span><strong>DOUBLE CLICK</strong> ENTER</span>
+    </div>
+
+    <div id="solar-loader" class="solar-loader" aria-live="polite">
+      <div class="loader-copy">
+        <strong>7719</strong>
+        <span>ASSEMBLING INTEREST SYSTEM</span>
+      </div>
+    </div>
+  </main>
+
+  <section id="solar-fallback" class="solar-fallback" aria-label="静态兴趣入口">
+    <div class="fallback-heading">
+      <p class="system-kicker">STATIC NAVIGATION MODE</p>
+      <h1>MY<br>UNIVERSE</h1>
+      <p data-fallback-message>3D 模型未能启动，当前显示静态兴趣入口。</p>
+    </div>
+    <div id="fallback-grid" class="fallback-grid">
+      <a class="fallback-card" href="/basketball/">
+        <small>PLANET 01 · ACTIVE</small>
+        <h2>Basketball</h2>
+        <p>Legends, iconic frames and the moments that made the game larger than life.</p>
+      </a>
+      <a class="fallback-card" href="/games/">
+        <small>PLANET 02 · FORMING</small>
+        <h2>Games</h2>
+        <p>Strategy, civilization building and memorable virtual worlds.</p>
+      </a>
+      <a class="fallback-card" href="/music/">
+        <small>PLANET 03 · FORMING</small>
+        <h2>Music</h2>
+        <p>Artists, albums and songs collected over time.</p>
+      </a>
+    </div>
+  </section>
+
+  <noscript>
+    <style>
+      #solar-stage { display: none; }
+      #solar-fallback { display: block; }
+    </style>
+  </noscript>
+
+  <script>
+    window.setTimeout(() => {
+      if (!document.documentElement.dataset.solarReady) {
+        document.querySelector('#solar-loader')?.classList.add('is-complete');
+        document.querySelector('#solar-stage')?.setAttribute('aria-hidden', 'true');
+        document.querySelector('#solar-fallback')?.classList.add('is-visible');
+      }
+    }, 9000);
+  </script>
+  <script type="module" src="https://cdn.jsdelivr.net/gh/7719Drinkin/7719Drinkin.github.io@e8fdc60912a92b7b8168d2471f3af5b1097d1a3d/js/solar-universe.js"></script>
+</body>
+</html>
