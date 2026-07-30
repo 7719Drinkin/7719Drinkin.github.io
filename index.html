@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A personal basketball tribute page.">
+  <title>23 · Basketball Tribute</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="返回顶部">23</a>
+    <nav aria-label="页面导航">
+      <a href="#legacy">LEGACY</a>
+      <a href="#moments">MOMENTS</a>
+      <a href="#film">FILM</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-backdrop" aria-hidden="true"></div>
+      <div class="hero-media placeholder" role="img" aria-label="主视觉图片或 GIF 占位区域">
+        <span>HERO IMAGE / GIF</span>
+        <small>建议尺寸 1920 × 1080</small>
+      </div>
+
+      <!--
+      上传你自己的主视觉素材到 assets/hero.gif 后，
+      用下面这行替换上面的 .hero-media 占位元素：
+      <img class="hero-image" src="assets/hero.gif" alt="Michael Jordan tribute">
+      -->
+
+      <div class="hero-overlay"></div>
+      <div class="hero-copy reveal">
+        <p class="eyebrow">A PERSONAL BASKETBALL TRIBUTE</p>
+        <h1><span>THE</span><strong>LEGACY</strong></h1>
+        <p class="hero-line">FOCUS · DISCIPLINE · GREATNESS</p>
+        <a class="scroll-cue" href="#legacy">ENTER THE COURT <span>↓</span></a>
+      </div>
+      <div class="hero-number" aria-hidden="true">23</div>
+    </section>
+
+    <section id="legacy" class="legacy section-shell">
+      <div class="section-heading reveal">
+        <p>01 / LEGACY</p>
+        <h2>MORE THAN<br>A GAME.</h2>
+      </div>
+
+      <div class="legacy-grid">
+        <div class="portrait-slot placeholder reveal">
+          <span>PORTRAIT / GIF</span>
+          <small>建议尺寸 900 × 1200</small>
+        </div>
+
+        <!--
+        上传素材到 assets/portrait.jpg 后，
+        用下面这行替换上面的 .portrait-slot：
+        <img class="portrait-image reveal" src="assets/portrait.jpg" alt="Basketball portrait">
+        -->
+
+        <div class="legacy-copy reveal">
+          <div class="red-rule"></div>
+          <p class="display-copy">THE GAME.<br>THE FOCUS.<br>THE LEGACY.</p>
+          <p class="small-copy">留给你自己的篮球故事、偶像记忆或一句简短介绍。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="moments" class="moments section-shell">
+      <div class="section-heading horizontal reveal">
+        <div>
+          <p>02 / MOMENTS</p>
+          <h2>ICONIC<br>FRAMES.</h2>
+        </div>
+        <span>YOUR GALLERY</span>
+      </div>
+
+      <div class="gallery">
+        <article class="gallery-card gallery-card--wide reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 01</span></div>
+          <div class="card-label"><span>01</span><strong>AIR</strong></div>
+        </article>
+        <article class="gallery-card reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 02</span></div>
+          <div class="card-label"><span>02</span><strong>FOCUS</strong></div>
+        </article>
+        <article class="gallery-card reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 03</span></div>
+          <div class="card-label"><span>03</span><strong>CLUTCH</strong></div>
+        </article>
+        <article class="gallery-card gallery-card--wide reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 04</span></div>
+          <div class="card-label"><span>04</span><strong>LEGACY</strong></div>
+        </article>
+      </div>
+
+      <!--
+      添加图片时，把对应 .media-slot 替换为：
+      <img src="assets/moment-01.gif" alt="Basketball moment 01">
+      -->
+    </section>
+
+    <section id="film" class="film section-shell">
+      <div class="section-heading reveal">
+        <p>03 / FILM</p>
+        <h2>WATCH THE<br>MOMENT.</h2>
+      </div>
+
+      <div class="video-frame reveal">
+        <div class="video-placeholder">
+          <span class="play-mark">▶</span>
+          <strong>YOUTUBE VIDEO</strong>
+          <small>在 index.html 中替换为你的 YouTube iframe</small>
+        </div>
+
+        <!--
+        将 VIDEO_ID 替换成你自己的视频 ID，然后取消下面 iframe 的注释，
+        并删除上面的 .video-placeholder：
+
+        <iframe
+          src="https://www.youtube.com/embed/VIDEO_ID"
+          title="Basketball video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen>
+        </iframe>
+        -->
+      </div>
+    </section>
+
+    <section class="finale">
+      <div class="finale-lines" aria-hidden="true"></div>
+      <div class="finale-content reveal">
+        <span>23</span>
+        <p>INSPIRED BY GREATNESS.</p>
+        <a href="https://github.com/7719Drinkin">BACK TO GITHUB →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>7719DRINKIN</span>
+    <span>PERSONAL TRIBUTE · 2026</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
