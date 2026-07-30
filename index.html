@@ -2,139 +2,126 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="7719 Universe — an expanding personal universe where every interest becomes an independent galaxy.">
-  <title>7719 Universe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="7719 Universe 3D experiment — each interest becomes an explorable planet in a responsive solar system.">
+  <title>7719 Solar Universe · 3D Experiment</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@500;600;700;800;900&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/universe.css?v=20260730-5">
-  <link rel="stylesheet" href="/css/universe-home.css?v=20260730-5">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/solar-universe.css?v=20260730-1">
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+      }
+    }
+  </script>
 </head>
-<body class="theme-universe universe-home">
-  <div class="universe-noise" aria-hidden="true"></div>
+<body>
+  <main id="solar-stage" class="solar-stage" aria-label="3D 兴趣太阳系">
+    <div class="space-vignette" aria-hidden="true"></div>
+    <div class="space-grain" aria-hidden="true"></div>
 
-  <header class="universe-header">
-    <a class="universe-brand" href="/" aria-label="7719 Universe 首页">7719</a>
-    <nav class="universe-nav" aria-label="主导航">
-      <a href="#galaxies">GALAXIES</a>
-      <a href="#featured">FEATURED</a>
-      <a href="#about">ABOUT</a>
-      <a href="https://github.com/7719Drinkin">GITHUB</a>
-    </nav>
-  </header>
+    <header class="solar-header">
+      <a class="solar-brand" href="/">
+        <span>7719</span>
+        <small>SOLAR UNIVERSE / EXPERIMENT</small>
+      </a>
+      <nav class="solar-nav" aria-label="3D 首页控制">
+        <a href="https://github.com/7719Drinkin">GITHUB</a>
+        <button id="reset-view" type="button">RESET VIEW</button>
+      </nav>
+    </header>
 
-  <main>
-    <section class="universe-hero" id="top">
-      <div class="deep-field" aria-hidden="true"></div>
-      <div class="universe-hero-copy reveal">
-        <p class="eyebrow">FIELD NOTE 7719 / OPEN CATALOG</p>
-        <h1><span>PERSONAL</span><strong>UNIVERSE</strong></h1>
-        <p class="universe-tagline">No center. No fixed boundary. Every interest occupies its own region of space, and the catalog remains open to galaxies that have not formed yet.</p>
-        <a class="universe-scroll" href="#galaxies">EXPLORE THE CATALOG <span>↓</span></a>
-      </div>
-
-      <aside class="hero-readout" aria-label="Universe catalog status">
-        <div><span>ACTIVE GALAXIES</span><strong>03</strong></div>
-        <div><span>CATALOG STATUS</span><strong>EXPANDING</strong></div>
-        <div><span>BOUNDARY</span><strong>OPEN</strong></div>
-      </aside>
+    <section class="system-intro" aria-labelledby="system-title">
+      <p class="system-kicker">INTERACTIVE MODEL / PERSONAL INTEREST SYSTEM</p>
+      <h1 id="system-title"><span>EXPLORE</span>MY UNIVERSE</h1>
+      <p>在这个实验版本里，每个爱好是一颗可以接近和探索的行星。新的爱好会成为新的行星，并自动扩展整个系统。</p>
     </section>
 
-    <section id="galaxies" class="universe-section galaxy-catalog">
-      <div class="section-heading reveal">
-        <div>
-          <p>01 / DEEP FIELD CATALOG</p>
-          <h2>INDEPENDENT<br>GALAXIES.</h2>
-        </div>
-        <span>Each entry is a separate interest system. There is no central subject and no permanent final list.</span>
+    <aside class="system-readout" aria-label="3D 系统状态">
+      <div><span>REGISTERED PLANETS</span><strong id="readout-count">03</strong></div>
+      <div><span>RENDER MODE</span><strong id="readout-mode">AUTO</strong></div>
+      <div><span>MODEL SCALE</span><strong>SYMBOLIC</strong></div>
+      <div><span>WEBGL</span><strong>2.0</strong></div>
+    </aside>
+
+    <button id="performance-mode" class="performance-button" type="button">MODE / AUTO</button>
+
+    <div id="planet-labels" class="planet-label-layer" aria-hidden="true"></div>
+
+    <aside id="planet-panel" class="planet-panel" aria-hidden="true">
+      <button id="planet-panel-close" class="planet-panel-close" type="button" aria-label="关闭行星信息">×</button>
+      <div class="planet-panel-meta">
+        <span id="planet-panel-index">PLANET --</span>
+        <span id="planet-panel-status">SYSTEM</span>
       </div>
+      <h2 id="planet-panel-title">Interest</h2>
+      <p id="planet-panel-description"></p>
+      <a id="planet-panel-link" class="planet-panel-link" href="/">
+        <span>ENTER INTEREST</span>
+        <strong>↗</strong>
+      </a>
+    </aside>
 
-      <div id="interest-grid" class="interest-grid" aria-live="polite">
-        <a class="interest-card reveal" data-theme="basketball" href="/basketball/" aria-label="进入 Basketball 星系">
-          <div class="interest-card-visual" aria-hidden="true"></div>
-          <div class="interest-card-content">
-            <div class="interest-card-top"><span>GALAXY 01</span><span class="interest-card-status">EXPLORE</span></div>
-            <div class="interest-card-copy">
-              <p class="interest-card-kicker">ACTIVE INTEREST SYSTEM</p>
-              <h3>Basketball</h3>
-              <p class="interest-card-subtitle">The game never stops.</p>
-              <p class="interest-card-description">Legends, iconic frames and the moments that made the game larger than life.</p>
-            </div>
-            <span class="interest-card-enter">ENTER GALAXY <strong>↗</strong></span>
-          </div>
-        </a>
+    <div class="solar-instructions" aria-hidden="true">
+      <span><strong>DRAG</strong> ROTATE</span>
+      <span><strong>SCROLL</strong> ZOOM</span>
+      <span><strong>CLICK</strong> INSPECT</span>
+      <span><strong>DOUBLE CLICK</strong> ENTER</span>
+    </div>
 
-        <a class="interest-card reveal" data-theme="games" href="/games/" aria-label="进入 Games 星系">
-          <div class="interest-card-visual" aria-hidden="true"></div>
-          <div class="interest-card-content">
-            <div class="interest-card-top"><span>GALAXY 02</span><span class="interest-card-status">FORMING</span></div>
-            <div class="interest-card-copy">
-              <p class="interest-card-kicker">DEVELOPING INTEREST SYSTEM</p>
-              <h3>Games</h3>
-              <p class="interest-card-subtitle">Worlds built one decision at a time.</p>
-              <p class="interest-card-description">Strategy, civilization building and memorable virtual worlds.</p>
-            </div>
-            <span class="interest-card-enter">ENTER GALAXY <strong>↗</strong></span>
-          </div>
-        </a>
-
-        <a class="interest-card reveal" data-theme="music" href="/music/" aria-label="进入 Music 星系">
-          <div class="interest-card-visual" aria-hidden="true"></div>
-          <div class="interest-card-content">
-            <div class="interest-card-top"><span>GALAXY 03</span><span class="interest-card-status">FORMING</span></div>
-            <div class="interest-card-copy">
-              <p class="interest-card-kicker">DEVELOPING INTEREST SYSTEM</p>
-              <h3>Music</h3>
-              <p class="interest-card-subtitle">Soundtracks for different versions of me.</p>
-              <p class="interest-card-description">Artists, albums and songs collected over time.</p>
-            </div>
-            <span class="interest-card-enter">ENTER GALAXY <strong>↗</strong></span>
-          </div>
-        </a>
+    <div id="solar-loader" class="solar-loader" aria-live="polite">
+      <div class="loader-copy">
+        <strong>7719</strong>
+        <span>ASSEMBLING INTEREST SYSTEM</span>
       </div>
-    </section>
-
-    <section id="featured" class="universe-section">
-      <div class="section-heading reveal">
-        <div>
-          <p>02 / FEATURED COLLECTION</p>
-          <h2>THE<br>LEGACY.</h2>
-        </div>
-        <span>The first fully developed collection inside the Basketball galaxy.</span>
-      </div>
-
-      <article class="featured-collection reveal">
-        <div class="featured-copy">
-          <p class="eyebrow">BASKETBALL / MICHAEL JORDAN</p>
-          <h3>23</h3>
-          <p>A visual tribute built around iconic frames, movement, focus and the legacy that made basketball feel larger than the game.</p>
-          <a class="primary-link" href="/basketball/michael-jordan/">VIEW COLLECTION <span>↗</span></a>
-        </div>
-        <figure class="featured-media">
-          <img src="/assets/15815936170156050909.GIF" alt="Michael Jordan basketball tribute animation">
-          <figcaption>COLLECTION 01 · MOVING IMAGE ARCHIVE</figcaption>
-        </figure>
-      </article>
-    </section>
-
-    <section id="about" class="universe-section about-block reveal">
-      <div>
-        <p class="eyebrow">03 / SYSTEM PRINCIPLE</p>
-        <h2>STILL<br>EXPANDING.</h2>
-      </div>
-      <div class="about-copy">
-        <p>This site is not a fixed list of favorites. Every interest can become an independent galaxy, each galaxy can contain multiple collections, and new systems can be registered without displacing the existing ones.</p>
-        <p>Basketball is simply the first developed galaxy. It is not the center of the universe.</p>
-      </div>
-    </section>
+    </div>
   </main>
 
-  <footer class="universe-footer">
-    <span>7719 UNIVERSE</span>
-    <span>NO CENTER · NO FINAL BOUNDARY · 2026</span>
-  </footer>
+  <section id="solar-fallback" class="solar-fallback" aria-label="静态兴趣入口">
+    <div class="fallback-heading">
+      <p class="system-kicker">STATIC NAVIGATION MODE</p>
+      <h1>MY<br>UNIVERSE</h1>
+      <p data-fallback-message>3D 模型未能启动，当前显示静态兴趣入口。</p>
+    </div>
+    <div id="fallback-grid" class="fallback-grid">
+      <a class="fallback-card" href="/basketball/">
+        <small>PLANET 01 · ACTIVE</small>
+        <h2>Basketball</h2>
+        <p>Legends, iconic frames and the moments that made the game larger than life.</p>
+      </a>
+      <a class="fallback-card" href="/games/">
+        <small>PLANET 02 · FORMING</small>
+        <h2>Games</h2>
+        <p>Strategy, civilization building and memorable virtual worlds.</p>
+      </a>
+      <a class="fallback-card" href="/music/">
+        <small>PLANET 03 · FORMING</small>
+        <h2>Music</h2>
+        <p>Artists, albums and songs collected over time.</p>
+      </a>
+    </div>
+  </section>
 
-  <script src="/js/universe.js?v=20260730-5"></script>
+  <noscript>
+    <style>
+      #solar-stage { display: none; }
+      #solar-fallback { display: block; }
+    </style>
+  </noscript>
+
+  <script>
+    window.setTimeout(() => {
+      if (!document.documentElement.dataset.solarReady) {
+        document.querySelector('#solar-loader')?.classList.add('is-complete');
+        document.querySelector('#solar-stage')?.setAttribute('aria-hidden', 'true');
+        document.querySelector('#solar-fallback')?.classList.add('is-visible');
+      }
+    }, 9000);
+  </script>
+  <script type="module" src="/js/solar-universe.js?v=20260730-1"></script>
 </body>
 </html>
