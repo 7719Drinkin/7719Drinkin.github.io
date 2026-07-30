@@ -26,17 +26,12 @@
   <main id="top">
     <section class="hero">
       <div class="hero-backdrop" aria-hidden="true"></div>
-      <div class="hero-media placeholder" role="img" aria-label="主视觉图片或 GIF 占位区域">
-        <span>HERO IMAGE / GIF</span>
-        <small>建议尺寸 1920 × 1080</small>
-      </div>
-
-      <!--
-      上传你自己的主视觉素材到 assets/hero.gif 后，
-      用下面这行替换上面的 .hero-media 占位元素：
-      <img class="hero-image" src="assets/hero.gif" alt="Michael Jordan tribute">
-      -->
-
+      <img
+        class="hero-image"
+        src="assets/15815936170156050909.GIF"
+        alt="Michael Jordan basketball tribute animation"
+        fetchpriority="high"
+      >
       <div class="hero-overlay"></div>
       <div class="hero-copy reveal">
         <p class="eyebrow">A PERSONAL BASKETBALL TRIBUTE</p>
@@ -54,21 +49,17 @@
       </div>
 
       <div class="legacy-grid">
-        <div class="portrait-slot placeholder reveal">
-          <span>PORTRAIT / GIF</span>
-          <small>建议尺寸 900 × 1200</small>
-        </div>
-
-        <!--
-        上传素材到 assets/portrait.jpg 后，
-        用下面这行替换上面的 .portrait-slot：
-        <img class="portrait-image reveal" src="assets/portrait.jpg" alt="Basketball portrait">
-        -->
+        <img
+          class="portrait-image reveal"
+          src="assets/moment-02.jpg"
+          alt="Michael Jordan tribute portrait"
+          loading="lazy"
+        >
 
         <div class="legacy-copy reveal">
           <div class="red-rule"></div>
           <p class="display-copy">THE GAME.<br>THE FOCUS.<br>THE LEGACY.</p>
-          <p class="small-copy">留给你自己的篮球故事、偶像记忆或一句简短介绍。</p>
+          <p class="small-copy">Inspired by the player who made every moment feel larger than the game.</p>
         </div>
       </div>
     </section>
@@ -79,76 +70,21 @@
           <p>02 / IMAGE WALL</p>
           <h2>ICONIC<br>FRAMES.</h2>
         </div>
-        <span>14 SLOTS · ADD MORE ANYTIME</span>
+        <span>AUTO-CURATED FROM YOUR UPLOADS</span>
       </div>
 
-      <div class="gallery-wall">
-        <article class="gallery-card gallery-card--feature reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 01</span><small>moment-01</small></div>
-          <div class="card-label"><span>01</span><strong>AIR</strong></div>
-        </article>
-        <article class="gallery-card gallery-card--tall reveal">
-          <img src="assets/moment-02.jpg" alt="Basketball moment 02" loading="lazy">
-          <div class="card-label"><span>02</span><strong>FLIGHT</strong></div>
-        </article>
-        <article class="gallery-card reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 03</span><small>moment-03</small></div>
-          <div class="card-label"><span>03</span><strong>FOCUS</strong></div>
-        </article>
-        <article class="gallery-card gallery-card--wide reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 04</span><small>moment-04</small></div>
-          <div class="card-label"><span>04</span><strong>CLUTCH</strong></div>
-        </article>
-        <article class="gallery-card reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 05</span><small>moment-05</small></div>
-          <div class="card-label"><span>05</span><strong>DRIVE</strong></div>
-        </article>
-        <article class="gallery-card gallery-card--tall reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 06</span><small>moment-06</small></div>
-          <div class="card-label"><span>06</span><strong>RISE</strong></div>
-        </article>
-        <article class="gallery-card gallery-card--feature reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 07</span><small>moment-07</small></div>
-          <div class="card-label"><span>07</span><strong>LEGACY</strong></div>
-        </article>
-        <article class="gallery-card gallery-card--wide reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 08</span><small>moment-08</small></div>
-          <div class="card-label"><span>08</span><strong>COURT</strong></div>
-        </article>
-        <article class="gallery-card reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 09</span><small>moment-09</small></div>
-          <div class="card-label"><span>09</span><strong>HEART</strong></div>
-        </article>
-        <article class="gallery-card gallery-card--tall reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 10</span><small>moment-10</small></div>
-          <div class="card-label"><span>10</span><strong>POWER</strong></div>
-        </article>
-        <article class="gallery-card reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 11</span><small>moment-11</small></div>
-          <div class="card-label"><span>11</span><strong>CRAFT</strong></div>
-        </article>
-        <article class="gallery-card gallery-card--wide reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 12</span><small>moment-12</small></div>
-          <div class="card-label"><span>12</span><strong>FIRE</strong></div>
-        </article>
-        <article class="gallery-card gallery-card--tall reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 13</span><small>moment-13</small></div>
-          <div class="card-label"><span>13</span><strong>ICON</strong></div>
-        </article>
-        <article class="gallery-card gallery-card--feature reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 14</span><small>moment-14</small></div>
-          <div class="card-label"><span>14</span><strong>23</strong></div>
+      <div id="gallery-wall" class="gallery-wall" aria-live="polite">
+        <article id="gallery-loading" class="gallery-card gallery-card--feature reveal">
+          <div class="media-slot placeholder">
+            <span>CURATING WALL</span>
+            <small>正在匹配横图、竖图与大图位置</small>
+          </div>
         </article>
       </div>
 
-      <!--
-      添加图片时，把对应的 .media-slot 替换为下面的 img。
-      图片与 GIF 都可使用；真实素材会自动支持点击全屏预览：
-
-      <img src="assets/moment-01.jpg" alt="Basketball moment 01" loading="lazy">
-
-      需要更多素材位时，复制任意一个 gallery-card article 即可。
-      -->
+      <noscript>
+        <p class="small-copy">请启用 JavaScript 以显示自动图片墙。</p>
+      </noscript>
     </section>
 
     <section id="film" class="film section-shell">
@@ -161,21 +97,8 @@
         <div class="video-placeholder">
           <span class="play-mark">▶</span>
           <strong>YOUTUBE VIDEO</strong>
-          <small>在 index.html 中替换为你的 YouTube iframe</small>
+          <small>视频区域暂时留空</small>
         </div>
-
-        <!--
-        将 VIDEO_ID 替换成你自己的视频 ID，然后取消下面 iframe 的注释，
-        并删除上面的 .video-placeholder：
-
-        <iframe
-          src="https://www.youtube.com/embed/VIDEO_ID"
-          title="Basketball video"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen>
-        </iframe>
-        -->
       </div>
     </section>
 
