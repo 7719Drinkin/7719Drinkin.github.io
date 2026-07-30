@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="7719 Universe 3D experiment — each interest becomes an explorable planet in a responsive solar system.">
-  <title>7719 Solar Universe · 3D Experiment</title>
+  <meta name="description" content="7719 Universe 3D experiment — every interest becomes a miniature explorable world.">
+  <title>7719 Solar Universe · Miniature Worlds</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
@@ -37,14 +37,14 @@
     </header>
 
     <section class="system-intro" aria-label="太阳系模型说明">
-      <p class="system-kicker">7719 / PERSONAL INTEREST SYSTEM</p>
-      <p class="system-summary">Each planet represents an interest. Select a planet to inspect the world behind it.</p>
+      <p class="system-kicker">7719 / MINIATURE INTEREST WORLDS</p>
+      <p class="system-summary">Each interest is a small world shaped by its own places, objects and stories.</p>
     </section>
 
     <aside class="system-readout" aria-label="3D 系统状态">
-      <div><span>PLANETS</span><strong id="readout-count">03</strong></div>
+      <div><span>WORLDS</span><strong id="readout-count">03</strong></div>
       <div><span>RENDER</span><strong id="readout-mode">AUTO</strong></div>
-      <div><span>SCALE</span><strong>SYMBOLIC</strong></div>
+      <div><span>SCALE</span><strong>STORY</strong></div>
     </aside>
 
     <button id="performance-mode" class="performance-button" type="button">MODE / AUTO</button>
@@ -54,7 +54,7 @@
       <button id="planet-panel-close" class="planet-panel-close" type="button" aria-label="关闭行星信息">×</button>
       <div class="planet-panel-meta">
         <span id="planet-panel-index">PLANET --</span>
-        <span id="planet-panel-status">SYSTEM</span>
+        <span id="planet-panel-status">WORLD</span>
       </div>
       <h2 id="planet-panel-title">Interest</h2>
       <p id="planet-panel-description"></p>
@@ -67,14 +67,14 @@
     <div class="solar-instructions" aria-hidden="true">
       <span><strong>DRAG</strong> ROTATE</span>
       <span><strong>SCROLL</strong> ZOOM</span>
-      <span><strong>CLICK</strong> FOCUS</span>
+      <span><strong>CLICK</strong> EXPLORE</span>
       <span><strong>DOUBLE CLICK</strong> ENTER</span>
     </div>
 
     <div id="solar-loader" class="solar-loader" aria-live="polite">
       <div class="loader-copy">
         <strong>7719</strong>
-        <span>FORGING CHAMPIONSHIP SYSTEM</span>
+        <span>BUILDING THE LAST COURT</span>
       </div>
     </div>
   </main>
@@ -86,7 +86,7 @@
       <p data-fallback-message>3D 模型未能启动，当前显示静态兴趣入口。</p>
     </div>
     <div id="fallback-grid" class="fallback-grid">
-      <a class="fallback-card" href="/basketball/"><small>PLANET 01 · ACTIVE</small><h2>Basketball</h2><p>Legends, iconic frames and the moments that made the game larger than life.</p></a>
+      <a class="fallback-card" href="/basketball/"><small>PLANET 01 · ACTIVE</small><h2>Basketball</h2><p>A miniature world shaped by courts, lights, memory and championship ambition.</p></a>
       <a class="fallback-card" href="/games/"><small>PLANET 02 · FORMING</small><h2>Games</h2><p>Strategy, civilization building and memorable virtual worlds.</p></a>
       <a class="fallback-card" href="/music/"><small>PLANET 03 · FORMING</small><h2>Music</h2><p>Artists, albums and songs collected over time.</p></a>
     </div>
@@ -102,6 +102,6 @@
       }
     }, 12000);
   </script>
-  <script type="module" src="/js/solar-universe-championship.js?v=20260730-1"></script>
+  <script type="module" src="/js/solar-universe-worlds.js?v=20260730-1"></script>
 </body>
 </html>
