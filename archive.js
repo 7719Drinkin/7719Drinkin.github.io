@@ -44,12 +44,10 @@ const fallbackAssets = [
 
 function renderArchive(items) {
   if (!archiveGrid) return;
-
   archiveGrid.replaceChildren();
   items.forEach((item, index) => {
     const card = document.createElement('article');
     card.className = 'archive-card';
-
     const image = document.createElement('img');
     image.src = item.url;
     image.alt = `Michael Jordan archive frame ${String(index + 1).padStart(2, '0')}`;
@@ -59,38 +57,29 @@ function renderArchive(items) {
     image.setAttribute('role', 'button');
     image.setAttribute('aria-label', `${image.alt}，点击放大`);
     image.addEventListener('error', () => card.remove(), { once: true });
-
     const number = document.createElement('span');
     number.className = 'archive-card-index';
     number.textContent = String(index + 1).padStart(2, '0');
-
     card.append(image, number);
     archiveGrid.append(card);
   });
-
   archiveStatus?.remove();
   if (archiveCount) archiveCount.textContent = `${items.length} FRAMES`;
 }
 
 async function loadArchive() {
   try {
-    const response = await fetch(assetsApi, {
-      headers: { Accept: 'application/vnd.github+json' }
-    });
+    const response = await fetch(assetsApi, { headers: { Accept: 'application/vnd.github+json' } });
     if (!response.ok) throw new Error(`GitHub API ${response.status}`);
-
     const files = await response.json();
     const images = files
       .filter((file) => file.type === 'file' && supportedImage.test(file.name))
       .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
       .map((file) => ({ name: file.name, url: file.download_url }));
-
     renderArchive(images);
   } catch (error) {
     console.warn('Using local archive fallback:', error);
-    renderArchive(
-      fallbackAssets.map((name) => ({ name, url: `assets/${encodeURIComponent(name)}` }))
-    );
+    renderArchive(fallbackAssets.map((name) => ({ name, url: `/assets/${encodeURIComponent(name)}` })));
   }
 }
 
@@ -103,7 +92,6 @@ function openLightbox(image) {
   document.body.classList.add('lightbox-open');
   lightboxClose?.focus();
 }
-
 function closeLightbox() {
   if (!lightbox || !lightboxImage) return;
   lightbox.classList.remove('is-open');
@@ -111,25 +99,17 @@ function closeLightbox() {
   document.body.classList.remove('lightbox-open');
   lightboxImage.src = '';
 }
-
 archiveGrid?.addEventListener('click', (event) => {
   const image = event.target.closest?.('.archive-card img');
   if (image) openLightbox(image);
 });
-
 archiveGrid?.addEventListener('keydown', (event) => {
   const image = event.target.closest?.('.archive-card img');
   if (!image || !['Enter', ' '].includes(event.key)) return;
   event.preventDefault();
   openLightbox(image);
 });
-
 lightboxClose?.addEventListener('click', closeLightbox);
-lightbox?.addEventListener('click', (event) => {
-  if (event.target === lightbox) closeLightbox();
-});
-window.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') closeLightbox();
-});
-
+lightbox?.addEventListener('click', (event) => { if (event.target === lightbox) closeLightbox(); });
+window.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeLightbox(); });
 loadArchive();

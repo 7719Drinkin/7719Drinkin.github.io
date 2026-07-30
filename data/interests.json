@@ -1,0 +1,35 @@
+[
+  {
+    "id": "basketball",
+    "title": "Basketball",
+    "subtitle": "The game never stops.",
+    "description": "Legends, iconic frames and the moments that made the game larger than life.",
+    "route": "/basketball/",
+    "theme": "basketball",
+    "status": "published",
+    "number": "01",
+    "cover": "/assets/15942445778634938029.JPG"
+  },
+  {
+    "id": "games",
+    "title": "Games",
+    "subtitle": "Worlds built one decision at a time.",
+    "description": "Strategy, civilization building and memorable virtual worlds.",
+    "route": "/games/",
+    "theme": "games",
+    "status": "preview",
+    "number": "02",
+    "cover": null
+  },
+  {
+    "id": "music",
+    "title": "Music",
+    "subtitle": "Soundtracks for different versions of me.",
+    "description": "Artists, albums and songs collected over time.",
+    "route": "/music/",
+    "theme": "music",
+    "status": "preview",
+    "number": "03",
+    "cover": null
+  }
+]

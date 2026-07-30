@@ -3,145 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="A personal basketball tribute page.">
-  <title>23 · Basketball Tribute</title>
+  <meta name="description" content="7719 Universe — a personal collection of basketball, movies, games, music and the interests that shaped me.">
+  <title>7719 Universe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260730-4">
-  <link rel="stylesheet" href="gallery-fit.css?v=20260730-2">
-  <link rel="stylesheet" href="archive-entry.css?v=20260730-1">
+  <link rel="stylesheet" href="/css/universe.css?v=20260730-1">
 </head>
 <body>
-  <div class="grain" aria-hidden="true"></div>
-  <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="universe-noise" aria-hidden="true"></div>
 
-  <header class="site-header">
-    <a class="brand" href="#top" aria-label="返回顶部">23</a>
-    <nav aria-label="页面导航">
-      <a href="#legacy">LEGACY</a>
-      <a href="#moments">WALL</a>
-      <a href="#film">FILM</a>
-      <a href="archive.html">ALL PHOTOS</a>
+  <header class="universe-header">
+    <a class="universe-brand" href="/" aria-label="7719 Universe 首页">7719</a>
+    <nav class="universe-nav" aria-label="主导航">
+      <a href="#interests">INTERESTS</a>
+      <a href="#featured">FEATURED</a>
+      <a href="#about">ABOUT</a>
+      <a href="https://github.com/7719Drinkin">GITHUB</a>
     </nav>
   </header>
 
-  <main id="top">
-    <section class="hero">
-      <div class="hero-backdrop" aria-hidden="true"></div>
-      <img
-        class="hero-image"
-        src="assets/15815936170156050909.GIF"
-        alt="Michael Jordan basketball tribute animation"
-        fetchpriority="high"
-      >
-      <div class="hero-overlay"></div>
-      <div class="hero-copy reveal">
-        <p class="eyebrow">A PERSONAL BASKETBALL TRIBUTE</p>
-        <h1><span>THE</span><strong>LEGACY</strong></h1>
-        <p class="hero-line">FOCUS · DISCIPLINE · GREATNESS</p>
-        <a class="scroll-cue" href="#legacy">ENTER THE COURT <span>↓</span></a>
+  <main>
+    <section class="universe-hero" id="top">
+      <div class="universe-hero-number" aria-hidden="true">7719</div>
+      <div class="universe-hero-copy reveal">
+        <p class="eyebrow">A PERSONAL DIGITAL UNIVERSE</p>
+        <h1><span>MY</span><strong>UNIVERSE</strong></h1>
+        <p class="universe-tagline">The people, stories, worlds and sounds that stayed with me.</p>
+        <a class="universe-scroll" href="#interests">CHOOSE A WORLD <span>↓</span></a>
       </div>
-      <div class="hero-number" aria-hidden="true">23</div>
     </section>
 
-    <section id="legacy" class="legacy section-shell">
+    <section id="interests" class="universe-section">
       <div class="section-heading reveal">
-        <p>01 / LEGACY</p>
-        <h2>MORE THAN<br>A GAME.</h2>
-      </div>
-
-      <div class="legacy-grid">
-        <img
-          class="portrait-image reveal"
-          src="assets/moment-02.jpg"
-          alt="Michael Jordan tribute portrait"
-          loading="lazy"
-        >
-
-        <div class="legacy-copy reveal">
-          <div class="red-rule"></div>
-          <p class="display-copy">THE GAME.<br>THE FOCUS.<br>THE LEGACY.</p>
-          <p class="small-copy">Inspired by the player who made every moment feel larger than the game.</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="moments" class="moments section-shell section-shell--wide">
-      <div class="section-heading horizontal reveal">
         <div>
-          <p>02 / CURATED WALL</p>
-          <h2>ICONIC<br>FRAMES.</h2>
+          <p>01 / INTERESTS</p>
+          <h2>ENTER A<br>WORLD.</h2>
         </div>
-        <span>16 CURATED FRAMES</span>
+        <span>Each interest is an independent collection with its own visual language, archive and room to grow.</span>
       </div>
 
-      <div id="gallery-wall" class="gallery-wall">
-        <article class="gallery-card gallery-card--feature"><img src="assets/15942445778634938029.JPG" alt="Michael Jordan tribute image 01" loading="eager"><div class="card-label"><span>01</span><strong>AIR</strong></div></article>
-        <article class="gallery-card gallery-card--tall"><img src="assets/17882157698450135981.JPG" alt="Michael Jordan tribute image 02" loading="eager"><div class="card-label"><span>02</span><strong>FLIGHT</strong></div></article>
-        <article class="gallery-card"><img src="assets/10196131834617797520.JPG" alt="Michael Jordan tribute image 03" loading="eager"><div class="card-label"><span>03</span><strong>FOCUS</strong></div></article>
-        <article class="gallery-card gallery-card--wide"><img src="assets/10488980165229573680.JPG" alt="Michael Jordan tribute image 04" loading="eager"><div class="card-label"><span>04</span><strong>CLUTCH</strong></div></article>
-        <article class="gallery-card"><img src="assets/11646838632284565940.JPG" alt="Michael Jordan tribute image 05" loading="eager"><div class="card-label"><span>05</span><strong>DRIVE</strong></div></article>
-        <article class="gallery-card gallery-card--tall"><img src="assets/11775843438435290282.JPG" alt="Michael Jordan tribute image 06" loading="eager"><div class="card-label"><span>06</span><strong>RISE</strong></div></article>
-        <article class="gallery-card gallery-card--feature"><img src="assets/12114021349949282200.JPG" alt="Michael Jordan tribute image 07" loading="lazy"><div class="card-label"><span>07</span><strong>LEGACY</strong></div></article>
-        <article class="gallery-card gallery-card--wide"><img src="assets/12847381581561420996.JPG" alt="Michael Jordan tribute image 08" loading="lazy"><div class="card-label"><span>08</span><strong>COURT</strong></div></article>
-        <article class="gallery-card"><img src="assets/13448986505012058779.JPG" alt="Michael Jordan tribute image 09" loading="lazy"><div class="card-label"><span>09</span><strong>POWER</strong></div></article>
-        <article class="gallery-card gallery-card--tall"><img src="assets/14460113893979216777.JPG" alt="Michael Jordan tribute image 10" loading="lazy"><div class="card-label"><span>10</span><strong>CRAFT</strong></div></article>
-        <article class="gallery-card"><img src="assets/15842363397869260745.JPG" alt="Michael Jordan tribute image 11" loading="lazy"><div class="card-label"><span>11</span><strong>FIRE</strong></div></article>
-        <article class="gallery-card gallery-card--wide"><img src="assets/16706842144915762594.JPG" alt="Michael Jordan tribute image 12" loading="lazy"><div class="card-label"><span>12</span><strong>23</strong></div></article>
-        <article class="gallery-card gallery-card--tall"><img src="assets/1772568631635563604.JPG" alt="Michael Jordan tribute image 13" loading="lazy"><div class="card-label"><span>13</span><strong>MOMENT</strong></div></article>
-        <article class="gallery-card gallery-card--feature"><img src="assets/18251605632468628377.JPG" alt="Michael Jordan tribute image 14" loading="lazy"><div class="card-label"><span>14</span><strong>GLORY</strong></div></article>
-        <article class="gallery-card"><img src="assets/3144560115330642069.JPG" alt="Michael Jordan tribute image 15" loading="lazy"><div class="card-label"><span>15</span><strong>ICON</strong></div></article>
-        <article class="gallery-card gallery-card--feature"><img src="assets/5389104262546023871.JPG" alt="Michael Jordan tribute image 16" loading="lazy"><div class="card-label"><span>16</span><strong>FOREVER</strong></div></article>
+      <div id="interest-grid" class="interest-grid" aria-live="polite">
+        <a class="interest-card reveal" data-theme="basketball" data-cover="true" href="/basketball/">
+          <div class="interest-card-bg" style="background-image:url('/assets/15942445778634938029.JPG')"></div>
+          <div class="interest-card-content">
+            <div class="interest-card-top"><span>01</span><span class="interest-card-status">OPEN</span></div>
+            <div><h3>Basketball</h3><p class="interest-card-subtitle">The game never stops.</p><span class="interest-card-enter">ENTER WORLD <strong>→</strong></span></div>
+          </div>
+        </a>
       </div>
-
-      <a class="archive-entry reveal" href="archive.html">
-        <span class="archive-entry-copy">
-          <small>THE COMPLETE COLLECTION</small>
-          <strong>VIEW ALL<br>MJ PHOTOS</strong>
-        </span>
-        <span class="archive-entry-arrow" aria-hidden="true">→</span>
-      </a>
     </section>
 
-    <section id="film" class="film section-shell">
+    <section id="featured" class="universe-section">
       <div class="section-heading reveal">
-        <p>03 / FILM</p>
-        <h2>WATCH THE<br>MOMENT.</h2>
+        <div>
+          <p>02 / FEATURED COLLECTION</p>
+          <h2>THE<br>LEGACY.</h2>
+        </div>
+        <span>The first complete collection in 7719 Universe.</span>
       </div>
 
-      <div class="video-frame reveal">
-        <iframe
-          src="https://www.youtube.com/embed/-5hWb6E0xHU"
-          title="Michael Jordan basketball tribute video"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerpolicy="strict-origin-when-cross-origin"
-          allowfullscreen>
-        </iframe>
-      </div>
+      <article class="featured-collection reveal">
+        <img src="/assets/15815936170156050909.GIF" alt="Michael Jordan basketball tribute animation">
+        <div class="featured-copy">
+          <p class="eyebrow">BASKETBALL / MICHAEL JORDAN</p>
+          <h3>23</h3>
+          <p>A visual tribute built around iconic frames, movement, focus and the legacy that made basketball feel larger than the game.</p>
+          <a class="primary-link" href="/basketball/michael-jordan/">VIEW COLLECTION <span>→</span></a>
+        </div>
+      </article>
     </section>
 
-    <section class="finale">
-      <div class="finale-lines" aria-hidden="true"></div>
-      <div class="finale-content reveal">
-        <span>23</span>
-        <p>INSPIRED BY GREATNESS.</p>
-        <a href="https://github.com/7719Drinkin">BACK TO GITHUB →</a>
+    <section id="about" class="universe-section about-block reveal">
+      <h2>WHY<br>THIS<br>PLACE?</h2>
+      <div class="about-copy">
+        <p>This is not a résumé and not a list of favorites. It is a growing digital museum for the people, works and experiences that shaped how I see the world.</p>
+        <p>New interests can be registered as independent modules, while shared navigation, themes, galleries and archives remain reusable across the whole site.</p>
       </div>
     </section>
   </main>
 
-  <footer>
-    <span>7719DRINKIN</span>
-    <span>PERSONAL TRIBUTE · 2026</span>
+  <footer class="universe-footer">
+    <span>7719 UNIVERSE</span>
+    <span>PERSONAL DIGITAL ARCHIVE · 2026</span>
   </footer>
 
-  <div class="lightbox" role="dialog" aria-modal="true" aria-label="图片预览" aria-hidden="true">
-    <button class="lightbox-close" type="button" aria-label="关闭图片预览">×</button>
-    <img class="lightbox-image" src="" alt="">
-  </div>
-
-  <script src="script.js?v=20260730-4"></script>
-  <script src="gallery-fit.js?v=20260730-2"></script>
+  <script src="/js/universe.js?v=20260730-1"></script>
 </body>
 </html>
