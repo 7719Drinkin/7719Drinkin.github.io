@@ -51,7 +51,7 @@ button { color: inherit; }
 .solar-nav,
 .system-intro p,
 .system-readout,
-.quality-button,
+.view-controls,
 .interaction-help,
 .planet-panel-meta,
 .planet-panel-link,
@@ -90,17 +90,33 @@ button { color: inherit; }
 .system-readout span { color: #697289; }
 .system-readout strong { color: #c9d1e2; font-weight: 500; }
 
-.quality-button {
+.view-controls {
   position: absolute;
-  top: 78px;
+  top: 205px;
   right: 44px;
   z-index: 11;
-  border: 1px solid rgba(147,169,217,.3);
-  background: rgba(7,10,20,.72);
-  padding: 9px 12px;
+  display: grid;
+  width: 168px;
+  border: 1px solid rgba(147,169,217,.24);
+  background: rgba(5, 8, 17, .7);
+  backdrop-filter: blur(8px);
   font-size: 8px;
+}
+.view-controls button {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border: 0;
+  border-bottom: 1px solid rgba(147,169,217,.16);
+  background: transparent;
+  padding: 9px 11px;
+  color: #717b91;
   cursor: pointer;
 }
+.view-controls button:last-child { border-bottom: 0; }
+.view-controls button:hover { color: #fff; background: rgba(126,151,205,.08); }
+.view-controls strong { color: #cbd4e7; font-weight: 500; }
+.view-controls button[aria-pressed='true'] strong { color: #91b7ff; }
 
 .planet-label {
   min-width: 110px;
@@ -159,7 +175,8 @@ button { color: inherit; }
   .system-intro strong { font-size: 10px; line-height: 1.6; }
   .system-readout { top: 70px; right: 18px; width: 140px; }
   .system-readout div:last-child { display: none; }
-  .quality-button { top: 128px; right: 18px; }
+  .view-controls { top: 142px; right: 18px; width: 142px; }
+  .view-controls button { padding: 8px 9px; }
   .planet-panel { right: 16px; bottom: 50px; width: calc(100vw - 32px); padding: 34px 26px 28px; }
   .planet-panel h2 { font-size: 48px; }
   .interaction-help { left: 18px; bottom: 18px; gap: 10px; }
