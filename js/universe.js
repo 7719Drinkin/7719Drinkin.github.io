@@ -1,5 +1,3 @@
-document.documentElement.classList.add('reveal-ready');
-
 const header = document.querySelector('.universe-header');
 const interestGrid = document.querySelector('#interest-grid');
 
@@ -7,18 +5,17 @@ const fallbackInterests = [
   {
     id: 'basketball', title: 'Basketball', subtitle: 'The game never stops.',
     description: 'Legends, iconic frames and the moments that made the game larger than life.',
-    route: '/basketball/', theme: 'basketball', status: 'published', number: '01',
-    cover: '/assets/15942445778634938029.JPG'
+    route: '/basketball/', theme: 'basketball', status: 'published', number: '01'
   },
   {
     id: 'games', title: 'Games', subtitle: 'Worlds built one decision at a time.',
     description: 'Strategy, civilization building and memorable virtual worlds.',
-    route: '/games/', theme: 'games', status: 'preview', number: '02', cover: null
+    route: '/games/', theme: 'games', status: 'preview', number: '02'
   },
   {
     id: 'music', title: 'Music', subtitle: 'Soundtracks for different versions of me.',
     description: 'Artists, albums and songs collected over time.',
-    route: '/music/', theme: 'music', status: 'preview', number: '03', cover: null
+    route: '/music/', theme: 'music', status: 'preview', number: '03'
   }
 ];
 
@@ -44,32 +41,30 @@ class InterestRegistry {
 const GalaxyFactory = {
   create(interest) {
     const link = document.createElement('a');
+    const isPublished = interest.status === 'published';
+
     link.className = 'interest-card reveal';
     link.href = interest.route;
     link.dataset.theme = interest.theme;
-    link.dataset.cover = String(Boolean(interest.cover));
     link.setAttribute('aria-label', `进入 ${interest.title} 星系`);
 
-    const backgroundStyle = interest.cover
-      ? `style="background-image:url('${interest.cover}')"`
-      : '';
-    const statusLabel = interest.status === 'published' ? 'EXPLORE' : 'FORMING';
-
     link.innerHTML = `
-      <div class="interest-card-bg" ${backgroundStyle}></div>
+      <div class="interest-card-visual" aria-hidden="true"></div>
       <div class="interest-card-content">
         <div class="interest-card-top">
           <span>GALAXY ${interest.number}</span>
-          <span class="interest-card-status">${statusLabel}</span>
+          <span class="interest-card-status">${isPublished ? 'EXPLORE' : 'FORMING'}</span>
         </div>
-        <div>
+        <div class="interest-card-copy">
+          <p class="interest-card-kicker">${isPublished ? 'ACTIVE' : 'DEVELOPING'} INTEREST SYSTEM</p>
           <h3>${interest.title}</h3>
           <p class="interest-card-subtitle">${interest.subtitle}</p>
           <p class="interest-card-description">${interest.description}</p>
-          <span class="interest-card-enter">ENTER GALAXY <strong>→</strong></span>
         </div>
+        <span class="interest-card-enter">ENTER GALAXY <strong>↗</strong></span>
       </div>
     `;
+
     return link;
   }
 };
@@ -80,6 +75,7 @@ function showReveal(item) {
 
 function observeReveals(scope = document) {
   const items = scope.querySelectorAll('.reveal:not([data-observed])');
+
   if (!('IntersectionObserver' in window)) {
     items.forEach(showReveal);
     return;
@@ -100,17 +96,32 @@ function observeReveals(scope = document) {
   });
 }
 
-async function renderInterests() {
+async function renderGalaxies() {
   if (!interestGrid) return;
+
   const registry = new InterestRegistry('/data/interests.json', fallbackInterests);
   const interests = await registry.getAll();
-  interestGrid.replaceChildren(...interests.map((interest) => GalaxyFactory.create(interest)));
+  const cards = interests.map((interest) => GalaxyFactory.create(interest));
+
+  interestGrid.replaceChildren(...cards);
   observeReveals(interestGrid);
+
+  const count = document.querySelector('.hero-readout div:first-child strong');
+  if (count) count.textContent = String(interests.length).padStart(2, '0');
 }
 
 window.addEventListener('scroll', () => {
   header?.classList.toggle('is-scrolled', window.scrollY > 22);
 });
 
-observeReveals();
-renderInterests();
+try {
+  document.documentElement.classList.add('reveal-ready');
+  observeReveals();
+  renderGalaxies().catch((error) => {
+    console.warn('Galaxy rendering failed; keeping static catalog.', error);
+    document.documentElement.classList.remove('reveal-ready');
+  });
+} catch (error) {
+  console.warn('Reveal enhancement unavailable:', error);
+  document.documentElement.classList.remove('reveal-ready');
+}
