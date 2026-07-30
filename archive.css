@@ -1,0 +1,191 @@
+:root {
+  --black: #050505;
+  --panel: #0d0d10;
+  --white: #f5f2ed;
+  --muted: #98979d;
+  --red: #d71920;
+  --line: rgba(255, 255, 255, 0.13);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  overflow-x: hidden;
+  color: var(--white);
+  background:
+    radial-gradient(circle at 80% 10%, rgba(215, 25, 32, 0.18), transparent 30%),
+    var(--black);
+  font-family: "Montserrat", sans-serif;
+}
+body.lightbox-open { overflow: hidden; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+
+.archive-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px clamp(22px, 5vw, 78px);
+  border-bottom: 1px solid var(--line);
+  background: rgba(5, 5, 5, 0.82);
+  backdrop-filter: blur(18px);
+}
+.archive-brand {
+  color: var(--red);
+  font-family: "Anton", sans-serif;
+  font-size: 34px;
+  line-height: 1;
+  text-decoration: none;
+}
+.archive-header nav { display: flex; gap: clamp(18px, 3vw, 38px); }
+.archive-header nav a {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-decoration: none;
+}
+
+.archive-hero {
+  width: min(1500px, calc(100% - 36px));
+  margin: 0 auto;
+  padding: 150px 0 80px;
+  border-bottom: 1px solid var(--line);
+}
+.eyebrow {
+  margin: 0 0 22px;
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+}
+.archive-hero h1 {
+  margin: 0;
+  font-family: "Anton", sans-serif;
+  font-size: clamp(92px, 19vw, 310px);
+  font-weight: 400;
+  line-height: 0.74;
+  letter-spacing: -0.035em;
+}
+.archive-hero h1 span {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.38);
+}
+.archive-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 56px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.archive-section {
+  width: min(1500px, calc(100% - 28px));
+  margin: 0 auto;
+  padding: 70px 0 120px;
+}
+.archive-status {
+  padding: 40px 0;
+  color: var(--muted);
+  text-align: center;
+  letter-spacing: 0.12em;
+}
+.archive-grid {
+  columns: 4 270px;
+  column-gap: 14px;
+}
+.archive-card {
+  position: relative;
+  margin: 0 0 14px;
+  break-inside: avoid;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--panel);
+}
+.archive-card img {
+  width: 100%;
+  height: auto;
+  cursor: zoom-in;
+  transition: transform 0.45s ease, filter 0.45s ease;
+}
+.archive-card:hover img {
+  transform: scale(1.012);
+  filter: contrast(1.04) saturate(1.04);
+}
+.archive-card-index {
+  position: absolute;
+  right: 10px;
+  bottom: 9px;
+  padding: 4px 7px;
+  color: var(--white);
+  background: rgba(0, 0, 0, 0.66);
+  font-family: "Anton", sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+}
+
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 30px clamp(22px, 5vw, 78px);
+  border-top: 1px solid var(--line);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+footer a { text-decoration: none; }
+
+.archive-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 5vw, 70px);
+  visibility: hidden;
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.94);
+  backdrop-filter: blur(18px);
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+.archive-lightbox.is-open { visibility: visible; opacity: 1; }
+.archive-lightbox-image {
+  width: auto;
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+}
+.archive-lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 26px;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 50%;
+  color: white;
+  background: rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  font-size: 30px;
+}
+
+@media (max-width: 720px) {
+  .archive-header nav { gap: 14px; }
+  .archive-header nav a { font-size: 8px; letter-spacing: 0.12em; }
+  .archive-hero { padding-top: 125px; }
+  .archive-grid { columns: 2 150px; column-gap: 8px; }
+  .archive-card { margin-bottom: 8px; }
+  footer { align-items: flex-start; flex-direction: column; }
+}
