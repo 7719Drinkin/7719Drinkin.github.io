@@ -10,6 +10,8 @@ export default function App() {
     const coarse = window.matchMedia('(max-width: 760px), (pointer: coarse)').matches;
     return coarse ? 'eco' : 'quality';
   });
+  const [showOrbits, setShowOrbits] = useState(true);
+  const [showEcliptic, setShowEcliptic] = useState(true);
   const planetRefs = useRef(new Map());
 
   const registerPlanet = useCallback((id, ref) => {
@@ -29,20 +31,26 @@ export default function App() {
         selectedId={selectedId}
         onSelect={setSelectedId}
         quality={quality}
+        showOrbits={showOrbits}
+        showEcliptic={showEcliptic}
         planetRefs={planetRefs}
         registerPlanet={registerPlanet}
       />
 
       <Hud
         quality={quality}
+        showOrbits={showOrbits}
+        showEcliptic={showEcliptic}
         onToggleQuality={() => setQuality((value) => value === 'quality' ? 'eco' : 'quality')}
+        onToggleOrbits={() => setShowOrbits((value) => !value)}
+        onToggleEcliptic={() => setShowEcliptic((value) => !value)}
         onReset={() => setSelectedId(null)}
       />
 
       <PlanetPanel interest={selected} onClose={() => setSelectedId(null)} />
 
       <div className="interaction-help" aria-hidden="true">
-        <span><strong>DRAG</strong> ROTATE</span>
+        <span><strong>DRAG</strong> FREE ROTATE</span>
         <span><strong>SCROLL</strong> ZOOM</span>
         <span><strong>CLICK</strong> EXPLORE</span>
         <span><strong>DOUBLE CLICK</strong> ENTER</span>
