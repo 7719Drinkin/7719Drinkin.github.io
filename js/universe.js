@@ -41,31 +41,32 @@ class InterestRegistry {
   }
 }
 
-const InterestCardFactory = {
+const GalaxyFactory = {
   create(interest) {
     const link = document.createElement('a');
     link.className = 'interest-card reveal';
     link.href = interest.route;
     link.dataset.theme = interest.theme;
     link.dataset.cover = String(Boolean(interest.cover));
+    link.setAttribute('aria-label', `进入 ${interest.title} 星系`);
 
     const backgroundStyle = interest.cover
       ? `style="background-image:url('${interest.cover}')"`
       : '';
-    const statusLabel = interest.status === 'published' ? 'OPEN' : 'PREVIEW';
+    const statusLabel = interest.status === 'published' ? 'EXPLORE' : 'FORMING';
 
     link.innerHTML = `
       <div class="interest-card-bg" ${backgroundStyle}></div>
       <div class="interest-card-content">
         <div class="interest-card-top">
-          <span>${interest.number}</span>
+          <span>GALAXY ${interest.number}</span>
           <span class="interest-card-status">${statusLabel}</span>
         </div>
         <div>
           <h3>${interest.title}</h3>
           <p class="interest-card-subtitle">${interest.subtitle}</p>
           <p class="interest-card-description">${interest.description}</p>
-          <span class="interest-card-enter">ENTER WORLD <strong>→</strong></span>
+          <span class="interest-card-enter">ENTER GALAXY <strong>→</strong></span>
         </div>
       </div>
     `;
@@ -103,7 +104,7 @@ async function renderInterests() {
   if (!interestGrid) return;
   const registry = new InterestRegistry('/data/interests.json', fallbackInterests);
   const interests = await registry.getAll();
-  interestGrid.replaceChildren(...interests.map((interest) => InterestCardFactory.create(interest)));
+  interestGrid.replaceChildren(...interests.map((interest) => GalaxyFactory.create(interest)));
   observeReveals(interestGrid);
 }
 
