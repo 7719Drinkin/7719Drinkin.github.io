@@ -11,17 +11,6 @@
     "cover": "/assets/15942445778634938029.JPG"
   },
   {
-    "id": "movies",
-    "title": "Movies",
-    "subtitle": "Stories that stayed with me.",
-    "description": "Films, directors, posters and scenes worth returning to.",
-    "route": "/movies/",
-    "theme": "movies",
-    "status": "preview",
-    "number": "02",
-    "cover": null
-  },
-  {
     "id": "games",
     "title": "Games",
     "subtitle": "Worlds built one decision at a time.",
@@ -29,7 +18,7 @@
     "route": "/games/",
     "theme": "games",
     "status": "preview",
-    "number": "03",
+    "number": "02",
     "cover": null
   },
   {
@@ -40,7 +29,7 @@
     "route": "/music/",
     "theme": "music",
     "status": "preview",
-    "number": "04",
+    "number": "03",
     "cover": null
   }
 ]
