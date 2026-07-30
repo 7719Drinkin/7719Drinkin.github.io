@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: process.env.VITE_SOURCEMAP === 'true',
     target: 'es2022'
   }
 });
