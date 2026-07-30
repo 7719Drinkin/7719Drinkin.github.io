@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="7719 Universe — a growing personal universe where every interest becomes an independent galaxy.">
+  <meta name="description" content="7719 Universe — an expanding personal universe where every interest becomes an independent galaxy.">
   <title>7719 Universe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/universe.css?v=20260730-3">
-  <link rel="stylesheet" href="/css/universe-home.css?v=20260730-3">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@500;600;700;800;900&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/universe.css?v=20260730-5">
+  <link rel="stylesheet" href="/css/universe-home.css?v=20260730-5">
 </head>
 <body class="theme-universe universe-home">
   <div class="universe-noise" aria-hidden="true"></div>
@@ -17,7 +17,7 @@
   <header class="universe-header">
     <a class="universe-brand" href="/" aria-label="7719 Universe 首页">7719</a>
     <nav class="universe-nav" aria-label="主导航">
-      <a href="#interests">GALAXIES</a>
+      <a href="#galaxies">GALAXIES</a>
       <a href="#featured">FEATURED</a>
       <a href="#about">ABOUT</a>
       <a href="https://github.com/7719Drinkin">GITHUB</a>
@@ -26,61 +26,70 @@
 
   <main>
     <section class="universe-hero" id="top">
-      <div class="universe-hero-number" aria-hidden="true">7719</div>
+      <div class="deep-field" aria-hidden="true"></div>
       <div class="universe-hero-copy reveal">
-        <p class="eyebrow">A PERSONAL EXPANDING UNIVERSE</p>
-        <h1><span>MY</span><strong>UNIVERSE</strong></h1>
-        <p class="universe-tagline">No center. No fixed boundary. Every interest becomes an independent galaxy, and new galaxies can always appear.</p>
-        <a class="universe-scroll" href="#interests">EXPLORE THE GALAXIES <span>↓</span></a>
+        <p class="eyebrow">FIELD NOTE 7719 / OPEN CATALOG</p>
+        <h1><span>PERSONAL</span><strong>UNIVERSE</strong></h1>
+        <p class="universe-tagline">No center. No fixed boundary. Every interest occupies its own region of space, and the catalog remains open to galaxies that have not formed yet.</p>
+        <a class="universe-scroll" href="#galaxies">EXPLORE THE CATALOG <span>↓</span></a>
       </div>
+
+      <aside class="hero-readout" aria-label="Universe catalog status">
+        <div><span>ACTIVE GALAXIES</span><strong>03</strong></div>
+        <div><span>CATALOG STATUS</span><strong>EXPANDING</strong></div>
+        <div><span>BOUNDARY</span><strong>OPEN</strong></div>
+      </aside>
     </section>
 
-    <section id="interests" class="universe-section">
+    <section id="galaxies" class="universe-section galaxy-catalog">
       <div class="section-heading reveal">
         <div>
-          <p>01 / INTEREST GALAXIES</p>
-          <h2>OPEN<br>SPACE.</h2>
+          <p>01 / DEEP FIELD CATALOG</p>
+          <h2>INDEPENDENT<br>GALAXIES.</h2>
         </div>
-        <span>These galaxies do not orbit a center. Each one exists independently and leaves room for interests that have not appeared yet.</span>
+        <span>Each entry is a separate interest system. There is no central subject and no permanent final list.</span>
       </div>
 
       <div id="interest-grid" class="interest-grid" aria-live="polite">
-        <a class="interest-card reveal" data-theme="basketball" data-cover="true" href="/basketball/" aria-label="进入 Basketball 星系">
-          <div class="interest-card-bg" style="background-image:url('/assets/15942445778634938029.JPG')"></div>
+        <a class="interest-card reveal" data-theme="basketball" href="/basketball/" aria-label="进入 Basketball 星系">
+          <div class="interest-card-visual" aria-hidden="true"></div>
           <div class="interest-card-content">
             <div class="interest-card-top"><span>GALAXY 01</span><span class="interest-card-status">EXPLORE</span></div>
-            <div>
+            <div class="interest-card-copy">
+              <p class="interest-card-kicker">ACTIVE INTEREST SYSTEM</p>
               <h3>Basketball</h3>
               <p class="interest-card-subtitle">The game never stops.</p>
               <p class="interest-card-description">Legends, iconic frames and the moments that made the game larger than life.</p>
-              <span class="interest-card-enter">ENTER GALAXY <strong>→</strong></span>
             </div>
+            <span class="interest-card-enter">ENTER GALAXY <strong>↗</strong></span>
           </div>
         </a>
 
-        <a class="interest-card reveal" data-theme="games" data-cover="false" href="/games/" aria-label="进入 Games 星系">
-          <div class="interest-card-bg"></div>
+        <a class="interest-card reveal" data-theme="games" href="/games/" aria-label="进入 Games 星系">
+          <div class="interest-card-visual" aria-hidden="true"></div>
           <div class="interest-card-content">
             <div class="interest-card-top"><span>GALAXY 02</span><span class="interest-card-status">FORMING</span></div>
-            <div>
+            <div class="interest-card-copy">
+              <p class="interest-card-kicker">DEVELOPING INTEREST SYSTEM</p>
               <h3>Games</h3>
               <p class="interest-card-subtitle">Worlds built one decision at a time.</p>
               <p class="interest-card-description">Strategy, civilization building and memorable virtual worlds.</p>
-              <span class="interest-card-enter">ENTER GALAXY <strong>→</strong></span>
             </div>
+            <span class="interest-card-enter">ENTER GALAXY <strong>↗</strong></span>
           </div>
         </a>
 
-        <a class="interest-card reveal" data-theme="music" data-cover="false" href="/music/" aria-label="进入 Music 星系">
-          <div class="interest-card-bg"></div>
+        <a class="interest-card reveal" data-theme="music" href="/music/" aria-label="进入 Music 星系">
+          <div class="interest-card-visual" aria-hidden="true"></div>
           <div class="interest-card-content">
             <div class="interest-card-top"><span>GALAXY 03</span><span class="interest-card-status">FORMING</span></div>
-            <div>
+            <div class="interest-card-copy">
+              <p class="interest-card-kicker">DEVELOPING INTEREST SYSTEM</p>
               <h3>Music</h3>
               <p class="interest-card-subtitle">Soundtracks for different versions of me.</p>
               <p class="interest-card-description">Artists, albums and songs collected over time.</p>
-              <span class="interest-card-enter">ENTER GALAXY <strong>→</strong></span>
             </div>
+            <span class="interest-card-enter">ENTER GALAXY <strong>↗</strong></span>
           </div>
         </a>
       </div>
@@ -96,21 +105,27 @@
       </div>
 
       <article class="featured-collection reveal">
-        <img src="/assets/15815936170156050909.GIF" alt="Michael Jordan basketball tribute animation">
         <div class="featured-copy">
           <p class="eyebrow">BASKETBALL / MICHAEL JORDAN</p>
           <h3>23</h3>
           <p>A visual tribute built around iconic frames, movement, focus and the legacy that made basketball feel larger than the game.</p>
-          <a class="primary-link" href="/basketball/michael-jordan/">VIEW COLLECTION <span>→</span></a>
+          <a class="primary-link" href="/basketball/michael-jordan/">VIEW COLLECTION <span>↗</span></a>
         </div>
+        <figure class="featured-media">
+          <img src="/assets/15815936170156050909.GIF" alt="Michael Jordan basketball tribute animation">
+          <figcaption>COLLECTION 01 · MOVING IMAGE ARCHIVE</figcaption>
+        </figure>
       </article>
     </section>
 
     <section id="about" class="universe-section about-block reveal">
-      <h2>STILL<br>EXPANDING.</h2>
+      <div>
+        <p class="eyebrow">03 / SYSTEM PRINCIPLE</p>
+        <h2>STILL<br>EXPANDING.</h2>
+      </div>
       <div class="about-copy">
-        <p>This site is not a fixed list of favorites. It is an expanding personal universe: every interest can grow into its own galaxy, collections can form inside it, and new interests can appear without displacing the old ones.</p>
-        <p>There is no central interest and no final boundary. Basketball is simply the first galaxy with a complete collection.</p>
+        <p>This site is not a fixed list of favorites. Every interest can become an independent galaxy, each galaxy can contain multiple collections, and new systems can be registered without displacing the existing ones.</p>
+        <p>Basketball is simply the first developed galaxy. It is not the center of the universe.</p>
       </div>
     </section>
   </main>
@@ -120,6 +135,6 @@
     <span>NO CENTER · NO FINAL BOUNDARY · 2026</span>
   </footer>
 
-  <script src="/js/universe.js?v=20260730-4"></script>
+  <script src="/js/universe.js?v=20260730-5"></script>
 </body>
 </html>
