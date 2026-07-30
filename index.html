@@ -18,7 +18,7 @@
     <a class="brand" href="#top" aria-label="返回顶部">23</a>
     <nav aria-label="页面导航">
       <a href="#legacy">LEGACY</a>
-      <a href="#moments">MOMENTS</a>
+      <a href="#moments">WALL</a>
       <a href="#film">FILM</a>
     </nav>
   </header>
@@ -73,37 +73,81 @@
       </div>
     </section>
 
-    <section id="moments" class="moments section-shell">
+    <section id="moments" class="moments section-shell section-shell--wide">
       <div class="section-heading horizontal reveal">
         <div>
-          <p>02 / MOMENTS</p>
+          <p>02 / IMAGE WALL</p>
           <h2>ICONIC<br>FRAMES.</h2>
         </div>
-        <span>YOUR GALLERY</span>
+        <span>14 SLOTS · ADD MORE ANYTIME</span>
       </div>
 
-      <div class="gallery">
-        <article class="gallery-card gallery-card--wide reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 01</span></div>
+      <div class="gallery-wall">
+        <article class="gallery-card gallery-card--feature reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 01</span><small>moment-01</small></div>
           <div class="card-label"><span>01</span><strong>AIR</strong></div>
         </article>
-        <article class="gallery-card reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 02</span></div>
-          <div class="card-label"><span>02</span><strong>FOCUS</strong></div>
+        <article class="gallery-card gallery-card--tall reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 02</span><small>moment-02</small></div>
+          <div class="card-label"><span>02</span><strong>FLIGHT</strong></div>
         </article>
         <article class="gallery-card reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 03</span></div>
-          <div class="card-label"><span>03</span><strong>CLUTCH</strong></div>
+          <div class="media-slot placeholder"><span>IMAGE / GIF 03</span><small>moment-03</small></div>
+          <div class="card-label"><span>03</span><strong>FOCUS</strong></div>
         </article>
         <article class="gallery-card gallery-card--wide reveal">
-          <div class="media-slot placeholder"><span>IMAGE / GIF 04</span></div>
-          <div class="card-label"><span>04</span><strong>LEGACY</strong></div>
+          <div class="media-slot placeholder"><span>IMAGE / GIF 04</span><small>moment-04</small></div>
+          <div class="card-label"><span>04</span><strong>CLUTCH</strong></div>
+        </article>
+        <article class="gallery-card reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 05</span><small>moment-05</small></div>
+          <div class="card-label"><span>05</span><strong>DRIVE</strong></div>
+        </article>
+        <article class="gallery-card gallery-card--tall reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 06</span><small>moment-06</small></div>
+          <div class="card-label"><span>06</span><strong>RISE</strong></div>
+        </article>
+        <article class="gallery-card gallery-card--feature reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 07</span><small>moment-07</small></div>
+          <div class="card-label"><span>07</span><strong>LEGACY</strong></div>
+        </article>
+        <article class="gallery-card gallery-card--wide reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 08</span><small>moment-08</small></div>
+          <div class="card-label"><span>08</span><strong>COURT</strong></div>
+        </article>
+        <article class="gallery-card reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 09</span><small>moment-09</small></div>
+          <div class="card-label"><span>09</span><strong>HEART</strong></div>
+        </article>
+        <article class="gallery-card gallery-card--tall reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 10</span><small>moment-10</small></div>
+          <div class="card-label"><span>10</span><strong>POWER</strong></div>
+        </article>
+        <article class="gallery-card reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 11</span><small>moment-11</small></div>
+          <div class="card-label"><span>11</span><strong>CRAFT</strong></div>
+        </article>
+        <article class="gallery-card gallery-card--wide reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 12</span><small>moment-12</small></div>
+          <div class="card-label"><span>12</span><strong>FIRE</strong></div>
+        </article>
+        <article class="gallery-card gallery-card--tall reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 13</span><small>moment-13</small></div>
+          <div class="card-label"><span>13</span><strong>ICON</strong></div>
+        </article>
+        <article class="gallery-card gallery-card--feature reveal">
+          <div class="media-slot placeholder"><span>IMAGE / GIF 14</span><small>moment-14</small></div>
+          <div class="card-label"><span>14</span><strong>23</strong></div>
         </article>
       </div>
 
       <!--
-      添加图片时，把对应 .media-slot 替换为：
-      <img src="assets/moment-01.gif" alt="Basketball moment 01">
+      添加图片时，把对应的 .media-slot 替换为下面的 img。
+      图片与 GIF 都可使用；真实素材会自动支持点击全屏预览：
+
+      <img src="assets/moment-01.jpg" alt="Basketball moment 01" loading="lazy">
+
+      需要更多素材位时，复制任意一个 gallery-card article 即可。
       -->
     </section>
 
@@ -149,6 +193,11 @@
     <span>7719DRINKIN</span>
     <span>PERSONAL TRIBUTE · 2026</span>
   </footer>
+
+  <div class="lightbox" role="dialog" aria-modal="true" aria-label="图片预览" aria-hidden="true">
+    <button class="lightbox-close" type="button" aria-label="关闭图片预览">×</button>
+    <img class="lightbox-image" src="" alt="">
+  </div>
 
   <script src="script.js"></script>
 </body>
