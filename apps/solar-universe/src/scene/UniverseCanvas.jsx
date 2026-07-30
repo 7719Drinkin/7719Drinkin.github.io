@@ -1,33 +1,117 @@
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Stars } from '@react-three/drei';
+import { Stars, TrackballControls } from '@react-three/drei';
 import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import PlanetSystem from './PlanetSystem.jsx';
 
 const SYSTEM_CAMERA = new THREE.Vector3(0, 13, 29);
 
+function createSunGlowTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const context = canvas.getContext('2d');
+  const gradient = context.createRadialGradient(256, 256, 20, 256, 256, 256);
+  gradient.addColorStop(0, 'rgba(255,248,205,1)');
+  gradient.addColorStop(0.12, 'rgba(255,194,82,.88)');
+  gradient.addColorStop(0.32, 'rgba(255,103,24,.34)');
+  gradient.addColorStop(0.62, 'rgba(255,61,8,.09)');
+  gradient.addColorStop(1, 'rgba(255,40,0,0)');
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, 512, 512);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
 function Sun() {
   const material = useRef();
-  useFrame(({ clock }) => {
-    if (material.current) {
-      material.current.emissiveIntensity = 2.8 + Math.sin(clock.elapsedTime * 0.45) * 0.18;
+  const shell = useRef();
+  const glowTexture = useMemo(createSunGlowTexture, []);
+  const uniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
+
+  useFrame(({ clock }, delta) => {
+    if (material.current) material.current.uniforms.uTime.value = clock.elapsedTime;
+    if (shell.current) {
+      shell.current.rotation.y += delta * 0.035;
+      shell.current.rotation.x -= delta * 0.012;
+      const pulse = 1 + Math.sin(clock.elapsedTime * 0.42) * 0.018;
+      shell.current.scale.setScalar(pulse);
     }
   });
 
   return (
     <group>
+      <sprite scale={[4.5, 4.5, 1]} renderOrder={-1}>
+        <spriteMaterial
+          map={glowTexture}
+          color="#ff8a27"
+          transparent
+          opacity={0.9}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </sprite>
+
       <mesh>
-        <sphereGeometry args={[1.02, 72, 48]} />
-        <meshStandardMaterial
+        <icosahedronGeometry args={[0.9, 5]} />
+        <shaderMaterial
           ref={material}
-          color="#ff7a19"
-          emissive="#ff3d00"
-          emissiveIntensity={2.8}
-          roughness={0.62}
+          uniforms={uniforms}
+          vertexShader={`
+            uniform float uTime;
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+            varying vec3 vView;
+            void main() {
+              float waveA = sin(position.x * 8.0 + uTime * .42) * .012;
+              float waveB = sin(position.y * 13.0 - uTime * .31) * .008;
+              float waveC = sin(position.z * 17.0 + uTime * .23) * .006;
+              vec3 displaced = position + normal * (waveA + waveB + waveC);
+              vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
+              vNormal = normalize(normalMatrix * normal);
+              vPosition = normalize(position);
+              vView = -mvPosition.xyz;
+              gl_Position = projectionMatrix * mvPosition;
+            }
+          `}
+          fragmentShader={`
+            uniform float uTime;
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+            varying vec3 vView;
+            void main() {
+              float bandA = sin(vPosition.x * 12.0 + vPosition.y * 7.0 + uTime * .48);
+              float bandB = sin(vPosition.y * 18.0 - vPosition.z * 9.0 - uTime * .31);
+              float cells = sin((vPosition.x + vPosition.y + vPosition.z) * 25.0 + uTime * .22);
+              float heat = clamp(.55 + bandA * .18 + bandB * .14 + cells * .1, 0.0, 1.0);
+              vec3 deep = vec3(.72, .075, .006);
+              vec3 amber = vec3(1.0, .39, .035);
+              vec3 hot = vec3(1.0, .92, .55);
+              vec3 color = mix(deep, amber, smoothstep(.05, .72, heat));
+              color = mix(color, hot, smoothstep(.68, 1.0, heat));
+              float rim = pow(1.0 - max(dot(normalize(vNormal), normalize(vView)), 0.0), 2.2);
+              color += vec3(1.0, .22, .02) * rim * .34;
+              gl_FragColor = vec4(color, 1.0);
+            }
+          `}
         />
       </mesh>
-      <pointLight color="#ffb16e" intensity={125} distance={115} decay={1.7} />
+
+      <mesh ref={shell}>
+        <icosahedronGeometry args={[1.02, 3]} />
+        <meshBasicMaterial
+          color="#ff6c16"
+          transparent
+          opacity={0.13}
+          side={THREE.BackSide}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
+
+      <pointLight color="#ffb46d" intensity={168} distance={118} decay={1.8} />
     </group>
   );
 }
@@ -43,8 +127,29 @@ function OrbitLine({ radius, inclination, color }) {
 
   return (
     <lineLoop geometry={geometry} rotation-z={inclination}>
-      <lineBasicMaterial color={color} transparent opacity={0.1} depthWrite={false} />
+      <lineBasicMaterial color={color} transparent opacity={0.09} depthWrite={false} />
     </lineLoop>
+  );
+}
+
+function EclipticPlane() {
+  return (
+    <group rotation-x={-Math.PI / 2}>
+      <mesh>
+        <ringGeometry args={[1.35, 22.5, 160, 1]} />
+        <meshBasicMaterial
+          color="#6d7890"
+          transparent
+          opacity={0.022}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh>
+        <ringGeometry args={[22.44, 22.5, 160, 1]} />
+        <meshBasicMaterial color="#8391ad" transparent opacity={0.12} side={THREE.DoubleSide} depthWrite={false} />
+      </mesh>
+    </group>
   );
 }
 
@@ -124,32 +229,43 @@ function CameraController({ selectedId, planetRefs }) {
   });
 
   return (
-    <OrbitControls
+    <TrackballControls
       ref={controlsRef}
       makeDefault
-      enableDamping
-      dampingFactor={0.055}
-      enablePan={false}
-      minPolarAngle={0.12}
-      maxPolarAngle={Math.PI - 0.12}
+      noPan
+      rotateSpeed={2.15}
+      zoomSpeed={1.05}
+      staticMoving={false}
+      dynamicDampingFactor={0.12}
       onStart={() => { transition.current = null; }}
     />
   );
 }
 
-function Scene({ interests, selectedId, onSelect, planetRefs, registerPlanet, quality }) {
+function Scene({
+  interests,
+  selectedId,
+  onSelect,
+  planetRefs,
+  registerPlanet,
+  quality,
+  showOrbits,
+  showEcliptic
+}) {
   return (
     <>
       <color attach="background" args={['#000106']} />
       <fogExp2 attach="fog" args={['#000106', 0.0034]} />
 
-      <ambientLight color="#7889a4" intensity={0.34} />
-      <hemisphereLight args={['#b7d0f0', '#5a3828', 1.15]} />
-      <directionalLight position={[8, 12, 14]} color="#e2ecff" intensity={0.72} />
+      <ambientLight color="#718099" intensity={0.07} />
+      <hemisphereLight args={['#8fa4c2', '#25170f', 0.38]} />
+      <directionalLight position={[9, 11, 16]} color="#cbd8ed" intensity={0.18} />
       <Sun />
       <Stars radius={170} depth={95} count={quality === 'quality' ? 7200 : 1900} factor={4} saturation={0.12} fade speed={0.12} />
 
-      {interests.map((interest) => (
+      {showEcliptic && <EclipticPlane />}
+
+      {showOrbits && interests.map((interest) => (
         <OrbitLine
           key={`orbit-${interest.id}`}
           radius={interest.orbitRadius}
@@ -173,8 +289,8 @@ function Scene({ interests, selectedId, onSelect, planetRefs, registerPlanet, qu
 
       {quality === 'quality' && (
         <EffectComposer multisampling={4}>
-          <Bloom luminanceThreshold={0.95} luminanceSmoothing={0.6} intensity={0.7} mipmapBlur />
-          <Vignette offset={0.28} darkness={0.72} />
+          <Bloom luminanceThreshold={1.02} luminanceSmoothing={0.55} intensity={0.58} mipmapBlur />
+          <Vignette offset={0.3} darkness={0.56} />
         </EffectComposer>
       )}
     </>
@@ -192,7 +308,7 @@ export default function UniverseCanvas(props) {
       onCreated={({ gl }) => {
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = props.quality === 'quality' ? 1.34 : 1.16;
+        gl.toneMappingExposure = props.quality === 'quality' ? 1.2 : 1.06;
       }}
       onPointerMissed={(event) => {
         if (event.type === 'click') props.onSelect(null);
