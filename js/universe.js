@@ -9,19 +9,14 @@ const fallbackInterests = [
     cover: '/assets/15942445778634938029.JPG'
   },
   {
-    id: 'movies', title: 'Movies', subtitle: 'Stories that stayed with me.',
-    description: 'Films, directors, posters and scenes worth returning to.',
-    route: '/movies/', theme: 'movies', status: 'preview', number: '02', cover: null
-  },
-  {
     id: 'games', title: 'Games', subtitle: 'Worlds built one decision at a time.',
     description: 'Strategy, civilization building and memorable virtual worlds.',
-    route: '/games/', theme: 'games', status: 'preview', number: '03', cover: null
+    route: '/games/', theme: 'games', status: 'preview', number: '02', cover: null
   },
   {
     id: 'music', title: 'Music', subtitle: 'Soundtracks for different versions of me.',
     description: 'Artists, albums and songs collected over time.',
-    route: '/music/', theme: 'music', status: 'preview', number: '04', cover: null
+    route: '/music/', theme: 'music', status: 'preview', number: '03', cover: null
   }
 ];
 
@@ -76,21 +71,25 @@ const InterestCardFactory = {
   }
 };
 
+function showReveal(item) {
+  item.classList.add('visible', 'is-visible');
+}
+
 function observeReveals(scope = document) {
   const items = scope.querySelectorAll('.reveal:not([data-observed])');
   if (!('IntersectionObserver' in window)) {
-    items.forEach((item) => item.classList.add('is-visible'));
+    items.forEach(showReveal);
     return;
   }
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
+        showReveal(entry.target);
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.12, rootMargin: '0px 0px -35px 0px' });
+  }, { threshold: 0.08, rootMargin: '0px 0px -18px 0px' });
 
   items.forEach((item) => {
     item.dataset.observed = 'true';
