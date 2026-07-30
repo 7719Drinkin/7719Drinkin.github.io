@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -44,10 +44,8 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             echo "VITE_BASE_PATH=/preview/solar-universe/" >> "$GITHUB_ENV"
-            echo "DEPLOY_SUBDIR=preview/solar-universe" >> "$GITHUB_ENV"
           else
             echo "VITE_BASE_PATH=/solar-universe/" >> "$GITHUB_ENV"
-            echo "DEPLOY_SUBDIR=solar-universe" >> "$GITHUB_ENV"
           fi
 
       - name: Install 3D app dependencies
@@ -58,38 +56,26 @@ jobs:
         working-directory: apps/solar-universe
         run: npm run build
 
-      - name: Assemble complete static site
+      - name: Publish pull request preview
+        if: github.event_name == 'pull_request'
         shell: bash
         run: |
-          rm -rf _site
-          mkdir -p _site
+          rm -rf main-site/preview/solar-universe
+          mkdir -p main-site/preview/solar-universe
+          cp -a apps/solar-universe/dist/. main-site/preview/solar-universe/
 
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            rsync -a main-site/ _site/ \
-              --exclude '.git' \
-              --exclude '.github' \
-              --exclude 'apps'
-          else
-            rsync -a ./ _site/ \
-              --exclude '.git' \
-              --exclude '.github' \
-              --exclude '_site' \
-              --exclude 'apps'
+          cd main-site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A preview/solar-universe
+
+          if git diff --cached --quiet; then
+            echo "Preview is already current."
+            exit 0
           fi
 
-          # The legacy native-Three.js preview is intentionally removed.
-          rm -rf _site/preview/solar-universe
-          mkdir -p "_site/$DEPLOY_SUBDIR"
-          cp -a apps/solar-universe/dist/. "_site/$DEPLOY_SUBDIR/"
-          touch _site/.nojekyll
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: _site
+          git commit -m "preview: deploy R3F Solar Universe from PR #${{ github.event.pull_request.number }}"
+          git push origin HEAD:main
 
       - name: Upload pull request build archive
         if: github.event_name == 'pull_request'
@@ -98,7 +84,36 @@ jobs:
           name: solar-universe-preview
           path: apps/solar-universe/dist
 
+      - name: Assemble complete static site
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          rsync -a ./ _site/ \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude '_site' \
+            --exclude 'apps'
+
+          # The native-Three.js preview is not part of the production site.
+          rm -rf _site/preview/solar-universe
+          mkdir -p _site/solar-universe
+          cp -a apps/solar-universe/dist/. _site/solar-universe/
+          touch _site/.nojekyll
+
+      - name: Configure Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
   deploy:
+    if: github.event_name != 'pull_request'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
