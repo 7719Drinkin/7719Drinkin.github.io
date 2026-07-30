@@ -1,0 +1,72 @@
+/* Compact HUD layer for the 3D experiment. The model remains the visual subject. */
+.system-intro {
+  top: 92px;
+  left: clamp(18px, 3vw, 46px);
+  width: min(340px, calc(100vw - 36px));
+  padding: 10px 0 10px 14px;
+  border-left: 1px solid rgba(138, 180, 255, .55);
+  background: linear-gradient(90deg, rgba(1, 4, 12, .52), transparent 94%);
+  backdrop-filter: blur(5px);
+}
+
+.system-intro .system-kicker {
+  margin: 0;
+  font-size: 7px;
+  letter-spacing: .13em;
+}
+
+.system-summary {
+  max-width: 320px;
+  margin: 6px 0 0;
+  color: rgba(188, 201, 220, .62);
+  font: 9px/1.55 "DM Mono", monospace;
+  letter-spacing: .02em;
+}
+
+.system-readout {
+  top: 116px;
+  width: min(190px, calc(100vw - 36px));
+  opacity: .72;
+}
+
+.system-readout div {
+  gap: 12px;
+  padding: 7px 0;
+  font-size: 7px;
+  letter-spacing: .08em;
+}
+
+.performance-button {
+  top: 76px;
+  padding: 7px 10px;
+  font-size: 7px;
+}
+
+.solar-instructions {
+  bottom: 16px;
+  gap: 7px 14px;
+  font-size: 7px;
+  opacity: .72;
+}
+
+@media (max-width: 900px) {
+  .system-intro {
+    top: 78px;
+    width: min(300px, calc(100vw - 36px));
+  }
+}
+
+@media (max-width: 620px) {
+  .system-intro {
+    top: 68px;
+    left: 14px;
+    width: auto;
+    max-width: calc(100vw - 92px);
+    padding-block: 7px;
+  }
+
+  .system-summary { display: none; }
+  .performance-button { top: 64px; }
+  .solar-instructions span:nth-child(2),
+  .solar-instructions span:nth-child(4) { display: none; }
+}
