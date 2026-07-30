@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/solar-universe.css?v=20260730-1">
+  <link rel="stylesheet" href="/css/solar-universe.css?v=20260730-2">
 
   <script type="importmap">
     {
@@ -35,17 +35,15 @@
       </nav>
     </header>
 
-    <section class="system-intro" aria-labelledby="system-title">
-      <p class="system-kicker">INTERACTIVE MODEL / PERSONAL INTEREST SYSTEM</p>
-      <h1 id="system-title"><span>EXPLORE</span>MY UNIVERSE</h1>
-      <p>在这个实验版本里，每个爱好是一颗可以接近和探索的行星。新的爱好会成为新的行星，并自动扩展整个系统。</p>
+    <section class="system-intro" aria-label="太阳系模型说明">
+      <p class="system-kicker">7719 / PERSONAL INTEREST SYSTEM</p>
+      <p class="system-summary">Each planet represents an interest. Select a planet to inspect the world behind it.</p>
     </section>
 
     <aside class="system-readout" aria-label="3D 系统状态">
-      <div><span>REGISTERED PLANETS</span><strong id="readout-count">03</strong></div>
-      <div><span>RENDER MODE</span><strong id="readout-mode">AUTO</strong></div>
-      <div><span>MODEL SCALE</span><strong>SYMBOLIC</strong></div>
-      <div><span>WEBGL</span><strong>2.0</strong></div>
+      <div><span>PLANETS</span><strong id="readout-count">03</strong></div>
+      <div><span>RENDER</span><strong id="readout-mode">AUTO</strong></div>
+      <div><span>SCALE</span><strong>SYMBOLIC</strong></div>
     </aside>
 
     <button id="performance-mode" class="performance-button" type="button">MODE / AUTO</button>
@@ -122,6 +120,6 @@
       }
     }, 9000);
   </script>
-  <script type="module" src="/js/solar-universe.js?v=20260730-1"></script>
+  <script type="module" src="/js/solar-universe.js?v=20260730-2"></script>
 </body>
 </html>
