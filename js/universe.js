@@ -1,3 +1,5 @@
+document.documentElement.classList.add('reveal-ready');
+
 const header = document.querySelector('.universe-header');
 const interestGrid = document.querySelector('#interest-grid');
 
