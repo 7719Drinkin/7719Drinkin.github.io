@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="7719 Universe — a personal collection of basketball, movies, games, music and the interests that shaped me.">
+  <meta name="description" content="7719 Universe — a personal collection of basketball, games, music and the interests that shaped me.">
   <title>7719 Universe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/universe.css?v=20260730-1">
+  <link rel="stylesheet" href="/css/universe.css?v=20260730-2">
+  <link rel="stylesheet" href="/css/universe-home.css?v=20260730-2">
 </head>
-<body>
+<body class="theme-universe universe-home">
   <div class="universe-noise" aria-hidden="true"></div>
 
   <header class="universe-header">
@@ -29,7 +30,7 @@
       <div class="universe-hero-copy reveal">
         <p class="eyebrow">A PERSONAL DIGITAL UNIVERSE</p>
         <h1><span>MY</span><strong>UNIVERSE</strong></h1>
-        <p class="universe-tagline">The people, stories, worlds and sounds that stayed with me.</p>
+        <p class="universe-tagline">The people, games, sounds and worlds that stayed with me.</p>
         <a class="universe-scroll" href="#interests">CHOOSE A WORLD <span>↓</span></a>
       </div>
     </section>
@@ -48,7 +49,38 @@
           <div class="interest-card-bg" style="background-image:url('/assets/15942445778634938029.JPG')"></div>
           <div class="interest-card-content">
             <div class="interest-card-top"><span>01</span><span class="interest-card-status">OPEN</span></div>
-            <div><h3>Basketball</h3><p class="interest-card-subtitle">The game never stops.</p><span class="interest-card-enter">ENTER WORLD <strong>→</strong></span></div>
+            <div>
+              <h3>Basketball</h3>
+              <p class="interest-card-subtitle">The game never stops.</p>
+              <p class="interest-card-description">Legends, iconic frames and the moments that made the game larger than life.</p>
+              <span class="interest-card-enter">ENTER WORLD <strong>→</strong></span>
+            </div>
+          </div>
+        </a>
+
+        <a class="interest-card reveal" data-theme="games" data-cover="false" href="/games/">
+          <div class="interest-card-bg"></div>
+          <div class="interest-card-content">
+            <div class="interest-card-top"><span>02</span><span class="interest-card-status">PREVIEW</span></div>
+            <div>
+              <h3>Games</h3>
+              <p class="interest-card-subtitle">Worlds built one decision at a time.</p>
+              <p class="interest-card-description">Strategy, civilization building and memorable virtual worlds.</p>
+              <span class="interest-card-enter">ENTER WORLD <strong>→</strong></span>
+            </div>
+          </div>
+        </a>
+
+        <a class="interest-card reveal" data-theme="music" data-cover="false" href="/music/">
+          <div class="interest-card-bg"></div>
+          <div class="interest-card-content">
+            <div class="interest-card-top"><span>03</span><span class="interest-card-status">PREVIEW</span></div>
+            <div>
+              <h3>Music</h3>
+              <p class="interest-card-subtitle">Soundtracks for different versions of me.</p>
+              <p class="interest-card-description">Artists, albums and songs collected over time.</p>
+              <span class="interest-card-enter">ENTER WORLD <strong>→</strong></span>
+            </div>
           </div>
         </a>
       </div>
@@ -88,6 +120,6 @@
     <span>PERSONAL DIGITAL ARCHIVE · 2026</span>
   </footer>
 
-  <script src="/js/universe.js?v=20260730-1"></script>
+  <script src="/js/universe.js?v=20260730-2"></script>
 </body>
 </html>
