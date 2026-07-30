@@ -18,7 +18,6 @@ Current implementation:
 ├── basketball/
 │   └── michael-jordan/
 │       └── archive/
-├── movies/
 ├── games/
 └── music/
 ```
@@ -100,7 +99,7 @@ Example registry entry:
   "route": "/photography/",
   "theme": "photography",
   "status": "preview",
-  "number": "05",
+  "number": "04",
   "cover": null
 }
 ```
