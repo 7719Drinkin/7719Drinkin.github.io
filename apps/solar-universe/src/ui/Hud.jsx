@@ -1,4 +1,12 @@
-export default function Hud({ quality, onToggleQuality, onReset }) {
+export default function Hud({
+  quality,
+  showOrbits,
+  showEcliptic,
+  onToggleQuality,
+  onToggleOrbits,
+  onToggleEcliptic,
+  onReset
+}) {
   return (
     <>
       <header className="solar-header">
@@ -24,9 +32,17 @@ export default function Hud({ quality, onToggleQuality, onReset }) {
         <div><span>MOTION</span><strong>ORBIT + AXIAL</strong></div>
       </aside>
 
-      <button className="quality-button" type="button" onClick={onToggleQuality}>
-        MODE / {quality === 'quality' ? 'QUALITY+' : 'ECO'}
-      </button>
+      <div className="view-controls" aria-label="3D display controls">
+        <button type="button" onClick={onToggleQuality}>
+          MODE <strong>{quality === 'quality' ? 'QUALITY+' : 'ECO'}</strong>
+        </button>
+        <button type="button" aria-pressed={showOrbits} onClick={onToggleOrbits}>
+          ORBITS <strong>{showOrbits ? 'ON' : 'OFF'}</strong>
+        </button>
+        <button type="button" aria-pressed={showEcliptic} onClick={onToggleEcliptic}>
+          ECLIPTIC <strong>{showEcliptic ? 'ON' : 'OFF'}</strong>
+        </button>
+      </div>
     </>
   );
 }
