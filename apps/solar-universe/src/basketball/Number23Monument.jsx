@@ -29,11 +29,11 @@ const DIGIT_3 = [
 function Digit({ points, x }) {
   const geometry = useMemo(() => {
     const result = new THREE.ExtrudeGeometry(shapeFrom(points), {
-      depth: 0.082,
+      depth: 0.074,
       bevelEnabled: true,
       bevelSegments: 3,
-      bevelSize: 0.018,
-      bevelThickness: 0.016,
+      bevelSize: 0.016,
+      bevelThickness: 0.014,
       curveSegments: 4
     });
     result.center();
@@ -43,17 +43,17 @@ function Digit({ points, x }) {
 
   return (
     <group position={[x, 0, 0]}>
-      <mesh geometry={geometry} scale={[1.2, 1.2, 1]} position-z={-0.055}>
+      <mesh geometry={geometry} scale={[1.18, 1.18, 1]} position-z={-0.05}>
         <meshStandardMaterial color="#050506" roughness={0.7} metalness={0.1} />
       </mesh>
-      <mesh geometry={geometry} scale={[1.1, 1.1, 1]} position-z={0.005}>
+      <mesh geometry={geometry} scale={[1.09, 1.09, 1]} position-z={0.002}>
         <meshStandardMaterial color="#f4f0e8" roughness={0.58} metalness={0.03} />
       </mesh>
-      <mesh geometry={geometry} position-z={0.07}>
+      <mesh geometry={geometry} position-z={0.062}>
         <meshStandardMaterial
           color="#d31132"
           emissive="#3d0010"
-          emissiveIntensity={0.16}
+          emissiveIntensity={0.14}
           roughness={0.5}
           metalness={0.09}
         />
@@ -64,28 +64,32 @@ function Digit({ points, x }) {
 
 export default function Number23Monument({ radius }) {
   return (
-    <group position={[0, -0.06, radius * 0.975]} scale={0.66}>
-      <mesh position-z={-0.115}>
-        <boxGeometry args={[1.72, 1.18, 0.16, 4, 4, 1]} />
-        <meshStandardMaterial color="#2c201a" roughness={0.96} metalness={0} />
+    <group position={[0, -0.045, radius + 0.145]} scale={0.54}>
+      <mesh position={[0, -0.5, -0.16]} rotation-x={-0.16}>
+        <boxGeometry args={[1.18, 0.2, 0.24]} />
+        <meshStandardMaterial color="#3d2b22" roughness={0.94} metalness={0.01} />
+      </mesh>
+      <mesh position-z={-0.11}>
+        <boxGeometry args={[1.68, 1.14, 0.14, 4, 4, 1]} />
+        <meshStandardMaterial color="#2c201a" roughness={0.94} metalness={0} />
       </mesh>
       <mesh position-z={-0.035}>
-        <boxGeometry args={[1.58, 1.06, 0.055]} />
+        <boxGeometry args={[1.54, 1.02, 0.05]} />
         <meshStandardMaterial color="#050507" roughness={0.78} metalness={0.12} />
       </mesh>
-      <mesh position-z={0.005}>
-        <boxGeometry args={[1.48, 0.98, 0.022]} />
+      <mesh position-z={0.003}>
+        <boxGeometry args={[1.44, 0.94, 0.02]} />
         <meshBasicMaterial color="#a10b25" />
       </mesh>
-      <mesh position-z={0.036}>
-        <boxGeometry args={[1.39, 0.9, 0.018]} />
+      <mesh position-z={0.032}>
+        <boxGeometry args={[1.35, 0.86, 0.016]} />
         <meshBasicMaterial color="#050506" />
       </mesh>
-      <group position={[0.015, 0, 0.145]} scale={0.76}>
+      <group position={[0.012, 0, 0.13]} scale={0.72}>
         <Digit points={DIGIT_2} x={-0.39} />
         <Digit points={DIGIT_3} x={0.39} />
       </group>
-      <pointLight position={[0, 0.04, 0.5]} color="#e83043" intensity={0.6} distance={1.6} decay={2} />
+      <pointLight position={[0, 0.03, 0.46]} color="#e83043" intensity={0.48} distance={1.35} decay={2} />
     </group>
   );
 }
