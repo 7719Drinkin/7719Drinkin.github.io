@@ -30,7 +30,13 @@ function Hoop({ x, direction, y }) {
       </mesh>
       <mesh position={[0, 0.36, -0.23]} rotation-x={Math.PI / 2}>
         <torusGeometry args={[0.065, 0.009, 8, 28]} />
-        <meshStandardMaterial color="#b31b2c" emissive="#3c000a" emissiveIntensity={0.3} roughness={0.42} metalness={0.25} />
+        <meshStandardMaterial
+          color="#b31b2c"
+          emissive="#3c000a"
+          emissiveIntensity={0.3}
+          roughness={0.42}
+          metalness={0.25}
+        />
       </mesh>
     </group>
   );
@@ -45,9 +51,20 @@ function Floodlight({ position }) {
       </mesh>
       <mesh position-y={0.5} rotation-x={-0.22}>
         <boxGeometry args={[0.1, 0.05, 0.04]} />
-        <meshStandardMaterial color="#ffe0a9" emissive="#ff9430" emissiveIntensity={2.0} roughness={0.24} />
+        <meshStandardMaterial
+          color="#ffe0a9"
+          emissive="#ff9430"
+          emissiveIntensity={2.0}
+          roughness={0.24}
+        />
       </mesh>
-      <pointLight position={[0, 0.48, 0]} color="#ffb25f" intensity={0.62} distance={1.8} decay={2} />
+      <pointLight
+        position={[0, 0.48, 0]}
+        color="#ffb25f"
+        intensity={0.62}
+        distance={1.8}
+        decay={2}
+      />
     </group>
   );
 }
@@ -58,7 +75,10 @@ function CourtPulse({ y }) {
 
   useFrame(({ clock }) => {
     const cycle = (clock.elapsedTime % 6.4) / 6.4;
-    const visibility = cycle < 0.58 ? 1 - THREE.MathUtils.smoothstep(cycle, 0.12, 0.58) : 0;
+    const visibility = cycle < 0.58
+      ? 1 - THREE.MathUtils.smoothstep(cycle, 0.12, 0.58)
+      : 0;
+
     if (ring.current) {
       const scale = 0.65 + cycle * 1.75;
       ring.current.scale.setScalar(scale);
@@ -82,61 +102,76 @@ function CourtPulse({ y }) {
 }
 
 function LastCourt({ radius, quality }) {
+  const courtY = radius + 0.23;
   const audience = useMemo(() => {
     const random = seededRandom(1998);
     return Array.from({ length: quality === 'quality' ? 44 : 18 }, (_, index) => {
       const side = index % 2 ? 1 : -1;
       return {
-        position: [(random() - 0.5) * 0.58, radius * 1.11 + random() * 0.055, side * (0.37 + random() * 0.09)],
+        position: [
+          (random() - 0.5) * 0.58,
+          courtY + 0.055 + random() * 0.04,
+          side * (0.37 + random() * 0.09)
+        ],
         scale: 0.006 + random() * 0.008
       };
     });
-  }, [quality, radius]);
+  }, [courtY, quality]);
 
-  const y = radius * 1.055;
-  const plateauSegments = quality === 'quality' ? 36 : 24;
+  const plateauSegments = quality === 'quality' ? 40 : 26;
+  const floodlights = [
+    [-0.53, courtY - 0.045, -0.38],
+    [0.53, courtY - 0.045, -0.38],
+    [-0.53, courtY - 0.045, 0.38],
+    [0.53, courtY - 0.045, 0.38]
+  ];
 
   return (
-    <group scale={[0.76, 0.9, 0.76]}>
-      <mesh position-y={radius * 0.89}>
-        <cylinderGeometry args={[0.72, 0.86, 0.14, plateauSegments]} />
-        <meshStandardMaterial color="#4b3a2e" roughness={0.86} />
+    <group scale={[0.72, 1, 0.72]}>
+      {/* This plug extends into the planet and guarantees that uneven terrain
+          can never rise through the court surface. */}
+      <mesh position-y={radius - 0.01}>
+        <cylinderGeometry args={[0.69, 0.82, 0.34, plateauSegments]} />
+        <meshStandardMaterial color="#3f3129" roughness={0.9} />
       </mesh>
-      <mesh position-y={radius * 0.975}>
-        <cylinderGeometry args={[0.64, 0.73, 0.11, plateauSegments]} />
-        <meshStandardMaterial color="#97613d" roughness={0.8} />
+
+      <mesh position-y={radius + 0.125}>
+        <cylinderGeometry args={[0.63, 0.71, 0.11, plateauSegments]} />
+        <meshStandardMaterial color="#825139" roughness={0.82} />
       </mesh>
-      <mesh position-y={radius}>
-        <boxGeometry args={[1.13, 0.12, 0.7, 4, 1, 3]} />
+
+      <mesh position-y={radius + 0.185}>
+        <boxGeometry args={[1.1, 0.08, 0.68, 4, 1, 3]} />
         <meshStandardMaterial color="#302825" roughness={0.86} />
       </mesh>
-      <mesh position-y={y}>
-        <boxGeometry args={[1.02, 0.03, 0.59]} />
+
+      <mesh position-y={courtY}>
+        <boxGeometry args={[1.02, 0.032, 0.59]} />
         <meshStandardMaterial color="#71362f" roughness={0.74} />
       </mesh>
 
       {[-0.278, 0.278].map((z) => (
-        <mesh key={`hz-${z}`} position={[0, y + 0.02, z]}>
+        <mesh key={`hz-${z}`} position={[0, courtY + 0.021, z]}>
           <boxGeometry args={[0.96, 0.006, 0.011]} />
           <meshBasicMaterial color="#f1e9dc" />
         </mesh>
       ))}
       {[-0.474, 0, 0.474].map((x) => (
-        <mesh key={`vt-${x}`} position={[x, y + 0.02, 0]}>
+        <mesh key={`vt-${x}`} position={[x, courtY + 0.021, 0]}>
           <boxGeometry args={[0.011, 0.006, 0.55]} />
           <meshBasicMaterial color="#f1e9dc" />
         </mesh>
       ))}
-      <mesh position-y={y + 0.023} rotation-x={Math.PI / 2}>
+      <mesh position-y={courtY + 0.024} rotation-x={Math.PI / 2}>
         <torusGeometry args={[0.1, 0.0055, 6, 32]} />
         <meshBasicMaterial color="#f1e9dc" />
       </mesh>
-      <CourtPulse y={y} />
+      <CourtPulse y={courtY} />
 
-      <Hoop x={0.41} direction={1} y={radius * 1.06} />
-      <Hoop x={-0.41} direction={-1} y={radius * 1.06} />
+      <Hoop x={0.41} direction={1} y={courtY + 0.005} />
+      <Hoop x={-0.41} direction={-1} y={courtY + 0.005} />
 
-      {[[-0.53, radius * 1.01, -0.38], [0.53, radius * 1.01, -0.38], [-0.53, radius * 1.01, 0.38], [0.53, radius * 1.01, 0.38]].map((position, index) => (
+      {floodlights.map((position, index) => (
         <Floodlight key={index} position={position} />
       ))}
 
@@ -240,6 +275,18 @@ const BASKETBALL_BANDS = [
   }
 ];
 
+const BASKETBALL_FLATTEN_ZONES = [
+  {
+    direction: [0, 1, 0],
+    radius: 0.57,
+    softness: 0.2,
+    target: 0.006,
+    strength: 1,
+    color: '#845438',
+    colorStrength: 0.42
+  }
+];
+
 export default function BasketballWorld({ radius, quality }) {
   const geometry = useMemo(
     () => createStylizedTerrain({
@@ -249,6 +296,7 @@ export default function BasketballWorld({ radius, quality }) {
       relief: 0.76,
       features: BASKETBALL_FEATURES,
       bands: BASKETBALL_BANDS,
+      flattenZones: BASKETBALL_FLATTEN_ZONES,
       palette: {
         low: '#171b21',
         mid: '#573a2d',
