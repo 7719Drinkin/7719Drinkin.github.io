@@ -1,21 +1,18 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import Number23Monument from '../basketball/Number23Monument.jsx';
-import ChampionshipGallery from '../basketball/ChampionshipGallery.jsx';
 import BasketballLife from '../basketball/BasketballLife.jsx';
+import CourtDynamics from '../basketball/CourtDynamics.jsx';
+import CourtStands from '../basketball/CourtStands.jsx';
+import Number23Monument from '../basketball/Number23Monument.jsx';
+import {
+  COURT_LENGTH,
+  COURT_SCALE_XZ,
+  COURT_WIDTH,
+  HOOP_GROUP_X,
+  courtSurfaceY
+} from '../basketball/courtLayout.js';
 import { createStylizedTerrain } from './stylizedTerrain.js';
-
-function seededRandom(seed) {
-  let value = seed >>> 0;
-  return () => {
-    value += 0x6D2B79F5;
-    let t = value;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 function Hoop({ x, direction, y }) {
   return (
@@ -54,7 +51,7 @@ function Floodlight({ position }) {
         <meshStandardMaterial
           color="#ffe0a9"
           emissive="#ff9430"
-          emissiveIntensity={2.0}
+          emissiveIntensity={2}
           roughness={0.24}
         />
       </mesh>
@@ -102,22 +99,7 @@ function CourtPulse({ y }) {
 }
 
 function LastCourt({ radius, quality }) {
-  const courtY = radius + 0.045;
-  const audience = useMemo(() => {
-    const random = seededRandom(1998);
-    return Array.from({ length: quality === 'quality' ? 36 : 14 }, (_, index) => {
-      const side = index % 2 ? 1 : -1;
-      return {
-        position: [
-          (random() - 0.5) * 0.58,
-          courtY + 0.026 + random() * 0.026,
-          side * (0.37 + random() * 0.09)
-        ],
-        scale: 0.006 + random() * 0.008
-      };
-    });
-  }, [courtY, quality]);
-
+  const courtY = courtSurfaceY(radius);
   const plateauSegments = quality === 'quality' ? 36 : 24;
   const floodlights = [
     [-0.53, courtY - 0.018, -0.38],
@@ -127,16 +109,14 @@ function LastCourt({ radius, quality }) {
   ];
 
   return (
-    <group scale={[0.68, 1, 0.68]}>
-      {/* A single shallow pad overlaps the planar terrain by a few millimetres.
-          It hides the seam without turning the court into a tall tower. */}
+    <group scale={[COURT_SCALE_XZ, 1, COURT_SCALE_XZ]}>
       <mesh position-y={radius + 0.014}>
         <cylinderGeometry args={[0.7, 0.73, 0.052, plateauSegments]} />
         <meshStandardMaterial color="#7f5038" roughness={0.84} />
       </mesh>
 
       <mesh position-y={courtY}>
-        <boxGeometry args={[1.02, 0.024, 0.59]} />
+        <boxGeometry args={[COURT_LENGTH, 0.024, COURT_WIDTH]} />
         <meshStandardMaterial color="#71362f" roughness={0.74} />
       </mesh>
 
@@ -158,18 +138,11 @@ function LastCourt({ radius, quality }) {
       </mesh>
       <CourtPulse y={courtY} />
 
-      <Hoop x={0.41} direction={1} y={courtY} />
-      <Hoop x={-0.41} direction={-1} y={courtY} />
+      <Hoop x={HOOP_GROUP_X} direction={1} y={courtY} />
+      <Hoop x={-HOOP_GROUP_X} direction={-1} y={courtY} />
 
       {floodlights.map((position, index) => (
         <Floodlight key={index} position={position} />
-      ))}
-
-      {audience.map((person, index) => (
-        <mesh key={index} position={person.position} scale={person.scale}>
-          <sphereGeometry args={[1, 6, 5]} />
-          <meshBasicMaterial color="#ffc578" />
-        </mesh>
       ))}
     </group>
   );
@@ -308,8 +281,9 @@ export default function BasketballWorld({ radius, quality }) {
       </mesh>
       <BasketballLife radius={radius} quality={quality} />
       <LastCourt radius={radius} quality={quality} />
+      <CourtStands radius={radius} quality={quality} />
+      <CourtDynamics radius={radius} quality={quality} />
       <Number23Monument radius={radius} />
-      <ChampionshipGallery radius={radius} />
     </group>
   );
 }
