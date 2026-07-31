@@ -49,15 +49,15 @@ export default function Hud({
         </button>
 
         <label className="sunlight-control">
-          <span>SUNLIGHT <strong>{sunlightPercent}%</strong></span>
+          <span>SOLAR OUTPUT <strong>{sunlightPercent}%</strong></span>
           <input
             type="range"
-            min="0.35"
-            max="1.65"
+            min="0.25"
+            max="2.5"
             step="0.05"
             value={sunBrightness}
             onChange={(event) => onSunBrightnessChange(Number(event.target.value))}
-            aria-label={`太阳光亮度 ${sunlightPercent}%`}
+            aria-label={`太阳辐射视觉强度 ${sunlightPercent}%`}
           />
         </label>
       </div>
