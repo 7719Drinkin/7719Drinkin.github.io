@@ -14,7 +14,13 @@ function arcGeometry(radius, start, span, tube, quality) {
     );
   });
   const curve = new THREE.CatmullRomCurve3(points);
-  return new THREE.TubeGeometry(curve, pointCount * 2, tube, quality === 'quality' ? 6 : 4, false);
+  return new THREE.TubeGeometry(
+    curve,
+    pointCount * 2,
+    tube,
+    quality === 'quality' ? 6 : 4,
+    false
+  );
 }
 
 function MotionRing({ radius, quality }) {
@@ -47,11 +53,15 @@ function MotionRing({ radius, quality }) {
   return (
     <group ref={ring} rotation={[0.17, 0.08, -0.34]}>
       <mesh rotation-x={Math.PI / 2}>
-        <torusGeometry args={[radius * 1.31, radius * 0.0035, 5, quality === 'quality' ? 220 : 120]} />
+        <torusGeometry
+          args={[radius * 1.31, radius * 0.0035, 5, quality === 'quality' ? 220 : 120]}
+        />
         <meshBasicMaterial color="#d8b77e" transparent opacity={0.14} depthWrite={false} />
       </mesh>
       <mesh rotation-x={Math.PI / 2}>
-        <torusGeometry args={[radius * 1.42, radius * 0.0024, 5, quality === 'quality' ? 220 : 120]} />
+        <torusGeometry
+          args={[radius * 1.42, radius * 0.0024, 5, quality === 'quality' ? 220 : 120]}
+        />
         <meshBasicMaterial color="#c95a4c" transparent opacity={0.12} depthWrite={false} />
       </mesh>
       {arcSpecs.map((arc, index) => (
@@ -69,7 +79,7 @@ function MotionRing({ radius, quality }) {
   );
 }
 
-function TrainingMoon({ radius, quality }) {
+function TrainingMoon({ radius, quality, showOrbit }) {
   const orbit = useRef();
   const moon = useRef();
 
@@ -80,14 +90,30 @@ function TrainingMoon({ radius, quality }) {
 
   return (
     <group rotation={[0.48, 0.12, 0.28]}>
-      <mesh rotation-x={Math.PI / 2}>
-        <torusGeometry args={[radius * 1.86, radius * 0.0018, 4, quality === 'quality' ? 180 : 96]} />
-        <meshBasicMaterial color="#e1c994" transparent opacity={0.09} depthWrite={false} />
-      </mesh>
+      {showOrbit && (
+        <mesh rotation-x={Math.PI / 2}>
+          <torusGeometry
+            args={[radius * 1.86, radius * 0.0018, 4, quality === 'quality' ? 180 : 96]}
+          />
+          <meshBasicMaterial
+            color="#e1c994"
+            transparent
+            opacity={0.09}
+            depthWrite={false}
+          />
+        </mesh>
+      )}
+
       <group ref={orbit}>
         <group position={[radius * 1.86, 0, 0]}>
           <mesh ref={moon}>
-            <sphereGeometry args={[radius * 0.105, quality === 'quality' ? 40 : 24, quality === 'quality' ? 28 : 16]} />
+            <sphereGeometry
+              args={[
+                radius * 0.105,
+                quality === 'quality' ? 40 : 24,
+                quality === 'quality' ? 28 : 16
+              ]}
+            />
             <meshStandardMaterial
               color="#c69a61"
               emissive="#27170b"
@@ -97,7 +123,13 @@ function TrainingMoon({ radius, quality }) {
             />
           </mesh>
           <mesh scale={1.055}>
-            <sphereGeometry args={[radius * 0.105, quality === 'quality' ? 32 : 20, quality === 'quality' ? 22 : 14]} />
+            <sphereGeometry
+              args={[
+                radius * 0.105,
+                quality === 'quality' ? 32 : 20,
+                quality === 'quality' ? 22 : 14
+              ]}
+            />
             <meshBasicMaterial
               color="#f1d6a1"
               transparent
@@ -112,7 +144,7 @@ function TrainingMoon({ radius, quality }) {
   );
 }
 
-export default function BasketballOrbitals({ radius, quality, onSelect }) {
+export default function BasketballOrbitals({ radius, quality, showOrbit, onSelect }) {
   const select = (event) => {
     event.stopPropagation();
     onSelect();
@@ -121,7 +153,7 @@ export default function BasketballOrbitals({ radius, quality, onSelect }) {
   return (
     <group onClick={select}>
       <MotionRing radius={radius} quality={quality} />
-      <TrainingMoon radius={radius} quality={quality} />
+      <TrainingMoon radius={radius} quality={quality} showOrbit={showOrbit} />
     </group>
   );
 }
