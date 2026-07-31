@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import Number23Monument from '../basketball/Number23Monument.jsx';
 import ChampionshipGallery from '../basketball/ChampionshipGallery.jsx';
+import BasketballLife from '../basketball/BasketballLife.jsx';
 import { createStylizedTerrain } from './stylizedTerrain.js';
 
 function seededRandom(seed) {
@@ -68,11 +69,11 @@ function LastCourt({ radius, quality }) {
     <group>
       <mesh position-y={radius * 0.89}>
         <cylinderGeometry args={[0.72, 0.86, 0.14, plateauSegments]} />
-        <meshStandardMaterial color="#4d352e" roughness={0.86} />
+        <meshStandardMaterial color="#4b3a2e" roughness={0.86} />
       </mesh>
       <mesh position-y={radius * 0.975}>
         <cylinderGeometry args={[0.64, 0.73, 0.11, plateauSegments]} />
-        <meshStandardMaterial color="#80533e" roughness={0.82} />
+        <meshStandardMaterial color="#97613d" roughness={0.8} />
       </mesh>
       <mesh position-y={radius}>
         <boxGeometry args={[1.13, 0.12, 0.7, 4, 1, 3]} />
@@ -117,21 +118,97 @@ function LastCourt({ radius, quality }) {
   );
 }
 
+const BASKETBALL_FEATURES = [
+  {
+    direction: [-0.78, 0.12, 0.61],
+    radius: 0.72,
+    softness: 0.24,
+    elevation: 0.006,
+    color: '#416c48',
+    colorStrength: 0.78
+  },
+  {
+    direction: [-0.38, 0.45, 0.81],
+    radius: 0.45,
+    softness: 0.18,
+    elevation: 0.014,
+    color: '#8d8b4d',
+    colorStrength: 0.56
+  },
+  {
+    direction: [0.7, -0.06, -0.71],
+    radius: 0.5,
+    softness: 0.18,
+    elevation: -0.026,
+    color: '#993b2d',
+    colorStrength: 0.74,
+    rimAt: 0.48,
+    rimWidth: 0.09,
+    rimElevation: 0.018,
+    rimColor: '#c77849',
+    rimColorStrength: 0.58
+  },
+  {
+    direction: [-0.08, -0.18, -0.98],
+    radius: 0.3,
+    softness: 0.12,
+    elevation: -0.05,
+    color: '#20252c',
+    colorStrength: 0.9,
+    rimAt: 0.3,
+    rimWidth: 0.075,
+    rimElevation: 0.032,
+    rimColor: '#865d42',
+    rimColorStrength: 0.64
+  },
+  {
+    direction: [0.2, 0.58, 0.79],
+    radius: 0.34,
+    softness: 0.15,
+    elevation: 0.022,
+    color: '#d0a05d',
+    colorStrength: 0.62
+  }
+];
+
+const BASKETBALL_BANDS = [
+  {
+    normal: [0.18, 0.97, 0.12],
+    width: 0.105,
+    softness: 0.075,
+    elevation: -0.012,
+    frequency: 7,
+    color: '#732f2a',
+    colorStrength: 0.56
+  },
+  {
+    normal: [0.84, 0.1, -0.52],
+    width: 0.065,
+    softness: 0.055,
+    elevation: 0.014,
+    frequency: 11,
+    color: '#c18a50',
+    colorStrength: 0.42
+  }
+];
+
 export default function BasketballWorld({ radius, quality }) {
   const geometry = useMemo(
     () => createStylizedTerrain({
       radius,
       detail: quality === 'quality' ? 5 : 4,
       seed: 23,
-      relief: 0.7,
+      relief: 0.78,
+      features: BASKETBALL_FEATURES,
+      bands: BASKETBALL_BANDS,
       palette: {
-        low: '#17191f',
-        mid: '#443028',
-        high: '#875a3f',
-        accent: '#a63d31',
-        accent2: '#d0a06b',
-        shadowTint: '#0d1119',
-        highlightTint: '#e5bd85'
+        low: '#171b21',
+        mid: '#56382c',
+        high: '#a06a42',
+        accent: '#b64432',
+        accent2: '#d2a268',
+        shadowTint: '#0d1218',
+        highlightTint: '#efc783'
       }
     }),
     [quality, radius]
@@ -142,11 +219,12 @@ export default function BasketballWorld({ radius, quality }) {
       <mesh geometry={geometry}>
         <meshStandardMaterial
           vertexColors
-          roughness={0.74}
+          roughness={0.72}
           metalness={0}
           dithering
         />
       </mesh>
+      <BasketballLife radius={radius} quality={quality} />
       <LastCourt radius={radius} quality={quality} />
       <Number23Monument radius={radius} />
       <ChampionshipGallery radius={radius} />
