@@ -184,14 +184,30 @@ export function createStylizedTerrain({
     authoredFlattenZones.forEach((zone, zoneIndex) => {
       const angle = Math.acos(THREE.MathUtils.clamp(normal.dot(zone.direction), -1, 1));
       const mask = 1 - smoothstep(zone.radius, zone.radius + (zone.softness ?? 0.16), angle);
-      const strength = mask * (zone.strength ?? 1);
-      const targetDisplacement = (zone.target ?? 0) * radius;
-      displacement = THREE.MathUtils.lerp(displacement, targetDisplacement, strength);
       flattenState[zoneIndex] = mask;
+
+      if (zone.mode !== 'plane') {
+        const strength = mask * (zone.strength ?? 1);
+        const targetDisplacement = (zone.target ?? 0) * radius;
+        displacement = THREE.MathUtils.lerp(displacement, targetDisplacement, strength);
+      }
     });
 
     vertex.addScaledVector(normal, displacement);
+
+    // A plane zone flattens the actual mesh against a plane perpendicular to
+    // zone.direction. Unlike radial flattening, this produces a truly level
+    // construction pad and prevents the spherical cap from rising through a deck.
+    authoredFlattenZones.forEach((zone, zoneIndex) => {
+      if (zone.mode !== 'plane') return;
+      const strength = flattenState[zoneIndex] * (zone.strength ?? 1);
+      const targetAlong = radius + (zone.target ?? 0) * radius;
+      const currentAlong = vertex.dot(zone.direction);
+      vertex.addScaledVector(zone.direction, (targetAlong - currentAlong) * strength);
+    });
+
     position.setXYZ(index, vertex.x, vertex.y, vertex.z);
+    displacement = vertex.length() - radius;
 
     const normalizedHeight = THREE.MathUtils.clamp(
       0.5 + displacement / (radius * 0.11 * Math.max(relief, 0.001)),
