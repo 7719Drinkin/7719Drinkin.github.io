@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { INTERESTS } from './data/interests.js';
+import { INTERESTS, SUN } from './data/interests.js';
 import UniverseCanvas from './scene/UniverseCanvas.jsx';
 import Hud from './ui/Hud.jsx';
 import PlanetPanel from './ui/PlanetPanel.jsx';
@@ -19,10 +19,10 @@ export default function App() {
     else planetRefs.current.delete(id);
   }, []);
 
-  const selected = useMemo(
-    () => INTERESTS.find((interest) => interest.id === selectedId) ?? null,
-    [selectedId]
-  );
+  const selected = useMemo(() => {
+    if (selectedId === SUN.id) return SUN;
+    return INTERESTS.find((interest) => interest.id === selectedId) ?? null;
+  }, [selectedId]);
 
   return (
     <main className="solar-app">
@@ -39,6 +39,7 @@ export default function App() {
 
       <Hud
         quality={quality}
+        selectedId={selectedId}
         showOrbits={showOrbits}
         showEcliptic={showEcliptic}
         onToggleQuality={() => setQuality((value) => value === 'quality' ? 'eco' : 'quality')}
@@ -50,9 +51,9 @@ export default function App() {
       <PlanetPanel interest={selected} onClose={() => setSelectedId(null)} />
 
       <div className="interaction-help" aria-hidden="true">
-        <span><strong>DRAG</strong> FREE ROTATE</span>
+        <span><strong>DRAG</strong> {selectedId ? 'FREE ROTATE' : 'ABOVE ECLIPTIC'}</span>
         <span><strong>SCROLL</strong> ZOOM</span>
-        <span><strong>CLICK</strong> EXPLORE</span>
+        <span><strong>CLICK</strong> SELECT BODY</span>
         <span><strong>DOUBLE CLICK</strong> ENTER</span>
       </div>
 
