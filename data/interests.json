@@ -31,5 +31,16 @@
     "status": "preview",
     "number": "03",
     "cover": null
+  },
+  {
+    "id": "anime",
+    "title": "Anime",
+    "subtitle": "Stories drawn one frame at a time.",
+    "description": "Works, characters, scenes and stories collected across different stages of life.",
+    "route": "/anime/",
+    "theme": "anime",
+    "status": "preview",
+    "number": "04",
+    "cover": null
   }
 ]
