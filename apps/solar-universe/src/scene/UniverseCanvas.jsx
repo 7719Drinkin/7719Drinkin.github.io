@@ -12,6 +12,8 @@ const SYSTEM_MIN_POLAR = 0.36;
 const SYSTEM_MAX_POLAR = Math.PI / 2 - 0.035;
 const FREE_MIN_POLAR = 0.001;
 const FREE_MAX_POLAR = Math.PI - 0.001;
+const SUNLIGHT_MIN = 0.35;
+const SUNLIGHT_MAX = 1.65;
 
 function OrbitLine({ radius, inclination, color }) {
   const geometry = useMemo(() => {
@@ -27,6 +29,39 @@ function OrbitLine({ radius, inclination, color }) {
       <lineBasicMaterial color={color} transparent opacity={0.075} depthWrite={false} />
     </lineLoop>
   );
+}
+
+function LightingController({ sunBrightness, quality }) {
+  const { gl, scene } = useThree();
+  const sunlight = useRef();
+
+  useEffect(() => {
+    const baseExposure = quality === 'quality' ? 1.06 : 1.0;
+    const normalized = THREE.MathUtils.clamp(
+      (sunBrightness - SUNLIGHT_MIN) / (SUNLIGHT_MAX - SUNLIGHT_MIN),
+      0,
+      1
+    );
+    gl.toneMappingExposure = baseExposure * THREE.MathUtils.lerp(0.94, 1.06, normalized);
+  }, [gl, quality, sunBrightness]);
+
+  useFrame(() => {
+    if (!sunlight.current) {
+      scene.traverse((object) => {
+        if (
+          object.isPointLight
+          && Math.abs(object.distance - 125) < 0.01
+          && Math.abs(object.decay - 1.9) < 0.01
+        ) {
+          sunlight.current = object;
+        }
+      });
+    }
+
+    if (sunlight.current) sunlight.current.intensity = 255 * sunBrightness;
+  });
+
+  return null;
 }
 
 function CameraController({ selectedId, planetRefs }) {
@@ -115,8 +150,8 @@ function CameraController({ selectedId, planetRefs }) {
       camera.position.lerp(desiredCamera.current, 0.07);
       controls.target.lerp(desiredTarget.current, 0.085);
       if (
-        camera.position.distanceTo(desiredCamera.current) < 0.03 &&
-        controls.target.distanceTo(desiredTarget.current) < 0.03
+        camera.position.distanceTo(desiredCamera.current) < 0.03
+        && controls.target.distanceTo(desiredTarget.current) < 0.03
       ) {
         transition.current = null;
       }
@@ -154,7 +189,8 @@ function Scene({
   registerPlanet,
   quality,
   showOrbits,
-  showEcliptic
+  showEcliptic,
+  sunBrightness
 }) {
   return (
     <>
@@ -170,6 +206,7 @@ function Scene({
         onSelect={onSelect}
         registerPlanet={registerPlanet}
       />
+      <LightingController sunBrightness={sunBrightness} quality={quality} />
 
       <Stars
         radius={170}
@@ -210,7 +247,12 @@ function Scene({
 
       {quality === 'quality' && (
         <EffectComposer multisampling={4}>
-          <Bloom luminanceThreshold={1.12} luminanceSmoothing={0.42} intensity={0.5} mipmapBlur />
+          <Bloom
+            luminanceThreshold={1.12}
+            luminanceSmoothing={0.42}
+            intensity={0.5}
+            mipmapBlur
+          />
           <Vignette offset={0.3} darkness={0.68} />
         </EffectComposer>
       )}
@@ -220,6 +262,13 @@ function Scene({
 
 export default function UniverseCanvas(props) {
   const dpr = props.quality === 'quality' ? [1, 2] : [1, 1.2];
+  const normalizedBrightness = THREE.MathUtils.clamp(
+    (props.sunBrightness - SUNLIGHT_MIN) / (SUNLIGHT_MAX - SUNLIGHT_MIN),
+    0,
+    1
+  );
+  const initialExposure = (props.quality === 'quality' ? 1.06 : 1.0)
+    * THREE.MathUtils.lerp(0.94, 1.06, normalizedBrightness);
 
   return (
     <Canvas
@@ -233,7 +282,7 @@ export default function UniverseCanvas(props) {
       onCreated={({ gl }) => {
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = props.quality === 'quality' ? 1.06 : 1.0;
+        gl.toneMappingExposure = initialExposure;
       }}
       onPointerMissed={(event) => {
         if (event.type === 'click') props.onSelect(null);
