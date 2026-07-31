@@ -1,9 +1,23 @@
 import * as THREE from 'three';
 
+export const SUN = {
+  id: 'sun',
+  number: '00',
+  kind: 'star',
+  title: 'Sun',
+  worldName: 'SYSTEM STAR',
+  status: 'ACTIVE',
+  route: null,
+  description: 'The central star, rendered as a layered photosphere with granulation, sunspots, chromosphere, corona and a stylized solar-wind field.',
+  accent: '#ffbd68',
+  size: 0.95
+};
+
 export const INTERESTS = [
   {
     id: 'basketball',
     number: '01',
+    kind: 'planet',
     title: 'Basketball',
     worldName: 'THE LAST COURT',
     status: 'ACTIVE',
@@ -21,6 +35,7 @@ export const INTERESTS = [
   {
     id: 'games',
     number: '02',
+    kind: 'planet',
     title: 'Games',
     worldName: 'STRATEGY WORLD',
     status: 'FORMING',
@@ -38,6 +53,7 @@ export const INTERESTS = [
   {
     id: 'music',
     number: '03',
+    kind: 'planet',
     title: 'Music',
     worldName: 'SOUND FOREST',
     status: 'FORMING',
