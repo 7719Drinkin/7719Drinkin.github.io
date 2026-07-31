@@ -4,8 +4,14 @@ on:
   pull_request:
     paths:
       - 'apps/solar-universe/**'
-      - 'index.html'
-      - 'css/universe-3d-entry.css'
+      - 'anime/**'
+      - 'basketball/**'
+      - 'games/**'
+      - 'music/**'
+      - 'data/**'
+      - 'js/**'
+      - 'css/**'
+      - '*.html'
       - '.github/workflows/deploy-pages.yml'
   push:
     branches: [main]
@@ -96,7 +102,6 @@ jobs:
             --exclude '_site' \
             --exclude 'apps'
 
-          # The native-Three.js preview is not part of the production site.
           rm -rf _site/preview/solar-universe
           mkdir -p _site/solar-universe
           cp -a apps/solar-universe/dist/. _site/solar-universe/
