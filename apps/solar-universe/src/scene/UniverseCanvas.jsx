@@ -161,9 +161,8 @@ function Scene({
       <color attach="background" args={['#000106']} />
       <fogExp2 attach="fog" args={['#000106', 0.0031]} />
 
-      <ambientLight color="#718099" intensity={0.045} />
-      <hemisphereLight args={['#8799b4', '#160d08', 0.24]} />
-      <directionalLight position={[10, 12, 17]} color="#c7d5e9" intensity={0.09} />
+      <ambientLight color="#647087" intensity={0.004} />
+      <hemisphereLight args={['#526078', '#030202', 0.028]} />
 
       <Sun
         quality={quality}
@@ -210,8 +209,8 @@ function Scene({
 
       {quality === 'quality' && (
         <EffectComposer multisampling={4}>
-          <Bloom luminanceThreshold={1.05} luminanceSmoothing={0.48} intensity={0.62} mipmapBlur />
-          <Vignette offset={0.3} darkness={0.66} />
+          <Bloom luminanceThreshold={1.12} luminanceSmoothing={0.42} intensity={0.5} mipmapBlur />
+          <Vignette offset={0.3} darkness={0.68} />
         </EffectComposer>
       )}
     </>
@@ -233,7 +232,7 @@ export default function UniverseCanvas(props) {
       onCreated={({ gl }) => {
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = props.quality === 'quality' ? 1.19 : 1.08;
+        gl.toneMappingExposure = props.quality === 'quality' ? 1.06 : 1.0;
       }}
       onPointerMissed={(event) => {
         if (event.type === 'click') props.onSelect(null);
