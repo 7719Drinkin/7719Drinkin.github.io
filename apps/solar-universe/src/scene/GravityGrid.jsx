@@ -50,7 +50,6 @@ export default function GravityGrid({ interests, planetRefs, quality }) {
           uniform float uRadii[${MAX_MASSES}];
           varying vec2 vCoordinate;
           varying float vDepth;
-          varying float vSlope;
 
           float massWell(vec2 point, vec2 center, float strength, float radius) {
             vec2 delta = point - center;
@@ -67,7 +66,6 @@ export default function GravityGrid({ interests, planetRefs, quality }) {
             displaced.z -= depth;
             vCoordinate = position.xy;
             vDepth = depth;
-            vSlope = length(vec2(dFdx(depth), dFdy(depth)));
             gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced, 1.0);
           }
         `}
@@ -75,7 +73,6 @@ export default function GravityGrid({ interests, planetRefs, quality }) {
           uniform float uOpacity;
           varying vec2 vCoordinate;
           varying float vDepth;
-          varying float vSlope;
 
           float gridLine(vec2 coordinate, float spacing, float thickness) {
             vec2 scaled = coordinate / spacing;
@@ -88,12 +85,11 @@ export default function GravityGrid({ interests, planetRefs, quality }) {
             float minor = gridLine(vCoordinate, .52, 1.1);
             float major = gridLine(vCoordinate, 2.08, 1.5);
             float depthGlow = smoothstep(.08, 2.8, vDepth);
-            float slopeGlow = smoothstep(.015, .38, vSlope);
             float line = max(minor * .42, major * .95);
             vec3 flatColor = vec3(.19, .28, .42);
             vec3 wellColor = vec3(.47, .66, .94);
-            vec3 color = mix(flatColor, wellColor, clamp(depthGlow * .75 + slopeGlow * .38, 0.0, 1.0));
-            float alpha = line * (.13 + depthGlow * .24 + slopeGlow * .18) * uOpacity;
+            vec3 color = mix(flatColor, wellColor, depthGlow);
+            float alpha = line * (.13 + depthGlow * .34) * uOpacity;
             gl_FragColor = vec4(color, alpha);
           }
         `}
