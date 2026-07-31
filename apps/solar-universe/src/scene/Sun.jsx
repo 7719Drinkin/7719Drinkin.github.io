@@ -22,10 +22,10 @@ function createCoronaTexture() {
   const center = size / 2;
   const gradient = context.createRadialGradient(center, center, 58, center, center, center);
   gradient.addColorStop(0, 'rgba(255,255,242,1)');
-  gradient.addColorStop(0.12, 'rgba(255,245,190,.94)');
-  gradient.addColorStop(0.24, 'rgba(255,187,75,.52)');
-  gradient.addColorStop(0.48, 'rgba(255,115,30,.16)');
-  gradient.addColorStop(0.78, 'rgba(255,83,18,.035)');
+  gradient.addColorStop(0.12, 'rgba(255,245,190,.9)');
+  gradient.addColorStop(0.24, 'rgba(255,187,75,.38)');
+  gradient.addColorStop(0.44, 'rgba(255,115,30,.085)');
+  gradient.addColorStop(0.68, 'rgba(255,83,18,.014)');
   gradient.addColorStop(1, 'rgba(255,70,12,0)');
   context.fillStyle = gradient;
   context.fillRect(0, 0, size, size);
@@ -39,11 +39,11 @@ function createCoronaTexture() {
     const width = 0.0015 + random() * 0.007;
     const length = center * (0.32 + random() * 0.54);
     const inner = center * (0.18 + random() * 0.07);
-    const alpha = 0.01 + random() * 0.045;
+    const alpha = 0.006 + random() * 0.022;
     context.rotate(angle);
     const ray = context.createLinearGradient(inner, 0, length, 0);
     ray.addColorStop(0, `rgba(255,240,176,${alpha})`);
-    ray.addColorStop(0.35, `rgba(255,169,66,${alpha * 0.68})`);
+    ray.addColorStop(0.35, `rgba(255,169,66,${alpha * 0.58})`);
     ray.addColorStop(1, 'rgba(255,90,20,0)');
     context.fillStyle = ray;
     context.beginPath();
@@ -250,9 +250,9 @@ export default function Sun({ quality, selected, onSelect, registerPlanet }) {
     if (chromosphere.current) chromosphere.current.uniforms.uTime.value = time;
     if (surface.current) surface.current.rotation.y += delta * 0.012;
     if (corona.current) {
-      const pulse = 1 + Math.sin(time * 0.17) * 0.018;
+      const pulse = 1 + Math.sin(time * 0.17) * 0.012;
       corona.current.scale.setScalar(pulse);
-      corona.current.material.opacity = selected ? 0.74 : 0.58;
+      corona.current.material.opacity = selected ? 0.24 : 0.16;
     }
   });
 
@@ -263,12 +263,12 @@ export default function Sun({ quality, selected, onSelect, registerPlanet }) {
 
   return (
     <group ref={root} onClick={select}>
-      <sprite ref={corona} scale={[6.2, 6.2, 1]} renderOrder={-2}>
+      <sprite ref={corona} scale={[4.4, 4.4, 1]} renderOrder={-2}>
         <spriteMaterial
           map={coronaTexture}
           color="#fff0b0"
           transparent
-          opacity={0.58}
+          opacity={0.16}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           toneMapped={false}
@@ -313,7 +313,7 @@ export default function Sun({ quality, selected, onSelect, registerPlanet }) {
                 f = f * f * (3.0 - 2.0 * f);
                 return mix(
                   mix(mix(hash(i + vec3(0,0,0)), hash(i + vec3(1,0,0)), f.x),
-                      mix(hash(i + vec3(0,1,0)), hash(i + vec3(1,1,0)), f.x), f.y),
+                      mix(hash(i + vec3(0,1,0)), hash(i + vec3(1,1,1)), f.x), f.y),
                   mix(mix(hash(i + vec3(0,0,1)), hash(i + vec3(1,0,1)), f.x),
                       mix(hash(i + vec3(0,1,1)), hash(i + vec3(1,1,1)), f.x), f.y),
                   f.z
