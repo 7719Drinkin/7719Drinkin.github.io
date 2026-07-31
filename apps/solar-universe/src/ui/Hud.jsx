@@ -1,5 +1,6 @@
 export default function Hud({
   quality,
+  selectedId,
   showOrbits,
   showEcliptic,
   onToggleQuality,
@@ -27,9 +28,9 @@ export default function Hud({
       </section>
 
       <aside className="system-readout" aria-label="Rendering status">
-        <div><span>WORLDS</span><strong>03</strong></div>
+        <div><span>WORLDS</span><strong>03 + STAR</strong></div>
         <div><span>RENDER</span><strong>{quality.toUpperCase()}</strong></div>
-        <div><span>MOTION</span><strong>ORBIT + AXIAL</strong></div>
+        <div><span>CAMERA</span><strong>{selectedId ? 'CELESTIAL FREE' : 'ECLIPTIC LOCK'}</strong></div>
       </aside>
 
       <div className="view-controls" aria-label="3D display controls">
@@ -40,7 +41,7 @@ export default function Hud({
           ORBITS <strong>{showOrbits ? 'ON' : 'OFF'}</strong>
         </button>
         <button type="button" aria-pressed={showEcliptic} onClick={onToggleEcliptic}>
-          ECLIPTIC <strong>{showEcliptic ? 'ON' : 'OFF'}</strong>
+          GRAVITY GRID <strong>{showEcliptic ? 'ON' : 'OFF'}</strong>
         </button>
       </div>
     </>
