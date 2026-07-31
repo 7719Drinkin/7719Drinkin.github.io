@@ -1,120 +1,17 @@
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Stars, TrackballControls } from '@react-three/drei';
+import { OrbitControls, Stars } from '@react-three/drei';
 import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import PlanetSystem from './PlanetSystem.jsx';
+import Sun from './Sun.jsx';
+import GravityGrid from './GravityGrid.jsx';
 
-const SYSTEM_CAMERA = new THREE.Vector3(0, 13, 29);
-
-function createSunGlowTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
-  const context = canvas.getContext('2d');
-  const gradient = context.createRadialGradient(256, 256, 20, 256, 256, 256);
-  gradient.addColorStop(0, 'rgba(255,248,205,1)');
-  gradient.addColorStop(0.12, 'rgba(255,194,82,.88)');
-  gradient.addColorStop(0.32, 'rgba(255,103,24,.34)');
-  gradient.addColorStop(0.62, 'rgba(255,61,8,.09)');
-  gradient.addColorStop(1, 'rgba(255,40,0,0)');
-  context.fillStyle = gradient;
-  context.fillRect(0, 0, 512, 512);
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  return texture;
-}
-
-function Sun() {
-  const material = useRef();
-  const shell = useRef();
-  const glowTexture = useMemo(createSunGlowTexture, []);
-  const uniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
-
-  useFrame(({ clock }, delta) => {
-    if (material.current) material.current.uniforms.uTime.value = clock.elapsedTime;
-    if (shell.current) {
-      shell.current.rotation.y += delta * 0.035;
-      shell.current.rotation.x -= delta * 0.012;
-      const pulse = 1 + Math.sin(clock.elapsedTime * 0.42) * 0.018;
-      shell.current.scale.setScalar(pulse);
-    }
-  });
-
-  return (
-    <group>
-      <sprite scale={[4.5, 4.5, 1]} renderOrder={-1}>
-        <spriteMaterial
-          map={glowTexture}
-          color="#ff8a27"
-          transparent
-          opacity={0.9}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </sprite>
-
-      <mesh>
-        <icosahedronGeometry args={[0.9, 5]} />
-        <shaderMaterial
-          ref={material}
-          uniforms={uniforms}
-          vertexShader={`
-            uniform float uTime;
-            varying vec3 vNormal;
-            varying vec3 vPosition;
-            varying vec3 vView;
-            void main() {
-              float waveA = sin(position.x * 8.0 + uTime * .42) * .012;
-              float waveB = sin(position.y * 13.0 - uTime * .31) * .008;
-              float waveC = sin(position.z * 17.0 + uTime * .23) * .006;
-              vec3 displaced = position + normal * (waveA + waveB + waveC);
-              vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
-              vNormal = normalize(normalMatrix * normal);
-              vPosition = normalize(position);
-              vView = -mvPosition.xyz;
-              gl_Position = projectionMatrix * mvPosition;
-            }
-          `}
-          fragmentShader={`
-            uniform float uTime;
-            varying vec3 vNormal;
-            varying vec3 vPosition;
-            varying vec3 vView;
-            void main() {
-              float bandA = sin(vPosition.x * 12.0 + vPosition.y * 7.0 + uTime * .48);
-              float bandB = sin(vPosition.y * 18.0 - vPosition.z * 9.0 - uTime * .31);
-              float cells = sin((vPosition.x + vPosition.y + vPosition.z) * 25.0 + uTime * .22);
-              float heat = clamp(.55 + bandA * .18 + bandB * .14 + cells * .1, 0.0, 1.0);
-              vec3 deep = vec3(.72, .075, .006);
-              vec3 amber = vec3(1.0, .39, .035);
-              vec3 hot = vec3(1.0, .92, .55);
-              vec3 color = mix(deep, amber, smoothstep(.05, .72, heat));
-              color = mix(color, hot, smoothstep(.68, 1.0, heat));
-              float rim = pow(1.0 - max(dot(normalize(vNormal), normalize(vView)), 0.0), 2.2);
-              color += vec3(1.0, .22, .02) * rim * .34;
-              gl_FragColor = vec4(color, 1.0);
-            }
-          `}
-        />
-      </mesh>
-
-      <mesh ref={shell}>
-        <icosahedronGeometry args={[1.02, 3]} />
-        <meshBasicMaterial
-          color="#ff6c16"
-          transparent
-          opacity={0.13}
-          side={THREE.BackSide}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </mesh>
-
-      <pointLight color="#ffb46d" intensity={168} distance={118} decay={1.8} />
-    </group>
-  );
-}
+const SYSTEM_CAMERA = new THREE.Vector3(0, 11.5, 30);
+const SYSTEM_MIN_POLAR = 0.36;
+const SYSTEM_MAX_POLAR = Math.PI / 2 - 0.035;
+const FREE_MIN_POLAR = 0.001;
+const FREE_MAX_POLAR = Math.PI - 0.001;
 
 function OrbitLine({ radius, inclination, color }) {
   const geometry = useMemo(() => {
@@ -127,29 +24,8 @@ function OrbitLine({ radius, inclination, color }) {
 
   return (
     <lineLoop geometry={geometry} rotation-z={inclination}>
-      <lineBasicMaterial color={color} transparent opacity={0.09} depthWrite={false} />
+      <lineBasicMaterial color={color} transparent opacity={0.075} depthWrite={false} />
     </lineLoop>
-  );
-}
-
-function EclipticPlane() {
-  return (
-    <group rotation-x={-Math.PI / 2}>
-      <mesh>
-        <ringGeometry args={[1.35, 22.5, 160, 1]} />
-        <meshBasicMaterial
-          color="#6d7890"
-          transparent
-          opacity={0.022}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-        />
-      </mesh>
-      <mesh>
-        <ringGeometry args={[22.44, 22.5, 160, 1]} />
-        <meshBasicMaterial color="#8391ad" transparent opacity={0.12} side={THREE.DoubleSide} depthWrite={false} />
-      </mesh>
-    </group>
   );
 }
 
@@ -163,6 +39,8 @@ function CameraController({ selectedId, planetRefs }) {
   const desiredTarget = useRef(new THREE.Vector3());
   const target = useMemo(() => new THREE.Vector3(), []);
   const delta = useMemo(() => new THREE.Vector3(), []);
+  const currentDirection = useMemo(() => new THREE.Vector3(), []);
+  const sunFacing = useMemo(() => new THREE.Vector3(), []);
 
   useEffect(() => {
     const controls = controlsRef.current;
@@ -173,8 +51,11 @@ function CameraController({ selectedId, planetRefs }) {
       desiredCamera.current.copy(SYSTEM_CAMERA);
       desiredTarget.current.set(0, 0, 0);
       hasPreviousTarget.current = false;
-      controls.minDistance = 6;
+      controls.minDistance = 8;
       controls.maxDistance = 58;
+      controls.minPolarAngle = SYSTEM_MIN_POLAR;
+      controls.maxPolarAngle = SYSTEM_MAX_POLAR;
+      controls.target.y = 0;
       return;
     }
 
@@ -184,15 +65,31 @@ function CameraController({ selectedId, planetRefs }) {
     previousTarget.current.copy(target);
     hasPreviousTarget.current = true;
 
-    const currentDirection = camera.position.clone().sub(controls.target).normalize();
-    const sunFacing = target.clone().multiplyScalar(-1).normalize();
-    const preferred = currentDirection.multiplyScalar(0.78).add(sunFacing.multiplyScalar(0.22)).normalize();
+    currentDirection.copy(camera.position).sub(controls.target).normalize();
+    if (selectedId === 'sun') {
+      sunFacing.copy(currentDirection);
+    } else {
+      sunFacing.copy(target).multiplyScalar(-1).normalize();
+      if (sunFacing.lengthSq() < 0.001) sunFacing.copy(currentDirection);
+    }
+
+    const preferred = currentDirection
+      .multiplyScalar(selectedId === 'sun' ? 1 : 0.8)
+      .add(sunFacing.multiplyScalar(selectedId === 'sun' ? 0 : 0.2))
+      .normalize();
+    const focusDistance = selectedId === 'sun' ? 4.35 : 5.8;
+    const heightOffset = selectedId === 'sun' ? 0.18 : 0.52;
+
     desiredTarget.current.copy(target);
-    desiredCamera.current.copy(target).add(preferred.multiplyScalar(5.8)).add(new THREE.Vector3(0, 0.55, 0));
-    transition.current = 'planet';
-    controls.minDistance = 1.75;
-    controls.maxDistance = 12;
-  }, [camera, planetRefs, selectedId, target]);
+    desiredCamera.current.copy(target)
+      .add(preferred.multiplyScalar(focusDistance))
+      .add(new THREE.Vector3(0, heightOffset, 0));
+    transition.current = 'celestial';
+    controls.minDistance = selectedId === 'sun' ? 2.05 : 1.75;
+    controls.maxDistance = selectedId === 'sun' ? 16 : 12;
+    controls.minPolarAngle = FREE_MIN_POLAR;
+    controls.maxPolarAngle = FREE_MAX_POLAR;
+  }, [camera, currentDirection, planetRefs, selectedId, sunFacing, target]);
 
   useFrame(() => {
     const controls = controlsRef.current;
@@ -225,18 +122,25 @@ function CameraController({ selectedId, planetRefs }) {
       }
     }
 
+    if (!selectedId) {
+      controls.target.y = 0;
+      camera.position.y = Math.max(camera.position.y, 0.35);
+    }
+
     controls.update();
   });
 
   return (
-    <TrackballControls
+    <OrbitControls
       ref={controlsRef}
       makeDefault
-      noPan
-      rotateSpeed={2.15}
-      zoomSpeed={1.05}
-      staticMoving={false}
-      dynamicDampingFactor={0.12}
+      enableDamping
+      dampingFactor={0.055}
+      enablePan={false}
+      minDistance={8}
+      maxDistance={58}
+      minPolarAngle={SYSTEM_MIN_POLAR}
+      maxPolarAngle={SYSTEM_MAX_POLAR}
       onStart={() => { transition.current = null; }}
     />
   );
@@ -255,15 +159,32 @@ function Scene({
   return (
     <>
       <color attach="background" args={['#000106']} />
-      <fogExp2 attach="fog" args={['#000106', 0.0034]} />
+      <fogExp2 attach="fog" args={['#000106', 0.0031]} />
 
-      <ambientLight color="#718099" intensity={0.07} />
-      <hemisphereLight args={['#8fa4c2', '#25170f', 0.38]} />
-      <directionalLight position={[9, 11, 16]} color="#cbd8ed" intensity={0.18} />
-      <Sun />
-      <Stars radius={170} depth={95} count={quality === 'quality' ? 7200 : 1900} factor={4} saturation={0.12} fade speed={0.12} />
+      <ambientLight color="#718099" intensity={0.045} />
+      <hemisphereLight args={['#8799b4', '#160d08', 0.24]} />
+      <directionalLight position={[10, 12, 17]} color="#c7d5e9" intensity={0.09} />
 
-      {showEcliptic && <EclipticPlane />}
+      <Sun
+        quality={quality}
+        selected={selectedId === 'sun'}
+        onSelect={onSelect}
+        registerPlanet={registerPlanet}
+      />
+
+      <Stars
+        radius={170}
+        depth={95}
+        count={quality === 'quality' ? 7200 : 1900}
+        factor={4}
+        saturation={0.12}
+        fade
+        speed={0.12}
+      />
+
+      {showEcliptic && (
+        <GravityGrid interests={interests} planetRefs={planetRefs} quality={quality} />
+      )}
 
       {showOrbits && interests.map((interest) => (
         <OrbitLine
@@ -289,8 +210,8 @@ function Scene({
 
       {quality === 'quality' && (
         <EffectComposer multisampling={4}>
-          <Bloom luminanceThreshold={1.02} luminanceSmoothing={0.55} intensity={0.58} mipmapBlur />
-          <Vignette offset={0.3} darkness={0.56} />
+          <Bloom luminanceThreshold={1.05} luminanceSmoothing={0.48} intensity={0.62} mipmapBlur />
+          <Vignette offset={0.3} darkness={0.66} />
         </EffectComposer>
       )}
     </>
@@ -299,16 +220,20 @@ function Scene({
 
 export default function UniverseCanvas(props) {
   const dpr = props.quality === 'quality' ? [1, 2] : [1, 1.2];
+
   return (
     <Canvas
       className="universe-canvas"
       camera={{ position: SYSTEM_CAMERA.toArray(), fov: 42, near: 0.1, far: 380 }}
       dpr={dpr}
-      gl={{ antialias: props.quality === 'quality', powerPreference: props.quality === 'quality' ? 'high-performance' : 'low-power' }}
+      gl={{
+        antialias: props.quality === 'quality',
+        powerPreference: props.quality === 'quality' ? 'high-performance' : 'low-power'
+      }}
       onCreated={({ gl }) => {
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = props.quality === 'quality' ? 1.2 : 1.06;
+        gl.toneMappingExposure = props.quality === 'quality' ? 1.19 : 1.08;
       }}
       onPointerMissed={(event) => {
         if (event.type === 'click') props.onSelect(null);
