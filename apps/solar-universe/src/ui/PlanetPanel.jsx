@@ -1,9 +1,20 @@
-export default function PlanetPanel({ interest, onClose }) {
-  const bodyLabel = interest?.kind === 'star' ? 'STAR' : 'PLANET';
+import { translate } from '../i18n.js';
+
+export default function PlanetPanel({ interest, language, onClose }) {
+  const bodyLabel = interest?.kind === 'star'
+    ? translate(language, 'panel.star')
+    : translate(language, 'panel.planet');
 
   return (
     <aside className={`planet-panel${interest ? ' is-open' : ''}`} aria-hidden={!interest}>
-      <button className="planet-panel-close" type="button" onClick={onClose} aria-label="关闭天体信息">×</button>
+      <button
+        className="planet-panel-close"
+        type="button"
+        onClick={onClose}
+        aria-label={translate(language, 'panel.close')}
+      >
+        ×
+      </button>
       {interest && (
         <>
           <div className="planet-panel-meta" style={{ '--panel-accent': interest.accent }}>
@@ -14,12 +25,12 @@ export default function PlanetPanel({ interest, onClose }) {
           <p>{interest.description}</p>
           {interest.route ? (
             <a className="planet-panel-link" href={interest.route}>
-              <span>ENTER INTEREST</span>
+              <span>{translate(language, 'panel.enter')}</span>
               <strong>↗</strong>
             </a>
           ) : (
             <div className="planet-panel-link planet-panel-link-static">
-              <span>SELECTED CELESTIAL BODY</span>
+              <span>{translate(language, 'panel.selected')}</span>
               <strong>◎</strong>
             </div>
           )}

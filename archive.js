@@ -1,3 +1,22 @@
+function mountLanguageToggleContrast() {
+  if (document.querySelector('#language-toggle-contrast')) return;
+  const style = document.createElement('style');
+  style.id = 'language-toggle-contrast';
+  style.textContent = '.language-toggle:hover,.language-toggle:focus-visible{background:#f4f1e8!important;color:#07090d!important;}';
+  document.head.append(style);
+}
+
+function loadSiteI18n() {
+  mountLanguageToggleContrast();
+  if (window.SiteI18n || document.querySelector('script[data-site-i18n]')) return;
+  const script = document.createElement('script');
+  script.src = '/js/site-i18n.js?v=20260731-1';
+  script.dataset.siteI18n = '';
+  document.head.append(script);
+}
+
+loadSiteI18n();
+
 const archiveGrid = document.querySelector('#archive-grid');
 const archiveStatus = document.querySelector('#archive-status');
 const archiveCount = document.querySelector('#archive-count');
@@ -42,29 +61,55 @@ const fallbackAssets = [
   '994436124432461512.JPG', 'moment-02.jpg'
 ];
 
+let currentItems = [];
+
+function translate(key, variables, fallback) {
+  const value = window.SiteI18n?.t(key, variables);
+  return value && value !== key ? value : fallback;
+}
+
 function renderArchive(items) {
   if (!archiveGrid) return;
+  currentItems = items;
   archiveGrid.replaceChildren();
+
   items.forEach((item, index) => {
     const card = document.createElement('article');
     card.className = 'archive-card';
+
     const image = document.createElement('img');
+    const number = String(index + 1).padStart(2, '0');
     image.src = item.url;
-    image.alt = `Michael Jordan archive frame ${String(index + 1).padStart(2, '0')}`;
+    image.alt = translate(
+      'archive.frameAlt',
+      { number },
+      `Michael Jordan archive frame ${number}`
+    );
     image.loading = index < 10 ? 'eager' : 'lazy';
     image.decoding = 'async';
     image.tabIndex = 0;
     image.setAttribute('role', 'button');
-    image.setAttribute('aria-label', `${image.alt}，点击放大`);
+    image.setAttribute(
+      'aria-label',
+      translate('archive.openImage', { label: image.alt }, `${image.alt}，点击放大`)
+    );
     image.addEventListener('error', () => card.remove(), { once: true });
-    const number = document.createElement('span');
-    number.className = 'archive-card-index';
-    number.textContent = String(index + 1).padStart(2, '0');
-    card.append(image, number);
+
+    const indexLabel = document.createElement('span');
+    indexLabel.className = 'archive-card-index';
+    indexLabel.textContent = number;
+    card.append(image, indexLabel);
     archiveGrid.append(card);
   });
+
   archiveStatus?.remove();
-  if (archiveCount) archiveCount.textContent = `${items.length} FRAMES`;
+  if (archiveCount) {
+    archiveCount.textContent = translate(
+      'archive.frames',
+      { count: items.length },
+      `${items.length} FRAMES`
+    );
+  }
 }
 
 async function loadArchive() {
@@ -92,6 +137,7 @@ function openLightbox(image) {
   document.body.classList.add('lightbox-open');
   lightboxClose?.focus();
 }
+
 function closeLightbox() {
   if (!lightbox || !lightboxImage) return;
   lightbox.classList.remove('is-open');
@@ -99,17 +145,28 @@ function closeLightbox() {
   document.body.classList.remove('lightbox-open');
   lightboxImage.src = '';
 }
+
 archiveGrid?.addEventListener('click', (event) => {
   const image = event.target.closest?.('.archive-card img');
   if (image) openLightbox(image);
 });
+
 archiveGrid?.addEventListener('keydown', (event) => {
   const image = event.target.closest?.('.archive-card img');
   if (!image || !['Enter', ' '].includes(event.key)) return;
   event.preventDefault();
   openLightbox(image);
 });
+
 lightboxClose?.addEventListener('click', closeLightbox);
-lightbox?.addEventListener('click', (event) => { if (event.target === lightbox) closeLightbox(); });
-window.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeLightbox(); });
+lightbox?.addEventListener('click', (event) => {
+  if (event.target === lightbox) closeLightbox();
+});
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeLightbox();
+});
+window.addEventListener('7719:languagechange', () => {
+  if (currentItems.length) renderArchive(currentItems);
+});
+
 loadArchive();

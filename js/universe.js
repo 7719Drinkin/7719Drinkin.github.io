@@ -1,3 +1,22 @@
+function mountLanguageToggleContrast() {
+  if (document.querySelector('#language-toggle-contrast')) return;
+  const style = document.createElement('style');
+  style.id = 'language-toggle-contrast';
+  style.textContent = '.language-toggle:hover,.language-toggle:focus-visible{background:#f4f1e8!important;color:#07090d!important;}';
+  document.head.append(style);
+}
+
+function loadSiteI18n() {
+  mountLanguageToggleContrast();
+  if (window.SiteI18n || document.querySelector('script[data-site-i18n]')) return;
+  const script = document.createElement('script');
+  script.src = '/js/site-i18n.js?v=20260731-1';
+  script.dataset.siteI18n = '';
+  document.head.append(script);
+}
+
+loadSiteI18n();
+
 const header = document.querySelector('.universe-header');
 const interestGrid = document.querySelector('#interest-grid');
 
@@ -105,6 +124,7 @@ async function renderGalaxies() {
 
   interestGrid.replaceChildren(...cards);
   observeReveals(interestGrid);
+  window.SiteI18n?.apply();
 
   const count = document.querySelector('.hero-readout div:first-child strong');
   if (count) count.textContent = String(interests.length).padStart(2, '0');
