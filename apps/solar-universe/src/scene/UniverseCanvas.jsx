@@ -5,6 +5,7 @@ import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import PlanetSystem from './PlanetSystem.jsx';
 import Sun from './Sun.jsx';
+import SolarRadiance from './SolarRadiance.jsx';
 import GravityGrid from './GravityGrid.jsx';
 
 const SYSTEM_CAMERA = new THREE.Vector3(0, 11.5, 30);
@@ -12,8 +13,8 @@ const SYSTEM_MIN_POLAR = 0.36;
 const SYSTEM_MAX_POLAR = Math.PI / 2 - 0.035;
 const FREE_MIN_POLAR = 0.001;
 const FREE_MAX_POLAR = Math.PI - 0.001;
-const SUNLIGHT_MIN = 0.35;
-const SUNLIGHT_MAX = 1.65;
+const SUNLIGHT_MIN = 0.25;
+const SUNLIGHT_MAX = 2.5;
 
 function OrbitLine({ radius, inclination, color }) {
   const geometry = useMemo(() => {
@@ -36,13 +37,16 @@ function LightingController({ sunBrightness, quality }) {
   const sunlight = useRef();
 
   useEffect(() => {
-    const baseExposure = quality === 'quality' ? 1.06 : 1.0;
+    const baseExposure = quality === 'quality' ? 1.04 : 0.99;
     const normalized = THREE.MathUtils.clamp(
       (sunBrightness - SUNLIGHT_MIN) / (SUNLIGHT_MAX - SUNLIGHT_MIN),
       0,
       1
     );
-    gl.toneMappingExposure = baseExposure * THREE.MathUtils.lerp(0.94, 1.06, normalized);
+
+    // Keep the world exposure controlled while the Sun itself remains HDR.
+    // This preserves dark space and prevents the planets from washing out.
+    gl.toneMappingExposure = baseExposure * THREE.MathUtils.lerp(0.93, 1.02, normalized);
   }, [gl, quality, sunBrightness]);
 
   useFrame(() => {
@@ -58,7 +62,13 @@ function LightingController({ sunBrightness, quality }) {
       });
     }
 
-    if (sunlight.current) sunlight.current.intensity = 255 * sunBrightness;
+    if (sunlight.current) {
+      const physicalResponse = Math.pow(
+        THREE.MathUtils.clamp(sunBrightness, SUNLIGHT_MIN, SUNLIGHT_MAX),
+        1.65
+      );
+      sunlight.current.intensity = 680 * physicalResponse;
+    }
   });
 
   return null;
@@ -192,6 +202,8 @@ function Scene({
   showEcliptic,
   sunBrightness
 }) {
+  const bloomIntensity = 0.82 + Math.pow(sunBrightness, 0.82) * 0.74;
+
   return (
     <>
       <color attach="background" args={['#000106']} />
@@ -205,6 +217,11 @@ function Scene({
         selected={selectedId === 'sun'}
         onSelect={onSelect}
         registerPlanet={registerPlanet}
+      />
+      <SolarRadiance
+        brightness={sunBrightness}
+        selected={selectedId === 'sun'}
+        quality={quality}
       />
       <LightingController sunBrightness={sunBrightness} quality={quality} />
 
@@ -248,9 +265,9 @@ function Scene({
       {quality === 'quality' && (
         <EffectComposer multisampling={4}>
           <Bloom
-            luminanceThreshold={1.12}
-            luminanceSmoothing={0.42}
-            intensity={0.5}
+            luminanceThreshold={0.72}
+            luminanceSmoothing={0.34}
+            intensity={bloomIntensity}
             mipmapBlur
           />
           <Vignette offset={0.3} darkness={0.68} />
@@ -262,13 +279,14 @@ function Scene({
 
 export default function UniverseCanvas(props) {
   const dpr = props.quality === 'quality' ? [1, 2] : [1, 1.2];
+  const sunBrightness = props.sunBrightness ?? 1;
   const normalizedBrightness = THREE.MathUtils.clamp(
-    (props.sunBrightness - SUNLIGHT_MIN) / (SUNLIGHT_MAX - SUNLIGHT_MIN),
+    (sunBrightness - SUNLIGHT_MIN) / (SUNLIGHT_MAX - SUNLIGHT_MIN),
     0,
     1
   );
-  const initialExposure = (props.quality === 'quality' ? 1.06 : 1.0)
-    * THREE.MathUtils.lerp(0.94, 1.06, normalizedBrightness);
+  const initialExposure = (props.quality === 'quality' ? 1.04 : 0.99)
+    * THREE.MathUtils.lerp(0.93, 1.02, normalizedBrightness);
 
   return (
     <Canvas
@@ -289,7 +307,7 @@ export default function UniverseCanvas(props) {
       }}
     >
       <Suspense fallback={null}>
-        <Scene {...props} />
+        <Scene {...props} sunBrightness={sunBrightness} />
       </Suspense>
     </Canvas>
   );
