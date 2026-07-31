@@ -94,6 +94,14 @@ function prepareBands(bands = []) {
   }));
 }
 
+function prepareFlattenZones(flattenZones = []) {
+  return flattenZones.map((zone) => ({
+    ...zone,
+    direction: new THREE.Vector3(...zone.direction).normalize(),
+    colorValue: zone.color ? new THREE.Color(zone.color) : null
+  }));
+}
+
 export function createStylizedTerrain({
   radius,
   detail,
@@ -101,7 +109,8 @@ export function createStylizedTerrain({
   palette,
   relief = 1,
   features = [],
-  bands = []
+  bands = [],
+  flattenZones = []
 }) {
   const [widthSegments, heightSegments] = terrainSegments(detail);
   const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
@@ -121,8 +130,10 @@ export function createStylizedTerrain({
   const resultColor = new THREE.Color();
   const authoredFeatures = prepareFeatures(features);
   const authoredBands = prepareBands(bands);
+  const authoredFlattenZones = prepareFlattenZones(flattenZones);
   const featureState = authoredFeatures.map(() => ({ mask: 0, rim: 0 }));
   const bandState = authoredBands.map(() => 0);
+  const flattenState = authoredFlattenZones.map(() => 0);
 
   for (let index = 0; index < position.count; index += 1) {
     vertex.fromBufferAttribute(position, index);
@@ -170,6 +181,15 @@ export function createStylizedTerrain({
       displacement += shapedMask * (band.elevation ?? 0) * radius;
     });
 
+    authoredFlattenZones.forEach((zone, zoneIndex) => {
+      const angle = Math.acos(THREE.MathUtils.clamp(normal.dot(zone.direction), -1, 1));
+      const mask = 1 - smoothstep(zone.radius, zone.radius + (zone.softness ?? 0.16), angle);
+      const strength = mask * (zone.strength ?? 1);
+      const targetDisplacement = (zone.target ?? 0) * radius;
+      displacement = THREE.MathUtils.lerp(displacement, targetDisplacement, strength);
+      flattenState[zoneIndex] = mask;
+    });
+
     vertex.addScaledVector(normal, displacement);
     position.setXYZ(index, vertex.x, vertex.y, vertex.z);
 
@@ -208,6 +228,15 @@ export function createStylizedTerrain({
     authoredBands.forEach((band, bandIndex) => {
       if (band.colorValue) {
         resultColor.lerp(band.colorValue, bandState[bandIndex] * (band.colorStrength ?? 0.45));
+      }
+    });
+
+    authoredFlattenZones.forEach((zone, zoneIndex) => {
+      if (zone.colorValue) {
+        resultColor.lerp(
+          zone.colorValue,
+          flattenState[zoneIndex] * (zone.colorStrength ?? 0.36)
+        );
       }
     });
 
