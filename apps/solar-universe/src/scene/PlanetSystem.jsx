@@ -5,6 +5,7 @@ import BasketballWorld from '../worlds/BasketballWorld.jsx';
 import PlaceholderWorld from '../worlds/PlaceholderWorld.jsx';
 import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
 import CourtStands from '../basketball/CourtStands.jsx';
+import CourtDynamics from '../basketball/CourtDynamics.jsx';
 
 export default function PlanetSystem({
   interest,
@@ -61,6 +62,7 @@ export default function PlanetSystem({
               <>
                 <BasketballWorld radius={interest.size} quality={quality} />
                 <CourtStands radius={interest.size} quality={quality} />
+                <CourtDynamics radius={interest.size} quality={quality} />
               </>
             ) : (
               <PlaceholderWorld interest={interest} quality={quality} />
