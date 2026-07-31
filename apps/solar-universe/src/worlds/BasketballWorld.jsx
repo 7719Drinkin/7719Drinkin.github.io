@@ -53,7 +53,7 @@ function Floodlight({ position }) {
 function LastCourt({ radius, quality }) {
   const audience = useMemo(() => {
     const random = seededRandom(1998);
-    return Array.from({ length: quality === 'quality' ? 58 : 24 }, (_, index) => {
+    return Array.from({ length: quality === 'quality' ? 52 : 22 }, (_, index) => {
       const side = index % 2 ? 1 : -1;
       return {
         position: [(random() - 0.5) * 0.58, radius * 1.11 + random() * 0.055, side * (0.37 + random() * 0.09)],
@@ -66,7 +66,7 @@ function LastCourt({ radius, quality }) {
   const plateauSegments = quality === 'quality' ? 36 : 24;
 
   return (
-    <group>
+    <group scale={[0.88, 1, 0.88]}>
       <mesh position-y={radius * 0.89}>
         <cylinderGeometry args={[0.72, 0.86, 0.14, plateauSegments]} />
         <meshStandardMaterial color="#4b3a2e" roughness={0.86} />
@@ -123,7 +123,7 @@ const BASKETBALL_FEATURES = [
     direction: [-0.78, 0.12, 0.61],
     radius: 0.72,
     softness: 0.24,
-    elevation: 0.006,
+    elevation: 0.008,
     color: '#416c48',
     colorStrength: 0.78
   },
@@ -131,35 +131,25 @@ const BASKETBALL_FEATURES = [
     direction: [-0.38, 0.45, 0.81],
     radius: 0.45,
     softness: 0.18,
-    elevation: 0.014,
-    color: '#8d8b4d',
-    colorStrength: 0.56
+    elevation: 0.016,
+    color: '#9a914d',
+    colorStrength: 0.58
   },
   {
-    direction: [0.7, -0.06, -0.71],
-    radius: 0.5,
-    softness: 0.18,
-    elevation: -0.026,
-    color: '#993b2d',
-    colorStrength: 0.74,
-    rimAt: 0.48,
-    rimWidth: 0.09,
-    rimElevation: 0.018,
-    rimColor: '#c77849',
-    rimColorStrength: 0.58
+    direction: [0.72, -0.02, -0.69],
+    radius: 0.48,
+    softness: 0.2,
+    elevation: 0.008,
+    color: '#a44a32',
+    colorStrength: 0.72
   },
   {
-    direction: [-0.08, -0.18, -0.98],
-    radius: 0.3,
-    softness: 0.12,
-    elevation: -0.05,
-    color: '#20252c',
-    colorStrength: 0.9,
-    rimAt: 0.3,
-    rimWidth: 0.075,
-    rimElevation: 0.032,
-    rimColor: '#865d42',
-    rimColorStrength: 0.64
+    direction: [-0.1, -0.14, -0.98],
+    radius: 0.36,
+    softness: 0.16,
+    elevation: -0.008,
+    color: '#2f7180',
+    colorStrength: 0.84
   },
   {
     direction: [0.2, 0.58, 0.79],
@@ -168,27 +158,53 @@ const BASKETBALL_FEATURES = [
     elevation: 0.022,
     color: '#d0a05d',
     colorStrength: 0.62
+  },
+  {
+    direction: [0.54, -0.3, 0.79],
+    radius: 0.31,
+    softness: 0.16,
+    elevation: 0.012,
+    color: '#365d43',
+    colorStrength: 0.7
   }
 ];
 
 const BASKETBALL_BANDS = [
   {
     normal: [0.18, 0.97, 0.12],
-    width: 0.105,
-    softness: 0.075,
-    elevation: -0.012,
+    width: 0.095,
+    softness: 0.07,
+    elevation: -0.008,
     frequency: 7,
-    color: '#732f2a',
-    colorStrength: 0.56
+    color: '#7e3b2d',
+    colorStrength: 0.48
   },
   {
     normal: [0.84, 0.1, -0.52],
-    width: 0.065,
-    softness: 0.055,
+    width: 0.062,
+    softness: 0.052,
     elevation: 0.014,
     frequency: 11,
     color: '#c18a50',
     colorStrength: 0.42
+  },
+  {
+    normal: [-0.42, 0.58, 0.7],
+    width: 0.034,
+    softness: 0.038,
+    elevation: -0.005,
+    frequency: 5,
+    color: '#41828a',
+    colorStrength: 0.62
+  },
+  {
+    normal: [-0.62, 0.18, 0.76],
+    width: 0.07,
+    softness: 0.055,
+    elevation: 0.004,
+    frequency: 9,
+    color: '#527b50',
+    colorStrength: 0.48
   }
 ];
 
@@ -198,17 +214,17 @@ export default function BasketballWorld({ radius, quality }) {
       radius,
       detail: quality === 'quality' ? 5 : 4,
       seed: 23,
-      relief: 0.78,
+      relief: 0.76,
       features: BASKETBALL_FEATURES,
       bands: BASKETBALL_BANDS,
       palette: {
         low: '#171b21',
-        mid: '#56382c',
-        high: '#a06a42',
-        accent: '#b64432',
-        accent2: '#d2a268',
-        shadowTint: '#0d1218',
-        highlightTint: '#efc783'
+        mid: '#573a2d',
+        high: '#a36d43',
+        accent: '#b84a35',
+        accent2: '#d5aa6c',
+        shadowTint: '#0e1418',
+        highlightTint: '#efca8a'
       }
     }),
     [quality, radius]
@@ -217,12 +233,7 @@ export default function BasketballWorld({ radius, quality }) {
   return (
     <group>
       <mesh geometry={geometry}>
-        <meshStandardMaterial
-          vertexColors
-          roughness={0.72}
-          metalness={0}
-          dithering
-        />
+        <meshStandardMaterial vertexColors roughness={0.72} metalness={0} dithering />
       </mesh>
       <BasketballLife radius={radius} quality={quality} />
       <LastCourt radius={radius} quality={quality} />
