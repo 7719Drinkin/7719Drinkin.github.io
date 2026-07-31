@@ -1,18 +1,32 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { courtSurfaceY, hoopRimPosition } from './courtLayout.js';
+
+const DRIBBLE_END = 0.54;
+const SHOT_END = 0.82;
+const SWISH_END = 0.92;
 
 function smoothstep(value) {
   const t = THREE.MathUtils.clamp(value, 0, 1);
   return t * t * (3 - 2 * t);
 }
 
-function ReplayBall({ radius }) {
+function quadraticBezier(start, control, end, progress) {
+  const inverse = 1 - progress;
+  return inverse * inverse * start
+    + 2 * inverse * progress * control
+    + progress * progress * end;
+}
+
+function ReplayBall({ radius, quality }) {
   const root = useRef();
   const ball = useRef();
-  const glow = useRef();
-  const courtY = radius + 0.045;
+  const groundHalo = useRef();
+  const courtY = courtSurfaceY(radius);
+  const rim = useMemo(() => hoopRimPosition(radius, 1), [radius]);
   const ballRadius = radius * 0.026;
+  const sphereSegments = quality === 'quality' ? [20, 14] : [14, 10];
 
   useFrame(({ clock }, delta) => {
     const cycle = (clock.elapsedTime % 8.2) / 8.2;
@@ -21,22 +35,41 @@ function ReplayBall({ radius }) {
     let z;
     let visibility = 1;
 
-    if (cycle < 0.58) {
-      const progress = smoothstep(cycle / 0.58);
-      const bounce = Math.pow(Math.abs(Math.sin(progress * Math.PI * 4)), 0.72);
-      x = THREE.MathUtils.lerp(-0.22, 0.055, progress);
-      z = THREE.MathUtils.lerp(0.045, 0.005, progress);
-      y = courtY + ballRadius + 0.012 + bounce * radius * 0.085;
-    } else if (cycle < 0.9) {
-      const progress = (cycle - 0.58) / 0.32;
-      x = THREE.MathUtils.lerp(0.055, 0.205, progress);
-      z = THREE.MathUtils.lerp(0.005, -0.085, progress);
-      y = courtY + radius * 0.105 + Math.sin(progress * Math.PI) * radius * 0.235;
+    if (cycle < DRIBBLE_END) {
+      const progress = smoothstep(cycle / DRIBBLE_END);
+      const bounce = Math.pow(Math.abs(Math.sin(progress * Math.PI * 6)), 0.72);
+      x = THREE.MathUtils.lerp(-0.22, -0.045, progress);
+      z = THREE.MathUtils.lerp(0.055, 0.025, progress);
+      y = courtY + ballRadius + 0.012 + bounce * radius * 0.075;
+    } else if (cycle < SHOT_END) {
+      const progress = smoothstep((cycle - DRIBBLE_END) / (SHOT_END - DRIBBLE_END));
+      const startX = -0.045;
+      const startY = courtY + ballRadius + 0.055;
+      const startZ = 0.025;
+      const endY = rim.y + ballRadius * 0.08;
+
+      x = quadraticBezier(startX, THREE.MathUtils.lerp(startX, rim.x, 0.52), rim.x, progress);
+      y = quadraticBezier(
+        startY,
+        Math.max(startY, endY) + radius * 0.25,
+        endY,
+        progress
+      );
+      z = quadraticBezier(startZ, -0.015, rim.z, progress);
+    } else if (cycle < SWISH_END) {
+      const progress = smoothstep((cycle - SHOT_END) / (SWISH_END - SHOT_END));
+      x = rim.x;
+      z = rim.z;
+      y = THREE.MathUtils.lerp(
+        rim.y + ballRadius * 0.08,
+        rim.y - radius * 0.13,
+        progress
+      );
     } else {
-      const progress = (cycle - 0.9) / 0.1;
-      x = 0.205;
-      z = -0.085;
-      y = courtY + radius * 0.07 - progress * radius * 0.035;
+      const progress = smoothstep((cycle - SWISH_END) / (1 - SWISH_END));
+      x = rim.x + progress * 0.015;
+      z = rim.z;
+      y = THREE.MathUtils.lerp(rim.y - radius * 0.13, courtY + ballRadius, progress);
       visibility = 1 - progress;
     }
 
@@ -51,9 +84,12 @@ function ReplayBall({ radius }) {
       ball.current.rotation.z += delta * 2.1;
     }
 
-    if (glow.current) {
-      glow.current.material.opacity = visibility * 0.13;
-      glow.current.scale.setScalar(1.25 + Math.sin(clock.elapsedTime * 5) * 0.08);
+    if (groundHalo.current) {
+      const height = Math.max(0, y - courtY);
+      const proximity = 1 - THREE.MathUtils.clamp(height / (radius * 0.3), 0, 1);
+      groundHalo.current.position.y = courtY - y + 0.014;
+      groundHalo.current.material.opacity = visibility * (0.025 + proximity * 0.1);
+      groundHalo.current.scale.setScalar(1.1 + (1 - proximity) * 0.55);
     }
   });
 
@@ -61,7 +97,7 @@ function ReplayBall({ radius }) {
     <group ref={root}>
       <group ref={ball}>
         <mesh>
-          <sphereGeometry args={[ballRadius, 20, 14]} />
+          <sphereGeometry args={[ballRadius, ...sphereSegments]} />
           <meshStandardMaterial
             color="#c85a2f"
             emissive="#351006"
@@ -80,7 +116,7 @@ function ReplayBall({ radius }) {
         </mesh>
       </group>
 
-      <mesh ref={glow} rotation-x={Math.PI / 2} position-y={-ballRadius * 1.15}>
+      <mesh ref={groundHalo} rotation-x={Math.PI / 2}>
         <ringGeometry args={[ballRadius * 0.9, ballRadius * 1.7, 24]} />
         <meshBasicMaterial
           color="#ffb15d"
@@ -100,13 +136,15 @@ function SidelineLightWave({ radius, quality }) {
   const count = quality === 'quality' ? 14 : 8;
   const lights = useMemo(() => {
     const result = [];
+    const courtY = courtSurfaceY(radius);
+
     [-1, 1].forEach((side) => {
       for (let index = 0; index < count; index += 1) {
         const progress = count === 1 ? 0.5 : index / (count - 1);
         result.push({
           side,
           index,
-          position: [THREE.MathUtils.lerp(-0.31, 0.31, progress), radius + 0.064, side * 0.206],
+          position: [THREE.MathUtils.lerp(-0.31, 0.31, progress), courtY + 0.019, side * 0.206],
           color: index % 3 === 0 ? '#f2c376' : '#b53432'
         });
       }
@@ -148,7 +186,7 @@ export default function CourtDynamics({ radius, quality }) {
   return (
     <group>
       <SidelineLightWave radius={radius} quality={quality} />
-      <ReplayBall radius={radius} />
+      <ReplayBall radius={radius} quality={quality} />
     </group>
   );
 }
