@@ -3,11 +3,15 @@ export default function Hud({
   selectedId,
   showOrbits,
   showEcliptic,
+  sunBrightness,
+  onSunBrightnessChange,
   onToggleQuality,
   onToggleOrbits,
   onToggleEcliptic,
   onReset
 }) {
+  const sunlightPercent = Math.round(sunBrightness * 100);
+
   return (
     <>
       <header className="solar-header">
@@ -43,6 +47,19 @@ export default function Hud({
         <button type="button" aria-pressed={showEcliptic} onClick={onToggleEcliptic}>
           GRAVITY GRID <strong>{showEcliptic ? 'ON' : 'OFF'}</strong>
         </button>
+
+        <label className="sunlight-control">
+          <span>SUNLIGHT <strong>{sunlightPercent}%</strong></span>
+          <input
+            type="range"
+            min="0.35"
+            max="1.65"
+            step="0.05"
+            value={sunBrightness}
+            onChange={(event) => onSunBrightnessChange(Number(event.target.value))}
+            aria-label={`太阳光亮度 ${sunlightPercent}%`}
+          />
+        </label>
       </div>
     </>
   );
