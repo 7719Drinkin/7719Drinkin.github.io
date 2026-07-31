@@ -4,8 +4,16 @@ import { useFrame } from '@react-three/fiber';
 import BasketballWorld from '../worlds/BasketballWorld.jsx';
 import PlaceholderWorld from '../worlds/PlaceholderWorld.jsx';
 import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
+import CourtStands from '../basketball/CourtStands.jsx';
 
-export default function PlanetSystem({ interest, selected, onSelect, registerPlanet, quality }) {
+export default function PlanetSystem({
+  interest,
+  selected,
+  onSelect,
+  registerPlanet,
+  quality,
+  showOrbits
+}) {
   const orbitalPivot = useRef();
   const carrier = useRef();
   const axialBody = useRef();
@@ -38,20 +46,34 @@ export default function PlanetSystem({ interest, selected, onSelect, registerPla
             <BasketballOrbitals
               radius={interest.size}
               quality={quality}
+              showOrbit={showOrbits}
               onSelect={() => onSelect(interest.id)}
             />
           )}
 
-          <group ref={axialBody} rotation-y={interest.initialAxial} onClick={select} onDoubleClick={enter}>
+          <group
+            ref={axialBody}
+            rotation-y={interest.initialAxial}
+            onClick={select}
+            onDoubleClick={enter}
+          >
             {interest.id === 'basketball' ? (
-              <BasketballWorld radius={interest.size} quality={quality} />
+              <>
+                <BasketballWorld radius={interest.size} quality={quality} />
+                <CourtStands radius={interest.size} quality={quality} />
+              </>
             ) : (
               <PlaceholderWorld interest={interest} quality={quality} />
             )}
           </group>
 
           {!selected && (
-            <Html center distanceFactor={12} position={[0, interest.size + 0.45, 0]} style={{ pointerEvents: 'none' }}>
+            <Html
+              center
+              distanceFactor={12}
+              position={[0, interest.size + 0.45, 0]}
+              style={{ pointerEvents: 'none' }}
+            >
               <div className="planet-label" style={{ '--planet-accent': interest.accent }}>
                 <strong>{interest.title.toUpperCase()}</strong>
                 <span>{interest.worldName}</span>
