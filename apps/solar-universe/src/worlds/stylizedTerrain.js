@@ -71,6 +71,12 @@ function smoothstep(edge0, edge1, value) {
   return t * t * (3 - 2 * t);
 }
 
+function terrainSegments(detail) {
+  if (detail >= 5) return [144, 88];
+  if (detail >= 4) return [112, 68];
+  return [72, 44];
+}
+
 export function createStylizedTerrain({
   radius,
   detail,
@@ -78,7 +84,8 @@ export function createStylizedTerrain({
   palette,
   relief = 1
 }) {
-  const geometry = new THREE.IcosahedronGeometry(radius, detail);
+  const [widthSegments, heightSegments] = terrainSegments(detail);
+  const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
   const position = geometry.attributes.position;
   const vertex = new THREE.Vector3();
   const normal = new THREE.Vector3();
@@ -89,45 +96,63 @@ export function createStylizedTerrain({
   const midColor = new THREE.Color(palette.mid);
   const highColor = new THREE.Color(palette.high);
   const accentColor = new THREE.Color(palette.accent);
+  const accent2Color = new THREE.Color(palette.accent2 ?? palette.accent);
+  const shadowTint = new THREE.Color(palette.shadowTint ?? palette.low);
+  const highlightTint = new THREE.Color(palette.highlightTint ?? palette.high);
   const resultColor = new THREE.Color();
 
   for (let index = 0; index < position.count; index += 1) {
     vertex.fromBufferAttribute(position, index);
     normal.copy(vertex).normalize();
 
-    sample.copy(normal).multiplyScalar(1.7).addScalar(seed * 0.013);
+    sample.copy(normal).multiplyScalar(1.65).addScalar(seed * 0.013);
     const continental = fbm(sample, seed, 4);
 
-    sample.copy(normal).multiplyScalar(4.2).add(new THREE.Vector3(3.1, -1.7, 2.4));
+    sample.copy(normal).multiplyScalar(3.8).add(new THREE.Vector3(3.1, -1.7, 2.4));
     const regional = fbm(sample, seed + 31, 3);
 
-    sample.copy(normal).multiplyScalar(10.5).add(new THREE.Vector3(-2.2, 4.6, 1.3));
+    sample.copy(normal).multiplyScalar(7.2).add(new THREE.Vector3(-2.2, 4.6, 1.3));
+    const secondaryRegion = fbm(sample, seed + 49, 3);
+
+    sample.copy(normal).multiplyScalar(12.0).add(new THREE.Vector3(1.4, -3.5, 2.8));
     const surface = fbm(sample, seed + 67, 2);
 
-    const latitudeBand = Math.sin((normal.y + regional * 0.12) * Math.PI * 3.2) * 0.5 + 0.5;
-    const broadRelief = (continental - 0.5) * radius * 0.062 * relief;
-    const regionalRelief = (regional - 0.5) * radius * 0.022 * relief;
-    const surfaceRelief = (surface - 0.5) * radius * 0.006 * relief;
-    const bandRelief = (latitudeBand - 0.5) * radius * 0.006 * relief;
+    const latitudeBand = Math.sin((normal.y + regional * 0.1) * Math.PI * 2.8) * 0.5 + 0.5;
+    const broadRelief = (continental - 0.5) * radius * 0.052 * relief;
+    const regionalRelief = (regional - 0.5) * radius * 0.018 * relief;
+    const surfaceRelief = (surface - 0.5) * radius * 0.0038 * relief;
+    const bandRelief = (latitudeBand - 0.5) * radius * 0.0035 * relief;
     const displacement = broadRelief + regionalRelief + surfaceRelief + bandRelief;
 
     vertex.addScaledVector(normal, displacement);
     position.setXYZ(index, vertex.x, vertex.y, vertex.z);
 
     const normalizedHeight = THREE.MathUtils.clamp(
-      0.5 + displacement / (radius * 0.105 * Math.max(relief, 0.001)),
+      0.5 + displacement / (radius * 0.082 * Math.max(relief, 0.001)),
       0,
       1
     );
-    const middleBlend = smoothstep(0.2, 0.64, normalizedHeight);
-    const highBlend = smoothstep(0.62, 0.94, normalizedHeight);
-    const regionalAccent = smoothstep(0.58, 0.84, regional) * (0.08 + latitudeBand * 0.08);
+
+    const middleBlend = smoothstep(0.16, 0.58, normalizedHeight);
+    const highBlend = smoothstep(0.58, 0.9, normalizedHeight);
+    const redEarthMask = smoothstep(0.57, 0.82, regional)
+      * (1 - smoothstep(0.83, 0.98, normalizedHeight));
+    const weatheredMask = smoothstep(0.58, 0.86, secondaryRegion)
+      * smoothstep(0.5, 0.88, normalizedHeight);
+    const coolLowlandMask = smoothstep(0.25, 0.58, 1 - normalizedHeight)
+      * smoothstep(0.48, 0.8, 1 - continental);
 
     resultColor.copy(lowColor).lerp(midColor, middleBlend);
     resultColor.lerp(highColor, highBlend);
-    resultColor.lerp(accentColor, regionalAccent);
+    resultColor.lerp(accentColor, redEarthMask * 0.42);
+    resultColor.lerp(accent2Color, weatheredMask * 0.34);
+    resultColor.lerp(shadowTint, coolLowlandMask * 0.2);
+    resultColor.lerp(highlightTint, smoothstep(0.72, 0.96, normalizedHeight) * 0.12);
 
-    const handPaintedShade = 0.88 + continental * 0.08 + regional * 0.045 + surface * 0.025;
+    const handPaintedShade = 0.9
+      + continental * 0.055
+      + regional * 0.035
+      + surface * 0.018;
     resultColor.multiplyScalar(handPaintedShade);
 
     colors[index * 3] = resultColor.r;
