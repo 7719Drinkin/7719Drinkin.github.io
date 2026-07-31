@@ -12,6 +12,7 @@ export default function App() {
   });
   const [showOrbits, setShowOrbits] = useState(true);
   const [showEcliptic, setShowEcliptic] = useState(true);
+  const [sunBrightness, setSunBrightness] = useState(1);
   const planetRefs = useRef(new Map());
 
   const registerPlanet = useCallback((id, ref) => {
@@ -33,6 +34,7 @@ export default function App() {
         quality={quality}
         showOrbits={showOrbits}
         showEcliptic={showEcliptic}
+        sunBrightness={sunBrightness}
         planetRefs={planetRefs}
         registerPlanet={registerPlanet}
       />
@@ -42,6 +44,8 @@ export default function App() {
         selectedId={selectedId}
         showOrbits={showOrbits}
         showEcliptic={showEcliptic}
+        sunBrightness={sunBrightness}
+        onSunBrightnessChange={setSunBrightness}
         onToggleQuality={() => setQuality((value) => value === 'quality' ? 'eco' : 'quality')}
         onToggleOrbits={() => setShowOrbits((value) => !value)}
         onToggleEcliptic={() => setShowEcliptic((value) => !value)}
