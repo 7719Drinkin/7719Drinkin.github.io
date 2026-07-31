@@ -68,19 +68,19 @@ function LastCourt({ radius, quality }) {
     <group>
       <mesh position-y={radius * 0.89}>
         <cylinderGeometry args={[0.72, 0.86, 0.14, plateauSegments]} />
-        <meshStandardMaterial color="#5b463b" roughness={0.88} />
+        <meshStandardMaterial color="#4d352e" roughness={0.86} />
       </mesh>
       <mesh position-y={radius * 0.975}>
         <cylinderGeometry args={[0.64, 0.73, 0.11, plateauSegments]} />
-        <meshStandardMaterial color="#765b49" roughness={0.84} />
+        <meshStandardMaterial color="#80533e" roughness={0.82} />
       </mesh>
       <mesh position-y={radius}>
         <boxGeometry args={[1.13, 0.12, 0.7, 4, 1, 3]} />
-        <meshStandardMaterial color="#3d3029" roughness={0.88} />
+        <meshStandardMaterial color="#302825" roughness={0.86} />
       </mesh>
       <mesh position-y={y}>
         <boxGeometry args={[1.02, 0.03, 0.59]} />
-        <meshStandardMaterial color="#6e3e33" roughness={0.76} />
+        <meshStandardMaterial color="#71362f" roughness={0.74} />
       </mesh>
 
       {[-0.278, 0.278].map((z) => (
@@ -123,12 +123,15 @@ export default function BasketballWorld({ radius, quality }) {
       radius,
       detail: quality === 'quality' ? 5 : 4,
       seed: 23,
-      relief: 0.82,
+      relief: 0.7,
       palette: {
-        low: '#251f1b',
-        mid: '#4b3b31',
-        high: '#7c604d',
-        accent: '#a98262'
+        low: '#17191f',
+        mid: '#443028',
+        high: '#875a3f',
+        accent: '#a63d31',
+        accent2: '#d0a06b',
+        shadowTint: '#0d1119',
+        highlightTint: '#e5bd85'
       }
     }),
     [quality, radius]
@@ -139,7 +142,7 @@ export default function BasketballWorld({ radius, quality }) {
       <mesh geometry={geometry}>
         <meshStandardMaterial
           vertexColors
-          roughness={0.8}
+          roughness={0.74}
           metalness={0}
           dithering
         />
