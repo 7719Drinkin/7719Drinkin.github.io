@@ -11,8 +11,6 @@ function shapeFrom(points) {
   return shape;
 }
 
-// Block-athletic silhouettes with no self-intersections. The extra side bearing
-// prevents the left edge of the 2 from being cut by the plaque frame in perspective.
 const DIGIT_2 = [
   [-0.34, 0.50], [0.15, 0.50], [0.34, 0.37], [0.34, 0.12], [0.24, -0.02],
   [-0.04, -0.23], [-0.15, -0.32], [0.34, -0.32], [0.34, -0.50], [-0.34, -0.50],
@@ -66,7 +64,7 @@ function Digit({ points, x }) {
 
 export default function Number23Monument({ radius }) {
   return (
-    <group position={[0, -0.06, radius * 0.965]} scale={0.76}>
+    <group position={[0, -0.06, radius * 0.975]} scale={0.66}>
       <mesh position-z={-0.115}>
         <boxGeometry args={[1.72, 1.18, 0.16, 4, 4, 1]} />
         <meshStandardMaterial color="#2c201a" roughness={0.96} metalness={0} />
@@ -87,7 +85,7 @@ export default function Number23Monument({ radius }) {
         <Digit points={DIGIT_2} x={-0.39} />
         <Digit points={DIGIT_3} x={0.39} />
       </group>
-      <pointLight position={[0, 0.04, 0.5]} color="#e83043" intensity={0.75} distance={1.8} decay={2} />
+      <pointLight position={[0, 0.04, 0.5]} color="#e83043" intensity={0.6} distance={1.6} decay={2} />
     </group>
   );
 }
