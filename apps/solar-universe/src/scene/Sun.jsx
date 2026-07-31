@@ -34,16 +34,16 @@ function createCoronaTexture() {
   context.save();
   context.translate(center, center);
   context.globalCompositeOperation = 'lighter';
-  for (let index = 0; index < 180; index += 1) {
+  for (let index = 0; index < 150; index += 1) {
     const angle = random() * Math.PI * 2;
-    const width = 0.0015 + random() * 0.008;
-    const length = center * (0.34 + random() * 0.6);
+    const width = 0.0015 + random() * 0.007;
+    const length = center * (0.32 + random() * 0.54);
     const inner = center * (0.18 + random() * 0.07);
-    const alpha = 0.012 + random() * 0.055;
+    const alpha = 0.01 + random() * 0.045;
     context.rotate(angle);
     const ray = context.createLinearGradient(inner, 0, length, 0);
     ray.addColorStop(0, `rgba(255,240,176,${alpha})`);
-    ray.addColorStop(0.35, `rgba(255,169,66,${alpha * 0.72})`);
+    ray.addColorStop(0.35, `rgba(255,169,66,${alpha * 0.68})`);
     ray.addColorStop(1, 'rgba(255,90,20,0)');
     context.fillStyle = ray;
     context.beginPath();
@@ -62,102 +62,176 @@ function createCoronaTexture() {
   return texture;
 }
 
-function createWindAttributes(count) {
-  const random = seededRandom(26071998);
-  const directions = new Float32Array(count * 3);
-  const phases = new Float32Array(count);
-  const speeds = new Float32Array(count);
-  const sizes = new Float32Array(count);
-  const twists = new Float32Array(count);
-
-  for (let index = 0; index < count; index += 1) {
-    const y = random() * 2 - 1;
-    const angle = random() * Math.PI * 2;
-    const radial = Math.sqrt(Math.max(0, 1 - y * y));
-    directions[index * 3] = Math.cos(angle) * radial;
-    directions[index * 3 + 1] = y;
-    directions[index * 3 + 2] = Math.sin(angle) * radial;
-    phases[index] = random() * 9.5;
-    speeds[index] = 0.18 + random() * 0.42;
-    sizes[index] = 1.2 + random() * 2.6;
-    twists[index] = (random() - 0.5) * 1.4;
-  }
-
-  return { directions, phases, speeds, sizes, twists };
+function createFlareGlowTexture() {
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const context = canvas.getContext('2d');
+  const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 128);
+  gradient.addColorStop(0, 'rgba(255,255,238,1)');
+  gradient.addColorStop(0.17, 'rgba(255,232,144,.92)');
+  gradient.addColorStop(0.42, 'rgba(255,116,30,.42)');
+  gradient.addColorStop(1, 'rgba(255,72,12,0)');
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, size, size);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
 }
 
-function SolarWind({ quality }) {
-  const material = useRef();
-  const count = quality === 'quality' ? 1700 : 430;
-  const attributes = useMemo(() => createWindAttributes(count), [count]);
-  const uniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
+function smoothstep(edge0, edge1, value) {
+  const t = THREE.MathUtils.clamp((value - edge0) / (edge1 - edge0), 0, 1);
+  return t * t * (3 - 2 * t);
+}
 
-  useFrame(({ clock }) => {
-    if (material.current) material.current.uniforms.uTime.value = clock.elapsedTime;
+function SolarFlare({ quality }) {
+  const group = useRef();
+  const coreMaterials = useRef([]);
+  const outerMaterials = useRef([]);
+  const glow = useRef();
+  const light = useRef();
+  const active = useRef(false);
+  const startedAt = useRef(0);
+  const nextAt = useRef(5.5);
+  const random = useRef(seededRandom(23061998));
+  const up = useMemo(() => new THREE.Vector3(0, 1, 0), []);
+  const viewDirection = useMemo(() => new THREE.Vector3(), []);
+  const tangent = useMemo(() => new THREE.Vector3(), []);
+  const normal = useMemo(() => new THREE.Vector3(), []);
+  const flareTexture = useMemo(createFlareGlowTexture, []);
+
+  const curves = useMemo(() => {
+    const segments = quality === 'quality' ? 56 : 32;
+    const radialSegments = quality === 'quality' ? 8 : 5;
+    const paths = [
+      new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-0.38, 0.86, 0),
+        new THREE.Vector3(-0.24, 1.26, 0.035),
+        new THREE.Vector3(0.02, 1.62, 0.08),
+        new THREE.Vector3(0.31, 1.24, 0.025),
+        new THREE.Vector3(0.42, 0.86, 0)
+      ]),
+      new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-0.28, 0.9, -0.11),
+        new THREE.Vector3(-0.16, 1.2, -0.18),
+        new THREE.Vector3(0.06, 1.43, -0.2),
+        new THREE.Vector3(0.29, 0.91, -0.1)
+      ]),
+      new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-0.18, 0.91, 0.14),
+        new THREE.Vector3(-0.06, 1.12, 0.22),
+        new THREE.Vector3(0.17, 1.31, 0.18),
+        new THREE.Vector3(0.3, 0.9, 0.11)
+      ])
+    ];
+
+    return paths.map((curve) => ({
+      core: new THREE.TubeGeometry(curve, segments, 0.012, radialSegments, false),
+      outer: new THREE.TubeGeometry(curve, segments, 0.032, radialSegments, false)
+    }));
+  }, [quality]);
+
+  useFrame(({ clock, camera }) => {
+    const time = clock.elapsedTime;
+    const root = group.current;
+    if (!root) return;
+
+    if (!active.current && time >= nextAt.current) {
+      active.current = true;
+      startedAt.current = time;
+      root.visible = true;
+
+      viewDirection.copy(camera.position).normalize();
+      tangent.set(
+        random.current() * 2 - 1,
+        random.current() * 2 - 1,
+        random.current() * 2 - 1
+      ).normalize();
+      normal.copy(viewDirection).multiplyScalar(0.72).addScaledVector(tangent, 0.55).normalize();
+      root.quaternion.setFromUnitVectors(up, normal);
+      root.rotation.y += (random.current() - 0.5) * 1.5;
+    }
+
+    if (!active.current) return;
+
+    const duration = 4.8;
+    const progress = (time - startedAt.current) / duration;
+    if (progress >= 1) {
+      active.current = false;
+      root.visible = false;
+      nextAt.current = time + 17 + random.current() * 19;
+      return;
+    }
+
+    const rise = smoothstep(0, 0.18, progress);
+    const fade = 1 - smoothstep(0.58, 1, progress);
+    const intensity = rise * fade;
+    const expansion = 0.34 + rise * 0.72 + smoothstep(0.32, 1, progress) * 0.08;
+    root.scale.setScalar(expansion);
+
+    coreMaterials.current.forEach((material, index) => {
+      if (material) material.opacity = intensity * (0.92 - index * 0.12);
+    });
+    outerMaterials.current.forEach((material, index) => {
+      if (material) material.opacity = intensity * (0.38 - index * 0.045);
+    });
+    if (glow.current) {
+      glow.current.material.opacity = intensity * 0.78;
+      glow.current.scale.setScalar(0.48 + rise * 0.45);
+    }
+    if (light.current) light.current.intensity = intensity * 12;
   });
 
   return (
-    <points frustumCulled={false} renderOrder={-1}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[attributes.directions, 3]} />
-        <bufferAttribute attach="attributes-aPhase" args={[attributes.phases, 1]} />
-        <bufferAttribute attach="attributes-aSpeed" args={[attributes.speeds, 1]} />
-        <bufferAttribute attach="attributes-aSize" args={[attributes.sizes, 1]} />
-        <bufferAttribute attach="attributes-aTwist" args={[attributes.twists, 1]} />
-      </bufferGeometry>
-      <shaderMaterial
-        ref={material}
-        uniforms={uniforms}
-        transparent
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-        toneMapped={false}
-        vertexShader={`
-          uniform float uTime;
-          attribute float aPhase;
-          attribute float aSpeed;
-          attribute float aSize;
-          attribute float aTwist;
-          varying float vFade;
-          varying float vHeat;
+    <group ref={group} visible={false}>
+      {curves.map((geometry, index) => (
+        <group key={index} rotation-y={(index - 1) * 0.17}>
+          <mesh geometry={geometry.outer}>
+            <meshBasicMaterial
+              ref={(material) => { outerMaterials.current[index] = material; }}
+              color={index === 0 ? '#ff7d19' : '#ff3f0c'}
+              transparent
+              opacity={0}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              toneMapped={false}
+            />
+          </mesh>
+          <mesh geometry={geometry.core}>
+            <meshBasicMaterial
+              ref={(material) => { coreMaterials.current[index] = material; }}
+              color={index === 0 ? '#fffbe0' : '#ffd777'}
+              transparent
+              opacity={0}
+              blending={THREE.AdditiveBlending}
+              depthWrite={false}
+              toneMapped={false}
+            />
+          </mesh>
+        </group>
+      ))}
 
-          void main() {
-            float life = mod(aPhase + uTime * aSpeed, 9.5) / 9.5;
-            float radius = 1.08 + life * 8.6;
-            vec3 direction = normalize(position);
-            float spiral = radius * .045 * aTwist;
-            float cosine = cos(spiral);
-            float sine = sin(spiral);
-            direction.xz = mat2(cosine, -sine, sine, cosine) * direction.xz;
-            vec3 displaced = direction * radius;
-            vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
-            gl_Position = projectionMatrix * mvPosition;
-            gl_PointSize = aSize * (90.0 / max(4.0, -mvPosition.z));
-            vFade = smoothstep(0.0, .08, life) * (1.0 - smoothstep(.58, 1.0, life));
-            vHeat = 1.0 - life;
-          }
-        `}
-        fragmentShader={`
-          varying float vFade;
-          varying float vHeat;
-
-          void main() {
-            vec2 centered = gl_PointCoord - .5;
-            float radial = length(centered);
-            float particle = 1.0 - smoothstep(.12, .5, radial);
-            vec3 warm = vec3(1.0, .48, .11);
-            vec3 pale = vec3(1.0, .92, .63);
-            vec3 color = mix(warm, pale, vHeat);
-            gl_FragColor = vec4(color, particle * vFade * .36);
-          }
-        `}
-      />
-    </points>
+      <sprite ref={glow} position={[0.02, 1.28, 0.04]} scale={[0.5, 0.5, 1]}>
+        <spriteMaterial
+          map={flareTexture}
+          color="#fff2bd"
+          transparent
+          opacity={0}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </sprite>
+      <pointLight ref={light} position={[0.02, 1.25, 0.04]} color="#ffd07b" intensity={0} distance={5} decay={2} />
+    </group>
   );
 }
 
 export default function Sun({ quality, selected, onSelect, registerPlanet }) {
   const root = useRef();
+  const surface = useRef();
   const photosphere = useRef();
   const chromosphere = useRef();
   const corona = useRef();
@@ -174,11 +248,11 @@ export default function Sun({ quality, selected, onSelect, registerPlanet }) {
     const time = clock.elapsedTime;
     if (photosphere.current) photosphere.current.uniforms.uTime.value = time;
     if (chromosphere.current) chromosphere.current.uniforms.uTime.value = time;
-    if (root.current) root.current.rotation.y += delta * 0.012;
+    if (surface.current) surface.current.rotation.y += delta * 0.012;
     if (corona.current) {
-      const pulse = 1 + Math.sin(time * 0.17) * 0.025;
+      const pulse = 1 + Math.sin(time * 0.17) * 0.018;
       corona.current.scale.setScalar(pulse);
-      corona.current.material.opacity = selected ? 0.82 : 0.68;
+      corona.current.material.opacity = selected ? 0.74 : 0.58;
     }
   });
 
@@ -189,142 +263,144 @@ export default function Sun({ quality, selected, onSelect, registerPlanet }) {
 
   return (
     <group ref={root} onClick={select}>
-      <sprite ref={corona} scale={[6.8, 6.8, 1]} renderOrder={-2}>
+      <sprite ref={corona} scale={[6.2, 6.2, 1]} renderOrder={-2}>
         <spriteMaterial
           map={coronaTexture}
           color="#fff0b0"
           transparent
-          opacity={0.68}
+          opacity={0.58}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           toneMapped={false}
         />
       </sprite>
 
-      <mesh>
-        <sphereGeometry args={[0.95, quality === 'quality' ? 128 : 64, quality === 'quality' ? 96 : 48]} />
-        <shaderMaterial
-          ref={photosphere}
-          uniforms={photosphereUniforms}
-          toneMapped={false}
-          vertexShader={`
-            varying vec3 vPosition;
-            varying vec3 vNormal;
-            varying vec3 vView;
+      <group ref={surface}>
+        <mesh>
+          <sphereGeometry args={[0.95, quality === 'quality' ? 128 : 64, quality === 'quality' ? 96 : 48]} />
+          <shaderMaterial
+            ref={photosphere}
+            uniforms={photosphereUniforms}
+            toneMapped={false}
+            vertexShader={`
+              varying vec3 vPosition;
+              varying vec3 vNormal;
+              varying vec3 vView;
 
-            void main() {
-              vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-              vPosition = normalize(position);
-              vNormal = normalize(normalMatrix * normal);
-              vView = normalize(-mvPosition.xyz);
-              gl_Position = projectionMatrix * mvPosition;
-            }
-          `}
-          fragmentShader={`
-            uniform float uTime;
-            varying vec3 vPosition;
-            varying vec3 vNormal;
-            varying vec3 vView;
-
-            float hash(vec3 p) {
-              p = fract(p * .3183099 + vec3(.1, .7, .113));
-              p *= 17.0;
-              return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
-            }
-
-            float noise(vec3 p) {
-              vec3 i = floor(p);
-              vec3 f = fract(p);
-              f = f * f * (3.0 - 2.0 * f);
-              return mix(
-                mix(mix(hash(i + vec3(0,0,0)), hash(i + vec3(1,0,0)), f.x),
-                    mix(hash(i + vec3(0,1,0)), hash(i + vec3(1,1,0)), f.x), f.y),
-                mix(mix(hash(i + vec3(0,0,1)), hash(i + vec3(1,0,1)), f.x),
-                    mix(hash(i + vec3(0,1,1)), hash(i + vec3(1,1,1)), f.x), f.y),
-                f.z
-              );
-            }
-
-            float fbm(vec3 p) {
-              float value = 0.0;
-              float amplitude = .5;
-              for (int octave = 0; octave < 5; octave++) {
-                value += noise(p) * amplitude;
-                p = p * 2.03 + vec3(1.7, 9.2, 2.4);
-                amplitude *= .5;
+              void main() {
+                vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                vPosition = normalize(position);
+                vNormal = normalize(normalMatrix * normal);
+                vView = normalize(-mvPosition.xyz);
+                gl_Position = projectionMatrix * mvPosition;
               }
-              return value;
-            }
+            `}
+            fragmentShader={`
+              uniform float uTime;
+              varying vec3 vPosition;
+              varying vec3 vNormal;
+              varying vec3 vView;
 
-            void main() {
-              vec3 p = vPosition;
-              float slow = uTime * .018;
-              float convection = fbm(p * 7.8 + vec3(slow, -slow * .7, slow * .4));
-              float cells = fbm(p * 23.0 - vec3(slow * .5, slow, -slow * .3));
-              float filaments = fbm(p * 3.4 + vec3(-slow * .2, slow * .35, slow));
-              float granulation = smoothstep(.23, .88, convection * .72 + cells * .36);
+              float hash(vec3 p) {
+                p = fract(p * .3183099 + vec3(.1, .7, .113));
+                p *= 17.0;
+                return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+              }
 
-              float spotField = fbm(p * 2.15 + vec3(2.1, -1.7, .9));
-              float spotDetail = fbm(p * 13.0 - vec3(slow, 0.0, slow * .5));
-              float sunspot = smoothstep(.72, .89, spotField) * smoothstep(.43, .7, spotDetail);
+              float noise(vec3 p) {
+                vec3 i = floor(p);
+                vec3 f = fract(p);
+                f = f * f * (3.0 - 2.0 * f);
+                return mix(
+                  mix(mix(hash(i + vec3(0,0,0)), hash(i + vec3(1,0,0)), f.x),
+                      mix(hash(i + vec3(0,1,0)), hash(i + vec3(1,1,0)), f.x), f.y),
+                  mix(mix(hash(i + vec3(0,0,1)), hash(i + vec3(1,0,1)), f.x),
+                      mix(hash(i + vec3(0,1,1)), hash(i + vec3(1,1,1)), f.x), f.y),
+                  f.z
+                );
+              }
 
-              float mu = clamp(dot(normalize(vNormal), normalize(vView)), 0.0, 1.0);
-              float limbDarkening = .46 + .54 * pow(mu, .58);
+              float fbm(vec3 p) {
+                float value = 0.0;
+                float amplitude = .5;
+                for (int octave = 0; octave < 5; octave++) {
+                  value += noise(p) * amplitude;
+                  p = p * 2.03 + vec3(1.7, 9.2, 2.4);
+                  amplitude *= .5;
+                }
+                return value;
+              }
 
-              vec3 amber = vec3(1.16, .46, .055);
-              vec3 gold = vec3(1.48, .88, .29);
-              vec3 whiteHot = vec3(1.72, 1.5, .88);
-              vec3 color = mix(amber, gold, granulation);
-              color = mix(color, whiteHot, smoothstep(.64, .96, cells + convection * .35));
-              color *= limbDarkening;
-              color *= 1.0 - sunspot * .72;
-              color += vec3(.32, .055, .008) * filaments * .24;
+              void main() {
+                vec3 p = vPosition;
+                float slow = uTime * .018;
+                float convection = fbm(p * 7.8 + vec3(slow, -slow * .7, slow * .4));
+                float cells = fbm(p * 23.0 - vec3(slow * .5, slow, -slow * .3));
+                float filaments = fbm(p * 3.4 + vec3(-slow * .2, slow * .35, slow));
+                float granulation = smoothstep(.23, .88, convection * .72 + cells * .36);
 
-              gl_FragColor = vec4(color, 1.0);
-            }
-          `}
-        />
-      </mesh>
+                float spotField = fbm(p * 2.15 + vec3(2.1, -1.7, .9));
+                float spotDetail = fbm(p * 13.0 - vec3(slow, 0.0, slow * .5));
+                float sunspot = smoothstep(.72, .89, spotField) * smoothstep(.43, .7, spotDetail);
 
-      <mesh scale={1.035}>
-        <sphereGeometry args={[0.95, quality === 'quality' ? 96 : 48, quality === 'quality' ? 72 : 36]} />
-        <shaderMaterial
-          ref={chromosphere}
-          uniforms={chromosphereUniforms}
-          transparent
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          side={THREE.BackSide}
-          toneMapped={false}
-          vertexShader={`
-            varying vec3 vNormal;
-            varying vec3 vView;
-            varying vec3 vPosition;
-            void main() {
-              vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-              vNormal = normalize(normalMatrix * normal);
-              vView = normalize(-mvPosition.xyz);
-              vPosition = normalize(position);
-              gl_Position = projectionMatrix * mvPosition;
-            }
-          `}
-          fragmentShader={`
-            uniform float uTime;
-            varying vec3 vNormal;
-            varying vec3 vView;
-            varying vec3 vPosition;
-            void main() {
-              float rim = pow(1.0 - abs(dot(normalize(vNormal), normalize(vView))), 2.1);
-              float turbulence = .72 + .28 * sin(vPosition.y * 37.0 + vPosition.x * 23.0 + uTime * .22);
-              vec3 color = mix(vec3(1.0, .18, .01), vec3(1.0, .73, .19), turbulence);
-              gl_FragColor = vec4(color, rim * .42);
-            }
-          `}
-        />
-      </mesh>
+                float mu = clamp(dot(normalize(vNormal), normalize(vView)), 0.0, 1.0);
+                float limbDarkening = .42 + .58 * pow(mu, .58);
 
-      <SolarWind quality={quality} />
-      <pointLight color="#fff0c1" intensity={215} distance={125} decay={1.85} />
+                vec3 amber = vec3(1.12, .42, .045);
+                vec3 gold = vec3(1.43, .82, .25);
+                vec3 whiteHot = vec3(1.67, 1.43, .82);
+                vec3 color = mix(amber, gold, granulation);
+                color = mix(color, whiteHot, smoothstep(.64, .96, cells + convection * .35));
+                color *= limbDarkening;
+                color *= 1.0 - sunspot * .76;
+                color += vec3(.3, .05, .006) * filaments * .21;
+
+                gl_FragColor = vec4(color, 1.0);
+              }
+            `}
+          />
+        </mesh>
+
+        <mesh scale={1.035}>
+          <sphereGeometry args={[0.95, quality === 'quality' ? 96 : 48, quality === 'quality' ? 72 : 36]} />
+          <shaderMaterial
+            ref={chromosphere}
+            uniforms={chromosphereUniforms}
+            transparent
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+            side={THREE.BackSide}
+            toneMapped={false}
+            vertexShader={`
+              varying vec3 vNormal;
+              varying vec3 vView;
+              varying vec3 vPosition;
+              void main() {
+                vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                vNormal = normalize(normalMatrix * normal);
+                vView = normalize(-mvPosition.xyz);
+                vPosition = normalize(position);
+                gl_Position = projectionMatrix * mvPosition;
+              }
+            `}
+            fragmentShader={`
+              uniform float uTime;
+              varying vec3 vNormal;
+              varying vec3 vView;
+              varying vec3 vPosition;
+              void main() {
+                float rim = pow(1.0 - abs(dot(normalize(vNormal), normalize(vView))), 2.1);
+                float turbulence = .72 + .28 * sin(vPosition.y * 37.0 + vPosition.x * 23.0 + uTime * .22);
+                vec3 color = mix(vec3(1.0, .18, .01), vec3(1.0, .73, .19), turbulence);
+                gl_FragColor = vec4(color, rim * .36);
+              }
+            `}
+          />
+        </mesh>
+      </group>
+
+      <SolarFlare quality={quality} />
+      <pointLight color="#fff1cf" intensity={255} distance={125} decay={1.9} />
     </group>
   );
 }
