@@ -1,4 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 import Number23Monument from '../basketball/Number23Monument.jsx';
 import ChampionshipGallery from '../basketball/ChampionshipGallery.jsx';
 import BasketballLife from '../basketball/BasketballLife.jsx';
@@ -43,17 +45,46 @@ function Floodlight({ position }) {
       </mesh>
       <mesh position-y={0.5} rotation-x={-0.22}>
         <boxGeometry args={[0.1, 0.05, 0.04]} />
-        <meshStandardMaterial color="#ffe0a9" emissive="#ff9430" emissiveIntensity={2.2} roughness={0.24} />
+        <meshStandardMaterial color="#ffe0a9" emissive="#ff9430" emissiveIntensity={2.0} roughness={0.24} />
       </mesh>
-      <pointLight position={[0, 0.48, 0]} color="#ffb25f" intensity={0.8} distance={2.1} decay={2} />
+      <pointLight position={[0, 0.48, 0]} color="#ffb25f" intensity={0.62} distance={1.8} decay={2} />
     </group>
+  );
+}
+
+function CourtPulse({ y }) {
+  const ring = useRef();
+  const material = useRef();
+
+  useFrame(({ clock }) => {
+    const cycle = (clock.elapsedTime % 6.4) / 6.4;
+    const visibility = cycle < 0.58 ? 1 - THREE.MathUtils.smoothstep(cycle, 0.12, 0.58) : 0;
+    if (ring.current) {
+      const scale = 0.65 + cycle * 1.75;
+      ring.current.scale.setScalar(scale);
+    }
+    if (material.current) material.current.opacity = visibility * 0.16;
+  });
+
+  return (
+    <mesh ref={ring} position-y={y + 0.026} rotation-x={Math.PI / 2}>
+      <ringGeometry args={[0.095, 0.105, 48]} />
+      <meshBasicMaterial
+        ref={material}
+        color="#f4c77b"
+        transparent
+        opacity={0}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </mesh>
   );
 }
 
 function LastCourt({ radius, quality }) {
   const audience = useMemo(() => {
     const random = seededRandom(1998);
-    return Array.from({ length: quality === 'quality' ? 52 : 22 }, (_, index) => {
+    return Array.from({ length: quality === 'quality' ? 44 : 18 }, (_, index) => {
       const side = index % 2 ? 1 : -1;
       return {
         position: [(random() - 0.5) * 0.58, radius * 1.11 + random() * 0.055, side * (0.37 + random() * 0.09)],
@@ -66,7 +97,7 @@ function LastCourt({ radius, quality }) {
   const plateauSegments = quality === 'quality' ? 36 : 24;
 
   return (
-    <group scale={[0.88, 1, 0.88]}>
+    <group scale={[0.76, 0.9, 0.76]}>
       <mesh position-y={radius * 0.89}>
         <cylinderGeometry args={[0.72, 0.86, 0.14, plateauSegments]} />
         <meshStandardMaterial color="#4b3a2e" roughness={0.86} />
@@ -100,6 +131,7 @@ function LastCourt({ radius, quality }) {
         <torusGeometry args={[0.1, 0.0055, 6, 32]} />
         <meshBasicMaterial color="#f1e9dc" />
       </mesh>
+      <CourtPulse y={y} />
 
       <Hoop x={0.41} direction={1} y={radius * 1.06} />
       <Hoop x={-0.41} direction={-1} y={radius * 1.06} />
@@ -145,11 +177,11 @@ const BASKETBALL_FEATURES = [
   },
   {
     direction: [-0.1, -0.14, -0.98],
-    radius: 0.36,
-    softness: 0.16,
-    elevation: -0.008,
-    color: '#2f7180',
-    colorStrength: 0.84
+    radius: 0.22,
+    softness: 0.12,
+    elevation: -0.004,
+    color: '#315d59',
+    colorStrength: 0.34
   },
   {
     direction: [0.2, 0.58, 0.79],
@@ -195,7 +227,7 @@ const BASKETBALL_BANDS = [
     elevation: -0.005,
     frequency: 5,
     color: '#41828a',
-    colorStrength: 0.62
+    colorStrength: 0.5
   },
   {
     normal: [-0.62, 0.18, 0.76],
