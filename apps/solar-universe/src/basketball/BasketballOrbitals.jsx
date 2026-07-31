@@ -2,6 +2,11 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
+const GOLD = '#e3b75e';
+const GOLD_LIGHT = '#f0cf82';
+const GOLD_DARK = '#6f4d18';
+const GOLD_SHADOW = '#3d2709';
+
 function arcGeometry(radius, start, span, tube, quality) {
   const pointCount = quality === 'quality' ? 30 : 18;
   const points = Array.from({ length: pointCount }, (_, index) => {
@@ -26,20 +31,20 @@ function arcGeometry(radius, start, span, tube, quality) {
 function MotionRing({ radius, quality }) {
   const ring = useRef();
   const arcSpecs = useMemo(() => [
-    [0.08, 0.58, '#f1d29b', 0.34],
-    [0.88, 0.34, '#b9483d', 0.42],
-    [1.42, 0.7, '#d9aa65', 0.3],
-    [2.36, 0.42, '#f3dfb8', 0.32],
-    [3.02, 0.62, '#9f3c37', 0.36],
-    [3.88, 0.32, '#d7b06f', 0.28],
-    [4.42, 0.74, '#f0d7a9', 0.3],
-    [5.42, 0.38, '#b9483d', 0.4]
+    [0.08, 0.58, '#f1d29b', 0.24],
+    [0.88, 0.34, '#b9483d', 0.3],
+    [1.42, 0.7, '#d9aa65', 0.22],
+    [2.36, 0.42, '#f3dfb8', 0.23],
+    [3.02, 0.62, '#9f3c37', 0.26],
+    [3.88, 0.32, '#d7b06f', 0.21],
+    [4.42, 0.74, '#f0d7a9', 0.22],
+    [5.42, 0.38, '#b9483d', 0.28]
   ].map(([start, span, color, opacity], index) => ({
     geometry: arcGeometry(
       radius * (index % 2 === 0 ? 1.34 : 1.39),
       start,
       span,
-      radius * (index % 2 === 0 ? 0.006 : 0.0045),
+      radius * (index % 2 === 0 ? 0.0055 : 0.004),
       quality
     ),
     color,
@@ -54,15 +59,15 @@ function MotionRing({ radius, quality }) {
     <group ref={ring} rotation={[0.17, 0.08, -0.34]}>
       <mesh rotation-x={Math.PI / 2}>
         <torusGeometry
-          args={[radius * 1.31, radius * 0.0035, 5, quality === 'quality' ? 220 : 120]}
+          args={[radius * 1.31, radius * 0.003, 5, quality === 'quality' ? 220 : 120]}
         />
-        <meshBasicMaterial color="#d8b77e" transparent opacity={0.14} depthWrite={false} />
+        <meshBasicMaterial color="#d8b77e" transparent opacity={0.085} depthWrite={false} />
       </mesh>
       <mesh rotation-x={Math.PI / 2}>
         <torusGeometry
-          args={[radius * 1.42, radius * 0.0024, 5, quality === 'quality' ? 220 : 120]}
+          args={[radius * 1.42, radius * 0.0022, 5, quality === 'quality' ? 220 : 120]}
         />
-        <meshBasicMaterial color="#c95a4c" transparent opacity={0.12} depthWrite={false} />
+        <meshBasicMaterial color="#c95a4c" transparent opacity={0.07} depthWrite={false} />
       </mesh>
       {arcSpecs.map((arc, index) => (
         <mesh key={index} geometry={arc.geometry}>
@@ -79,67 +84,174 @@ function MotionRing({ radius, quality }) {
   );
 }
 
-function TrainingMoon({ radius, quality, showOrbit }) {
-  const orbit = useRef();
-  const moon = useRef();
+function ChampionshipTrophy({ radius, quality }) {
+  const segments = quality === 'quality' ? 28 : 18;
+  const ballSegments = quality === 'quality' ? [28, 20] : [18, 12];
+
+  return (
+    <group scale={radius * 0.38}>
+      <mesh position-y={0.035}>
+        <cylinderGeometry args={[0.17, 0.19, 0.07, segments]} />
+        <meshStandardMaterial color={GOLD_DARK} roughness={0.3} metalness={0.86} />
+      </mesh>
+      <mesh position-y={0.088}>
+        <cylinderGeometry args={[0.125, 0.15, 0.045, segments]} />
+        <meshStandardMaterial color={GOLD} roughness={0.2} metalness={0.94} />
+      </mesh>
+
+      <group position={[0.014, 0.095, 0]} rotation-z={-0.2}>
+        <mesh position-y={0.205}>
+          <cylinderGeometry args={[0.046, 0.083, 0.41, segments]} />
+          <meshStandardMaterial color={GOLD} roughness={0.18} metalness={0.95} />
+        </mesh>
+
+        <mesh position={[0.092, 0.395, 0]} rotation-z={-0.58}>
+          <cylinderGeometry args={[0.026, 0.044, 0.25, segments]} />
+          <meshStandardMaterial color={GOLD_LIGHT} roughness={0.17} metalness={0.96} />
+        </mesh>
+
+        <mesh position={[0.142, 0.505, 0]} rotation-z={-0.22}>
+          <cylinderGeometry args={[0.071, 0.052, 0.035, segments]} />
+          <meshStandardMaterial color={GOLD} roughness={0.19} metalness={0.95} />
+        </mesh>
+
+        <group position={[0.175, 0.625, 0]} rotation={[0.16, 0.34, -0.2]}>
+          <mesh>
+            <sphereGeometry args={[0.145, ...ballSegments]} />
+            <meshStandardMaterial
+              color={GOLD_LIGHT}
+              emissive={GOLD_SHADOW}
+              emissiveIntensity={0.08}
+              roughness={0.25}
+              metalness={0.88}
+            />
+          </mesh>
+          <mesh rotation-x={Math.PI / 2}>
+            <torusGeometry args={[0.146, 0.005, 6, quality === 'quality' ? 42 : 26]} />
+            <meshStandardMaterial color={GOLD_DARK} roughness={0.48} metalness={0.58} />
+          </mesh>
+          <mesh rotation-y={Math.PI / 2}>
+            <torusGeometry args={[0.146, 0.005, 6, quality === 'quality' ? 42 : 26]} />
+            <meshStandardMaterial color={GOLD_DARK} roughness={0.48} metalness={0.58} />
+          </mesh>
+          <mesh rotation={[0.42, 0.25, Math.PI / 2]}>
+            <torusGeometry args={[0.146, 0.0042, 6, quality === 'quality' ? 42 : 26]} />
+            <meshStandardMaterial color={GOLD_DARK} roughness={0.48} metalness={0.58} />
+          </mesh>
+        </group>
+      </group>
+    </group>
+  );
+}
+
+function TrophySatellite({
+  radius,
+  quality,
+  orbitRadius,
+  initialOrbit,
+  initialSpin,
+  orbitSpeed,
+  spinSpeed
+}) {
+  const orbitalPivot = useRef();
+  const trophyPose = useRef();
+  const orbitAngle = useRef(initialOrbit);
+  const spinAngle = useRef(initialSpin);
 
   useFrame((_, delta) => {
-    if (orbit.current) orbit.current.rotation.y += delta * 0.12;
-    if (moon.current) moon.current.rotation.y += delta * 0.24;
+    orbitAngle.current += orbitSpeed * delta;
+    spinAngle.current += spinSpeed * delta;
+
+    if (orbitalPivot.current) {
+      orbitalPivot.current.rotation.y = orbitAngle.current;
+    }
+
+    if (trophyPose.current) {
+      // The parent pivot supplies the revolution angle. Counter-rotating it here
+      // prevents orbital motion from making the trophy tumble, while the
+      // independent spin angle produces a stable axial rotation.
+      trophyPose.current.rotation.y = spinAngle.current - orbitAngle.current;
+    }
   });
 
   return (
-    <group rotation={[0.48, 0.12, 0.28]}>
+    <group ref={orbitalPivot} rotation-y={initialOrbit}>
+      <group position={[orbitRadius, 0, 0]}>
+        <group ref={trophyPose} rotation-y={initialSpin - initialOrbit}>
+          <ChampionshipTrophy radius={radius} quality={quality} />
+        </group>
+      </group>
+    </group>
+  );
+}
+
+function ThreePeatOrbit({
+  radius,
+  quality,
+  showOrbit,
+  orbitRadius,
+  inclination,
+  orbitSpeed,
+  phaseOffset
+}) {
+  const phases = useMemo(
+    () => [0, Math.PI * 2 / 3, Math.PI * 4 / 3].map((phase) => phase + phaseOffset),
+    [phaseOffset]
+  );
+
+  return (
+    <group rotation={inclination}>
       {showOrbit && (
         <mesh rotation-x={Math.PI / 2}>
           <torusGeometry
-            args={[radius * 1.86, radius * 0.0018, 4, quality === 'quality' ? 180 : 96]}
+            args={[orbitRadius, radius * 0.0018, 4, quality === 'quality' ? 220 : 120]}
           />
           <meshBasicMaterial
-            color="#e1c994"
+            color={GOLD_LIGHT}
             transparent
-            opacity={0.09}
+            opacity={0.12}
             depthWrite={false}
           />
         </mesh>
       )}
 
-      <group ref={orbit}>
-        <group position={[radius * 1.86, 0, 0]}>
-          <mesh ref={moon}>
-            <sphereGeometry
-              args={[
-                radius * 0.105,
-                quality === 'quality' ? 40 : 24,
-                quality === 'quality' ? 28 : 16
-              ]}
-            />
-            <meshStandardMaterial
-              color="#c69a61"
-              emissive="#27170b"
-              emissiveIntensity={0.05}
-              roughness={0.76}
-              metalness={0.02}
-            />
-          </mesh>
-          <mesh scale={1.055}>
-            <sphereGeometry
-              args={[
-                radius * 0.105,
-                quality === 'quality' ? 32 : 20,
-                quality === 'quality' ? 22 : 14
-              ]}
-            />
-            <meshBasicMaterial
-              color="#f1d6a1"
-              transparent
-              opacity={0.06}
-              side={THREE.BackSide}
-              depthWrite={false}
-            />
-          </mesh>
-        </group>
-      </group>
+      {phases.map((phase, index) => (
+        <TrophySatellite
+          key={index}
+          radius={radius}
+          quality={quality}
+          orbitRadius={orbitRadius}
+          initialOrbit={phase}
+          initialSpin={phase * 0.37}
+          orbitSpeed={orbitSpeed}
+          spinSpeed={0.22}
+        />
+      ))}
+    </group>
+  );
+}
+
+function ChampionshipSatellites({ radius, quality, showOrbit }) {
+  return (
+    <group>
+      <ThreePeatOrbit
+        radius={radius}
+        quality={quality}
+        showOrbit={showOrbit}
+        orbitRadius={radius * 1.72}
+        inclination={[0.22, -0.1, -0.2]}
+        orbitSpeed={0.105}
+        phaseOffset={0.12}
+      />
+      <ThreePeatOrbit
+        radius={radius}
+        quality={quality}
+        showOrbit={showOrbit}
+        orbitRadius={radius * 2.08}
+        inclination={[-0.39, 0.18, 0.31]}
+        orbitSpeed={0.074}
+        phaseOffset={0.58}
+      />
     </group>
   );
 }
@@ -153,7 +265,7 @@ export default function BasketballOrbitals({ radius, quality, showOrbit, onSelec
   return (
     <group onClick={select}>
       <MotionRing radius={radius} quality={quality} />
-      <TrainingMoon radius={radius} quality={quality} showOrbit={showOrbit} />
+      <ChampionshipSatellites radius={radius} quality={quality} showOrbit={showOrbit} />
     </group>
   );
 }
