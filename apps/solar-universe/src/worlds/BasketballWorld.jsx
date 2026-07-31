@@ -87,7 +87,7 @@ function CourtPulse({ y }) {
   });
 
   return (
-    <mesh ref={ring} position-y={y + 0.026} rotation-x={Math.PI / 2}>
+    <mesh ref={ring} position-y={y + 0.018} rotation-x={Math.PI / 2}>
       <ringGeometry args={[0.095, 0.105, 48]} />
       <meshBasicMaterial
         ref={material}
@@ -102,15 +102,15 @@ function CourtPulse({ y }) {
 }
 
 function LastCourt({ radius, quality }) {
-  const courtY = radius + 0.23;
+  const courtY = radius + 0.045;
   const audience = useMemo(() => {
     const random = seededRandom(1998);
-    return Array.from({ length: quality === 'quality' ? 44 : 18 }, (_, index) => {
+    return Array.from({ length: quality === 'quality' ? 36 : 14 }, (_, index) => {
       const side = index % 2 ? 1 : -1;
       return {
         position: [
           (random() - 0.5) * 0.58,
-          courtY + 0.055 + random() * 0.04,
+          courtY + 0.026 + random() * 0.026,
           side * (0.37 + random() * 0.09)
         ],
         scale: 0.006 + random() * 0.008
@@ -118,58 +118,48 @@ function LastCourt({ radius, quality }) {
     });
   }, [courtY, quality]);
 
-  const plateauSegments = quality === 'quality' ? 40 : 26;
+  const plateauSegments = quality === 'quality' ? 36 : 24;
   const floodlights = [
-    [-0.53, courtY - 0.045, -0.38],
-    [0.53, courtY - 0.045, -0.38],
-    [-0.53, courtY - 0.045, 0.38],
-    [0.53, courtY - 0.045, 0.38]
+    [-0.53, courtY - 0.018, -0.38],
+    [0.53, courtY - 0.018, -0.38],
+    [-0.53, courtY - 0.018, 0.38],
+    [0.53, courtY - 0.018, 0.38]
   ];
 
   return (
-    <group scale={[0.72, 1, 0.72]}>
-      {/* This plug extends into the planet and guarantees that uneven terrain
-          can never rise through the court surface. */}
-      <mesh position-y={radius - 0.01}>
-        <cylinderGeometry args={[0.69, 0.82, 0.34, plateauSegments]} />
-        <meshStandardMaterial color="#3f3129" roughness={0.9} />
-      </mesh>
-
-      <mesh position-y={radius + 0.125}>
-        <cylinderGeometry args={[0.63, 0.71, 0.11, plateauSegments]} />
-        <meshStandardMaterial color="#825139" roughness={0.82} />
-      </mesh>
-
-      <mesh position-y={radius + 0.185}>
-        <boxGeometry args={[1.1, 0.08, 0.68, 4, 1, 3]} />
-        <meshStandardMaterial color="#302825" roughness={0.86} />
+    <group scale={[0.68, 1, 0.68]}>
+      {/* A single shallow pad overlaps the planar terrain by a few millimetres.
+          It hides the seam without turning the court into a tall tower. */}
+      <mesh position-y={radius + 0.014}>
+        <cylinderGeometry args={[0.7, 0.73, 0.052, plateauSegments]} />
+        <meshStandardMaterial color="#7f5038" roughness={0.84} />
       </mesh>
 
       <mesh position-y={courtY}>
-        <boxGeometry args={[1.02, 0.032, 0.59]} />
+        <boxGeometry args={[1.02, 0.024, 0.59]} />
         <meshStandardMaterial color="#71362f" roughness={0.74} />
       </mesh>
 
       {[-0.278, 0.278].map((z) => (
-        <mesh key={`hz-${z}`} position={[0, courtY + 0.021, z]}>
-          <boxGeometry args={[0.96, 0.006, 0.011]} />
+        <mesh key={`hz-${z}`} position={[0, courtY + 0.016, z]}>
+          <boxGeometry args={[0.96, 0.005, 0.011]} />
           <meshBasicMaterial color="#f1e9dc" />
         </mesh>
       ))}
       {[-0.474, 0, 0.474].map((x) => (
-        <mesh key={`vt-${x}`} position={[x, courtY + 0.021, 0]}>
-          <boxGeometry args={[0.011, 0.006, 0.55]} />
+        <mesh key={`vt-${x}`} position={[x, courtY + 0.016, 0]}>
+          <boxGeometry args={[0.011, 0.005, 0.55]} />
           <meshBasicMaterial color="#f1e9dc" />
         </mesh>
       ))}
-      <mesh position-y={courtY + 0.024} rotation-x={Math.PI / 2}>
-        <torusGeometry args={[0.1, 0.0055, 6, 32]} />
+      <mesh position-y={courtY + 0.018} rotation-x={Math.PI / 2}>
+        <torusGeometry args={[0.1, 0.005, 6, 32]} />
         <meshBasicMaterial color="#f1e9dc" />
       </mesh>
       <CourtPulse y={courtY} />
 
-      <Hoop x={0.41} direction={1} y={courtY + 0.005} />
-      <Hoop x={-0.41} direction={-1} y={courtY + 0.005} />
+      <Hoop x={0.41} direction={1} y={courtY} />
+      <Hoop x={-0.41} direction={-1} y={courtY} />
 
       {floodlights.map((position, index) => (
         <Floodlight key={index} position={position} />
@@ -278,12 +268,13 @@ const BASKETBALL_BANDS = [
 const BASKETBALL_FLATTEN_ZONES = [
   {
     direction: [0, 1, 0],
-    radius: 0.57,
-    softness: 0.2,
-    target: 0.006,
+    mode: 'plane',
+    radius: 0.36,
+    softness: 0.16,
+    target: 0.004,
     strength: 1,
-    color: '#845438',
-    colorStrength: 0.42
+    color: '#805139',
+    colorStrength: 0.24
   }
 ];
 
