@@ -202,6 +202,7 @@ function Scene({
           onSelect={onSelect}
           registerPlanet={registerPlanet}
           quality={quality}
+          showOrbits={showOrbits}
         />
       ))}
 
