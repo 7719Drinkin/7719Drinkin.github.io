@@ -3,6 +3,7 @@ import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import BasketballWorld from '../worlds/BasketballWorld.jsx';
 import PlaceholderWorld from '../worlds/PlaceholderWorld.jsx';
+import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
 
 export default function PlanetSystem({ interest, selected, onSelect, registerPlanet, quality }) {
   const orbitalPivot = useRef();
@@ -33,6 +34,14 @@ export default function PlanetSystem({ interest, selected, onSelect, registerPla
     <group rotation-z={interest.axialTilt * 0.25}>
       <group ref={orbitalPivot} rotation-y={interest.initialOrbit}>
         <group ref={carrier} position={[interest.orbitRadius, 0, 0]}>
+          {interest.id === 'basketball' && (
+            <BasketballOrbitals
+              radius={interest.size}
+              quality={quality}
+              onSelect={() => onSelect(interest.id)}
+            />
+          )}
+
           <group ref={axialBody} rotation-y={interest.initialAxial} onClick={select} onDoubleClick={enter}>
             {interest.id === 'basketball' ? (
               <BasketballWorld radius={interest.size} quality={quality} />
