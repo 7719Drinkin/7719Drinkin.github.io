@@ -1,11 +1,9 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import ChampionshipTrophy from './ChampionshipTrophy.jsx';
 
-const GOLD = '#e3b75e';
 const GOLD_LIGHT = '#f0cf82';
-const GOLD_DARK = '#6f4d18';
-const GOLD_SHADOW = '#3d2709';
 
 function arcGeometry(radius, start, span, tube, quality) {
   const pointCount = quality === 'quality' ? 30 : 18;
@@ -84,66 +82,6 @@ function MotionRing({ radius, quality }) {
   );
 }
 
-function ChampionshipTrophy({ radius, quality }) {
-  const segments = quality === 'quality' ? 28 : 18;
-  const ballSegments = quality === 'quality' ? [28, 20] : [18, 12];
-
-  return (
-    <group scale={radius * 0.38}>
-      <mesh position-y={0.035}>
-        <cylinderGeometry args={[0.17, 0.19, 0.07, segments]} />
-        <meshStandardMaterial color={GOLD_DARK} roughness={0.3} metalness={0.86} />
-      </mesh>
-      <mesh position-y={0.088}>
-        <cylinderGeometry args={[0.125, 0.15, 0.045, segments]} />
-        <meshStandardMaterial color={GOLD} roughness={0.2} metalness={0.94} />
-      </mesh>
-
-      <group position={[0.014, 0.095, 0]} rotation-z={-0.2}>
-        <mesh position-y={0.205}>
-          <cylinderGeometry args={[0.046, 0.083, 0.41, segments]} />
-          <meshStandardMaterial color={GOLD} roughness={0.18} metalness={0.95} />
-        </mesh>
-
-        <mesh position={[0.092, 0.395, 0]} rotation-z={-0.58}>
-          <cylinderGeometry args={[0.026, 0.044, 0.25, segments]} />
-          <meshStandardMaterial color={GOLD_LIGHT} roughness={0.17} metalness={0.96} />
-        </mesh>
-
-        <mesh position={[0.142, 0.505, 0]} rotation-z={-0.22}>
-          <cylinderGeometry args={[0.071, 0.052, 0.035, segments]} />
-          <meshStandardMaterial color={GOLD} roughness={0.19} metalness={0.95} />
-        </mesh>
-
-        <group position={[0.175, 0.625, 0]} rotation={[0.16, 0.34, -0.2]}>
-          <mesh>
-            <sphereGeometry args={[0.145, ...ballSegments]} />
-            <meshStandardMaterial
-              color={GOLD_LIGHT}
-              emissive={GOLD_SHADOW}
-              emissiveIntensity={0.08}
-              roughness={0.25}
-              metalness={0.88}
-            />
-          </mesh>
-          <mesh rotation-x={Math.PI / 2}>
-            <torusGeometry args={[0.146, 0.005, 6, quality === 'quality' ? 42 : 26]} />
-            <meshStandardMaterial color={GOLD_DARK} roughness={0.48} metalness={0.58} />
-          </mesh>
-          <mesh rotation-y={Math.PI / 2}>
-            <torusGeometry args={[0.146, 0.005, 6, quality === 'quality' ? 42 : 26]} />
-            <meshStandardMaterial color={GOLD_DARK} roughness={0.48} metalness={0.58} />
-          </mesh>
-          <mesh rotation={[0.42, 0.25, Math.PI / 2]}>
-            <torusGeometry args={[0.146, 0.0042, 6, quality === 'quality' ? 42 : 26]} />
-            <meshStandardMaterial color={GOLD_DARK} roughness={0.48} metalness={0.58} />
-          </mesh>
-        </group>
-      </group>
-    </group>
-  );
-}
-
 function TrophySatellite({
   radius,
   quality,
@@ -162,16 +100,8 @@ function TrophySatellite({
     orbitAngle.current += orbitSpeed * delta;
     spinAngle.current += spinSpeed * delta;
 
-    if (orbitalPivot.current) {
-      orbitalPivot.current.rotation.y = orbitAngle.current;
-    }
-
-    if (trophyPose.current) {
-      // The parent pivot supplies the revolution angle. Counter-rotating it here
-      // prevents orbital motion from making the trophy tumble, while the
-      // independent spin angle produces a stable axial rotation.
-      trophyPose.current.rotation.y = spinAngle.current - orbitAngle.current;
-    }
+    if (orbitalPivot.current) orbitalPivot.current.rotation.y = orbitAngle.current;
+    if (trophyPose.current) trophyPose.current.rotation.y = spinAngle.current - orbitAngle.current;
   });
 
   return (
