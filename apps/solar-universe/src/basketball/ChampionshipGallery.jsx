@@ -53,10 +53,7 @@ function Trophy({ position, scale = 1, phase = 0 }) {
 export default function ChampionshipGallery({ radius }) {
   const anchor = useMemo(() => {
     const southPole = new THREE.Vector3(0, -1, 0);
-    const quaternion = new THREE.Quaternion().setFromUnitVectors(
-      new THREE.Vector3(0, 1, 0),
-      southPole
-    );
+    const quaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), southPole);
     return {
       position: southPole.clone().multiplyScalar(radius + 0.045),
       quaternion
@@ -70,13 +67,13 @@ export default function ChampionshipGallery({ radius }) {
 
   return (
     <group position={anchor.position.toArray()} quaternion={anchor.quaternion}>
-      <group rotation-y={0.12}>
+      <group rotation-y={0.12} scale={0.84}>
         <mesh position-y={0.036}>
-          <cylinderGeometry args={[0.47, 0.52, 0.075, 16]} />
-          <meshStandardMaterial color="#443126" roughness={0.94} flatShading />
+          <cylinderGeometry args={[0.47, 0.52, 0.075, 24]} />
+          <meshStandardMaterial color="#443126" roughness={0.9} />
         </mesh>
         <mesh position-y={0.084}>
-          <cylinderGeometry args={[0.4, 0.45, 0.035, 16]} />
+          <cylinderGeometry args={[0.4, 0.45, 0.035, 24]} />
           <meshStandardMaterial color="#201814" roughness={0.82} metalness={0.12} />
         </mesh>
         <mesh position={[0, 0.2, -0.235]}>
@@ -92,7 +89,7 @@ export default function ChampionshipGallery({ radius }) {
             <Trophy key={index} position={position} scale={index < 3 ? 0.76 : 0.68} phase={index * 0.6} />
           ))}
         </group>
-        <pointLight position={[0, 0.45, 0.2]} color="#ffd17a" intensity={0.85} distance={2.4} decay={2} />
+        <pointLight position={[0, 0.45, 0.2]} color="#ffd17a" intensity={0.7} distance={2.1} decay={2} />
       </group>
     </group>
   );
