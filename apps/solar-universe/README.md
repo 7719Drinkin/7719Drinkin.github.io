@@ -24,6 +24,7 @@ The normal Vite base path is `/solar-universe/`. The GitHub Actions pull-request
 
 ## Deployment
 
+- Pages source: GitHub Actions
 - Production site: `https://7719drinkin.github.io/`
 - Production 3D experience: `https://7719drinkin.github.io/solar-universe/`
 - Pull-request preview: `https://7719drinkin.github.io/preview/solar-universe/`
