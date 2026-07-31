@@ -77,12 +77,31 @@ function terrainSegments(detail) {
   return [72, 44];
 }
 
+function prepareFeatures(features = []) {
+  return features.map((feature) => ({
+    ...feature,
+    direction: new THREE.Vector3(...feature.direction).normalize(),
+    colorValue: feature.color ? new THREE.Color(feature.color) : null,
+    rimColorValue: feature.rimColor ? new THREE.Color(feature.rimColor) : null
+  }));
+}
+
+function prepareBands(bands = []) {
+  return bands.map((band) => ({
+    ...band,
+    normal: new THREE.Vector3(...band.normal).normalize(),
+    colorValue: band.color ? new THREE.Color(band.color) : null
+  }));
+}
+
 export function createStylizedTerrain({
   radius,
   detail,
   seed,
   palette,
-  relief = 1
+  relief = 1,
+  features = [],
+  bands = []
 }) {
   const [widthSegments, heightSegments] = terrainSegments(detail);
   const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
@@ -100,6 +119,10 @@ export function createStylizedTerrain({
   const shadowTint = new THREE.Color(palette.shadowTint ?? palette.low);
   const highlightTint = new THREE.Color(palette.highlightTint ?? palette.high);
   const resultColor = new THREE.Color();
+  const authoredFeatures = prepareFeatures(features);
+  const authoredBands = prepareBands(bands);
+  const featureState = authoredFeatures.map(() => ({ mask: 0, rim: 0 }));
+  const bandState = authoredBands.map(() => 0);
 
   for (let index = 0; index < position.count; index += 1) {
     vertex.fromBufferAttribute(position, index);
@@ -122,13 +145,36 @@ export function createStylizedTerrain({
     const regionalRelief = (regional - 0.5) * radius * 0.018 * relief;
     const surfaceRelief = (surface - 0.5) * radius * 0.0038 * relief;
     const bandRelief = (latitudeBand - 0.5) * radius * 0.0035 * relief;
-    const displacement = broadRelief + regionalRelief + surfaceRelief + bandRelief;
+    let displacement = broadRelief + regionalRelief + surfaceRelief + bandRelief;
+
+    authoredFeatures.forEach((feature, featureIndex) => {
+      const angle = Math.acos(THREE.MathUtils.clamp(normal.dot(feature.direction), -1, 1));
+      const mask = 1 - smoothstep(feature.radius, feature.radius + (feature.softness ?? 0.18), angle);
+      const rimAt = feature.rimAt ?? feature.radius;
+      const rimWidth = feature.rimWidth ?? 0.075;
+      const rimDistance = Math.abs(angle - rimAt);
+      const rim = 1 - smoothstep(rimWidth * 0.35, rimWidth, rimDistance);
+      featureState[featureIndex].mask = mask;
+      featureState[featureIndex].rim = rim;
+      displacement += mask * (feature.elevation ?? 0) * radius;
+      displacement += rim * (feature.rimElevation ?? 0) * radius;
+    });
+
+    authoredBands.forEach((band, bandIndex) => {
+      const distance = Math.abs(normal.dot(band.normal));
+      const mask = 1 - smoothstep(band.width, band.width + (band.softness ?? 0.08), distance);
+      const longitude = Math.atan2(normal.z, normal.x);
+      const rhythm = 0.62 + Math.sin(longitude * (band.frequency ?? 8) + seed) * 0.38;
+      const shapedMask = mask * rhythm;
+      bandState[bandIndex] = shapedMask;
+      displacement += shapedMask * (band.elevation ?? 0) * radius;
+    });
 
     vertex.addScaledVector(normal, displacement);
     position.setXYZ(index, vertex.x, vertex.y, vertex.z);
 
     const normalizedHeight = THREE.MathUtils.clamp(
-      0.5 + displacement / (radius * 0.082 * Math.max(relief, 0.001)),
+      0.5 + displacement / (radius * 0.11 * Math.max(relief, 0.001)),
       0,
       1
     );
@@ -144,10 +190,26 @@ export function createStylizedTerrain({
 
     resultColor.copy(lowColor).lerp(midColor, middleBlend);
     resultColor.lerp(highColor, highBlend);
-    resultColor.lerp(accentColor, redEarthMask * 0.42);
-    resultColor.lerp(accent2Color, weatheredMask * 0.34);
-    resultColor.lerp(shadowTint, coolLowlandMask * 0.2);
-    resultColor.lerp(highlightTint, smoothstep(0.72, 0.96, normalizedHeight) * 0.12);
+    resultColor.lerp(accentColor, redEarthMask * 0.36);
+    resultColor.lerp(accent2Color, weatheredMask * 0.29);
+    resultColor.lerp(shadowTint, coolLowlandMask * 0.18);
+    resultColor.lerp(highlightTint, smoothstep(0.72, 0.96, normalizedHeight) * 0.1);
+
+    authoredFeatures.forEach((feature, featureIndex) => {
+      const state = featureState[featureIndex];
+      if (feature.colorValue) {
+        resultColor.lerp(feature.colorValue, state.mask * (feature.colorStrength ?? 0.5));
+      }
+      if (feature.rimColorValue) {
+        resultColor.lerp(feature.rimColorValue, state.rim * (feature.rimColorStrength ?? 0.42));
+      }
+    });
+
+    authoredBands.forEach((band, bandIndex) => {
+      if (band.colorValue) {
+        resultColor.lerp(band.colorValue, bandState[bandIndex] * (band.colorStrength ?? 0.45));
+      }
+    });
 
     const handPaintedShade = 0.9
       + continental * 0.055
