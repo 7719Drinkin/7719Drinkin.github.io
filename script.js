@@ -1,3 +1,13 @@
+function loadSiteI18n() {
+  if (window.SiteI18n || document.querySelector('script[data-site-i18n]')) return;
+  const script = document.createElement('script');
+  script.src = '/js/site-i18n.js?v=20260731-1';
+  script.dataset.siteI18n = '';
+  document.head.append(script);
+}
+
+loadSiteI18n();
+
 const header = document.querySelector('.site-header');
 const cursorGlow = document.querySelector('.cursor-glow');
 const galleryWall = document.querySelector('#gallery-wall');
@@ -60,6 +70,12 @@ function applyCardShape(card, image, index) {
   }
 }
 
+function updateImageAria(image) {
+  const label = image.alt || 'Basketball image';
+  const translated = window.SiteI18n?.t('gallery.openImage', { label });
+  image.setAttribute('aria-label', translated || `${label}，点击放大`);
+}
+
 function prepareGallery() {
   const images = document.querySelectorAll('.gallery-card > img');
 
@@ -69,7 +85,7 @@ function prepareGallery() {
 
     image.tabIndex = 0;
     image.setAttribute('role', 'button');
-    image.setAttribute('aria-label', `${image.alt || 'Basketball image'}，点击放大`);
+    updateImageAria(image);
 
     const updateShape = () => applyCardShape(card, image, index);
 
@@ -130,6 +146,10 @@ window.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && lightbox?.classList.contains('is-open')) {
     closeLightbox();
   }
+});
+
+window.addEventListener('7719:languagechange', () => {
+  document.querySelectorAll('.gallery-card > img').forEach(updateImageAria);
 });
 
 prepareGallery();
