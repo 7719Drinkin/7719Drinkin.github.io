@@ -1,1 +1,61 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><title>Anime · 7719 Universe</title></head><body><main>Anime module skeleton</main></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Anime collection preview in 7719 Universe.">
+  <title>Anime · 7719 Universe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/universe.css?v=20260730-1">
+  <link rel="stylesheet" href="/anime/anime.css?v=20260731-1">
+</head>
+<body class="theme-anime interest-page anime-page">
+  <div class="universe-noise" aria-hidden="true"></div>
+  <header class="universe-header">
+    <a class="universe-brand" href="/">7719</a>
+    <nav class="universe-nav" aria-label="动漫页面导航">
+      <a href="/" data-copy="navUniverse">宇宙</a>
+      <a href="#modules" data-copy="navModules">模块</a>
+      <a href="/solar-universe/" data-copy="nav3d">3D 模式</a>
+      <button id="anime-language-toggle" class="anime-language-toggle" type="button">EN</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="interest-hero anime-hero">
+      <div class="anime-frame-field" aria-hidden="true"></div>
+      <div class="interest-hero-copy reveal">
+        <div class="breadcrumb"><a href="/" data-copy="home">首页</a><span>/</span><span data-copy="anime">动漫</span></div>
+        <p class="eyebrow" data-copy="heroEyebrow">04 / 兴趣</p>
+        <h1 data-copy="anime">动漫</h1>
+        <p data-copy="heroBody">一帧一帧绘出的世界与记忆。这里将用于整理作品、角色、名场面与世界观。</p>
+        <span class="coming-soon-mark" data-copy="building">内容建设中</span>
+      </div>
+    </section>
+
+    <section id="modules" class="universe-section anime-modules">
+      <div class="section-heading reveal">
+        <div><p data-copy="skeleton">模块骨架</p><h2 data-copy="moduleTitle" data-html>等待内容<br>形成。</h2></div>
+        <span data-copy="moduleBody">先建立稳定的内容入口。后续确定作品和素材后，可以逐步扩展，而不需要重新设计整个模块。</span>
+      </div>
+      <div class="anime-module-grid">
+        <article class="anime-module-card reveal"><small>01</small><h3 data-copy="works">作品档案</h3><p data-copy="worksBody">单部作品专题、观看记忆和资料入口。</p><span data-copy="building">内容建设中</span></article>
+        <article class="anime-module-card reveal"><small>02</small><h3 data-copy="characters">角色档案</h3><p data-copy="charactersBody">角色、人物关系和角色印象。</p><span data-copy="building">内容建设中</span></article>
+        <article class="anime-module-card reveal"><small>03</small><h3 data-copy="worlds">名场面与世界观</h3><p data-copy="worldsBody">经典场景、设定、台词和世界构成。</p><span data-copy="building">内容建设中</span></article>
+      </div>
+    </section>
+
+    <section class="universe-section anime-principle reveal">
+      <p class="eyebrow" data-copy="principle">当前原则</p>
+      <h2 data-copy="principleTitle" data-html>先保留结构，<br>再决定内容。</h2>
+      <p data-copy="principleBody">现阶段不绑定具体动漫作品，也不使用未确认的图片。所有入口都作为后续扩展点保留。</p>
+    </section>
+  </main>
+
+  <footer class="universe-footer"><span>7719 / <span data-copy="anime">动漫</span></span><a href="/" data-copy="back">返回宇宙 →</a></footer>
+  <script src="/js/universe.js?v=20260731-2"></script>
+  <script src="/anime/anime.js?v=20260731-1"></script>
+</body>
+</html>
