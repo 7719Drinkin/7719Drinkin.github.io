@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { courtSurfaceY } from './courtLayout.js';
 
 function seededRandom(seed) {
   let value = seed >>> 0;
@@ -12,6 +13,11 @@ function seededRandom(seed) {
 }
 
 const CROWD_COLORS = ['#f2c477', '#d96a4b', '#ece4cf', '#73906a', '#b7473e'];
+const STAND_ROWS = [
+  { z: 0.235, y: 0.012 },
+  { z: 0.274, y: 0.034 },
+  { z: 0.313, y: 0.056 }
+];
 
 function Spectator({ position, color, scale }) {
   return (
@@ -29,21 +35,16 @@ function Spectator({ position, color, scale }) {
 }
 
 function SidelineStand({ side, radius, spectators }) {
-  const courtY = radius + 0.045;
-  const rows = [
-    { z: 0.235, y: 0.012 },
-    { z: 0.274, y: 0.034 },
-    { z: 0.313, y: 0.056 }
-  ];
+  const courtY = courtSurfaceY(radius);
 
   return (
     <group>
-      {rows.map((row, index) => (
+      {STAND_ROWS.map((row, index) => (
         <group key={index} position={[0, courtY + row.y, side * row.z]}>
           <mesh>
             <boxGeometry args={[0.66, 0.024, 0.052]} />
             <meshStandardMaterial
-              color={index === 2 ? '#392a25' : '#493129'}
+              color={index === STAND_ROWS.length - 1 ? '#392a25' : '#493129'}
               roughness={0.9}
             />
           </mesh>
@@ -70,17 +71,17 @@ export default function CourtStands({ radius, quality }) {
   const crowd = useMemo(() => {
     const random = seededRandom(771923);
     const countPerSide = quality === 'quality' ? 18 : 7;
+    const courtY = courtSurfaceY(radius);
 
     return [-1, 1].map((side) => Array.from({ length: countPerSide }, (_, index) => {
-      const row = index % 3;
-      const x = -0.29 + random() * 0.58;
-      const zBase = [0.235, 0.274, 0.313][row];
-      const yBase = [0.012, 0.034, 0.056][row];
+      const row = index % STAND_ROWS.length;
+      const rowLayout = STAND_ROWS[row];
+
       return {
         position: [
-          x,
-          radius + 0.045 + yBase + 0.021,
-          side * (zBase + (random() - 0.5) * 0.012)
+          -0.29 + random() * 0.58,
+          courtY + rowLayout.y + 0.021,
+          side * (rowLayout.z + (random() - 0.5) * 0.012)
         ],
         color: CROWD_COLORS[Math.floor(random() * CROWD_COLORS.length)],
         scale: 0.72 + random() * 0.32
