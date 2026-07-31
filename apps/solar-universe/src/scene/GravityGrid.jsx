@@ -2,7 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const MAX_MASSES = 4;
+const MAX_MASSES = 5;
 
 export default function GravityGrid({ interests, planetRefs, quality }) {
   const material = useRef();
@@ -11,8 +11,8 @@ export default function GravityGrid({ interests, planetRefs, quality }) {
     () => Array.from({ length: MAX_MASSES }, () => new THREE.Vector2()),
     []
   );
-  const strengths = useMemo(() => new Float32Array([2.8, 0.62, 0.42, 0.48]), []);
-  const radii = useMemo(() => new Float32Array([3.25, 1.18, 1.0, 1.08]), []);
+  const strengths = useMemo(() => new Float32Array([2.8, 0.62, 0.42, 0.48, 0.44]), []);
+  const radii = useMemo(() => new Float32Array([3.25, 1.18, 1.0, 1.08, 1.04]), []);
   const uniforms = useMemo(() => ({
     uCenters: { value: centers },
     uStrengths: { value: strengths },
@@ -36,7 +36,7 @@ export default function GravityGrid({ interests, planetRefs, quality }) {
 
   return (
     <mesh rotation-x={-Math.PI / 2} position-y={0.035} renderOrder={-3}>
-      <planeGeometry args={[46, 46, segments, segments]} />
+      <planeGeometry args={[54, 54, segments, segments]} />
       <shaderMaterial
         ref={material}
         uniforms={uniforms}

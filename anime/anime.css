@@ -1,0 +1,9 @@
+.theme-anime{--accent:#ff806f;--accent-soft:rgba(255,128,111,.18)}
+.anime-page{background:radial-gradient(circle at 75% 20%,rgba(255,128,111,.14),transparent 32%),#07070b}
+.anime-language-toggle{border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;padding:8px 11px;cursor:pointer}
+.anime-language-toggle:hover{background:#fff;color:#07070b}
+.anime-module-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.anime-module-card{min-height:360px;display:flex;flex-direction:column;justify-content:flex-end;padding:40px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:#0d0d12}
+.anime-module-card small,.anime-module-card>span{color:var(--accent)}
+.anime-module-card small{margin-bottom:auto}.anime-module-card h3{font-family:"Anton",sans-serif;font-size:54px;font-weight:400;margin:0 0 18px}.anime-module-card p{color:var(--muted);line-height:1.7}.anime-principle h2{font-family:"Anton",sans-serif;font-size:clamp(58px,8vw,120px);font-weight:400;line-height:.9}
+@media(max-width:900px){.anime-module-grid{grid-template-columns:1fr}}
