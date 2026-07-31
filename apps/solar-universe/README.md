@@ -22,6 +22,15 @@ npm run preview
 
 The normal Vite base path is `/solar-universe/`. The GitHub Actions pull-request workflow overrides it with `/preview/solar-universe/`. Production output is written to `dist/`.
 
+## Deployment
+
+- Production site: `https://7719drinkin.github.io/`
+- Production 3D experience: `https://7719drinkin.github.io/solar-universe/`
+- Pull-request preview: `https://7719drinkin.github.io/preview/solar-universe/`
+- Workflow: `.github/workflows/deploy-pages.yml`
+
+A push to `main` builds the Vite application with `/solar-universe/` as its base path, assembles the complete static site, uploads a GitHub Pages artifact and deploys it through the `github-pages` environment.
+
 ## Architecture
 
 - `src/scene/` — Canvas, camera controller, orbital system, gravity grid, Sun and render pipeline
