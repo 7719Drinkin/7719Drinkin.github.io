@@ -4,6 +4,69 @@ import * as THREE from 'three';
 const UP = new THREE.Vector3(0, 1, 0);
 const X_AXIS = new THREE.Vector3(1, 0, 0);
 
+const ATMOSPHERE_LAYERS = [
+  {
+    scale: 1.035,
+    opacity: 0.052,
+    ecoOpacity: 0.032,
+    innerStart: 0.58,
+    innerEnd: 0.86,
+    outerStart: 0.988,
+    shadowColor: '#35576d',
+    lightColor: '#b9dde7'
+  },
+  {
+    scale: 1.085,
+    opacity: 0.026,
+    ecoOpacity: 0.015,
+    innerStart: 0.44,
+    innerEnd: 0.77,
+    outerStart: 0.982,
+    shadowColor: '#31536b',
+    lightColor: '#acd4df'
+  },
+  {
+    scale: 1.16,
+    opacity: 0.013,
+    ecoOpacity: 0.0075,
+    innerStart: 0.31,
+    innerEnd: 0.67,
+    outerStart: 0.974,
+    shadowColor: '#2d4e67',
+    lightColor: '#9fcad8'
+  },
+  {
+    scale: 1.27,
+    opacity: 0.0068,
+    ecoOpacity: 0.0038,
+    innerStart: 0.2,
+    innerEnd: 0.58,
+    outerStart: 0.964,
+    shadowColor: '#294961',
+    lightColor: '#91bdce'
+  },
+  {
+    scale: 1.4,
+    opacity: 0.0038,
+    ecoOpacity: 0.0021,
+    innerStart: 0.11,
+    innerEnd: 0.5,
+    outerStart: 0.95,
+    shadowColor: '#26445c',
+    lightColor: '#83afc2'
+  },
+  {
+    scale: 1.62,
+    opacity: 0.0022,
+    ecoOpacity: 0.0012,
+    innerStart: 0.04,
+    innerEnd: 0.42,
+    outerStart: 0.93,
+    shadowColor: '#233f56',
+    lightColor: '#759fb5'
+  }
+];
+
 const ATMOSPHERE_VERTEX_SHADER = `
   varying vec3 vWorldNormal;
   varying vec3 vWorldPosition;
@@ -18,6 +81,9 @@ const ATMOSPHERE_VERTEX_SHADER = `
 
 const ATMOSPHERE_FRAGMENT_SHADER = `
   uniform float uOpacity;
+  uniform float uInnerStart;
+  uniform float uInnerEnd;
+  uniform float uOuterStart;
   uniform vec3 uShadowColor;
   uniform vec3 uLightColor;
 
@@ -29,27 +95,26 @@ const ATMOSPHERE_FRAGMENT_SHADER = `
     vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
     vec3 sunDirection = normalize(-vWorldPosition);
 
-    // This shader is rendered on BackSide geometry only. The far hemisphere is
-    // hidden by the opaque planet depth buffer, leaving only the shell that
-    // projects beyond the visible planetary silhouette.
+    // Each layer is rendered on BackSide geometry. Opaque terrain and all
+    // elevated structures write depth first, so they carve their silhouettes
+    // out of the atmospheric volume instead of being covered by a front shell.
     float backAlignment = clamp(-dot(normalDirection, viewDirection), 0.0, 1.0);
     float limbPosition = 1.0 - backAlignment;
 
-    // Build a narrow optical band. It fades in before the limb, reaches a soft
-    // maximum, and fades back to zero at the geometry boundary, so the shell
-    // never reads as a transparent dome with a hard outer edge.
-    float innerFade = smoothstep(0.64, 0.91, limbPosition);
-    float outerFade = 1.0 - smoothstep(0.965, 1.0, limbPosition);
-    float rim = innerFade * outerFade;
+    // The layers overlap like discrete samples of an exponential atmosphere.
+    // Every sample fades at both ends, preventing a readable spherical ceiling.
+    float innerFade = smoothstep(uInnerStart, uInnerEnd, limbPosition);
+    float outerFade = 1.0 - smoothstep(uOuterStart, 1.0, limbPosition);
+    float densityBand = innerFade * outerFade;
 
     float sunDot = dot(normalDirection, sunDirection);
-    float daylight = smoothstep(-0.2, 0.72, sunDot);
-    float terminator = pow(max(1.0 - abs(sunDot), 0.0), 3.0) * 0.08;
+    float daylight = smoothstep(-0.24, 0.72, sunDot);
+    float terminator = pow(max(1.0 - abs(sunDot), 0.0), 3.0) * 0.07;
 
     vec3 color = mix(uShadowColor, uLightColor, daylight);
-    float alpha = rim * (mix(0.16, 1.0, daylight) + terminator) * uOpacity;
+    float alpha = densityBand * (mix(0.12, 1.0, daylight) + terminator) * uOpacity;
 
-    if (alpha < 0.001) discard;
+    if (alpha < 0.00035) discard;
     gl_FragColor = vec4(color, alpha);
   }
 `;
@@ -294,18 +359,21 @@ function DenseTrainingTrail({ radius, quality }) {
   );
 }
 
-function BasketballAtmosphere({ radius, quality }) {
+function AtmosphereShell({ radius, quality, layer, index }) {
   const uniforms = useMemo(() => ({
-    uOpacity: { value: quality === 'quality' ? 0.11 : 0.065 },
-    uShadowColor: { value: new THREE.Color('#2f4f68') },
-    uLightColor: { value: new THREE.Color('#a9d2df') }
-  }), [quality]);
+    uOpacity: { value: quality === 'quality' ? layer.opacity : layer.ecoOpacity },
+    uInnerStart: { value: layer.innerStart },
+    uInnerEnd: { value: layer.innerEnd },
+    uOuterStart: { value: layer.outerStart },
+    uShadowColor: { value: new THREE.Color(layer.shadowColor) },
+    uLightColor: { value: new THREE.Color(layer.lightColor) }
+  }), [layer, quality]);
 
   return (
-    <mesh renderOrder={1}>
+    <mesh renderOrder={1 + index * 0.01}>
       <sphereGeometry
         args={[
-          radius * 1.06,
+          radius * layer.scale,
           quality === 'quality' ? 64 : 36,
           quality === 'quality' ? 48 : 24
         ]}
@@ -322,6 +390,26 @@ function BasketballAtmosphere({ radius, quality }) {
         toneMapped={false}
       />
     </mesh>
+  );
+}
+
+function BasketballAtmosphere({ radius, quality }) {
+  const layers = quality === 'quality'
+    ? ATMOSPHERE_LAYERS
+    : ATMOSPHERE_LAYERS.filter((_, index) => index === 0 || index === 2 || index === 4 || index === 5);
+
+  return (
+    <group>
+      {layers.map((layer, index) => (
+        <AtmosphereShell
+          key={layer.scale}
+          radius={radius}
+          quality={quality}
+          layer={layer}
+          index={index}
+        />
+      ))}
+    </group>
   );
 }
 
