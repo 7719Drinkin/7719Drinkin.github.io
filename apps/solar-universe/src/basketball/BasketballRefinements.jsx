@@ -18,11 +18,6 @@ const ATMOSPHERE_VERTEX_SHADER = `
 
 const ATMOSPHERE_FRAGMENT_SHADER = `
   uniform float uOpacity;
-  uniform float uRimPower;
-  uniform float uRimStart;
-  uniform float uRimEnd;
-  uniform float uEdgeFadeStart;
-  uniform float uEdgeFadeStrength;
   uniform vec3 uShadowColor;
   uniform vec3 uLightColor;
 
@@ -34,19 +29,25 @@ const ATMOSPHERE_FRAGMENT_SHADER = `
     vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
     vec3 sunDirection = normalize(-vWorldPosition);
 
-    float viewAlignment = clamp(abs(dot(normalDirection, viewDirection)), 0.0, 1.0);
-    float rimBase = pow(max(1.0 - viewAlignment, 0.0), uRimPower);
-    float rim = smoothstep(uRimStart, uRimEnd, rimBase);
+    // This shader is rendered on BackSide geometry only. The far hemisphere is
+    // hidden by the opaque planet depth buffer, leaving only the shell that
+    // projects beyond the visible planetary silhouette.
+    float backAlignment = clamp(-dot(normalDirection, viewDirection), 0.0, 1.0);
+    float limbPosition = 1.0 - backAlignment;
 
-    float edgeFade = 1.0 - smoothstep(uEdgeFadeStart, 1.0, rimBase);
-    rim *= mix(1.0, edgeFade, uEdgeFadeStrength);
+    // Build a narrow optical band. It fades in before the limb, reaches a soft
+    // maximum, and fades back to zero at the geometry boundary, so the shell
+    // never reads as a transparent dome with a hard outer edge.
+    float innerFade = smoothstep(0.64, 0.91, limbPosition);
+    float outerFade = 1.0 - smoothstep(0.965, 1.0, limbPosition);
+    float rim = innerFade * outerFade;
 
     float sunDot = dot(normalDirection, sunDirection);
-    float daylight = smoothstep(-0.24, 0.72, sunDot);
-    float terminator = pow(max(1.0 - abs(sunDot), 0.0), 3.0) * 0.12;
+    float daylight = smoothstep(-0.2, 0.72, sunDot);
+    float terminator = pow(max(1.0 - abs(sunDot), 0.0), 3.0) * 0.08;
 
     vec3 color = mix(uShadowColor, uLightColor, daylight);
-    float alpha = rim * (mix(0.24, 1.0, daylight) + terminator) * uOpacity;
+    float alpha = rim * (mix(0.16, 1.0, daylight) + terminator) * uOpacity;
 
     if (alpha < 0.001) discard;
     gl_FragColor = vec4(color, alpha);
@@ -293,29 +294,22 @@ function DenseTrainingTrail({ radius, quality }) {
   );
 }
 
-function AtmosphereLayer({ radius, quality, outer = false }) {
+function BasketballAtmosphere({ radius, quality }) {
   const uniforms = useMemo(() => ({
-    uOpacity: {
-      value: outer
-        ? (quality === 'quality' ? 0.052 : 0.032)
-        : (quality === 'quality' ? 0.058 : 0.036)
-    },
-    uRimPower: { value: outer ? 3.35 : 5.2 },
-    uRimStart: { value: outer ? 0.08 : 0.22 },
-    uRimEnd: { value: outer ? 0.78 : 0.9 },
-    uEdgeFadeStart: { value: outer ? 0.7 : 0.9 },
-    uEdgeFadeStrength: { value: outer ? 1 : 0.28 },
-    uShadowColor: { value: new THREE.Color(outer ? '#38556b' : '#45667a') },
-    uLightColor: { value: new THREE.Color(outer ? '#9fc6d3' : '#b8dbe4') }
-  }), [outer, quality]);
-
-  const widthSegments = quality === 'quality' ? 64 : 36;
-  const heightSegments = quality === 'quality' ? 48 : 24;
-  const shellRadius = radius * (outer ? 1.085 : 1.02);
+    uOpacity: { value: quality === 'quality' ? 0.11 : 0.065 },
+    uShadowColor: { value: new THREE.Color('#2f4f68') },
+    uLightColor: { value: new THREE.Color('#a9d2df') }
+  }), [quality]);
 
   return (
-    <mesh renderOrder={outer ? 2 : 5}>
-      <sphereGeometry args={[shellRadius, widthSegments, heightSegments]} />
+    <mesh renderOrder={1}>
+      <sphereGeometry
+        args={[
+          radius * 1.06,
+          quality === 'quality' ? 64 : 36,
+          quality === 'quality' ? 48 : 24
+        ]}
+      />
       <shaderMaterial
         uniforms={uniforms}
         vertexShader={ATMOSPHERE_VERTEX_SHADER}
@@ -323,20 +317,11 @@ function AtmosphereLayer({ radius, quality, outer = false }) {
         transparent
         depthTest
         depthWrite={false}
-        side={outer ? THREE.BackSide : THREE.FrontSide}
-        blending={THREE.NormalBlending}
+        side={THREE.BackSide}
+        blending={THREE.AdditiveBlending}
         toneMapped={false}
       />
     </mesh>
-  );
-}
-
-function BasketballAtmosphere({ radius, quality }) {
-  return (
-    <group>
-      <AtmosphereLayer radius={radius} quality={quality} outer />
-      <AtmosphereLayer radius={radius} quality={quality} />
-    </group>
   );
 }
 
