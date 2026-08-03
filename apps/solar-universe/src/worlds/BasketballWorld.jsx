@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import BasketballLife from '../basketball/BasketballLife.jsx';
+import BasketballRefinements from '../basketball/BasketballRefinements.jsx';
 import CourtDynamics from '../basketball/CourtDynamics.jsx';
 import CourtStands from '../basketball/CourtStands.jsx';
 import Number23Monument from '../basketball/Number23Monument.jsx';
@@ -277,9 +278,10 @@ export default function BasketballWorld({ radius, quality }) {
   return (
     <group>
       <mesh geometry={geometry}>
-        <meshStandardMaterial vertexColors roughness={0.72} metalness={0} dithering />
+        <meshStandardMaterial vertexColors roughness={0.82} metalness={0} dithering />
       </mesh>
       <BasketballLife radius={radius} quality={quality} />
+      <BasketballRefinements radius={radius} quality={quality} />
       <LastCourt radius={radius} quality={quality} />
       <CourtStands radius={radius} quality={quality} />
       <CourtDynamics radius={radius} quality={quality} />

@@ -104,9 +104,7 @@ function LakePatch({ direction, radius, scale = 1, phase = 0 }) {
       glint.current.position.x = -0.025 + wave * 0.05;
       glint.current.material.opacity = 0.035 + wave * 0.045;
     }
-    if (shallowMaterial.current) {
-      shallowMaterial.current.roughness = 0.25 + wave * 0.08;
-    }
+    if (shallowMaterial.current) shallowMaterial.current.roughness = 0.25 + wave * 0.08;
   });
 
   return (
@@ -161,79 +159,6 @@ function LakePatch({ direction, radius, scale = 1, phase = 0 }) {
           blending={THREE.AdditiveBlending}
         />
       </mesh>
-    </group>
-  );
-}
-
-function TrailLamp({ phase }) {
-  const material = useRef();
-  useFrame(({ clock }) => {
-    if (material.current) {
-      material.current.emissiveIntensity = 0.8 + (Math.sin(clock.elapsedTime * 1.35 + phase) * 0.5 + 0.5) * 0.75;
-    }
-  });
-
-  return (
-    <group position={[0, 0.018, 0.026]} scale={0.78}>
-      <mesh position-y={0.025}>
-        <cylinderGeometry args={[0.004, 0.006, 0.05, 6]} />
-        <meshStandardMaterial color="#3a3029" roughness={0.82} />
-      </mesh>
-      <mesh position-y={0.055}>
-        <sphereGeometry args={[0.011, 9, 6]} />
-        <meshStandardMaterial
-          ref={material}
-          color="#ffe2a1"
-          emissive="#ff9b35"
-          emissiveIntensity={1.1}
-          roughness={0.3}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-function TrainingTrail({ radius, quality }) {
-  const markers = useMemo(() => {
-    const count = quality === 'quality' ? 28 : 18;
-    return Array.from({ length: count }, (_, index) => {
-      const angle = index / count * Math.PI * 2;
-      const monumentGap = angle > 0.68 && angle < 2.46;
-      const southGap = angle > 4.35 && angle < 5.05;
-      if (monumentGap || southGap) return null;
-      const latitude = -0.15 + Math.sin(angle * 3 + 0.4) * 0.045;
-      const horizontal = Math.cos(latitude);
-      return {
-        angle,
-        direction: [
-          Math.cos(angle) * horizontal,
-          Math.sin(latitude),
-          Math.sin(angle) * horizontal
-        ],
-        lamp: index % 7 === 0
-      };
-    }).filter(Boolean);
-  }, [quality]);
-
-  return (
-    <group>
-      {markers.map((marker, index) => {
-        const anchor = surfaceAnchor(marker.direction, radius, 0.021);
-        return (
-          <group
-            key={index}
-            position={anchor.position.toArray()}
-            quaternion={anchor.quaternion}
-            rotation-y={marker.angle + Math.PI / 2}
-          >
-            <mesh position-y={0.004}>
-              <boxGeometry args={[0.066, 0.005, 0.011]} />
-              <meshStandardMaterial color={index % 3 === 0 ? '#e6d5ac' : '#a95a40'} roughness={0.72} />
-            </mesh>
-            {marker.lamp && <TrailLamp phase={index * 0.8} />}
-          </group>
-        );
-      })}
     </group>
   );
 }
@@ -297,7 +222,6 @@ export default function BasketballLife({ radius, quality }) {
       ))}
       <LakePatch direction={[-0.1, -0.14, -0.98]} radius={radius} scale={0.86} phase={0} />
       <LakePatch direction={[-0.32, -0.05, -0.94]} radius={radius} scale={0.52} phase={2.4} />
-      <TrainingTrail radius={radius} quality={quality} />
       <CourtBanners radius={radius} />
     </group>
   );
