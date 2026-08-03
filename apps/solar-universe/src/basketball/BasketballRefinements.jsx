@@ -4,6 +4,55 @@ import * as THREE from 'three';
 const UP = new THREE.Vector3(0, 1, 0);
 const X_AXIS = new THREE.Vector3(1, 0, 0);
 
+const ATMOSPHERE_VERTEX_SHADER = `
+  varying vec3 vWorldNormal;
+  varying vec3 vWorldPosition;
+
+  void main() {
+    vWorldNormal = normalize(mat3(modelMatrix) * normal);
+    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+    vWorldPosition = worldPosition.xyz;
+    gl_Position = projectionMatrix * viewMatrix * worldPosition;
+  }
+`;
+
+const ATMOSPHERE_FRAGMENT_SHADER = `
+  uniform float uOpacity;
+  uniform float uRimPower;
+  uniform float uRimStart;
+  uniform float uRimEnd;
+  uniform float uEdgeFadeStart;
+  uniform float uEdgeFadeStrength;
+  uniform vec3 uShadowColor;
+  uniform vec3 uLightColor;
+
+  varying vec3 vWorldNormal;
+  varying vec3 vWorldPosition;
+
+  void main() {
+    vec3 normalDirection = normalize(vWorldNormal);
+    vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
+    vec3 sunDirection = normalize(-vWorldPosition);
+
+    float viewAlignment = clamp(abs(dot(normalDirection, viewDirection)), 0.0, 1.0);
+    float rimBase = pow(max(1.0 - viewAlignment, 0.0), uRimPower);
+    float rim = smoothstep(uRimStart, uRimEnd, rimBase);
+
+    float edgeFade = 1.0 - smoothstep(uEdgeFadeStart, 1.0, rimBase);
+    rim *= mix(1.0, edgeFade, uEdgeFadeStrength);
+
+    float sunDot = dot(normalDirection, sunDirection);
+    float daylight = smoothstep(-0.24, 0.72, sunDot);
+    float terminator = pow(max(1.0 - abs(sunDot), 0.0), 3.0) * 0.12;
+
+    vec3 color = mix(uShadowColor, uLightColor, daylight);
+    float alpha = rim * (mix(0.24, 1.0, daylight) + terminator) * uOpacity;
+
+    if (alpha < 0.001) discard;
+    gl_FragColor = vec4(color, alpha);
+  }
+`;
+
 function seededRandom(seed) {
   let value = seed >>> 0;
   return () => {
@@ -244,48 +293,50 @@ function DenseTrainingTrail({ radius, quality }) {
   );
 }
 
-function BasketballAtmosphere({ radius, quality }) {
+function AtmosphereLayer({ radius, quality, outer = false }) {
   const uniforms = useMemo(() => ({
-    uOpacity: { value: quality === 'quality' ? 1 : 0.62 }
-  }), [quality]);
+    uOpacity: {
+      value: outer
+        ? (quality === 'quality' ? 0.052 : 0.032)
+        : (quality === 'quality' ? 0.058 : 0.036)
+    },
+    uRimPower: { value: outer ? 3.35 : 5.2 },
+    uRimStart: { value: outer ? 0.08 : 0.22 },
+    uRimEnd: { value: outer ? 0.78 : 0.9 },
+    uEdgeFadeStart: { value: outer ? 0.7 : 0.9 },
+    uEdgeFadeStrength: { value: outer ? 1 : 0.28 },
+    uShadowColor: { value: new THREE.Color(outer ? '#38556b' : '#45667a') },
+    uLightColor: { value: new THREE.Color(outer ? '#9fc6d3' : '#b8dbe4') }
+  }), [outer, quality]);
+
+  const widthSegments = quality === 'quality' ? 64 : 36;
+  const heightSegments = quality === 'quality' ? 48 : 24;
+  const shellRadius = radius * (outer ? 1.085 : 1.02);
 
   return (
-    <mesh renderOrder={4}>
-      <sphereGeometry args={[radius * 1.035, quality === 'quality' ? 64 : 36, quality === 'quality' ? 48 : 24]} />
+    <mesh renderOrder={outer ? 2 : 5}>
+      <sphereGeometry args={[shellRadius, widthSegments, heightSegments]} />
       <shaderMaterial
         uniforms={uniforms}
+        vertexShader={ATMOSPHERE_VERTEX_SHADER}
+        fragmentShader={ATMOSPHERE_FRAGMENT_SHADER}
         transparent
+        depthTest
         depthWrite={false}
-        side={THREE.FrontSide}
-        vertexShader={`
-          varying vec3 vWorldNormal;
-          varying vec3 vWorldPosition;
-          void main() {
-            vWorldNormal = normalize(mat3(modelMatrix) * normal);
-            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-            vWorldPosition = worldPosition.xyz;
-            gl_Position = projectionMatrix * viewMatrix * worldPosition;
-          }
-        `}
-        fragmentShader={`
-          uniform float uOpacity;
-          varying vec3 vWorldNormal;
-          varying vec3 vWorldPosition;
-          void main() {
-            vec3 normalDirection = normalize(vWorldNormal);
-            vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
-            vec3 sunDirection = normalize(-vWorldPosition);
-            float rim = pow(1.0 - max(dot(normalDirection, viewDirection), 0.0), 2.8);
-            float daylight = smoothstep(-0.18, 0.68, dot(normalDirection, sunDirection));
-            vec3 shadowColor = vec3(0.24, 0.43, 0.58);
-            vec3 lightColor = vec3(0.68, 0.84, 0.91);
-            vec3 color = mix(shadowColor, lightColor, daylight);
-            float alpha = rim * (0.018 + daylight * 0.075) * uOpacity;
-            gl_FragColor = vec4(color, alpha);
-          }
-        `}
+        side={outer ? THREE.BackSide : THREE.FrontSide}
+        blending={THREE.NormalBlending}
+        toneMapped={false}
       />
     </mesh>
+  );
+}
+
+function BasketballAtmosphere({ radius, quality }) {
+  return (
+    <group>
+      <AtmosphereLayer radius={radius} quality={quality} outer />
+      <AtmosphereLayer radius={radius} quality={quality} />
+    </group>
   );
 }
 
