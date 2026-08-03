@@ -10,6 +10,8 @@ export default defineConfig({
   resolve: {
     alias: [
       {
+        // Temporary visual-review switch: replace the old shell implementation
+        // with a camera-facing optical halo without touching production code.
         find: /^\.\.\/basketball\/BasketballRefinements\.jsx$/,
         replacement: fileURLToPath(
           new URL('./src/basketball/BasketballRefinementsActive.jsx', import.meta.url)
