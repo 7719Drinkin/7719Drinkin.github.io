@@ -1,7 +1,13 @@
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
-import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing';
+import {
+  Bloom,
+  EffectComposer,
+  Outline,
+  Selection,
+  Vignette
+} from '@react-three/postprocessing';
 import * as THREE from 'three';
 import PlanetSystem from './PlanetSystem.jsx';
 import Sun from './Sun.jsx';
@@ -69,6 +75,36 @@ function LightingController({ sunBrightness, quality }) {
       );
       sunlight.current.intensity = 680 * physicalResponse;
     }
+  });
+
+  return null;
+}
+
+function LegacyAtmosphereDisabler({ quality }) {
+  const { scene } = useThree();
+  const scanFrames = useRef(36);
+
+  useEffect(() => {
+    scanFrames.current = 36;
+  }, [quality]);
+
+  useFrame(() => {
+    if (scanFrames.current <= 0) return;
+
+    scene.traverse((object) => {
+      const uniforms = object.material?.uniforms;
+      const isLegacyAtmosphere = Boolean(
+        object.isMesh
+        && object.material?.isShaderMaterial
+        && uniforms?.uInnerStart
+        && uniforms?.uInnerEnd
+        && uniforms?.uOuterStart
+      );
+
+      if (isLegacyAtmosphere) object.visible = false;
+    });
+
+    scanFrames.current -= 1;
   });
 
   return null;
@@ -205,7 +241,7 @@ function Scene({
   const bloomIntensity = 0.82 + Math.pow(sunBrightness, 0.82) * 0.74;
 
   return (
-    <>
+    <Selection>
       <color attach="background" args={['#000106']} />
       <fogExp2 attach="fog" args={['#000106', 0.0031]} />
 
@@ -224,6 +260,7 @@ function Scene({
         quality={quality}
       />
       <LightingController sunBrightness={sunBrightness} quality={quality} />
+      <LegacyAtmosphereDisabler quality={quality} />
 
       <Stars
         radius={170}
@@ -262,18 +299,31 @@ function Scene({
 
       <CameraController selectedId={selectedId} planetRefs={planetRefs} />
 
-      {quality === 'quality' && (
-        <EffectComposer multisampling={4}>
+      <EffectComposer
+        multisampling={quality === 'quality' ? 4 : 0}
+        autoClear={false}
+      >
+        {quality === 'quality' && (
           <Bloom
             luminanceThreshold={0.72}
             luminanceSmoothing={0.34}
             intensity={bloomIntensity}
             mipmapBlur
           />
+        )}
+        <Outline
+          blur
+          edgeStrength={quality === 'quality' ? 0.72 : 0.42}
+          pulseSpeed={0}
+          visibleEdgeColor={0x8fb9c6}
+          hiddenEdgeColor={0x203541}
+          xRay={false}
+        />
+        {quality === 'quality' && (
           <Vignette offset={0.3} darkness={0.68} />
-        </EffectComposer>
-      )}
-    </>
+        )}
+      </EffectComposer>
+    </Selection>
   );
 }
 
