@@ -27,44 +27,59 @@ const CLOUD_FRAGMENT_SHADER = `
 
   uniform float uTime;
   uniform vec3 uCloudColor;
-  uniform vec3 uHighlightColor;
+  uniform vec3 uShadowColor;
+  uniform vec3 uLightDirection;
+  uniform vec3 uMicrophoneDirection;
+  uniform vec3 uVinylDirection;
+
   varying vec3 vWorldNormal;
   varying vec3 vWorldPosition;
   varying vec3 vObjectPosition;
 
-  void main() {
-    vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
-    float facing = abs(dot(normalize(vWorldNormal), viewDirection));
-    float fresnel = pow(1.0 - facing, 2.15);
-    vec3 p = normalize(vObjectPosition);
+  float revealMask(vec3 normal, vec3 direction, float radius, float softness) {
+    float angle = acos(clamp(dot(normal, normalize(direction)), -1.0, 1.0));
+    return 1.0 - smoothstep(radius, radius + softness, angle);
+  }
 
-    float broad = sin(p.x * 9.0 + p.z * 5.0 + uTime * 0.055);
-    float folded = sin(p.y * 18.0 - p.x * 8.0 - uTime * 0.082);
-    float detail = sin((p.x + p.y + p.z) * 31.0 + uTime * 0.12);
-    float cloud = smoothstep(-0.38, 0.72, broad * 0.48 + folded * 0.36 + detail * 0.16);
-    float banding = 0.68 + 0.32 * sin(p.y * 24.0 + p.x * 3.0);
+  void main() {
+    vec3 objectNormal = normalize(vObjectPosition);
+    vec3 worldNormal = normalize(vWorldNormal);
+
+    float broad = sin(objectNormal.x * 8.0 + objectNormal.z * 5.0 + uTime * 0.026);
+    float folded = sin(objectNormal.y * 17.0 - objectNormal.x * 7.0 - uTime * 0.038);
+    float detail = sin((objectNormal.x + objectNormal.y + objectNormal.z) * 29.0 + uTime * 0.052);
+    float cloudNoise = broad * 0.5 + folded * 0.34 + detail * 0.16;
+    float cloud = smoothstep(-0.28, 0.58, cloudNoise);
+    float banding = 0.72 + 0.28 * sin(objectNormal.y * 22.0 + objectNormal.x * 4.0);
     cloud *= banding;
 
-    vec3 color = mix(uCloudColor, uHighlightColor, fresnel * 0.72 + cloud * 0.24);
-    float alpha = 0.025 + cloud * 0.075 + fresnel * (0.13 + cloud * 0.16);
-    gl_FragColor = vec4(color, alpha);
-  }
-`;
+    float diffuse = max(dot(worldNormal, normalize(uLightDirection)), 0.0);
+    float wrappedLight = 0.16 + diffuse * 0.78;
+    vec3 baseColor = mix(uShadowColor, uCloudColor, 0.32 + cloud * 0.5);
+    vec3 color = baseColor * wrappedLight;
 
-const HALO_FRAGMENT_SHADER = `
-  precision highp float;
+    // The atmosphere is deliberately opaque enough to conceal the rainforest.
+    float alpha = mix(0.88, 0.975, cloud);
 
-  uniform vec3 uInnerColor;
-  uniform vec3 uOuterColor;
-  varying vec3 vWorldNormal;
-  varying vec3 vWorldPosition;
+    // The microphone only gets a narrow thinning region; its tall head still
+    // has to physically rise through the cloud deck. The vinyl clearing is wider.
+    float microphoneReveal = revealMask(
+      objectNormal,
+      uMicrophoneDirection,
+      0.105,
+      0.065
+    );
+    float vinylReveal = revealMask(
+      objectNormal,
+      uVinylDirection,
+      0.19,
+      0.075
+    );
 
-  void main() {
-    vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
-    float facing = abs(dot(normalize(vWorldNormal), viewDirection));
-    float rim = pow(1.0 - facing, 2.55);
-    vec3 color = mix(uInnerColor, uOuterColor, rim);
-    float alpha = rim * 0.34;
+    alpha -= microphoneReveal * 0.24;
+    alpha -= vinylReveal * 0.7;
+    alpha = clamp(alpha, 0.16, 0.985);
+
     gl_FragColor = vec4(color, alpha);
   }
 `;
@@ -240,11 +255,11 @@ function MicrophoneMonument({ radius }) {
         <cylinderGeometry args={[s * 0.115, s * 0.135, s * 0.04, 18]} />
         <meshStandardMaterial color="#5d4332" roughness={0.78} metalness={0.08} />
       </mesh>
-      <mesh position-y={s * 0.125}>
-        <cylinderGeometry args={[s * 0.014, s * 0.022, s * 0.22, 10]} />
+      <mesh position-y={s * 0.19}>
+        <cylinderGeometry args={[s * 0.014, s * 0.022, s * 0.35, 10]} />
         <meshStandardMaterial color="#8a6041" roughness={0.48} metalness={0.34} />
       </mesh>
-      <group position-y={s * 0.27}>
+      <group position-y={s * 0.4}>
         <mesh scale={[s * 0.085, s * 0.115, s * 0.065]}>
           <sphereGeometry args={[1, 20, 16]} />
           <meshStandardMaterial color="#a9764e" roughness={0.42} metalness={0.35} />
@@ -413,12 +428,11 @@ function MusicAtmosphere({ radius, quality }) {
   const cloudMaterial = useRef();
   const cloudUniforms = useMemo(() => ({
     uTime: { value: 0 },
-    uCloudColor: { value: new THREE.Color('#d89a55') },
-    uHighlightColor: { value: new THREE.Color('#ffe0a0') }
-  }), []);
-  const haloUniforms = useMemo(() => ({
-    uInnerColor: { value: new THREE.Color('#d98b4e') },
-    uOuterColor: { value: new THREE.Color('#ffd58a') }
+    uCloudColor: { value: new THREE.Color('#b89463') },
+    uShadowColor: { value: new THREE.Color('#45392f') },
+    uLightDirection: { value: new THREE.Vector3(-0.42, 0.68, 0.6).normalize() },
+    uMicrophoneDirection: { value: new THREE.Vector3(...MICROPHONE_DIRECTION).normalize() },
+    uVinylDirection: { value: new THREE.Vector3(...VINYL_DIRECTION).normalize() }
   }), []);
 
   useFrame((_, delta) => {
@@ -428,35 +442,20 @@ function MusicAtmosphere({ radius, quality }) {
   const segments = quality === 'quality' ? 96 : 56;
 
   return (
-    <group>
-      <mesh scale={1.09}>
-        <sphereGeometry args={[radius, segments, Math.round(segments * 0.68)]} />
-        <shaderMaterial
-          ref={cloudMaterial}
-          uniforms={cloudUniforms}
-          vertexShader={ATMOSPHERE_VERTEX_SHADER}
-          fragmentShader={CLOUD_FRAGMENT_SHADER}
-          transparent
-          depthWrite={false}
-          side={THREE.FrontSide}
-          blending={THREE.NormalBlending}
-          toneMapped={false}
-        />
-      </mesh>
-      <mesh scale={1.2}>
-        <sphereGeometry args={[radius, segments, Math.round(segments * 0.68)]} />
-        <shaderMaterial
-          uniforms={haloUniforms}
-          vertexShader={ATMOSPHERE_VERTEX_SHADER}
-          fragmentShader={HALO_FRAGMENT_SHADER}
-          transparent
-          depthWrite={false}
-          side={THREE.BackSide}
-          blending={THREE.AdditiveBlending}
-          toneMapped={false}
-        />
-      </mesh>
-    </group>
+    <mesh scale={1.14} renderOrder={6}>
+      <sphereGeometry args={[radius, segments, Math.round(segments * 0.68)]} />
+      <shaderMaterial
+        ref={cloudMaterial}
+        uniforms={cloudUniforms}
+        vertexShader={ATMOSPHERE_VERTEX_SHADER}
+        fragmentShader={CLOUD_FRAGMENT_SHADER}
+        transparent
+        depthWrite
+        depthTest
+        side={THREE.FrontSide}
+        blending={THREE.NormalBlending}
+      />
+    </mesh>
   );
 }
 
@@ -610,7 +609,7 @@ export default function MusicWorld({ radius, quality }) {
       <SurfaceAnchor
         direction={MICROPHONE_DIRECTION}
         radius={radius}
-        offset={radius * 0.018}
+        offset={radius * 0.026}
         rotationY={-0.18}
       >
         <MicrophoneMonument radius={radius} />
@@ -628,7 +627,7 @@ export default function MusicWorld({ radius, quality }) {
       <SurfaceAnchor
         direction={VINYL_DIRECTION}
         radius={radius}
-        offset={radius * 0.008}
+        offset={radius * 0.012}
         rotationY={0.42}
       >
         <VinylLagoon radius={radius} />
