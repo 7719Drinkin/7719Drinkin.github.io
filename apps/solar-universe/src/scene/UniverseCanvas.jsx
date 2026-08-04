@@ -14,7 +14,7 @@ import Sun from './Sun.jsx';
 import SolarRadiance from './SolarRadiance.jsx';
 import GravityGrid from './GravityGrid.jsx';
 
-const SYSTEM_CAMERA = new THREE.Vector3(0, 11.5, 30);
+const SYSTEM_CAMERA = new THREE.Vector3(0, 24, 62);
 const SYSTEM_MIN_POLAR = 0.36;
 const SYSTEM_MAX_POLAR = Math.PI / 2 - 0.035;
 const FREE_MIN_POLAR = 0.001;
@@ -24,8 +24,8 @@ const SUNLIGHT_MAX = 2.5;
 
 function OrbitLine({ radius, inclination, color }) {
   const geometry = useMemo(() => {
-    const points = Array.from({ length: 256 }, (_, index) => {
-      const angle = index / 256 * Math.PI * 2;
+    const points = Array.from({ length: 320 }, (_, index) => {
+      const angle = index / 320 * Math.PI * 2;
       return new THREE.Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
     });
     return new THREE.BufferGeometry().setFromPoints(points);
@@ -50,8 +50,6 @@ function LightingController({ sunBrightness, quality }) {
       1
     );
 
-    // Keep the world exposure controlled while the Sun itself remains HDR.
-    // This preserves dark space and prevents the planets from washing out.
     gl.toneMappingExposure = baseExposure * THREE.MathUtils.lerp(0.93, 1.02, normalized);
   }, [gl, quality, sunBrightness]);
 
@@ -132,8 +130,8 @@ function CameraController({ selectedId, planetRefs }) {
       desiredCamera.current.copy(SYSTEM_CAMERA);
       desiredTarget.current.set(0, 0, 0);
       hasPreviousTarget.current = false;
-      controls.minDistance = 8;
-      controls.maxDistance = 58;
+      controls.minDistance = 14;
+      controls.maxDistance = 110;
       controls.minPolarAngle = SYSTEM_MIN_POLAR;
       controls.maxPolarAngle = SYSTEM_MAX_POLAR;
       controls.target.y = 0;
@@ -154,20 +152,21 @@ function CameraController({ selectedId, planetRefs }) {
       if (sunFacing.lengthSq() < 0.001) sunFacing.copy(currentDirection);
     }
 
+    const isPuppet = selectedId === 'music-puppet';
     const preferred = currentDirection
       .multiplyScalar(selectedId === 'sun' ? 1 : 0.8)
       .add(sunFacing.multiplyScalar(selectedId === 'sun' ? 0 : 0.2))
       .normalize();
-    const focusDistance = selectedId === 'sun' ? 4.35 : 5.8;
-    const heightOffset = selectedId === 'sun' ? 0.18 : 0.52;
+    const focusDistance = selectedId === 'sun' ? 4.35 : isPuppet ? 3.2 : 5.8;
+    const heightOffset = selectedId === 'sun' ? 0.18 : isPuppet ? 0.2 : 0.52;
 
     desiredTarget.current.copy(target);
     desiredCamera.current.copy(target)
       .add(preferred.multiplyScalar(focusDistance))
       .add(new THREE.Vector3(0, heightOffset, 0));
     transition.current = 'celestial';
-    controls.minDistance = selectedId === 'sun' ? 2.05 : 1.75;
-    controls.maxDistance = selectedId === 'sun' ? 16 : 12;
+    controls.minDistance = selectedId === 'sun' ? 2.05 : isPuppet ? 0.72 : 1.75;
+    controls.maxDistance = selectedId === 'sun' ? 16 : isPuppet ? 7 : 12;
     controls.minPolarAngle = FREE_MIN_POLAR;
     controls.maxPolarAngle = FREE_MAX_POLAR;
   }, [camera, currentDirection, planetRefs, selectedId, sunFacing, target]);
@@ -218,8 +217,8 @@ function CameraController({ selectedId, planetRefs }) {
       enableDamping
       dampingFactor={0.055}
       enablePan={false}
-      minDistance={8}
-      maxDistance={58}
+      minDistance={14}
+      maxDistance={110}
       minPolarAngle={SYSTEM_MIN_POLAR}
       maxPolarAngle={SYSTEM_MAX_POLAR}
       onStart={() => { transition.current = null; }}
@@ -229,6 +228,7 @@ function CameraController({ selectedId, planetRefs }) {
 
 function Scene({
   interests,
+  celestials = [],
   selectedId,
   onSelect,
   planetRefs,
@@ -239,11 +239,12 @@ function Scene({
   sunBrightness
 }) {
   const bloomIntensity = 0.82 + Math.pow(sunBrightness, 0.82) * 0.74;
+  const gravityBodies = [...interests, ...celestials];
 
   return (
     <Selection>
       <color attach="background" args={['#000106']} />
-      <fogExp2 attach="fog" args={['#000106', 0.0031]} />
+      <fogExp2 attach="fog" args={['#000106', 0.0019]} />
 
       <ambientLight color="#647087" intensity={0.004} />
       <hemisphereLight args={['#526078', '#030202', 0.028]} />
@@ -263,9 +264,9 @@ function Scene({
       <LegacyAtmosphereDisabler quality={quality} />
 
       <Stars
-        radius={170}
-        depth={95}
-        count={quality === 'quality' ? 7200 : 1900}
+        radius={260}
+        depth={150}
+        count={quality === 'quality' ? 8600 : 2200}
         factor={4}
         saturation={0.12}
         fade
@@ -273,7 +274,7 @@ function Scene({
       />
 
       {showEcliptic && (
-        <GravityGrid interests={interests} planetRefs={planetRefs} quality={quality} />
+        <GravityGrid interests={gravityBodies} planetRefs={planetRefs} quality={quality} />
       )}
 
       {showOrbits && interests.map((interest) => (
@@ -289,7 +290,9 @@ function Scene({
         <PlanetSystem
           key={interest.id}
           interest={interest}
+          celestials={celestials}
           selected={interest.id === selectedId}
+          selectedId={selectedId}
           onSelect={onSelect}
           registerPlanet={registerPlanet}
           quality={quality}
@@ -341,7 +344,7 @@ export default function UniverseCanvas(props) {
   return (
     <Canvas
       className="universe-canvas"
-      camera={{ position: SYSTEM_CAMERA.toArray(), fov: 42, near: 0.1, far: 380 }}
+      camera={{ position: SYSTEM_CAMERA.toArray(), fov: 42, near: 0.1, far: 520 }}
       dpr={dpr}
       gl={{
         antialias: props.quality === 'quality',
