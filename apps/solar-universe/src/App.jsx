@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { INTERESTS, SUN } from './data/interests.js';
+import { MUSIC_PUPPET_CELESTIAL } from './data/musicPuppetCelestial.js';
 import {
   detectLanguage,
   localizeInterest,
@@ -9,6 +10,8 @@ import {
 import UniverseCanvas from './scene/UniverseCanvas.jsx';
 import Hud from './ui/Hud.jsx';
 import PlanetPanel from './ui/PlanetPanel.jsx';
+
+const AUXILIARY_CELESTIALS = [MUSIC_PUPPET_CELESTIAL];
 
 export default function App() {
   const [selectedId, setSelectedId] = useState(null);
@@ -34,6 +37,10 @@ export default function App() {
     () => INTERESTS.map((interest) => localizeInterest(interest, language)),
     [language]
   );
+  const localizedCelestials = useMemo(
+    () => AUXILIARY_CELESTIALS.map((body) => localizeInterest(body, language)),
+    [language]
+  );
 
   const registerPlanet = useCallback((id, ref) => {
     if (ref) planetRefs.current.set(id, ref);
@@ -42,13 +49,16 @@ export default function App() {
 
   const selected = useMemo(() => {
     if (selectedId === localizedSun.id) return localizedSun;
-    return localizedInterests.find((interest) => interest.id === selectedId) ?? null;
-  }, [localizedInterests, localizedSun, selectedId]);
+    return localizedInterests.find((interest) => interest.id === selectedId)
+      ?? localizedCelestials.find((body) => body.id === selectedId)
+      ?? null;
+  }, [localizedCelestials, localizedInterests, localizedSun, selectedId]);
 
   return (
     <main className="solar-app">
       <UniverseCanvas
         interests={localizedInterests}
+        celestials={localizedCelestials}
         selectedId={selectedId}
         onSelect={setSelectedId}
         quality={quality}
