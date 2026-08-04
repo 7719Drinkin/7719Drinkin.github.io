@@ -5,7 +5,7 @@ import { Select } from '@react-three/postprocessing';
 import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
 import MusicPuppetCelestial from '../music/MusicPuppetCelestial.jsx';
 import BasketballWorld from '../worlds/BasketballWorld.jsx';
-import MusicWorld from '../worlds/MusicWorld.jsx';
+import RealisticMusicWorld from '../worlds/RealisticMusicWorld.jsx';
 import PlaceholderWorld from '../worlds/PlaceholderWorld.jsx';
 
 export default function PlanetSystem({
@@ -82,7 +82,7 @@ export default function PlanetSystem({
               </Select>
             ) : interest.id === 'music' ? (
               <Select enabled>
-                <MusicWorld radius={interest.size} quality={quality} />
+                <RealisticMusicWorld radius={interest.size} quality={quality} />
               </Select>
             ) : (
               <PlaceholderWorld interest={interest} quality={quality} />
