@@ -112,19 +112,19 @@ function PuppetHead({ quality, selected }) {
       let y = position.getY(index);
       let z = position.getZ(index);
       const normalizedY = y / 0.5;
-      const lowerFace = THREE.MathUtils.clamp((-normalizedY - 0.04) / 0.96, 0, 1);
-      const forehead = THREE.MathUtils.clamp((normalizedY - 0.22) / 0.78, 0, 1);
-      const widthFactor = 1 + forehead * 0.07 - lowerFace * 0.24;
-      const depthFactor = 1 - lowerFace * 0.09;
+      const lowerFace = THREE.MathUtils.clamp((-normalizedY - 0.08) / 0.92, 0, 1);
+      const forehead = THREE.MathUtils.clamp((normalizedY - 0.28) / 0.72, 0, 1);
+      const widthFactor = 1 + forehead * 0.035 - lowerFace * 0.1;
+      const depthFactor = 1 - lowerFace * 0.025;
 
-      x *= 1.1 * widthFactor;
-      y *= 1.36;
-      z *= 0.96 * depthFactor;
+      x *= 1.16 * widthFactor;
+      y *= 1.18;
+      z *= depthFactor;
 
       if (z > 0) {
-        const faceCenter = Math.exp(-Math.pow(x / 0.37, 2))
-          * Math.exp(-Math.pow((y - 0.02) / 0.52, 2));
-        z += faceCenter * 0.07;
+        const faceCenter = Math.exp(-Math.pow(x / 0.4, 2))
+          * Math.exp(-Math.pow((y - 0.01) / 0.46, 2));
+        z += faceCenter * 0.06;
       }
 
       position.setXYZ(index, x, y, z);
@@ -142,15 +142,11 @@ function PuppetHead({ quality, selected }) {
 
   return (
     <group position={[0, 0.08, 0]} rotation={[-0.12, 0.29, -0.24]}>
-      <mesh geometry={headGeometry} position={[0, 0.02, -0.055]} scale={[1.045, 1.05, 1.02]}>
+      <mesh geometry={headGeometry} position={[0, 0.015, -0.05]} scale={[1.03, 1.03, 1.01]}>
         <meshStandardMaterial color="#28211d" roughness={0.92} metalness={0} />
       </mesh>
-      <mesh geometry={headGeometry} position={[0, -0.015, 0.065]} scale={[0.965, 0.965, 0.94]}>
+      <mesh geometry={headGeometry} position={[0, -0.005, 0.065]} scale={[0.98, 0.98, 0.95]}>
         <meshStandardMaterial color="#b87843" roughness={0.78} metalness={0} />
-      </mesh>
-      <mesh position={[0, -0.43, 0.3]} scale={[0.34, 0.24, 0.25]}>
-        <sphereGeometry args={[1, sphereSegments, sphereRows]} />
-        <meshStandardMaterial color="#a7663b" roughness={0.82} metalness={0} />
       </mesh>
 
       {[-1, 1].map((side) => (
