@@ -3,12 +3,15 @@ import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { Select } from '@react-three/postprocessing';
 import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
+import MusicPuppetCelestial from '../music/MusicPuppetCelestial.jsx';
 import BasketballWorld from '../worlds/BasketballWorld.jsx';
 import PlaceholderWorld from '../worlds/PlaceholderWorld.jsx';
 
 export default function PlanetSystem({
   interest,
+  celestials = [],
   selected,
+  selectedId,
   onSelect,
   registerPlanet,
   quality,
@@ -17,6 +20,9 @@ export default function PlanetSystem({
   const orbitalPivot = useRef();
   const carrier = useRef();
   const axialBody = useRef();
+  const musicPuppet = interest.id === 'music'
+    ? celestials.find((body) => body.parentId === interest.id)
+    : null;
 
   useEffect(() => {
     registerPlanet(interest.id, carrier);
@@ -51,6 +57,18 @@ export default function PlanetSystem({
             />
           )}
 
+          {musicPuppet && (
+            <MusicPuppetCelestial
+              body={musicPuppet}
+              quality={quality}
+              selectedId={selectedId}
+              parentSelected={selected}
+              showOrbit={showOrbits}
+              onSelect={onSelect}
+              registerPlanet={registerPlanet}
+            />
+          )}
+
           <group
             ref={axialBody}
             rotation-y={interest.initialAxial}
@@ -66,7 +84,7 @@ export default function PlanetSystem({
             )}
           </group>
 
-          {!selected && (
+          {!selected && selectedId !== musicPuppet?.id && (
             <Html
               center
               distanceFactor={12}
