@@ -3,7 +3,9 @@ import { translate } from '../i18n.js';
 export default function PlanetPanel({ interest, language, onClose }) {
   const bodyLabel = interest?.kind === 'star'
     ? translate(language, 'panel.star')
-    : translate(language, 'panel.planet');
+    : interest?.kind === 'satellite'
+      ? (language === 'zh' ? '卫星' : 'SATELLITE')
+      : translate(language, 'panel.planet');
 
   return (
     <aside className={`planet-panel${interest ? ' is-open' : ''}`} aria-hidden={!interest}>
