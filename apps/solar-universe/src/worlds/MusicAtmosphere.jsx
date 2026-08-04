@@ -50,6 +50,16 @@ const CLOUD_GLSL = `
     return value;
   }
 
+  vec3 rotateY(vec3 point, float angle) {
+    float cosine = cos(angle);
+    float sine = sin(angle);
+    return vec3(
+      cosine * point.x + sine * point.z,
+      point.y,
+      -sine * point.x + cosine * point.z
+    );
+  }
+
   vec3 rotateAroundAxis(vec3 point, vec3 axis, float angle) {
     axis = normalize(axis);
     float cosine = cos(angle);
@@ -57,6 +67,22 @@ const CLOUD_GLSL = `
     return point * cosine
       + cross(axis, point) * sine
       + axis * dot(axis, point) * (1.0 - cosine);
+  }
+
+  vec3 advectPoint(vec3 point, float time) {
+    point = normalize(point);
+    float latitude = asin(clamp(point.y, -1.0, 1.0));
+    float equatorialJet = 0.7 + 0.3 * cos(latitude * 2.0);
+    float latitudeShear = sin(latitude * 8.0 + time * 0.13) * 0.055;
+    float longitudeFlow = time * 0.09 * equatorialJet + latitudeShear;
+
+    point = rotateY(point, longitudeFlow);
+    point = rotateAroundAxis(
+      point,
+      normalize(vec3(0.18, 0.97, -0.12)),
+      time * 0.012
+    );
+    return normalize(point);
   }
 
   vec3 applyVortex(vec3 point, vec3 center, float radius, float strength) {
@@ -68,36 +94,36 @@ const CLOUD_GLSL = `
 
   vec3 domainWarp(vec3 point, float time) {
     vec3 q = vec3(
-      fbm(point * 2.1 + vec3(time * 0.012, 1.7, 4.1)),
-      fbm(point * 2.1 + vec3(8.3, time * 0.009, 2.6)),
-      fbm(point * 2.1 + vec3(3.4, 6.8, time * 0.011))
+      fbm(point * 2.15 + vec3(time * 0.055, 1.7, 4.1)),
+      fbm(point * 2.15 + vec3(8.3, time * 0.043, 2.6)),
+      fbm(point * 2.15 + vec3(3.4, 6.8, time * 0.049))
     );
-    return normalize(point + (q - 0.5) * 0.5);
+    return normalize(point + (q - 0.5) * 0.58);
   }
 
   float planetaryCloudField(vec3 point, float time) {
-    point = normalize(point);
+    point = advectPoint(point, time);
     point = applyVortex(point, vec3(0.58, 0.18, -0.79), 0.78, 1.45);
     point = applyVortex(point, vec3(-0.48, -0.58, 0.66), 0.68, -1.15);
 
     vec3 warped = domainWarp(point, time);
     vec3 secondaryWarp = vec3(
-      fbm(warped * 3.2 + vec3(2.0, time * 0.01, 0.0)),
-      fbm(warped * 3.2 + vec3(0.0, 5.0, time * 0.008)),
-      fbm(warped * 3.2 + vec3(time * 0.009, 0.0, 9.0))
+      fbm(warped * 3.2 + vec3(2.0, time * 0.038, 0.0)),
+      fbm(warped * 3.2 + vec3(0.0, 5.0, time * 0.031)),
+      fbm(warped * 3.2 + vec3(time * 0.034, 0.0, 9.0))
     );
 
-    vec3 flowPoint = normalize(warped + (secondaryWarp - 0.5) * 0.22);
-    float largeScale = fbm(flowPoint * 2.35 + vec3(time * 0.004, 0.0, 0.0));
-    float middleScale = fbm(flowPoint * 6.2 + secondaryWarp * 1.8);
-    float fineScale = fbm(flowPoint * 17.0 + secondaryWarp * 4.2);
+    vec3 flowPoint = normalize(warped + (secondaryWarp - 0.5) * 0.25);
+    float largeScale = fbm(flowPoint * 2.35 + vec3(time * 0.018, 0.0, 0.0));
+    float middleScale = fbm(flowPoint * 6.2 + secondaryWarp * 1.9);
+    float fineScale = fbm(flowPoint * 17.0 + secondaryWarp * 4.4);
 
     float latitude = asin(clamp(flowPoint.y, -1.0, 1.0));
     float zonalFlow = 0.5 + 0.5 * sin(
       latitude * 11.5
       + secondaryWarp.x * 3.4
       + largeScale * 2.2
-      + time * 0.016
+      + time * 0.21
     );
 
     return clamp(
@@ -119,7 +145,7 @@ const CLOUD_GLSL = `
   ) {
     point = normalize(point);
     direction = normalize(direction);
-    float edgeNoise = (fbm(point * 15.0 + time * 0.012) - 0.5) * 0.075;
+    float edgeNoise = (fbm(point * 15.0 + time * 0.026) - 0.5) * 0.075;
     float angularDistance = acos(clamp(dot(point, direction), -1.0, 1.0));
     return 1.0 - smoothstep(
       radius + edgeNoise,
@@ -177,15 +203,18 @@ const DENSE_BASE_FRAGMENT_SHADER = `
     vec3 normal = normalize(vWorldNormal);
     vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
     float cloud = planetaryCloudField(point, uTime);
+    float trailingCloud = planetaryCloudField(point, uTime - 0.32);
+    float movingFront = clamp((cloud - trailingCloud) * 2.8 + 0.5, 0.0, 1.0);
     float lightAmount = wrappedDiffuse(normal, uLightDirection);
     float broadShadow = smoothstep(0.18, 0.7, cloud);
     float brightCloud = smoothstep(0.58, 0.88, cloud) * lightAmount;
 
-    vec3 color = mix(uShadowColor, uBaseColor, 0.28 + broadShadow * 0.58);
-    color = mix(color, uHighlightColor, brightCloud * 0.48);
+    vec3 color = mix(uShadowColor, uBaseColor, 0.26 + broadShadow * 0.6);
+    color = mix(color, uHighlightColor, brightCloud * 0.5);
+    color *= mix(0.94, 1.045, movingFront);
 
     float limb = pow(1.0 - abs(dot(normal, viewDirection)), 2.4);
-    color *= 0.96 + limb * 0.035;
+    color *= 0.96 + limb * 0.03;
 
     gl_FragColor = vec4(color, 1.0);
     #include <tonemapping_fragment>
@@ -213,15 +242,19 @@ const MAIN_CLOUD_FRAGMENT_SHADER = `
     vec3 point = normalize(vObjectPosition);
     vec3 normal = normalize(vWorldNormal);
     float cloud = planetaryCloudField(point, uTime + 19.0);
-    float middleDetail = fbm(domainWarp(point, uTime) * 10.0 + uTime * 0.008);
-    float coverage = smoothstep(0.42, 0.78, cloud * 0.78 + middleDetail * 0.22);
+    vec3 movingPoint = advectPoint(point, uTime * 1.08);
+    float middleDetail = fbm(
+      domainWarp(movingPoint, uTime) * 10.0
+      + vec3(uTime * 0.04, 0.0, -uTime * 0.025)
+    );
+    float coverage = smoothstep(0.4, 0.77, cloud * 0.76 + middleDetail * 0.24);
     float lightAmount = wrappedDiffuse(normal, uLightDirection);
 
-    vec3 color = mix(uShadowColor, uBaseColor, 0.35 + coverage * 0.44);
+    vec3 color = mix(uShadowColor, uBaseColor, 0.33 + coverage * 0.46);
     color = mix(
       color,
       uHighlightColor,
-      smoothstep(0.55, 0.92, cloud) * lightAmount * 0.54
+      smoothstep(0.54, 0.91, cloud) * lightAmount * 0.56
     );
 
     float clearing = irregularClearing(
@@ -232,9 +265,9 @@ const MAIN_CLOUD_FRAGMENT_SHADER = `
       uTime
     );
 
-    float alpha = 0.06 + coverage * 0.52;
+    float alpha = 0.07 + coverage * 0.55;
     alpha *= 1.0 - clearing * 0.93;
-    alpha = clamp(alpha, 0.0, 0.62);
+    alpha = clamp(alpha, 0.0, 0.65);
 
     gl_FragColor = vec4(color, alpha);
     #include <tonemapping_fragment>
@@ -260,13 +293,20 @@ const HIGH_CLOUD_FRAGMENT_SHADER = `
   void main() {
     vec3 point = normalize(vObjectPosition);
     vec3 normal = normalize(vWorldNormal);
-    vec3 warped = domainWarp(point, uTime + 41.0);
-    float longWisps = fbm(warped * 18.0 + vec3(uTime * 0.012, 2.0, 8.0));
-    float fineWisps = fbm(warped * 31.0 + vec3(5.0, uTime * 0.015, 1.0));
-    float wisps = smoothstep(0.57, 0.81, longWisps * 0.76 + fineWisps * 0.24);
+    vec3 movingPoint = advectPoint(point, uTime * 1.3);
+    vec3 warped = domainWarp(movingPoint, uTime + 41.0);
+    float longWisps = fbm(
+      warped * 18.0
+      + vec3(uTime * 0.065, 2.0, -uTime * 0.035)
+    );
+    float fineWisps = fbm(
+      warped * 31.0
+      + vec3(5.0, uTime * 0.052, 1.0 + uTime * 0.03)
+    );
+    float wisps = smoothstep(0.55, 0.8, longWisps * 0.76 + fineWisps * 0.24);
     float lightAmount = wrappedDiffuse(normal, uLightDirection);
 
-    vec3 color = mix(uBaseColor, uHighlightColor, lightAmount * 0.72);
+    vec3 color = mix(uBaseColor, uHighlightColor, lightAmount * 0.74);
     float clearing = irregularClearing(
       point,
       uVinylDirection,
@@ -275,7 +315,7 @@ const HIGH_CLOUD_FRAGMENT_SHADER = `
       uTime + 13.0
     );
 
-    float alpha = wisps * 0.24 * (1.0 - clearing * 0.96);
+    float alpha = wisps * 0.28 * (1.0 - clearing * 0.96);
 
     gl_FragColor = vec4(color, alpha);
     #include <tonemapping_fragment>
@@ -303,9 +343,6 @@ function createLayerUniforms({
 }
 
 export default function MusicAtmosphere({ radius, quality, vinylDirection }) {
-  const denseBase = useRef();
-  const mainClouds = useRef();
-  const highClouds = useRef();
   const denseMaterial = useRef();
   const mainMaterial = useRef();
   const highMaterial = useRef();
@@ -313,7 +350,7 @@ export default function MusicAtmosphere({ radius, quality, vinylDirection }) {
   const lightDirection = useMemo(() => [-0.42, 0.68, 0.6], []);
 
   const denseUniforms = useMemo(() => createLayerUniforms({
-    displacement: 0.012,
+    displacement: 0.01,
     lightDirection,
     vinylDirection,
     shadowColor: '#342c27',
@@ -322,7 +359,7 @@ export default function MusicAtmosphere({ radius, quality, vinylDirection }) {
   }), [lightDirection, vinylDirection]);
 
   const mainUniforms = useMemo(() => createLayerUniforms({
-    displacement: 0.018,
+    displacement: 0.016,
     lightDirection,
     vinylDirection,
     shadowColor: '#4b392d',
@@ -331,7 +368,7 @@ export default function MusicAtmosphere({ radius, quality, vinylDirection }) {
   }), [lightDirection, vinylDirection]);
 
   const highUniforms = useMemo(() => createLayerUniforms({
-    displacement: 0.01,
+    displacement: 0.009,
     lightDirection,
     vinylDirection,
     shadowColor: '#6d5137',
@@ -340,24 +377,17 @@ export default function MusicAtmosphere({ radius, quality, vinylDirection }) {
   }), [lightDirection, vinylDirection]);
 
   useFrame((_, delta) => {
-    if (denseMaterial.current) denseMaterial.current.uniforms.uTime.value += delta * 0.22;
-    if (mainMaterial.current) mainMaterial.current.uniforms.uTime.value += delta * 0.36;
-    if (highMaterial.current) highMaterial.current.uniforms.uTime.value += delta * 0.52;
-
-    if (denseBase.current) denseBase.current.rotation.y += delta * 0.0015;
-    if (mainClouds.current) mainClouds.current.rotation.y += delta * 0.0045;
-    if (highClouds.current) {
-      highClouds.current.rotation.y -= delta * 0.0065;
-      highClouds.current.rotation.z += delta * 0.0008;
-    }
+    if (denseMaterial.current) denseMaterial.current.uniforms.uTime.value += delta * 0.35;
+    if (mainMaterial.current) mainMaterial.current.uniforms.uTime.value += delta * 0.55;
+    if (highMaterial.current) highMaterial.current.uniforms.uTime.value += delta * 0.82;
   });
 
-  const widthSegments = quality === 'quality' ? 96 : 64;
-  const heightSegments = quality === 'quality' ? 64 : 44;
+  const widthSegments = quality === 'quality' ? 112 : 72;
+  const heightSegments = quality === 'quality' ? 72 : 48;
 
   return (
     <group>
-      <mesh ref={denseBase} scale={1.145} renderOrder={4}>
+      <mesh scale={1.175} renderOrder={4}>
         <sphereGeometry args={[radius, widthSegments, heightSegments]} />
         <shaderMaterial
           ref={denseMaterial}
@@ -370,7 +400,7 @@ export default function MusicAtmosphere({ radius, quality, vinylDirection }) {
         />
       </mesh>
 
-      <mesh ref={mainClouds} scale={1.175} renderOrder={5}>
+      <mesh scale={1.2} renderOrder={5}>
         <sphereGeometry args={[radius, widthSegments, heightSegments]} />
         <shaderMaterial
           ref={mainMaterial}
@@ -385,7 +415,7 @@ export default function MusicAtmosphere({ radius, quality, vinylDirection }) {
         />
       </mesh>
 
-      <mesh ref={highClouds} scale={1.205} renderOrder={6}>
+      <mesh scale={1.222} renderOrder={6}>
         <sphereGeometry args={[radius, widthSegments, heightSegments]} />
         <shaderMaterial
           ref={highMaterial}
