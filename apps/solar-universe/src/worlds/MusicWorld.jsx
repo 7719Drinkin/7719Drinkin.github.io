@@ -58,27 +58,26 @@ const CLOUD_FRAGMENT_SHADER = `
     vec3 baseColor = mix(uShadowColor, uCloudColor, 0.32 + cloud * 0.5);
     vec3 color = baseColor * wrappedLight;
 
-    // The atmosphere is deliberately opaque enough to conceal the rainforest.
-    float alpha = mix(0.88, 0.975, cloud);
+    // Almost all of the cloud deck is visually opaque. Surface detail is
+    // revealed only through the two deliberately authored clearings below.
+    float alpha = mix(0.985, 1.0, cloud);
 
-    // The microphone only gets a narrow thinning region; its tall head still
-    // has to physically rise through the cloud deck. The vinyl clearing is wider.
     float microphoneReveal = revealMask(
       objectNormal,
       uMicrophoneDirection,
-      0.105,
-      0.065
+      0.09,
+      0.055
     );
     float vinylReveal = revealMask(
       objectNormal,
       uVinylDirection,
-      0.19,
-      0.075
+      0.18,
+      0.065
     );
 
-    alpha -= microphoneReveal * 0.24;
-    alpha -= vinylReveal * 0.7;
-    alpha = clamp(alpha, 0.16, 0.985);
+    alpha -= microphoneReveal * 0.1;
+    alpha -= vinylReveal * 0.52;
+    alpha = clamp(alpha, 0.38, 1.0);
 
     gl_FragColor = vec4(color, alpha);
   }
@@ -151,9 +150,9 @@ function createVegetationData(radius, quality) {
 
     trees.push({
       direction: direction.toArray(),
-      height: radius * (0.105 + random() * 0.075),
+      height: radius * (0.075 + random() * 0.055),
       trunkRadius: radius * (0.008 + random() * 0.004),
-      crownRadius: radius * (0.052 + random() * 0.035),
+      crownRadius: radius * (0.038 + random() * 0.025),
       crownScaleY: 0.72 + random() * 0.38,
       color: ['#315f42', '#477b4b', '#5a8b52', '#6b7650'][Math.floor(random() * 4)]
     });
@@ -442,7 +441,7 @@ function MusicAtmosphere({ radius, quality }) {
   const segments = quality === 'quality' ? 96 : 56;
 
   return (
-    <mesh scale={1.14} renderOrder={6}>
+    <mesh scale={1.2} renderOrder={6}>
       <sphereGeometry args={[radius, segments, Math.round(segments * 0.68)]} />
       <shaderMaterial
         ref={cloudMaterial}
@@ -456,27 +455,6 @@ function MusicAtmosphere({ radius, quality }) {
         blending={THREE.NormalBlending}
       />
     </mesh>
-  );
-}
-
-function SoundWaveRings({ radius, quality }) {
-  const group = useRef();
-  useFrame((_, delta) => {
-    if (group.current) group.current.rotation.y += delta * 0.035;
-  });
-
-  const segments = quality === 'quality' ? 160 : 80;
-  return (
-    <group ref={group}>
-      <mesh rotation={[0.92, 0.22, -0.16]}>
-        <torusGeometry args={[radius * 1.3, radius * 0.006, 6, segments]} />
-        <meshBasicMaterial color="#d69cff" transparent opacity={0.3} toneMapped={false} />
-      </mesh>
-      <mesh rotation={[1.15, -0.48, 0.28]}>
-        <torusGeometry args={[radius * 1.38, radius * 0.004, 6, segments]} />
-        <meshBasicMaterial color="#ffb36d" transparent opacity={0.2} toneMapped={false} />
-      </mesh>
-    </group>
   );
 }
 
@@ -635,7 +613,6 @@ export default function MusicWorld({ radius, quality }) {
 
       <GlowingDiscoveries radius={radius} />
       <MusicAtmosphere radius={radius} quality={quality} />
-      <SoundWaveRings radius={radius} quality={quality} />
     </group>
   );
 }
