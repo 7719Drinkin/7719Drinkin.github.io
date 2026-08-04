@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
+import { Select } from '@react-three/postprocessing';
 import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
 import BasketballWorld from '../worlds/BasketballWorld.jsx';
 import PlaceholderWorld from '../worlds/PlaceholderWorld.jsx';
@@ -57,7 +58,9 @@ export default function PlanetSystem({
             onDoubleClick={enter}
           >
             {interest.id === 'basketball' ? (
-              <BasketballWorld radius={interest.size} quality={quality} />
+              <Select enabled>
+                <BasketballWorld radius={interest.size} quality={quality} />
+              </Select>
             ) : (
               <PlaceholderWorld interest={interest} quality={quality} />
             )}
