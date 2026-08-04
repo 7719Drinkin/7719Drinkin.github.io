@@ -1,87 +1,12 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import MusicAtmosphere from './MusicAtmosphere.jsx';
 import { createStylizedTerrain } from './stylizedTerrain.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
 const MICROPHONE_DIRECTION = [0.02, 0.96, -0.28];
 const HEADPHONE_DIRECTION = [0.68, 0.53, 0.5];
 const VINYL_DIRECTION = [0.56, 0.16, -0.81];
-
-const ATMOSPHERE_VERTEX_SHADER = `
-  varying vec3 vWorldNormal;
-  varying vec3 vWorldPosition;
-  varying vec3 vObjectPosition;
-
-  void main() {
-    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-    vWorldPosition = worldPosition.xyz;
-    vWorldNormal = normalize(mat3(modelMatrix) * normal);
-    vObjectPosition = position;
-    gl_Position = projectionMatrix * viewMatrix * worldPosition;
-  }
-`;
-
-const CLOUD_FRAGMENT_SHADER = `
-  precision highp float;
-
-  uniform float uTime;
-  uniform vec3 uCloudColor;
-  uniform vec3 uShadowColor;
-  uniform vec3 uLightDirection;
-  uniform vec3 uMicrophoneDirection;
-  uniform vec3 uVinylDirection;
-
-  varying vec3 vWorldNormal;
-  varying vec3 vWorldPosition;
-  varying vec3 vObjectPosition;
-
-  float revealMask(vec3 normal, vec3 direction, float radius, float softness) {
-    float angle = acos(clamp(dot(normal, normalize(direction)), -1.0, 1.0));
-    return 1.0 - smoothstep(radius, radius + softness, angle);
-  }
-
-  void main() {
-    vec3 objectNormal = normalize(vObjectPosition);
-    vec3 worldNormal = normalize(vWorldNormal);
-
-    float broad = sin(objectNormal.x * 8.0 + objectNormal.z * 5.0 + uTime * 0.026);
-    float folded = sin(objectNormal.y * 17.0 - objectNormal.x * 7.0 - uTime * 0.038);
-    float detail = sin((objectNormal.x + objectNormal.y + objectNormal.z) * 29.0 + uTime * 0.052);
-    float cloudNoise = broad * 0.5 + folded * 0.34 + detail * 0.16;
-    float cloud = smoothstep(-0.28, 0.58, cloudNoise);
-    float banding = 0.72 + 0.28 * sin(objectNormal.y * 22.0 + objectNormal.x * 4.0);
-    cloud *= banding;
-
-    float diffuse = max(dot(worldNormal, normalize(uLightDirection)), 0.0);
-    float wrappedLight = 0.16 + diffuse * 0.78;
-    vec3 baseColor = mix(uShadowColor, uCloudColor, 0.32 + cloud * 0.5);
-    vec3 color = baseColor * wrappedLight;
-
-    // Almost all of the cloud deck is visually opaque. Surface detail is
-    // revealed only through the two deliberately authored clearings below.
-    float alpha = mix(0.985, 1.0, cloud);
-
-    float microphoneReveal = revealMask(
-      objectNormal,
-      uMicrophoneDirection,
-      0.09,
-      0.055
-    );
-    float vinylReveal = revealMask(
-      objectNormal,
-      uVinylDirection,
-      0.18,
-      0.065
-    );
-
-    alpha -= microphoneReveal * 0.1;
-    alpha -= vinylReveal * 0.52;
-    alpha = clamp(alpha, 0.38, 1.0);
-
-    gl_FragColor = vec4(color, alpha);
-  }
-`;
 
 function seededRandom(seed) {
   let state = seed >>> 0;
@@ -150,10 +75,10 @@ function createVegetationData(radius, quality) {
 
     trees.push({
       direction: direction.toArray(),
-      height: radius * (0.075 + random() * 0.055),
-      trunkRadius: radius * (0.008 + random() * 0.004),
-      crownRadius: radius * (0.038 + random() * 0.025),
-      crownScaleY: 0.72 + random() * 0.38,
+      height: radius * (0.035 + random() * 0.035),
+      trunkRadius: radius * (0.006 + random() * 0.003),
+      crownRadius: radius * (0.022 + random() * 0.018),
+      crownScaleY: 0.68 + random() * 0.28,
       color: ['#315f42', '#477b4b', '#5a8b52', '#6b7650'][Math.floor(random() * 4)]
     });
   }
@@ -272,7 +197,7 @@ function MicrophoneMonument({ radius }) {
       </group>
       <mesh position-y={s * 0.02} rotation-x={-Math.PI / 2}>
         <ringGeometry args={[s * 0.145, s * 0.16, 32]} />
-        <meshBasicMaterial color="#ffc56e" transparent opacity={0.52} toneMapped={false} />
+        <meshBasicMaterial color="#ffc56e" transparent opacity={0.42} toneMapped={false} />
       </mesh>
     </group>
   );
@@ -303,10 +228,10 @@ function HeadphoneGate({ radius }) {
         <meshBasicMaterial
           color="#ffb05e"
           transparent
-          opacity={0.22}
+          opacity={0.16}
           depthWrite={false}
           toneMapped={false}
-          blending={THREE.AdditiveBlending}
+          blending={THREE.NormalBlending}
         />
       </mesh>
       <mesh position-y={s * 0.012}>
@@ -421,41 +346,6 @@ function GlowingDiscoveries({ radius }) {
   return notes.map((note, index) => (
     <NotePlant key={index} radius={radius} {...note} />
   ));
-}
-
-function MusicAtmosphere({ radius, quality }) {
-  const cloudMaterial = useRef();
-  const cloudUniforms = useMemo(() => ({
-    uTime: { value: 0 },
-    uCloudColor: { value: new THREE.Color('#b89463') },
-    uShadowColor: { value: new THREE.Color('#45392f') },
-    uLightDirection: { value: new THREE.Vector3(-0.42, 0.68, 0.6).normalize() },
-    uMicrophoneDirection: { value: new THREE.Vector3(...MICROPHONE_DIRECTION).normalize() },
-    uVinylDirection: { value: new THREE.Vector3(...VINYL_DIRECTION).normalize() }
-  }), []);
-
-  useFrame((_, delta) => {
-    if (cloudMaterial.current) cloudMaterial.current.uniforms.uTime.value += delta;
-  });
-
-  const segments = quality === 'quality' ? 96 : 56;
-
-  return (
-    <mesh scale={1.2} renderOrder={6}>
-      <sphereGeometry args={[radius, segments, Math.round(segments * 0.68)]} />
-      <shaderMaterial
-        ref={cloudMaterial}
-        uniforms={cloudUniforms}
-        vertexShader={ATMOSPHERE_VERTEX_SHADER}
-        fragmentShader={CLOUD_FRAGMENT_SHADER}
-        transparent
-        depthWrite
-        depthTest
-        side={THREE.FrontSide}
-        blending={THREE.NormalBlending}
-      />
-    </mesh>
-  );
 }
 
 const MUSIC_FEATURES = [
@@ -587,7 +477,7 @@ export default function MusicWorld({ radius, quality }) {
       <SurfaceAnchor
         direction={MICROPHONE_DIRECTION}
         radius={radius}
-        offset={radius * 0.026}
+        offset={radius * 0.028}
         rotationY={-0.18}
       >
         <MicrophoneMonument radius={radius} />
@@ -596,23 +486,27 @@ export default function MusicWorld({ radius, quality }) {
       <SurfaceAnchor
         direction={HEADPHONE_DIRECTION}
         radius={radius}
-        offset={radius * 0.014}
+        offset={radius * 0.004}
         rotationY={-0.72}
       >
-        <HeadphoneGate radius={radius} />
+        <HeadphoneGate radius={radius * 0.5} />
       </SurfaceAnchor>
 
       <SurfaceAnchor
         direction={VINYL_DIRECTION}
         radius={radius}
-        offset={radius * 0.012}
+        offset={radius * 0.17}
         rotationY={0.42}
       >
         <VinylLagoon radius={radius} />
       </SurfaceAnchor>
 
       <GlowingDiscoveries radius={radius} />
-      <MusicAtmosphere radius={radius} quality={quality} />
+      <MusicAtmosphere
+        radius={radius}
+        quality={quality}
+        vinylDirection={VINYL_DIRECTION}
+      />
     </group>
   );
 }
