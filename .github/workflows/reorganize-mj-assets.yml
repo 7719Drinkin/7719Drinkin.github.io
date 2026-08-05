@@ -1,0 +1,50 @@
+name: Reorganize MJ assets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/reorganize-mj-assets.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reorganize-mj-assets
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Move MJ assets and refresh the wall
+        run: python .github/scripts/reorganize_mj_assets.py
+
+      - name: Commit migrated site
+        run: |
+          rm -f .github/workflows/reorganize-mj-assets.yml
+          rm -f .github/scripts/reorganize_mj_assets.py
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No migration changes were produced."
+            exit 0
+          fi
+
+          git commit -m "refactor: organize MJ media and refresh photo wall"
+          git push origin HEAD:main
