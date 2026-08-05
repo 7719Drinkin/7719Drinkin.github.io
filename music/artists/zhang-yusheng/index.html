@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/universe.css?v=20260730-5">
   <link rel="stylesheet" href="/css/music.css?v=20260805-1">
+  <link rel="stylesheet" href="/css/music-player.css?v=20260805-1">
 </head>
 <body class="theme-music music-artist-page" style="--artist-accent:#d8a84e;--artist-accent-soft:#f1ddb0;--artist-bg:#08111f;--artist-fg:#f6f0e5">
   <div class="universe-noise" aria-hidden="true"></div>
@@ -49,16 +50,25 @@
     <section id="songs" class="music-section artist-section">
       <div class="music-section-heading reveal">
         <div><p>02 / SELECTED SONGS</p><h2>反复<br>聆听.</h2></div>
-        <span>这里记录个人选择与聆听印象，不提供站内音频托管。</span>
+        <span>音频文件由外部对象存储提供，并通过本站播放器进行播放。</span>
       </div>
-      <div class="song-list reveal"><article class="song-row">
+      <div class="song-list reveal"><button class="song-row song-row--playable" type="button"
+        data-audio-src="https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%BC%A0%E9%9B%A8%E7%94%9F%20-%20%E5%A6%82%E6%9E%9C%E4%BD%A0%E8%A6%81%E9%9B%A2%E9%96%8B%E6%88%91.mp3"
+        data-audio-type="audio/mpeg"
+        data-song-title="如果你要離開我"
+        data-song-artist="Tom Chang"
+        data-song-album=""
+        aria-label="播放 如果你要離開我">
       <span class="song-index">01</span>
+      <div><h3>如果你要離開我</h3><p>COLLECTION NOTE</p></div>
+      <small>第一首接入本站播放器的张雨生收藏。</small><b class="song-row-action" aria-hidden="true">▶</b></button><article class="song-row">
+      <span class="song-index">02</span>
       <div><h3>我的未来不是梦</h3><p>COLLECTION NOTE</p></div>
       <small>理想主义与行动感的入口。</small><b>—</b></article><article class="song-row">
-      <span class="song-index">02</span>
+      <span class="song-index">03</span>
       <div><h3>大海</h3><p>COLLECTION NOTE</p></div>
       <small>辽阔、直接，也保留了很强的情绪记忆。</small><b>—</b></article><article class="song-row">
-      <span class="song-index">03</span>
+      <span class="song-index">04</span>
       <div><h3>一天到晚游泳的鱼</h3><p>COLLECTION NOTE</p></div>
       <small>轻盈表面下有独特的表达与想象。</small><b>—</b></article></div>
     </section>
@@ -93,10 +103,38 @@
     </section>
   </main>
 
+  <aside class="site-music-player" data-music-player hidden aria-label="网站音乐播放器">
+    <audio data-player-audio preload="metadata"></audio>
+    <div class="site-player-track">
+      <span class="site-player-label">NOW PLAYING</span>
+      <strong data-player-title>尚未选择歌曲</strong>
+      <small><span data-player-artist>7719 Music</span><span data-player-album></span></small>
+    </div>
+    <div class="site-player-center">
+      <div class="site-player-buttons">
+        <button type="button" data-player-prev aria-label="上一首">‹</button>
+        <button class="site-player-toggle" type="button" data-player-toggle aria-label="播放">▶</button>
+        <button type="button" data-player-next aria-label="下一首">›</button>
+      </div>
+      <div class="site-player-progress">
+        <time data-player-current>0:00</time>
+        <input data-player-seek type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
+        <time data-player-duration>0:00</time>
+      </div>
+      <p class="site-player-status" data-player-status aria-live="polite"></p>
+    </div>
+    <div class="site-player-volume">
+      <span aria-hidden="true">VOL</span>
+      <input data-player-volume type="range" min="0" max="1" value="0.8" step="0.05" aria-label="音量">
+      <button type="button" data-player-close aria-label="收起播放器">×</button>
+    </div>
+  </aside>
+
   <footer class="universe-footer">
     <a href="/music/">← MUSIC DIRECTORY</a>
     <span>TOM CHANG / 7719</span>
   </footer>
   <script src="/js/music.js?v=20260805-1"></script>
+  <script src="/js/music-player.js?v=20260805-1"></script>
 </body>
 </html>

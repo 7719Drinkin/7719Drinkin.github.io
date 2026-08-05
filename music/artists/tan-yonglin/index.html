@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/universe.css?v=20260730-5">
   <link rel="stylesheet" href="/css/music.css?v=20260805-1">
+  <link rel="stylesheet" href="/css/music-player.css?v=20260805-1">
 </head>
 <body class="theme-music music-artist-page" style="--artist-accent:#6ed4cc;--artist-accent-soft:#bcece6;--artist-bg:#07141a;--artist-fg:#eef8f6">
   <div class="universe-noise" aria-hidden="true"></div>
@@ -49,7 +50,7 @@
     <section id="songs" class="music-section artist-section">
       <div class="music-section-heading reveal">
         <div><p>02 / SELECTED SONGS</p><h2>反复<br>聆听.</h2></div>
-        <span>这里记录个人选择与聆听印象，不提供站内音频托管。</span>
+        <span>音频文件由外部对象存储提供，并通过本站播放器进行播放。</span>
       </div>
       <div class="song-list reveal"><article class="song-row">
       <span class="song-index">01</span>
@@ -86,17 +87,45 @@
       </div>
       <div class="related-grid">
       <a class="related-artist" href="/music/artists/zhang-yusheng/">
-        <span>Zhang Yusheng</span>
+        <span>Tom Chang</span>
         <strong>张雨生</strong>
         <b>↗</b>
       </a></div>
     </section>
   </main>
 
+  <aside class="site-music-player" data-music-player hidden aria-label="网站音乐播放器">
+    <audio data-player-audio preload="metadata"></audio>
+    <div class="site-player-track">
+      <span class="site-player-label">NOW PLAYING</span>
+      <strong data-player-title>尚未选择歌曲</strong>
+      <small><span data-player-artist>7719 Music</span><span data-player-album></span></small>
+    </div>
+    <div class="site-player-center">
+      <div class="site-player-buttons">
+        <button type="button" data-player-prev aria-label="上一首">‹</button>
+        <button class="site-player-toggle" type="button" data-player-toggle aria-label="播放">▶</button>
+        <button type="button" data-player-next aria-label="下一首">›</button>
+      </div>
+      <div class="site-player-progress">
+        <time data-player-current>0:00</time>
+        <input data-player-seek type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
+        <time data-player-duration>0:00</time>
+      </div>
+      <p class="site-player-status" data-player-status aria-live="polite"></p>
+    </div>
+    <div class="site-player-volume">
+      <span aria-hidden="true">VOL</span>
+      <input data-player-volume type="range" min="0" max="1" value="0.8" step="0.05" aria-label="音量">
+      <button type="button" data-player-close aria-label="收起播放器">×</button>
+    </div>
+  </aside>
+
   <footer class="universe-footer">
     <a href="/music/">← MUSIC DIRECTORY</a>
     <span>ALAN TAM / 7719</span>
   </footer>
   <script src="/js/music.js?v=20260805-1"></script>
+  <script src="/js/music-player.js?v=20260805-1"></script>
 </body>
 </html>
