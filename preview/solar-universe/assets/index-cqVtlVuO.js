@@ -4506,8 +4506,8 @@ return orthographicDepthToViewZ(depth,cameraNear,cameraFar);
     float amplitude = 0.5;
     mat3 transform = mat3(
       0.00, 0.80, 0.60,
-     -0.80, 0.36,-0.48,
-     -0.60,-0.48, 0.64
+     -0.80, 0.36, -0.48,
+     -0.60, -0.48, 0.64
     );
 
     for (int octave = 0; octave < 5; octave += 1) {
@@ -4623,7 +4623,7 @@ return orthographicDepthToViewZ(depth,cameraNear,cameraFar);
     );
   }
 
-  vec2 sunLighting(
+  vec3 solarTerms(
     vec3 normal,
     vec3 worldPosition,
     vec3 sunPosition,
@@ -4632,14 +4632,17 @@ return orthographicDepthToViewZ(depth,cameraNear,cameraFar);
     vec3 sunDirection = normalize(sunPosition - worldPosition);
     float normalDotLight = dot(normalize(normal), sunDirection);
 
-    // Broad atmospheric scattering around the terminator, plus a stricter
-    // direct-light term for highlights. Neither term depends on the camera.
-    float daySide = smoothstep(-0.22, 0.34, normalDotLight);
-    float directLight = smoothstep(0.02, 0.78, normalDotLight);
-    daySide *= mix(0.78, 1.12, clamp(sunPower, 0.0, 1.6));
-    directLight *= clamp(sunPower, 0.45, 1.55);
+    // Twilight is deliberately narrow. The far side must remain genuinely dark
+    // rather than receiving a camera-independent wrapped-light fill.
+    float twilight = smoothstep(-0.13, 0.045, normalDotLight);
+    float daylight = smoothstep(-0.015, 0.29, normalDotLight);
+    float directLight = smoothstep(0.28, 0.9, normalDotLight);
 
-    return vec2(clamp(daySide, 0.0, 1.0), clamp(directLight, 0.0, 1.0));
+    float power = clamp(sunPower, 0.45, 1.55);
+    daylight = clamp(daylight * mix(0.82, 1.08, power), 0.0, 1.0);
+    directLight = clamp(directLight * power, 0.0, 1.0);
+
+    return vec3(twilight, daylight, directLight);
   }
 `,gC=`
   uniform float uTime;
@@ -4659,9 +4662,6 @@ return orthographicDepthToViewZ(depth,cameraNear,cameraFar);
 
     vec4 worldPosition = modelMatrix * vec4(displacedPosition, 1.0);
     vWorldPosition = worldPosition.xyz;
-
-    // The displacement is radial, so the displaced radial direction is a
-    // better lighting normal than the original, undisplaced sphere normal.
     vWorldNormal = normalize(mat3(modelMatrix) * direction);
     vObjectPosition = displacedPosition;
     gl_Position = projectionMatrix * viewMatrix * worldPosition;
@@ -4689,27 +4689,25 @@ return orthographicDepthToViewZ(depth,cameraNear,cameraFar);
     float cloud = planetaryCloudField(point, uTime);
     float trailingCloud = planetaryCloudField(point, uTime - 0.32);
     float movingFront = clamp((cloud - trailingCloud) * 2.8 + 0.5, 0.0, 1.0);
-    vec2 lighting = sunLighting(normal, vWorldPosition, uSunPosition, uSunPower);
-    float daySide = lighting.x;
-    float directLight = lighting.y;
+    vec3 solar = solarTerms(normal, vWorldPosition, uSunPosition, uSunPower);
+    float twilight = solar.x;
+    float daylight = solar.y;
+    float directLight = solar.z;
     float broadCloud = smoothstep(0.18, 0.7, cloud);
     float illuminatedCloud = smoothstep(0.6, 0.9, cloud) * directLight;
 
-    vec3 color = mix(
-      uShadowColor,
-      uBaseColor,
-      0.18 + broadCloud * 0.47 + daySide * 0.2
-    );
-    color = mix(color, uHighlightColor, illuminatedCloud * 0.38);
+    vec3 nightColor = uShadowColor * (0.38 + broadCloud * 0.07);
+    vec3 dayColor = mix(uBaseColor * 0.7, uBaseColor, broadCloud);
+    dayColor = mix(dayColor, uHighlightColor, illuminatedCloud * 0.48);
+    dayColor *= 0.72 + daylight * 0.28;
 
-    // Moving fronts only alter albedo very slightly and only on the day side;
-    // they no longer create camera-independent flashes on the night side.
-    color *= 1.0 + (movingFront - 0.5) * 0.035 * daySide;
+    vec3 color = mix(nightColor, dayColor, daylight);
+    color += uBaseColor * twilight * (1.0 - daylight) * 0.025;
+    color *= 1.0 + (movingFront - 0.5) * 0.026 * daylight;
 
-    // The limb is gently darkened instead of brightened, preventing a false
-    // reflection that follows the camera.
+    // The atmospheric limb is darker on the night side and never emits light.
     float limb = pow(1.0 - abs(dot(normal, viewDirection)), 2.5);
-    color *= 1.0 - limb * mix(0.1, 0.035, daySide);
+    color *= 1.0 - limb * mix(0.16, 0.035, daylight);
 
     gl_FragColor = vec4(color, 1.0);
     #include <tonemapping_fragment>
@@ -4742,20 +4740,18 @@ return orthographicDepthToViewZ(depth,cameraNear,cameraFar);
       + vec3(uTime * 0.04, 0.0, -uTime * 0.025)
     );
     float coverage = smoothstep(0.4, 0.77, cloud * 0.76 + middleDetail * 0.24);
-    vec2 lighting = sunLighting(normal, vWorldPosition, uSunPosition, uSunPower);
-    float daySide = lighting.x;
-    float directLight = lighting.y;
+    vec3 solar = solarTerms(normal, vWorldPosition, uSunPosition, uSunPower);
+    float daylight = solar.y;
+    float directLight = solar.z;
 
-    vec3 color = mix(
-      uShadowColor,
-      uBaseColor,
-      0.25 + coverage * 0.36 + daySide * 0.18
-    );
-    color = mix(
-      color,
+    vec3 nightColor = uShadowColor * (0.3 + coverage * 0.06);
+    vec3 dayColor = mix(uBaseColor * 0.72, uBaseColor, coverage);
+    dayColor = mix(
+      dayColor,
       uHighlightColor,
-      smoothstep(0.56, 0.92, cloud) * directLight * 0.44
+      smoothstep(0.56, 0.92, cloud) * directLight * 0.5
     );
+    vec3 color = mix(nightColor, dayColor, daylight);
 
     float clearing = irregularClearing(
       point,
@@ -4765,7 +4761,7 @@ return orthographicDepthToViewZ(depth,cameraNear,cameraFar);
       uTime
     );
 
-    float alpha = 0.07 + coverage * 0.55;
+    float alpha = (0.07 + coverage * 0.55) * mix(0.06, 1.0, daylight);
     alpha *= 1.0 - clearing * 0.93;
     alpha = clamp(alpha, 0.0, 0.65);
 
@@ -4804,12 +4800,13 @@ return orthographicDepthToViewZ(depth,cameraNear,cameraFar);
       + vec3(5.0, uTime * 0.052, 1.0 + uTime * 0.03)
     );
     float wisps = smoothstep(0.55, 0.8, longWisps * 0.76 + fineWisps * 0.24);
-    vec2 lighting = sunLighting(normal, vWorldPosition, uSunPosition, uSunPower);
-    float daySide = lighting.x;
-    float directLight = lighting.y;
+    vec3 solar = solarTerms(normal, vWorldPosition, uSunPosition, uSunPower);
+    float daylight = solar.y;
+    float directLight = solar.z;
 
-    vec3 color = mix(uShadowColor, uBaseColor, 0.3 + daySide * 0.35);
-    color = mix(color, uHighlightColor, directLight * 0.5);
+    vec3 nightColor = uShadowColor * 0.25;
+    vec3 dayColor = mix(uBaseColor, uHighlightColor, directLight * 0.58);
+    vec3 color = mix(nightColor, dayColor, daylight);
 
     float clearing = irregularClearing(
       point,
@@ -4819,13 +4816,14 @@ return orthographicDepthToViewZ(depth,cameraNear,cameraFar);
       uTime + 13.0
     );
 
-    float alpha = wisps * 0.28 * (1.0 - clearing * 0.96);
+    float alpha = wisps * 0.28 * mix(0.015, 1.0, daylight);
+    alpha *= 1.0 - clearing * 0.96;
 
     gl_FragColor = vec4(color, alpha);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
   }
-`;function bC({displacement:e,vinylDirection:t,shadowColor:n,baseColor:r,highlightColor:i}){return{uTime:{value:0},uDisplacement:{value:e},uSunPower:{value:1},uSunPosition:{value:new G(0,0,0)},uVinylDirection:{value:new G(...t).normalize()},uShadowColor:{value:new K(n)},uBaseColor:{value:new K(r)},uHighlightColor:{value:new K(i)}}}function xC({radius:e,quality:t,vinylDirection:n}){let{scene:r}=V_(),i=(0,x.useRef)(),a=(0,x.useMemo)(()=>new G(0,0,0),[]),o=(0,x.useRef)(),s=(0,x.useRef)(),c=(0,x.useRef)(),l=(0,x.useMemo)(()=>bC({displacement:.01,vinylDirection:n,shadowColor:`#342c27`,baseColor:`#856640`,highlightColor:`#c09a63`}),[n]),u=(0,x.useMemo)(()=>bC({displacement:.016,vinylDirection:n,shadowColor:`#4b392d`,baseColor:`#a27d4f`,highlightColor:`#d9b77b`}),[n]),d=(0,x.useMemo)(()=>bC({displacement:.009,vinylDirection:n,shadowColor:`#6d5137`,baseColor:`#b58d5c`,highlightColor:`#dfc18c`}),[n]);H_((e,t)=>{i.current||r.traverse(e=>{e.isPointLight&&Math.abs(e.distance-125)<.01&&Math.abs(e.decay-1.9)<.01&&(i.current=e)});let n=1;if(i.current){i.current.getWorldPosition(a);let e=zn.clamp(i.current.intensity/680,.04,8);n=zn.clamp(e**.24,.55,1.5)}[o.current,s.current,c.current].forEach(e=>{e&&(e.uniforms.uSunPosition.value.copy(a),e.uniforms.uSunPower.value=n)}),o.current&&(o.current.uniforms.uTime.value+=t*.35),s.current&&(s.current.uniforms.uTime.value+=t*.55),c.current&&(c.current.uniforms.uTime.value+=t*.82)});let f=t===`quality`?112:72,p=t===`quality`?72:48;return(0,S.jsxs)(`group`,{children:[(0,S.jsxs)(`mesh`,{scale:1.175,renderOrder:4,children:[(0,S.jsx)(`sphereGeometry`,{args:[e,f,p]}),(0,S.jsx)(`shaderMaterial`,{ref:o,uniforms:l,vertexShader:gC,fragmentShader:_C,depthWrite:!0,depthTest:!0,side:0})]}),(0,S.jsxs)(`mesh`,{scale:1.2,renderOrder:5,children:[(0,S.jsx)(`sphereGeometry`,{args:[e,f,p]}),(0,S.jsx)(`shaderMaterial`,{ref:s,uniforms:u,vertexShader:gC,fragmentShader:vC,transparent:!0,depthWrite:!1,depthTest:!0,side:0,blending:1})]}),(0,S.jsxs)(`mesh`,{scale:1.222,renderOrder:6,children:[(0,S.jsx)(`sphereGeometry`,{args:[e,f,p]}),(0,S.jsx)(`shaderMaterial`,{ref:c,uniforms:d,vertexShader:gC,fragmentShader:yC,transparent:!0,depthWrite:!1,depthTest:!0,side:0,blending:1})]})]})}var SC=new G(0,1,0),CC=[.02,.96,-.28],wC=[.68,.53,.5],TC=[.56,.16,-.81];function EC(e){let t=e>>>0;return()=>{t+=1831565813;let e=t;return e=Math.imul(e^e>>>15,e|1),e^=e+Math.imul(e^e>>>7,e|61),((e^e>>>14)>>>0)/4294967296}}function DC(e,t){let n=zn.degToRad(e),r=zn.degToRad(t),i=Math.cos(n);return[i*Math.cos(r),Math.sin(n),i*Math.sin(r)]}function OC(e,t,n=0){let r=new G(...e).normalize();return{normal:r,position:r.clone().multiplyScalar(t+n),quaternion:new Bn().setFromUnitVectors(SC,r)}}function kC({direction:e,radius:t,offset:n=0,rotationY:r=0,children:i}){let a=(0,x.useMemo)(()=>OC(e,t,n),[e[0],e[1],e[2],n,t]);return(0,S.jsx)(`group`,{position:a.position,quaternion:a.quaternion,children:(0,S.jsx)(`group`,{"rotation-y":r,children:i})})}function AC(e,t){let n=EC(9103),r=[new G(...CC).normalize(),new G(...wC).normalize(),new G(...TC).normalize()],i=t===`quality`?42:24,a=t===`quality`?64:34,o=[],s=[],c=0;for(;o.length<i&&c<1e3;){c+=1;let t=n()*1.82-.82,i=n()*Math.PI*2,a=Math.sqrt(Math.max(0,1-t*t)),s=new G(a*Math.cos(i),t,a*Math.sin(i));r.some(e=>e.dot(s)>.925)||o.push({direction:s.toArray(),height:e*(.035+n()*.035),trunkRadius:e*(.006+n()*.003),crownRadius:e*(.022+n()*.018),crownScaleY:.68+n()*.28,color:[`#315f42`,`#477b4b`,`#5a8b52`,`#6b7650`][Math.floor(n()*4)]})}for(c=0;s.length<a&&c<1400;){c+=1;let t=n()*1.9-.9,i=n()*Math.PI*2,a=Math.sqrt(Math.max(0,1-t*t)),o=new G(a*Math.cos(i),t,a*Math.sin(i));r.some(e=>e.dot(o)>.94)||s.push({direction:o.toArray(),radius:e*(.018+n()*.024),color:[`#264d37`,`#3e7046`,`#725168`,`#8b5b78`,`#607f49`][Math.floor(n()*5)]})}return{trees:o,bushes:s}}function jC({radius:e,quality:t}){let n=(0,x.useRef)(),r=(0,x.useRef)(),i=(0,x.useRef)(),a=(0,x.useMemo)(()=>AC(e,t),[t,e]);return(0,x.useLayoutEffect)(()=>{let t=new zr,o=new G,s=new Bn,c=new G;a.trees.forEach((i,a)=>{o.set(...i.direction).normalize(),s.setFromUnitVectors(SC,o),c.copy(o).multiplyScalar(e+e*.008),t.position.copy(c).addScaledVector(o,i.height*.5),t.quaternion.copy(s),t.scale.set(i.trunkRadius,i.height,i.trunkRadius),t.updateMatrix(),n.current.setMatrixAt(a,t.matrix),n.current.setColorAt(a,new K(`#594431`)),t.position.copy(c).addScaledVector(o,i.height+i.crownRadius*.34),t.quaternion.copy(s),t.scale.set(i.crownRadius,i.crownRadius*i.crownScaleY,i.crownRadius),t.updateMatrix(),r.current.setMatrixAt(a,t.matrix),r.current.setColorAt(a,new K(i.color))}),a.bushes.forEach((n,r)=>{o.set(...n.direction).normalize(),s.setFromUnitVectors(SC,o),c.copy(o).multiplyScalar(e+n.radius*.45),t.position.copy(c),t.quaternion.copy(s),t.scale.set(n.radius*1.15,n.radius*.72,n.radius),t.updateMatrix(),i.current.setMatrixAt(r,t.matrix),i.current.setColorAt(r,new K(n.color))}),[n.current,r.current,i.current].forEach(e=>{e.instanceMatrix.needsUpdate=!0,e.instanceColor&&(e.instanceColor.needsUpdate=!0),e.computeBoundingSphere()})},[e,a]),(0,S.jsxs)(`group`,{children:[(0,S.jsxs)(`instancedMesh`,{ref:n,args:[null,null,a.trees.length],children:[(0,S.jsx)(`cylinderGeometry`,{args:[1,1,1,6]}),(0,S.jsx)(`meshStandardMaterial`,{vertexColors:!0,roughness:.94})]}),(0,S.jsxs)(`instancedMesh`,{ref:r,args:[null,null,a.trees.length],children:[(0,S.jsx)(`dodecahedronGeometry`,{args:[1,+(t===`quality`)]}),(0,S.jsx)(`meshStandardMaterial`,{vertexColors:!0,roughness:.88})]}),(0,S.jsxs)(`instancedMesh`,{ref:i,args:[null,null,a.bushes.length],children:[(0,S.jsx)(`dodecahedronGeometry`,{args:[1,0]}),(0,S.jsx)(`meshStandardMaterial`,{vertexColors:!0,roughness:.9})]})]})}function MC({radius:e}){let t=e;return(0,S.jsxs)(`group`,{children:[(0,S.jsxs)(`mesh`,{"position-y":t*.02,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.115,t*.135,t*.04,18]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#5d4332`,roughness:.78,metalness:.08})]}),(0,S.jsxs)(`mesh`,{"position-y":t*.19,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.014,t*.022,t*.35,10]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#8a6041`,roughness:.48,metalness:.34})]}),(0,S.jsxs)(`group`,{"position-y":t*.4,children:[(0,S.jsxs)(`mesh`,{scale:[t*.085,t*.115,t*.065],children:[(0,S.jsx)(`sphereGeometry`,{args:[1,20,16]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#a9764e`,roughness:.42,metalness:.35})]}),[-.058,-.03,0,.03,.058].map(e=>(0,S.jsxs)(`mesh`,{position:[0,t*e,t*.061],children:[(0,S.jsx)(`boxGeometry`,{args:[t*.125,t*.009,t*.008]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#2c211e`,roughness:.7,metalness:.22})]},e))]}),(0,S.jsxs)(`mesh`,{"position-y":t*.02,"rotation-x":-Math.PI/2,children:[(0,S.jsx)(`ringGeometry`,{args:[t*.145,t*.16,32]}),(0,S.jsx)(`meshBasicMaterial`,{color:`#ffc56e`,transparent:!0,opacity:.42,toneMapped:!1})]})]})}function NC({radius:e}){let t=e;return(0,S.jsxs)(`group`,{children:[(0,S.jsxs)(`mesh`,{"position-y":t*.13,children:[(0,S.jsx)(`torusGeometry`,{args:[t*.15,t*.022,10,48,Math.PI]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#7e563f`,roughness:.6,metalness:.18})]}),[-1,1].map(e=>(0,S.jsxs)(`group`,{position:[e*t*.15,t*.12,0],children:[(0,S.jsxs)(`mesh`,{"rotation-x":Math.PI/2,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.055,t*.055,t*.045,18]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#986a4a`,roughness:.52,metalness:.2})]}),(0,S.jsxs)(`mesh`,{"position-z":t*.026,"rotation-x":Math.PI/2,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.034,t*.038,t*.012,18]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#2d2228`,roughness:.78})]})]},e)),(0,S.jsxs)(`mesh`,{position:[0,t*.095,-t*.018],children:[(0,S.jsx)(`circleGeometry`,{args:[t*.09,32]}),(0,S.jsx)(`meshBasicMaterial`,{color:`#ffb05e`,transparent:!0,opacity:.16,depthWrite:!1,toneMapped:!1,blending:1})]}),(0,S.jsxs)(`mesh`,{"position-y":t*.012,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.19,t*.21,t*.024,28]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#504033`,roughness:.88})]})]})}function PC({radius:e}){let t=e;return(0,S.jsxs)(`group`,{children:[(0,S.jsxs)(`mesh`,{"position-y":t*.005,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.205,t*.22,t*.026,40]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#27515b`,roughness:.28,metalness:.12})]}),(0,S.jsxs)(`mesh`,{"position-y":t*.024,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.158,t*.158,t*.012,48]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#17161c`,roughness:.3,metalness:.28})]}),[.055,.09,.125].map(e=>(0,S.jsxs)(`mesh`,{"position-y":t*.032,"rotation-x":Math.PI/2,children:[(0,S.jsx)(`torusGeometry`,{args:[t*e,t*.002,5,48]}),(0,S.jsx)(`meshBasicMaterial`,{color:`#8f718d`,transparent:!0,opacity:.34})]},e)),(0,S.jsxs)(`mesh`,{"position-y":t*.035,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.04,t*.04,t*.014,28]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#b7654c`,roughness:.55})]}),(0,S.jsxs)(`mesh`,{"position-y":t*.044,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.008,t*.008,t*.026,12]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#d9aa70`,roughness:.36,metalness:.4})]})]})}function FC({radius:e,quality:t}){return(0,x.useMemo)(()=>{let e=t===`quality`?21:15;return Array.from({length:e},(t,n)=>{let r=n/Math.max(1,e-1);return{direction:DC(8+r*58,-116+r*87+Math.sin(r*Math.PI)*15),rotationY:-.48+r*.82,black:n%4==2||n%7==4}})},[t]).map((t,n)=>(0,S.jsx)(kC,{direction:t.direction,radius:e,offset:e*.014,rotationY:t.rotationY,children:(0,S.jsxs)(`mesh`,{"position-y":t.black?e*.012:0,children:[(0,S.jsx)(`boxGeometry`,{args:[e*(t.black?.052:.068),e*.022,e*(t.black?.078:.11)]}),(0,S.jsx)(`meshStandardMaterial`,{color:t.black?`#242129`:`#e7d9c4`,roughness:t.black?.58:.78,metalness:.02})]})},n))}function IC({radius:e,direction:t,rotationY:n=0,color:r=`#ffc26e`}){return(0,S.jsx)(kC,{direction:t,radius:e,offset:e*.012,rotationY:n,children:(0,S.jsxs)(`group`,{children:[(0,S.jsxs)(`mesh`,{position:[e*.018,e*.052,0],children:[(0,S.jsx)(`cylinderGeometry`,{args:[e*.004,e*.005,e*.105,6]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#76574a`,roughness:.82})]}),(0,S.jsxs)(`mesh`,{position:[0,e*.018,0],scale:[1.25,.78,1],children:[(0,S.jsx)(`sphereGeometry`,{args:[e*.025,12,8]}),(0,S.jsx)(`meshBasicMaterial`,{color:r,toneMapped:!1})]}),(0,S.jsxs)(`mesh`,{position:[e*.018,e*.105,0],"rotation-z":-.42,children:[(0,S.jsx)(`boxGeometry`,{args:[e*.055,e*.009,e*.008]}),(0,S.jsx)(`meshBasicMaterial`,{color:r,toneMapped:!1})]})]})})}function LC({radius:e}){return[{direction:DC(28,18),color:`#ffbc68`,rotationY:.2},{direction:DC(-2,75),color:`#d993ff`,rotationY:-.7},{direction:DC(15,-25),color:`#72d8d1`,rotationY:.8},{direction:DC(-22,-132),color:`#ff879f`,rotationY:-.2},{direction:DC(52,122),color:`#ffd27d`,rotationY:1.1}].map((t,n)=>(0,S.jsx)(IC,{radius:e,...t},n))}var RC=[{direction:CC,radius:.3,softness:.16,elevation:.018,color:`#786340`,colorStrength:.55},{direction:wC,radius:.34,softness:.18,elevation:.012,color:`#4f7044`,colorStrength:.62},{direction:TC,radius:.31,softness:.17,elevation:-.012,color:`#244c52`,colorStrength:.62},{direction:[-.62,.2,.76],radius:.55,softness:.22,elevation:.008,color:`#305a3c`,colorStrength:.76},{direction:[.02,-.52,.85],radius:.48,softness:.2,elevation:.006,color:`#704d6c`,colorStrength:.38}],zC=[{normal:[.2,.96,-.18],width:.068,softness:.06,elevation:-.004,frequency:9,color:`#876a47`,colorStrength:.32},{normal:[-.76,.15,.63],width:.045,softness:.05,elevation:.008,frequency:13,color:`#795779`,colorStrength:.26}],BC=[{direction:CC,mode:`plane`,radius:.22,softness:.14,target:.015,strength:1,color:`#72573d`,colorStrength:.34},{direction:wC,mode:`plane`,radius:.24,softness:.14,target:.008,strength:1,color:`#40543c`,colorStrength:.28},{direction:TC,mode:`plane`,radius:.25,softness:.15,target:-.006,strength:1,color:`#28494c`,colorStrength:.42}];function VC({radius:e,quality:t}){return(0,S.jsxs)(`group`,{children:[(0,S.jsx)(`mesh`,{geometry:(0,x.useMemo)(()=>oC({radius:e,detail:t===`quality`?5:4,seed:91,relief:.72,features:RC,bands:zC,flattenZones:BC,palette:{low:`#132a29`,mid:`#284f39`,high:`#667348`,accent:`#8d5d73`,accent2:`#b18366`,shadowTint:`#101b25`,highlightTint:`#c6a66e`}}),[t,e]),children:(0,S.jsx)(`meshStandardMaterial`,{vertexColors:!0,roughness:.86,metalness:.01,dithering:!0})}),(0,S.jsx)(jC,{radius:e,quality:t}),(0,S.jsx)(FC,{radius:e,quality:t}),(0,S.jsx)(kC,{direction:CC,radius:e,offset:e*.028,rotationY:-.18,children:(0,S.jsx)(MC,{radius:e})}),(0,S.jsx)(kC,{direction:wC,radius:e,offset:e*.004,rotationY:-.72,children:(0,S.jsx)(NC,{radius:e*.5})}),(0,S.jsx)(kC,{direction:TC,radius:e,offset:e*.17,rotationY:.42,children:(0,S.jsx)(PC,{radius:e})}),(0,S.jsx)(LC,{radius:e}),(0,S.jsx)(xC,{radius:e,quality:t,vinylDirection:TC})]})}var HC=[.02,.96,-.28],UC=[.56,.16,-.81],WC=new G(-.42,.68,.6).normalize(),GC=`
+`;function bC({displacement:e,vinylDirection:t,shadowColor:n,baseColor:r,highlightColor:i}){return{uTime:{value:0},uDisplacement:{value:e},uSunPower:{value:1},uSunPosition:{value:new G(0,0,0)},uVinylDirection:{value:new G(...t).normalize()},uShadowColor:{value:new K(n)},uBaseColor:{value:new K(r)},uHighlightColor:{value:new K(i)}}}function xC({radius:e,quality:t,vinylDirection:n}){let{scene:r}=V_(),i=(0,x.useRef)(),a=(0,x.useMemo)(()=>new G(0,0,0),[]),o=(0,x.useRef)(),s=(0,x.useRef)(),c=(0,x.useRef)(),l=(0,x.useMemo)(()=>bC({displacement:.01,vinylDirection:n,shadowColor:`#070605`,baseColor:`#765735`,highlightColor:`#c6a36d`}),[n]),u=(0,x.useMemo)(()=>bC({displacement:.016,vinylDirection:n,shadowColor:`#090705`,baseColor:`#946d43`,highlightColor:`#d9b77c`}),[n]),d=(0,x.useMemo)(()=>bC({displacement:.009,vinylDirection:n,shadowColor:`#0a0806`,baseColor:`#a27a4f`,highlightColor:`#e2c691`}),[n]);H_((e,t)=>{i.current||r.traverse(e=>{e.isPointLight&&Math.abs(e.distance-125)<.01&&Math.abs(e.decay-1.9)<.01&&(i.current=e)});let n=1;if(i.current){i.current.getWorldPosition(a);let e=zn.clamp(i.current.intensity/680,.04,8);n=zn.clamp(e**.24,.55,1.5)}[o.current,s.current,c.current].forEach(e=>{e&&(e.uniforms.uSunPosition.value.copy(a),e.uniforms.uSunPower.value=n)}),o.current&&(o.current.uniforms.uTime.value+=t*.35),s.current&&(s.current.uniforms.uTime.value+=t*.55),c.current&&(c.current.uniforms.uTime.value+=t*.82)});let f=t===`quality`?112:72,p=t===`quality`?72:48;return(0,S.jsxs)(`group`,{children:[(0,S.jsxs)(`mesh`,{scale:1.175,renderOrder:4,children:[(0,S.jsx)(`sphereGeometry`,{args:[e,f,p]}),(0,S.jsx)(`shaderMaterial`,{ref:o,uniforms:l,vertexShader:gC,fragmentShader:_C,depthWrite:!0,depthTest:!0,side:0})]}),(0,S.jsxs)(`mesh`,{scale:1.2,renderOrder:5,children:[(0,S.jsx)(`sphereGeometry`,{args:[e,f,p]}),(0,S.jsx)(`shaderMaterial`,{ref:s,uniforms:u,vertexShader:gC,fragmentShader:vC,transparent:!0,depthWrite:!1,depthTest:!0,side:0,blending:1})]}),(0,S.jsxs)(`mesh`,{scale:1.222,renderOrder:6,children:[(0,S.jsx)(`sphereGeometry`,{args:[e,f,p]}),(0,S.jsx)(`shaderMaterial`,{ref:c,uniforms:d,vertexShader:gC,fragmentShader:yC,transparent:!0,depthWrite:!1,depthTest:!0,side:0,blending:1})]})]})}var SC=new G(0,1,0),CC=[.02,.96,-.28],wC=[.68,.53,.5],TC=[.56,.16,-.81];function EC(e){let t=e>>>0;return()=>{t+=1831565813;let e=t;return e=Math.imul(e^e>>>15,e|1),e^=e+Math.imul(e^e>>>7,e|61),((e^e>>>14)>>>0)/4294967296}}function DC(e,t){let n=zn.degToRad(e),r=zn.degToRad(t),i=Math.cos(n);return[i*Math.cos(r),Math.sin(n),i*Math.sin(r)]}function OC(e,t,n=0){let r=new G(...e).normalize();return{normal:r,position:r.clone().multiplyScalar(t+n),quaternion:new Bn().setFromUnitVectors(SC,r)}}function kC({direction:e,radius:t,offset:n=0,rotationY:r=0,children:i}){let a=(0,x.useMemo)(()=>OC(e,t,n),[e[0],e[1],e[2],n,t]);return(0,S.jsx)(`group`,{position:a.position,quaternion:a.quaternion,children:(0,S.jsx)(`group`,{"rotation-y":r,children:i})})}function AC(e,t){let n=EC(9103),r=[new G(...CC).normalize(),new G(...wC).normalize(),new G(...TC).normalize()],i=t===`quality`?42:24,a=t===`quality`?64:34,o=[],s=[],c=0;for(;o.length<i&&c<1e3;){c+=1;let t=n()*1.82-.82,i=n()*Math.PI*2,a=Math.sqrt(Math.max(0,1-t*t)),s=new G(a*Math.cos(i),t,a*Math.sin(i));r.some(e=>e.dot(s)>.925)||o.push({direction:s.toArray(),height:e*(.035+n()*.035),trunkRadius:e*(.006+n()*.003),crownRadius:e*(.022+n()*.018),crownScaleY:.68+n()*.28,color:[`#315f42`,`#477b4b`,`#5a8b52`,`#6b7650`][Math.floor(n()*4)]})}for(c=0;s.length<a&&c<1400;){c+=1;let t=n()*1.9-.9,i=n()*Math.PI*2,a=Math.sqrt(Math.max(0,1-t*t)),o=new G(a*Math.cos(i),t,a*Math.sin(i));r.some(e=>e.dot(o)>.94)||s.push({direction:o.toArray(),radius:e*(.018+n()*.024),color:[`#264d37`,`#3e7046`,`#725168`,`#8b5b78`,`#607f49`][Math.floor(n()*5)]})}return{trees:o,bushes:s}}function jC({radius:e,quality:t}){let n=(0,x.useRef)(),r=(0,x.useRef)(),i=(0,x.useRef)(),a=(0,x.useMemo)(()=>AC(e,t),[t,e]);return(0,x.useLayoutEffect)(()=>{let t=new zr,o=new G,s=new Bn,c=new G;a.trees.forEach((i,a)=>{o.set(...i.direction).normalize(),s.setFromUnitVectors(SC,o),c.copy(o).multiplyScalar(e+e*.008),t.position.copy(c).addScaledVector(o,i.height*.5),t.quaternion.copy(s),t.scale.set(i.trunkRadius,i.height,i.trunkRadius),t.updateMatrix(),n.current.setMatrixAt(a,t.matrix),n.current.setColorAt(a,new K(`#594431`)),t.position.copy(c).addScaledVector(o,i.height+i.crownRadius*.34),t.quaternion.copy(s),t.scale.set(i.crownRadius,i.crownRadius*i.crownScaleY,i.crownRadius),t.updateMatrix(),r.current.setMatrixAt(a,t.matrix),r.current.setColorAt(a,new K(i.color))}),a.bushes.forEach((n,r)=>{o.set(...n.direction).normalize(),s.setFromUnitVectors(SC,o),c.copy(o).multiplyScalar(e+n.radius*.45),t.position.copy(c),t.quaternion.copy(s),t.scale.set(n.radius*1.15,n.radius*.72,n.radius),t.updateMatrix(),i.current.setMatrixAt(r,t.matrix),i.current.setColorAt(r,new K(n.color))}),[n.current,r.current,i.current].forEach(e=>{e.instanceMatrix.needsUpdate=!0,e.instanceColor&&(e.instanceColor.needsUpdate=!0),e.computeBoundingSphere()})},[e,a]),(0,S.jsxs)(`group`,{children:[(0,S.jsxs)(`instancedMesh`,{ref:n,args:[null,null,a.trees.length],children:[(0,S.jsx)(`cylinderGeometry`,{args:[1,1,1,6]}),(0,S.jsx)(`meshStandardMaterial`,{vertexColors:!0,roughness:.94})]}),(0,S.jsxs)(`instancedMesh`,{ref:r,args:[null,null,a.trees.length],children:[(0,S.jsx)(`dodecahedronGeometry`,{args:[1,+(t===`quality`)]}),(0,S.jsx)(`meshStandardMaterial`,{vertexColors:!0,roughness:.88})]}),(0,S.jsxs)(`instancedMesh`,{ref:i,args:[null,null,a.bushes.length],children:[(0,S.jsx)(`dodecahedronGeometry`,{args:[1,0]}),(0,S.jsx)(`meshStandardMaterial`,{vertexColors:!0,roughness:.9})]})]})}function MC({radius:e}){let t=e;return(0,S.jsxs)(`group`,{children:[(0,S.jsxs)(`mesh`,{"position-y":t*.02,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.115,t*.135,t*.04,18]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#5d4332`,roughness:.78,metalness:.08})]}),(0,S.jsxs)(`mesh`,{"position-y":t*.19,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.014,t*.022,t*.35,10]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#8a6041`,roughness:.48,metalness:.34})]}),(0,S.jsxs)(`group`,{"position-y":t*.4,children:[(0,S.jsxs)(`mesh`,{scale:[t*.085,t*.115,t*.065],children:[(0,S.jsx)(`sphereGeometry`,{args:[1,20,16]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#a9764e`,roughness:.42,metalness:.35})]}),[-.058,-.03,0,.03,.058].map(e=>(0,S.jsxs)(`mesh`,{position:[0,t*e,t*.061],children:[(0,S.jsx)(`boxGeometry`,{args:[t*.125,t*.009,t*.008]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#2c211e`,roughness:.7,metalness:.22})]},e))]}),(0,S.jsxs)(`mesh`,{"position-y":t*.02,"rotation-x":-Math.PI/2,children:[(0,S.jsx)(`ringGeometry`,{args:[t*.145,t*.16,32]}),(0,S.jsx)(`meshBasicMaterial`,{color:`#ffc56e`,transparent:!0,opacity:.42,toneMapped:!1})]})]})}function NC({radius:e}){let t=e;return(0,S.jsxs)(`group`,{children:[(0,S.jsxs)(`mesh`,{"position-y":t*.13,children:[(0,S.jsx)(`torusGeometry`,{args:[t*.15,t*.022,10,48,Math.PI]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#7e563f`,roughness:.6,metalness:.18})]}),[-1,1].map(e=>(0,S.jsxs)(`group`,{position:[e*t*.15,t*.12,0],children:[(0,S.jsxs)(`mesh`,{"rotation-x":Math.PI/2,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.055,t*.055,t*.045,18]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#986a4a`,roughness:.52,metalness:.2})]}),(0,S.jsxs)(`mesh`,{"position-z":t*.026,"rotation-x":Math.PI/2,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.034,t*.038,t*.012,18]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#2d2228`,roughness:.78})]})]},e)),(0,S.jsxs)(`mesh`,{position:[0,t*.095,-t*.018],children:[(0,S.jsx)(`circleGeometry`,{args:[t*.09,32]}),(0,S.jsx)(`meshBasicMaterial`,{color:`#ffb05e`,transparent:!0,opacity:.16,depthWrite:!1,toneMapped:!1,blending:1})]}),(0,S.jsxs)(`mesh`,{"position-y":t*.012,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.19,t*.21,t*.024,28]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#504033`,roughness:.88})]})]})}function PC({radius:e}){let t=e;return(0,S.jsxs)(`group`,{children:[(0,S.jsxs)(`mesh`,{"position-y":t*.005,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.205,t*.22,t*.026,40]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#27515b`,roughness:.28,metalness:.12})]}),(0,S.jsxs)(`mesh`,{"position-y":t*.024,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.158,t*.158,t*.012,48]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#17161c`,roughness:.3,metalness:.28})]}),[.055,.09,.125].map(e=>(0,S.jsxs)(`mesh`,{"position-y":t*.032,"rotation-x":Math.PI/2,children:[(0,S.jsx)(`torusGeometry`,{args:[t*e,t*.002,5,48]}),(0,S.jsx)(`meshBasicMaterial`,{color:`#8f718d`,transparent:!0,opacity:.34})]},e)),(0,S.jsxs)(`mesh`,{"position-y":t*.035,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.04,t*.04,t*.014,28]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#b7654c`,roughness:.55})]}),(0,S.jsxs)(`mesh`,{"position-y":t*.044,children:[(0,S.jsx)(`cylinderGeometry`,{args:[t*.008,t*.008,t*.026,12]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#d9aa70`,roughness:.36,metalness:.4})]})]})}function FC({radius:e,quality:t}){return(0,x.useMemo)(()=>{let e=t===`quality`?21:15;return Array.from({length:e},(t,n)=>{let r=n/Math.max(1,e-1);return{direction:DC(8+r*58,-116+r*87+Math.sin(r*Math.PI)*15),rotationY:-.48+r*.82,black:n%4==2||n%7==4}})},[t]).map((t,n)=>(0,S.jsx)(kC,{direction:t.direction,radius:e,offset:e*.014,rotationY:t.rotationY,children:(0,S.jsxs)(`mesh`,{"position-y":t.black?e*.012:0,children:[(0,S.jsx)(`boxGeometry`,{args:[e*(t.black?.052:.068),e*.022,e*(t.black?.078:.11)]}),(0,S.jsx)(`meshStandardMaterial`,{color:t.black?`#242129`:`#e7d9c4`,roughness:t.black?.58:.78,metalness:.02})]})},n))}function IC({radius:e,direction:t,rotationY:n=0,color:r=`#ffc26e`}){return(0,S.jsx)(kC,{direction:t,radius:e,offset:e*.012,rotationY:n,children:(0,S.jsxs)(`group`,{children:[(0,S.jsxs)(`mesh`,{position:[e*.018,e*.052,0],children:[(0,S.jsx)(`cylinderGeometry`,{args:[e*.004,e*.005,e*.105,6]}),(0,S.jsx)(`meshStandardMaterial`,{color:`#76574a`,roughness:.82})]}),(0,S.jsxs)(`mesh`,{position:[0,e*.018,0],scale:[1.25,.78,1],children:[(0,S.jsx)(`sphereGeometry`,{args:[e*.025,12,8]}),(0,S.jsx)(`meshBasicMaterial`,{color:r,toneMapped:!1})]}),(0,S.jsxs)(`mesh`,{position:[e*.018,e*.105,0],"rotation-z":-.42,children:[(0,S.jsx)(`boxGeometry`,{args:[e*.055,e*.009,e*.008]}),(0,S.jsx)(`meshBasicMaterial`,{color:r,toneMapped:!1})]})]})})}function LC({radius:e}){return[{direction:DC(28,18),color:`#ffbc68`,rotationY:.2},{direction:DC(-2,75),color:`#d993ff`,rotationY:-.7},{direction:DC(15,-25),color:`#72d8d1`,rotationY:.8},{direction:DC(-22,-132),color:`#ff879f`,rotationY:-.2},{direction:DC(52,122),color:`#ffd27d`,rotationY:1.1}].map((t,n)=>(0,S.jsx)(IC,{radius:e,...t},n))}var RC=[{direction:CC,radius:.3,softness:.16,elevation:.018,color:`#786340`,colorStrength:.55},{direction:wC,radius:.34,softness:.18,elevation:.012,color:`#4f7044`,colorStrength:.62},{direction:TC,radius:.31,softness:.17,elevation:-.012,color:`#244c52`,colorStrength:.62},{direction:[-.62,.2,.76],radius:.55,softness:.22,elevation:.008,color:`#305a3c`,colorStrength:.76},{direction:[.02,-.52,.85],radius:.48,softness:.2,elevation:.006,color:`#704d6c`,colorStrength:.38}],zC=[{normal:[.2,.96,-.18],width:.068,softness:.06,elevation:-.004,frequency:9,color:`#876a47`,colorStrength:.32},{normal:[-.76,.15,.63],width:.045,softness:.05,elevation:.008,frequency:13,color:`#795779`,colorStrength:.26}],BC=[{direction:CC,mode:`plane`,radius:.22,softness:.14,target:.015,strength:1,color:`#72573d`,colorStrength:.34},{direction:wC,mode:`plane`,radius:.24,softness:.14,target:.008,strength:1,color:`#40543c`,colorStrength:.28},{direction:TC,mode:`plane`,radius:.25,softness:.15,target:-.006,strength:1,color:`#28494c`,colorStrength:.42}];function VC({radius:e,quality:t}){return(0,S.jsxs)(`group`,{children:[(0,S.jsx)(`mesh`,{geometry:(0,x.useMemo)(()=>oC({radius:e,detail:t===`quality`?5:4,seed:91,relief:.72,features:RC,bands:zC,flattenZones:BC,palette:{low:`#132a29`,mid:`#284f39`,high:`#667348`,accent:`#8d5d73`,accent2:`#b18366`,shadowTint:`#101b25`,highlightTint:`#c6a66e`}}),[t,e]),children:(0,S.jsx)(`meshStandardMaterial`,{vertexColors:!0,roughness:.86,metalness:.01,dithering:!0})}),(0,S.jsx)(jC,{radius:e,quality:t}),(0,S.jsx)(FC,{radius:e,quality:t}),(0,S.jsx)(kC,{direction:CC,radius:e,offset:e*.028,rotationY:-.18,children:(0,S.jsx)(MC,{radius:e})}),(0,S.jsx)(kC,{direction:wC,radius:e,offset:e*.004,rotationY:-.72,children:(0,S.jsx)(NC,{radius:e*.5})}),(0,S.jsx)(kC,{direction:TC,radius:e,offset:e*.17,rotationY:.42,children:(0,S.jsx)(PC,{radius:e})}),(0,S.jsx)(LC,{radius:e}),(0,S.jsx)(xC,{radius:e,quality:t,vinylDirection:TC})]})}var HC=[.02,.96,-.28],UC=[.56,.16,-.81],WC=new G(-.42,.68,.6).normalize(),GC=`
   varying vec3 vWorldNormal;
   varying vec3 vWorldPosition;
   varying vec3 vObjectPosition;
