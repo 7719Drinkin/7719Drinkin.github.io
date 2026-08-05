@@ -3,105 +3,154 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="7719 Universe 音乐档案：按歌手整理歌曲、专辑、图片与个人聆听记录。">
-  <title>Music Archive · 7719 Universe</title>
+  <meta name="description" content="7719 Universe 的个人音乐收藏：按歌手整理歌曲、专辑、影像与聆听记忆。">
+  <title>Music Collection · 7719 Universe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/universe.css?v=20260730-5">
-  <link rel="stylesheet" href="/css/music.css?v=20260805-1">
-  <link rel="stylesheet" href="/css/music-player.css?v=20260805-1">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/music.css?v=20260805-2">
 </head>
-<body class="theme-music music-catalog-page">
-  <div class="universe-noise" aria-hidden="true"></div>
-  <header class="universe-header music-header">
-    <a class="universe-brand" href="/" aria-label="返回 7719 Universe">7719</a>
-    <nav class="universe-nav" aria-label="音乐页面导航">
-      <a href="/">UNIVERSE</a>
-      <a href="#artists">ARTISTS</a>
-      <a href="#roadmap">ROADMAP</a>
-    </nav>
+<body class="music-page music-collection-page">
+  <header class="music-site-header">
+    <a class="music-site-brand" href="/" aria-label="返回 7719 Universe">
+      <span>77</span><strong>19</strong>
+    </a>
+    <div class="music-header-middle"><a href="/music/" class="music-header-context is-current">COLLECTIONS / MUSIC</a></div>
+    <nav class="music-site-nav" aria-label="音乐收藏导航"><a href="/">HOME</a><a class="is-current" href="/music/">COLLECTIONS</a><a href="#artists">ARTISTS</a><a href="#listening">LISTENING</a></nav>
   </header>
-
   <main>
-    <section class="music-hero">
-      <div class="music-hero-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
-      <div class="music-hero-copy reveal">
-        <p class="music-kicker">03 / PERSONAL SOUND ARCHIVE</p>
-        <h1><span>MUSIC</span><strong>档案馆</strong></h1>
-        <p class="music-lead">这里不追求完整的音乐百科，而是按歌手整理我反复聆听的歌曲、专辑、影像和私人记忆。</p>
-        <a class="music-primary-link" href="#artists">浏览歌手主页 <span>↓</span></a>
+    <section class="collection-hero">
+      <div class="collection-hero-copy reveal">
+        <p class="music-eyebrow">03 / PERSONAL COLLECTION</p>
+        <h1><span>Music</span><strong>Collection</strong></h1>
+        <h2>音乐收藏</h2>
+        <p class="collection-intro">不是完整的音乐资料库，而是一份持续整理的个人聆听档案。收藏歌手、歌曲，也收藏与声音有关的记忆。</p>
+        <a class="music-text-link" href="#artists">进入收藏 <b>↓</b></a>
       </div>
-      <aside class="music-hero-readout">
-        <div><span>ARTISTS</span><strong>02</strong></div>
-        <div><span>MODEL</span><strong>EXPANDABLE</strong></div>
-        <div><span>STATUS</span><strong>BUILDING</strong></div>
-      </aside>
+      <div class="collection-record" aria-hidden="true">
+        <div class="collection-record-disc"><i></i><b></b></div>
+        <div class="collection-record-arm"><span></span></div>
+        <p>PERSONAL LISTENING ARCHIVE</p>
+      </div>
     </section>
 
-    <section id="artists" class="music-section">
-      <div class="music-section-heading reveal">
-        <div><p>01 / ARTIST DIRECTORY</p><h2>歌手<br>主页.</h2></div>
-        <span>每位歌手拥有独立路由、数据文件和素材目录，共享同一套可扩展页面系统。</span>
-      </div>
-      <div class="artist-grid">
-        
-        <a class="artist-card reveal" href="/music/artists/zhang-yusheng/" style="--artist-accent:#d8a84e;--artist-bg:#08111f">
-          <div class="artist-card-media">
-            <div class="artist-card-cover music-placeholder-visual" aria-hidden="true"><span>TC</span><i></i><b></b></div>
-            <span class="artist-card-number">01</span>
-          </div>
-          <div class="artist-card-copy">
-            <div class="artist-card-status"><span>OPEN ARCHIVE</span><strong>↗</strong></div>
-            <p>Tom Chang</p>
-            <h2>张雨生</h2>
-            <div class="artist-card-tags"><span>华语流行</span><span>创作歌手</span></div>
-            <p class="artist-card-description">个人收藏中的张雨生：歌曲、专辑、影像与聆听记忆。</p>
-          </div>
-        </a>
-        <a class="artist-card reveal" href="/music/artists/tan-yonglin/" style="--artist-accent:#6ed4cc;--artist-bg:#07141a">
-          <div class="artist-card-media">
-            <div class="artist-card-cover music-placeholder-visual" aria-hidden="true"><span>AT</span><i></i><b></b></div>
-            <span class="artist-card-number">02</span>
-          </div>
-          <div class="artist-card-copy">
-            <div class="artist-card-status"><span>OPEN ARCHIVE</span><strong>↗</strong></div>
-            <p>Alan Tam</p>
-            <h2>谭咏麟</h2>
-            <div class="artist-card-tags"><span>粤语流行</span><span>经典流行</span></div>
-            <p class="artist-card-description">个人收藏中的谭咏麟：粤语流行、舞台记忆与跨时代旋律。</p>
-          </div>
-        </a>
-        <article class="artist-card artist-card--future reveal">
-          <div class="artist-card-media music-placeholder-visual" aria-hidden="true"><span>+</span><i></i><b></b></div>
-          <div class="artist-card-copy">
-            <div class="artist-card-status"><span>EXPANDING</span><strong>∞</strong></div>
-            <p>NEXT ARTIST</p>
-            <h2>更多歌手</h2>
-            <p class="artist-card-description">后续新增歌手只需要注册数据和素材，不需要复制整套页面代码。</p>
+    <section id="artists" class="music-content-section">
+      <div class="music-section-header reveal">
+    <div>
+      <p>01 / CURATED ARTISTS</p>
+      <h2>歌手收藏</h2>
+    </div>
+    <span>每位歌手拥有独立页面，但共享统一的内容组件与数据结构。</span>
+    
+  </div>
+      <div class="collection-artist-grid">
+        <a class="collection-artist-card reveal" href="/music/artists/zhang-yusheng/"
+      style="--card-accent:#d8a84e;--card-bg:#08111f">
+    <div class="collection-artist-image">
+      <div class="collection-artist-cover artist-visual-placeholder" aria-hidden="true">
+    <span>TC</span>
+    <i></i><b></b><em></em>
+  </div>
+      <span class="collection-artist-index">01</span>
+    </div>
+    <div class="collection-artist-copy">
+      <p>Tom Chang</p>
+      <h3>张雨生</h3>
+      <span>让理想与声音继续远行</span>
+      <b aria-hidden="true">↗</b>
+    </div>
+  </a><a class="collection-artist-card reveal" href="/music/artists/tan-yonglin/"
+      style="--card-accent:#6ed4cc;--card-bg:#07141a">
+    <div class="collection-artist-image">
+      <div class="collection-artist-cover artist-visual-placeholder" aria-hidden="true">
+    <span>AT</span>
+    <i></i><b></b><em></em>
+  </div>
+      <span class="collection-artist-index">02</span>
+    </div>
+    <div class="collection-artist-copy">
+      <p>Alan Tam</p>
+      <h3>谭咏麟</h3>
+      <span>把经典留在每一次重播里</span>
+      <b aria-hidden="true">↗</b>
+    </div>
+  </a>
+        <article class="collection-artist-card collection-artist-card--more reveal">
+          <div class="collection-more-mark" aria-hidden="true"><i></i><b></b></div>
+          <div class="collection-artist-copy">
+            <p>MORE ARTISTS</p>
+            <h3>持续加入</h3>
+            <span>新增歌手只注册数据，不复制页面结构。</span>
+            <b aria-hidden="true">+</b>
           </div>
         </article>
       </div>
     </section>
 
-    <section id="roadmap" class="music-section music-roadmap">
-      <div class="music-section-heading reveal">
-        <div><p>02 / SYSTEM ROADMAP</p><h2>持续<br>扩展.</h2></div>
-        <span>当前先建立歌手主页系统，之后逐步开放专辑、歌单、现场与主题收藏。</span>
-      </div>
-      <div class="roadmap-grid">
-        <article class="roadmap-item reveal"><span>NOW</span><h3>ARTISTS</h3><p>张雨生、谭咏麟及后续新增的独立歌手主页。</p></article>
-        <article class="roadmap-item reveal"><span>NEXT</span><h3>ALBUMS</h3><p>专辑封面、年份、曲目选择和个人短评。</p></article>
-        <article class="roadmap-item reveal"><span>LATER</span><h3>PLAYLISTS</h3><p>跨歌手的主题歌单与不同人生阶段的声音记录。</p></article>
-      </div>
+    <section id="listening" class="music-content-section collection-listening">
+      <div class="music-section-header reveal">
+    <div>
+      <p>02 / SELECTED LISTENING</p>
+      <h2>最近整理</h2>
+    </div>
+    <span>从不同歌手的收藏中抽取少量条目，保持页面克制。</span>
+    
+  </div>
+      <div class="collection-song-list"><a class="collection-song-row reveal" href="/music/artists/zhang-yusheng/#songs">
+    <span>01</span>
+    <div>
+      <strong>如果你要離開我</strong>
+      <small>Tom Chang</small>
+    </div>
+    <p>第一首接入本站播放器的张雨生收藏。</p>
+    <em>PLAYABLE</em>
+    <b aria-hidden="true">↗</b>
+  </a><a class="collection-song-row reveal" href="/music/artists/zhang-yusheng/#songs">
+    <span>02</span>
+    <div>
+      <strong>我的未来不是梦</strong>
+      <small>Tom Chang</small>
+    </div>
+    <p>理想主义与行动感的入口。</p>
+    <em>ARCHIVE</em>
+    <b aria-hidden="true">↗</b>
+  </a><a class="collection-song-row reveal" href="/music/artists/zhang-yusheng/#songs">
+    <span>03</span>
+    <div>
+      <strong>大海</strong>
+      <small>Tom Chang</small>
+    </div>
+    <p>辽阔、直接，也保留了很强的情绪记忆。</p>
+    <em>ARCHIVE</em>
+    <b aria-hidden="true">↗</b>
+  </a><a class="collection-song-row reveal" href="/music/artists/zhang-yusheng/#songs">
+    <span>04</span>
+    <div>
+      <strong>一天到晚游泳的鱼</strong>
+      <small>Tom Chang</small>
+    </div>
+    <p>轻盈表面下有独特的表达与想象。</p>
+    <em>ARCHIVE</em>
+    <b aria-hidden="true">↗</b>
+  </a><a class="collection-song-row reveal" href="/music/artists/tan-yonglin/#songs">
+    <span>05</span>
+    <div>
+      <strong>讲不出再见</strong>
+      <small>Alan Tam</small>
+    </div>
+    <p>具有告别感，也有继续前行的力量。</p>
+    <em>ARCHIVE</em>
+    <b aria-hidden="true">↗</b>
+  </a></div>
+    </section>
+
+    <section class="music-content-section collection-manifesto reveal">
+      <p>COLLECTION PRINCIPLE</p>
+      <blockquote>少量、可持续、以个人记忆为核心。页面负责整理与呈现，播放器只是其中一个可复用组件。</blockquote>
+      <a href="/">返回 7719 Universe <b>↗</b></a>
     </section>
   </main>
-
-  <footer class="universe-footer">
-    <span>7719 / MUSIC ARCHIVE</span>
-    <a href="/">BACK TO UNIVERSE →</a>
-  </footer>
-  <script src="/js/music.js?v=20260805-1"></script>
-  <script src="/js/music-player.js?v=20260805-1"></script>
+  <footer class="music-site-footer"><span>7719 / MUSIC COLLECTION</span><span>CURATED, NOT COMPLETE.</span></footer>
+  <script src="/js/music.js?v=20260805-2"></script>
 </body>
 </html>

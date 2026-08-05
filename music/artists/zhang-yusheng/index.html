@@ -4,137 +4,151 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="个人收藏中的张雨生：歌曲、专辑、影像与聆听记忆。">
-  <title>张雨生 · Music · 7719 Universe</title>
+  <title>张雨生 · Music Collection · 7719 Universe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/universe.css?v=20260730-5">
-  <link rel="stylesheet" href="/css/music.css?v=20260805-1">
-  <link rel="stylesheet" href="/css/music-player.css?v=20260805-1">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/music.css?v=20260805-2">
+  <link rel="stylesheet" href="/css/music-player.css?v=20260805-2">
 </head>
-<body class="theme-music music-artist-page" style="--artist-accent:#d8a84e;--artist-accent-soft:#f1ddb0;--artist-bg:#08111f;--artist-fg:#f6f0e5">
-  <div class="universe-noise" aria-hidden="true"></div>
-  <header class="universe-header music-header">
-    <a class="universe-brand" href="/" aria-label="返回 7719 Universe">7719</a>
-    <nav class="universe-nav" aria-label="张雨生页面导航">
-      <a href="/music/">MUSIC</a>
-      <a href="#songs">SONGS</a>
-      <a href="#albums">ALBUMS</a>
-      <a href="#gallery">GALLERY</a>
-    </nav>
+<body class="music-page music-artist-page"
+  style="--artist-accent:#d8a84e;--artist-accent-soft:#f1ddb0;--artist-bg:#08111f;--artist-fg:#f6f0e5">
+  <header class="music-site-header">
+    <a class="music-site-brand" href="/" aria-label="返回 7719 Universe">
+      <span>77</span><strong>19</strong>
+    </a>
+    <div class="music-header-middle"><a href="/music/" class="music-header-context">MUSIC / TOM CHANG</a></div>
+    <nav class="music-site-nav" aria-label="音乐收藏导航"><a href="#overview">OVERVIEW</a><a href="#songs">SONGS</a><a href="#albums">ALBUMS</a><a href="#gallery">VISUAL</a></nav>
   </header>
-
   <main>
     <section class="artist-hero">
-      <div class="artist-hero-media"><div class="artist-hero-placeholder music-placeholder-visual" aria-hidden="true"><span>TC</span><i></i><b></b></div></div>
-      <div class="artist-hero-shade"></div>
       <div class="artist-hero-copy reveal">
-        <p>MUSIC / ARTIST 01</p>
-        <span>Tom Chang</span>
+        <p class="music-eyebrow">MUSIC / ARTIST 01</p>
         <h1>张雨生</h1>
-        <h2>声音不会消失</h2>
-        <a href="#story">进入声音档案 <b>↓</b></a>
+        <h2>Tom Chang</h2>
+        <span></span>
+        <blockquote>声音不会消失</blockquote>
+        <a class="music-text-link" href="#overview">进入收藏 <b>↓</b></a>
       </div>
-      <div class="artist-hero-order" aria-hidden="true">01</div>
+      <div class="artist-hero-media"><div class="artist-hero-placeholder" aria-hidden="true">
+        <span>TC</span><i></i><b></b><em></em>
+      </div></div>
     </section>
 
-    <section id="story" class="music-section artist-story">
-      <div class="artist-story-heading reveal"><p>01 / PERSONAL ARCHIVE</p><h2>THE VOICE REMAINS</h2></div>
-      <div class="artist-story-copy reveal">
-        <p>这里收集我与张雨生音乐之间的连接。它不是百科条目，而是一份会持续补充的私人聆听档案。</p>
-        <blockquote>第一阶段先建立主页结构，之后再补充专辑封面、演出影像、照片与更具体的听歌记录。</blockquote>
-        <div class="artist-tags"><span>华语流行</span><span>创作歌手</span></div>
-      </div>
-    </section>
+    <nav class="artist-tabs" aria-label="张雨生收藏分区">
+      <a class="is-current" href="#overview">OVERVIEW</a>
+      <a href="#songs">SONGS</a>
+      <a href="#albums">ALBUMS</a>
+      <a href="#gallery">VISUAL ARCHIVE</a>
+    </nav>
 
-    <section id="songs" class="music-section artist-section">
-      <div class="music-section-heading reveal">
-        <div><p>02 / SELECTED SONGS</p><h2>反复<br>聆听.</h2></div>
-        <span>音频文件由外部对象存储提供，并通过本站播放器进行播放。</span>
-      </div>
-      <div class="song-list reveal"><button class="song-row song-row--playable" type="button"
-        data-audio-src="https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%BC%B5%E9%9B%A8%E7%94%9F%20-%20%E5%A6%82%E6%9E%9C%E4%BD%A0%E8%A6%81%E9%9B%A2%E9%96%8B%E6%88%91.mp3"
-        data-audio-type="audio/mpeg"
-        data-song-title="如果你要離開我"
-        data-song-artist="Tom Chang"
-        data-song-album=""
-        aria-label="播放 如果你要離開我">
+    <section id="overview" class="artist-overview music-content-section">
+      <div id="songs" class="artist-song-column">
+        <div class="music-section-header reveal">
+    <div>
+      <p>01 / SELECTED SONGS</p>
+      <h2>反复聆听</h2>
+    </div>
+    <span>只有配置了音频源的条目才显示播放控制。</span>
+    
+  </div>
+        <div class="song-list reveal"><button class="song-row song-row--playable" type="button"
+      data-audio-src="https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%BC%B5%E9%9B%A8%E7%94%9F%20-%20%E5%A6%82%E6%9E%9C%E4%BD%A0%E8%A6%81%E9%9B%A2%E9%96%8B%E6%88%91.mp3"
+      data-audio-type="audio/mpeg"
+      data-song-title="如果你要離開我"
+      data-song-artist="Tom Chang"
+      data-song-album=""
+      aria-label="播放 如果你要離開我">
       <span class="song-index">01</span>
-      <div><h3>如果你要離開我</h3><p>COLLECTION NOTE</p></div>
-      <small>第一首接入本站播放器的张雨生收藏。</small><b class="song-row-action" aria-hidden="true">▶</b></button><article class="song-row">
-      <span class="song-index">02</span>
-      <div><h3>我的未来不是梦</h3><p>COLLECTION NOTE</p></div>
-      <small>理想主义与行动感的入口。</small><b>—</b></article><article class="song-row">
-      <span class="song-index">03</span>
-      <div><h3>大海</h3><p>COLLECTION NOTE</p></div>
-      <small>辽阔、直接，也保留了很强的情绪记忆。</small><b>—</b></article><article class="song-row">
-      <span class="song-index">04</span>
-      <div><h3>一天到晚游泳的鱼</h3><p>COLLECTION NOTE</p></div>
-      <small>轻盈表面下有独特的表达与想象。</small><b>—</b></article></div>
+    <div class="song-primary"><h3>如果你要離開我</h3><p>COLLECTION NOTE</p></div>
+    <small>第一首接入本站播放器的张雨生收藏。</small><b class="song-row-action" aria-hidden="true">▶</b>
+    </button><article class="song-row"><span class="song-index">02</span>
+    <div class="song-primary"><h3>我的未来不是梦</h3><p>COLLECTION NOTE</p></div>
+    <small>理想主义与行动感的入口。</small><b>—</b></article><article class="song-row"><span class="song-index">03</span>
+    <div class="song-primary"><h3>大海</h3><p>COLLECTION NOTE</p></div>
+    <small>辽阔、直接，也保留了很强的情绪记忆。</small><b>—</b></article><article class="song-row"><span class="song-index">04</span>
+    <div class="song-primary"><h3>一天到晚游泳的鱼</h3><p>COLLECTION NOTE</p></div>
+    <small>轻盈表面下有独特的表达与想象。</small><b>—</b></article></div>
+      </div>
+      <aside class="artist-note reveal">
+        <p>ABOUT THE COLLECTION</p>
+        <h2>THE VOICE REMAINS</h2>
+        <div>这里收集我与张雨生音乐之间的连接。它不是百科条目，而是一份会持续补充的私人聆听档案。</div>
+        <blockquote>第一阶段先建立主页结构，之后再补充专辑封面、演出影像、照片与更具体的听歌记录。</blockquote>
+        <span><i>华语流行</i><i>创作歌手</i></span>
+      </aside>
     </section>
 
-    <section id="albums" class="music-section artist-section">
-      <div class="music-section-heading reveal">
-        <div><p>03 / ALBUM ARCHIVE</p><h2>专辑<br>收藏.</h2></div>
-        <span>数据结构已经就位，加入封面与说明后会自动生成专辑卡片。</span>
-      </div>
-      <div class="album-grid"><div class="artist-empty artist-empty--large"><span>ALBUM ARCHIVE / RESERVED</span><p>专辑封面和个人选曲将在素材准备完成后自动进入这里。</p></div></div>
+    <section id="albums" class="music-content-section">
+      <div class="music-section-header reveal">
+    <div>
+      <p>02 / ALBUM ARCHIVE</p>
+      <h2>专辑收藏</h2>
+    </div>
+    <span>以少量封面建立作品脉络，避免把页面做成完整唱片数据库。</span>
+    
+  </div>
+      <div class="album-grid"><div class="music-empty music-empty--line"><span>ALBUM ARCHIVE / RESERVED</span><p>专辑封面和个人选曲会在素材准备完成后进入这里。</p></div></div>
     </section>
 
-    <section id="gallery" class="music-section artist-section">
-      <div class="music-section-heading reveal">
-        <div><p>04 / VISUAL ARCHIVE</p><h2>影像<br>记录.</h2></div>
-        <span>素材目录：/assets/Music/Artists/ZhangYusheng/</span>
-      </div>
-      <div class="artist-gallery"><div class="artist-empty artist-empty--gallery"><span>VISUAL ARCHIVE / RESERVED</span><p>照片、GIF 和演出影像将从对应的 Asset 目录读取。</p></div></div>
+    <section id="gallery" class="music-content-section">
+      <div class="music-section-header reveal">
+    <div>
+      <p>03 / VISUAL ARCHIVE</p>
+      <h2>影像记录</h2>
+    </div>
+    <span>素材目录：/assets/Music/Artists/ZhangYusheng/</span>
+    
+  </div>
+      <div class="visual-grid"><div class="music-empty music-empty--visual"><span>VISUAL ARCHIVE / RESERVED</span><p>照片、GIF 与演出影像将从对应的素材目录读取。</p></div></div>
     </section>
 
-    <section class="music-section artist-related">
-      <div class="music-section-heading reveal">
-        <div><p>05 / CONTINUE LISTENING</p><h2>其他<br>歌手.</h2></div>
-        <span>回到音乐目录，继续进入其他独立歌手主页。</span>
-      </div>
-      <div class="related-grid">
-      <a class="related-artist" href="/music/artists/tan-yonglin/">
-        <span>Alan Tam</span>
-        <strong>谭咏麟</strong>
-        <b>↗</b>
-      </a></div>
+    <section class="music-content-section related-section">
+      <div class="music-section-header reveal">
+    <div>
+      <p>04 / CONTINUE</p>
+      <h2>其他歌手</h2>
+    </div>
+    <span>返回音乐收藏，或进入其他歌手的独立档案。</span>
+    
+  </div>
+      <div class="related-grid"><a class="related-artist" href="/music/artists/tan-yonglin/">
+      <span>Alan Tam</span>
+      <strong>谭咏麟</strong>
+      <b>↗</b>
+    </a></div>
     </section>
   </main>
 
-  <aside class="site-music-player" data-music-player hidden aria-label="网站音乐播放器">
+  <aside class="site-music-player is-collapsed" data-music-player hidden aria-label="网站音乐播放器">
     <audio data-player-audio preload="metadata"></audio>
     <div class="site-player-track">
-      <span class="site-player-label">NOW PLAYING</span>
-      <strong data-player-title>尚未选择歌曲</strong>
-      <small><span data-player-artist>7719 Music</span><span data-player-album></span></small>
+      <div class="site-player-cover" aria-hidden="true">TC</div>
+      <div class="site-player-copy">
+        <span>NOW PLAYING</span>
+        <strong data-player-title>尚未选择歌曲</strong>
+        <small><span data-player-artist>Tom Chang</span><span data-player-album></span></small>
+      </div>
     </div>
-    <div class="site-player-center">
-      <div class="site-player-buttons">
-        <button type="button" data-player-prev aria-label="上一首">‹</button>
-        <button class="site-player-toggle" type="button" data-player-toggle aria-label="播放">▶</button>
-        <button type="button" data-player-next aria-label="下一首">›</button>
-      </div>
-      <div class="site-player-progress">
-        <time data-player-current>0:00</time>
-        <input data-player-seek type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
-        <time data-player-duration>0:00</time>
-      </div>
-      <p class="site-player-status" data-player-status aria-live="polite"></p>
+    <div class="site-player-controls">
+      <button type="button" data-player-prev aria-label="上一首">‹</button>
+      <button class="site-player-toggle" type="button" data-player-toggle aria-label="播放">▶</button>
+      <button type="button" data-player-next aria-label="下一首">›</button>
+    </div>
+    <div class="site-player-progress">
+      <time data-player-current>0:00</time>
+      <input data-player-seek type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
+      <time data-player-duration>0:00</time>
+      <p data-player-status aria-live="polite"></p>
     </div>
     <div class="site-player-volume">
-      <span aria-hidden="true">VOL</span>
+      <span>VOL</span>
       <input data-player-volume type="range" min="0" max="1" value="0.8" step="0.05" aria-label="音量">
-      <button type="button" data-player-close aria-label="收起播放器">×</button>
     </div>
+    <button class="site-player-expand" type="button" data-player-expand aria-expanded="false" aria-label="展开播放器">⌃</button>
   </aside>
-
-  <footer class="universe-footer">
-    <a href="/music/">← MUSIC DIRECTORY</a>
-    <span>TOM CHANG / 7719</span>
-  </footer>
-  <script src="/js/music.js?v=20260805-1"></script>
-  <script src="/js/music-player.js?v=20260805-1"></script>
+  <footer class="music-site-footer"><a href="/music/">← MUSIC COLLECTION</a><span>TOM CHANG / 7719</span></footer>
+  <script src="/js/music.js?v=20260805-2"></script>
+  <script src="/js/music-player.js?v=20260805-2"></script>
 </body>
 </html>
