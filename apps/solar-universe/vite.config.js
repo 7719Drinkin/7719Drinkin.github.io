@@ -9,6 +9,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: process.env.VITE_SOURCEMAP === 'true',
-    target: 'es2022'
+    target: 'es2022',
+    modulePreload: {
+      resolveDependencies: (_filename, dependencies, context) => (
+        context.hostType === 'html' ? [] : dependencies
+      )
+    }
   }
 });
