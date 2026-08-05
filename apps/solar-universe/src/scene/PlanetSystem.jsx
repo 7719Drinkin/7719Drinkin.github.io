@@ -83,8 +83,6 @@ export default function PlanetSystem({
                 <BasketballWorld radius={interest.size} quality={quality} />
               </Select>
             ) : interest.id === 'music' ? (
-              // The atmosphere intentionally stays outside the post-processing
-              // outline selection so a cyan rim cannot read as self-emission.
               <MusicWorld radius={interest.size} quality={quality} />
             ) : (
               <PlaceholderWorld interest={interest} quality={quality} />
