@@ -65,6 +65,7 @@ export default function PlanetSystem({
               body={musicPuppet}
               quality={quality}
               selectedId={selectedId}
+              parentSelected={showLabels}
               showOrbit={showOrbits}
               onSelect={onSelect}
               registerPlanet={registerPlanet}
