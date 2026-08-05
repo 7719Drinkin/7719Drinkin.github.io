@@ -28,7 +28,7 @@
     "description": "Artists, albums and songs collected over time.",
     "route": "/music/",
     "theme": "music",
-    "status": "preview",
+    "status": "published",
     "number": "03",
     "cover": null
   },
