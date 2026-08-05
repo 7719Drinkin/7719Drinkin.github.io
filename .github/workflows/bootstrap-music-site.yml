@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/bootstrap-music-site.yml'
       - '.github/scripts/build_music_site.py'
+  workflow_dispatch:
 
 permissions:
   contents: write
