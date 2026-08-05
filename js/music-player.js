@@ -1,4 +1,27 @@
 (() => {
+  const LUCIDE_CDN = 'https://unpkg.com/lucide@1.27.0/dist/umd/lucide.js';
+
+  const loadLucide = () => {
+    if (window.lucide?.createIcons) return Promise.resolve(true);
+
+    return new Promise((resolve) => {
+      const existing = document.querySelector('script[data-lucide-player-icons]');
+      if (existing) {
+        existing.addEventListener('load', () => resolve(Boolean(window.lucide?.createIcons)), { once: true });
+        existing.addEventListener('error', () => resolve(false), { once: true });
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = LUCIDE_CDN;
+      script.async = true;
+      script.dataset.lucidePlayerIcons = '';
+      script.addEventListener('load', () => resolve(Boolean(window.lucide?.createIcons)), { once: true });
+      script.addEventListener('error', () => resolve(false), { once: true });
+      document.head.append(script);
+    });
+  };
+
   class MusicPlayer {
     constructor(root, rows) {
       this.root = root;
@@ -12,15 +35,22 @@
       this.next = root.querySelector('[data-player-next]');
       this.seek = root.querySelector('[data-player-seek]');
       this.volume = root.querySelector('[data-player-volume]');
+      this.volumeIcon = root.querySelector('.site-player-volume > span');
       this.current = root.querySelector('[data-player-current]');
       this.duration = root.querySelector('[data-player-duration]');
       this.status = root.querySelector('[data-player-status]');
       this.expand = root.querySelector('[data-player-expand]');
       this.activeIndex = -1;
       this.seeking = false;
+
+      this.prepareIcons();
       this.bind();
       this.setCollapsed(true);
       this.audio.volume = Number(this.volume.value);
+
+      loadLucide().then((loaded) => {
+        if (loaded) this.refreshIcons();
+      });
     }
 
     formatTime(seconds) {
@@ -30,15 +60,67 @@
       return `${minutes}:${remainder}`;
     }
 
+    prepareIcons() {
+      this.previous.dataset.playerIcon = 'skip-back';
+      this.previous.dataset.playerFallback = '‹';
+      this.toggle.dataset.playerIcon = 'play';
+      this.toggle.dataset.playerFallback = '▶';
+      this.next.dataset.playerIcon = 'skip-forward';
+      this.next.dataset.playerFallback = '›';
+      this.expand.dataset.playerIcon = 'maximize-2';
+      this.expand.dataset.playerFallback = '⌃';
+
+      if (this.volumeIcon) {
+        this.volumeIcon.dataset.playerIcon = 'volume-2';
+        this.volumeIcon.dataset.playerFallback = 'VOL';
+      }
+
+      this.rows.forEach((row) => {
+        const action = row.querySelector('.song-row-action');
+        if (!action) return;
+        action.dataset.playerIcon = 'play';
+        action.dataset.playerFallback = '▶';
+      });
+
+      this.refreshIcons();
+    }
+
+    refreshIcons() {
+      const iconHosts = [
+        ...this.root.querySelectorAll('[data-player-icon]'),
+        ...this.rows.flatMap((row) => [...row.querySelectorAll('[data-player-icon]')])
+      ];
+
+      iconHosts.forEach((host) => {
+        const name = host.dataset.playerIcon;
+        const fallback = host.dataset.playerFallback || '';
+        host.innerHTML = window.lucide?.createIcons
+          ? `<i data-lucide="${name}" aria-hidden="true"></i>`
+          : `<span class="player-icon-fallback" aria-hidden="true">${fallback}</span>`;
+      });
+
+      if (window.lucide?.createIcons) {
+        window.lucide.createIcons({
+          attrs: {
+            'stroke-width': 1.9,
+            'aria-hidden': 'true'
+          }
+        });
+      }
+    }
+
     setCollapsed(collapsed) {
       this.root.classList.toggle('is-collapsed', collapsed);
       this.expand.setAttribute('aria-expanded', String(!collapsed));
       this.expand.setAttribute('aria-label', collapsed ? '展开播放器' : '收起播放器');
-      this.expand.textContent = collapsed ? '⌄' : '⌃';
+      this.expand.dataset.playerIcon = collapsed ? 'maximize-2' : 'minimize-2';
+      this.expand.dataset.playerFallback = collapsed ? '⌃' : '⌄';
+      this.refreshIcons();
     }
 
     setPlayingState(isPlaying) {
-      this.toggle.textContent = isPlaying ? 'Ⅱ' : '▶';
+      this.toggle.dataset.playerIcon = isPlaying ? 'pause' : 'play';
+      this.toggle.dataset.playerFallback = isPlaying ? 'Ⅱ' : '▶';
       this.toggle.setAttribute('aria-label', isPlaying ? '暂停' : '播放');
       this.root.classList.toggle('is-playing', isPlaying);
 
@@ -47,8 +129,12 @@
         row.classList.toggle('is-active', active);
         row.classList.toggle('is-playing', active && isPlaying);
         const action = row.querySelector('.song-row-action');
-        if (action) action.textContent = active && isPlaying ? 'Ⅱ' : '▶';
+        if (!action) return;
+        action.dataset.playerIcon = active && isPlaying ? 'pause' : 'play';
+        action.dataset.playerFallback = active && isPlaying ? 'Ⅱ' : '▶';
       });
+
+      this.refreshIcons();
     }
 
     async selectTrack(index, { autoplay = true, expand = true } = {}) {
@@ -134,6 +220,11 @@
 
       this.volume.addEventListener('input', () => {
         this.audio.volume = Number(this.volume.value);
+        if (this.volumeIcon) {
+          const level = Number(this.volume.value);
+          this.volumeIcon.dataset.playerIcon = level === 0 ? 'volume-x' : level < 0.45 ? 'volume-1' : 'volume-2';
+          this.refreshIcons();
+        }
       });
 
       this.seek.addEventListener('input', () => {
