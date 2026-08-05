@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { LabelVisibilityProvider } from './context/LabelVisibilityContext.js';
 import { INTERESTS, SUN } from './data/interests.js';
 import { MUSIC_PUPPET_CELESTIAL } from './data/musicPuppetCelestial.js';
 import {
@@ -21,6 +22,7 @@ export default function App() {
   });
   const [showOrbits, setShowOrbits] = useState(true);
   const [showEcliptic, setShowEcliptic] = useState(true);
+  const [showLabels, setShowLabels] = useState(true);
   const [sunBrightness, setSunBrightness] = useState(1);
   const [language, setLanguage] = useState(detectLanguage);
   const planetRefs = useRef(new Map());
@@ -55,54 +57,58 @@ export default function App() {
   }, [localizedCelestials, localizedInterests, localizedSun, selectedId]);
 
   return (
-    <main className="solar-app">
-      <UniverseCanvas
-        interests={localizedInterests}
-        celestials={localizedCelestials}
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-        quality={quality}
-        showOrbits={showOrbits}
-        showEcliptic={showEcliptic}
-        sunBrightness={sunBrightness}
-        planetRefs={planetRefs}
-        registerPlanet={registerPlanet}
-      />
+    <LabelVisibilityProvider visible={showLabels}>
+      <main className="solar-app">
+        <UniverseCanvas
+          interests={localizedInterests}
+          celestials={localizedCelestials}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+          quality={quality}
+          showOrbits={showOrbits}
+          showEcliptic={showEcliptic}
+          sunBrightness={sunBrightness}
+          planetRefs={planetRefs}
+          registerPlanet={registerPlanet}
+        />
 
-      <Hud
-        language={language}
-        quality={quality}
-        selectedId={selectedId}
-        showOrbits={showOrbits}
-        showEcliptic={showEcliptic}
-        sunBrightness={sunBrightness}
-        onSunBrightnessChange={setSunBrightness}
-        onToggleLanguage={() => setLanguage((value) => value === 'zh' ? 'en' : 'zh')}
-        onToggleQuality={() => setQuality((value) => value === 'quality' ? 'eco' : 'quality')}
-        onToggleOrbits={() => setShowOrbits((value) => !value)}
-        onToggleEcliptic={() => setShowEcliptic((value) => !value)}
-        onReset={() => setSelectedId(null)}
-      />
+        <Hud
+          language={language}
+          quality={quality}
+          selectedId={selectedId}
+          showOrbits={showOrbits}
+          showEcliptic={showEcliptic}
+          showLabels={showLabels}
+          sunBrightness={sunBrightness}
+          onSunBrightnessChange={setSunBrightness}
+          onToggleLanguage={() => setLanguage((value) => value === 'zh' ? 'en' : 'zh')}
+          onToggleQuality={() => setQuality((value) => value === 'quality' ? 'eco' : 'quality')}
+          onToggleOrbits={() => setShowOrbits((value) => !value)}
+          onToggleEcliptic={() => setShowEcliptic((value) => !value)}
+          onToggleLabels={() => setShowLabels((value) => !value)}
+          onReset={() => setSelectedId(null)}
+        />
 
-      <PlanetPanel
-        interest={selected}
-        language={language}
-        onClose={() => setSelectedId(null)}
-      />
+        <PlanetPanel
+          interest={selected}
+          language={language}
+          onClose={() => setSelectedId(null)}
+        />
 
-      <div className="interaction-help" aria-hidden="true">
-        <span>
-          <strong>{translate(language, 'help.drag')}</strong>{' '}
-          {selectedId
-            ? translate(language, 'help.freeRotate')
-            : translate(language, 'help.aboveEcliptic')}
-        </span>
-        <span><strong>{translate(language, 'help.scroll')}</strong> {translate(language, 'help.zoom')}</span>
-        <span><strong>{translate(language, 'help.click')}</strong> {translate(language, 'help.selectBody')}</span>
-        <span><strong>{translate(language, 'help.doubleClick')}</strong> {translate(language, 'help.enter')}</span>
-      </div>
+        <div className="interaction-help" aria-hidden="true">
+          <span>
+            <strong>{translate(language, 'help.drag')}</strong>{' '}
+            {selectedId
+              ? translate(language, 'help.freeRotate')
+              : translate(language, 'help.aboveEcliptic')}
+          </span>
+          <span><strong>{translate(language, 'help.scroll')}</strong> {translate(language, 'help.zoom')}</span>
+          <span><strong>{translate(language, 'help.click')}</strong> {translate(language, 'help.selectBody')}</span>
+          <span><strong>{translate(language, 'help.doubleClick')}</strong> {translate(language, 'help.enter')}</span>
+        </div>
 
-      <p className="affiliation-note">{translate(language, 'affiliation')}</p>
-    </main>
+        <p className="affiliation-note">{translate(language, 'affiliation')}</p>
+      </main>
+    </LabelVisibilityProvider>
   );
 }
