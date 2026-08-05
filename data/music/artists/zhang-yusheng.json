@@ -49,43 +49,51 @@
   ],
   "albums": [
     {
-      "label": "COVER 01",
-      "alt": "张雨生专辑封面收藏 01",
+      "year": "ARCHIVE 01",
+      "title": "封面收藏 01",
+      "note": "作品信息待后续整理。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_-10361447721785922148047.jpg"
     },
     {
-      "label": "COVER 02",
-      "alt": "张雨生专辑封面收藏 02",
+      "year": "ARCHIVE 02",
+      "title": "封面收藏 02",
+      "note": "作品信息待后续整理。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_-10486774451785922096419.jpg"
     },
     {
-      "label": "COVER 03",
-      "alt": "张雨生专辑封面收藏 03",
+      "year": "ARCHIVE 03",
+      "title": "封面收藏 03",
+      "note": "作品信息待后续整理。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_-14543430391785922101862.jpg"
     },
     {
-      "label": "COVER 04",
-      "alt": "张雨生专辑封面收藏 04",
+      "year": "ARCHIVE 04",
+      "title": "封面收藏 04",
+      "note": "作品信息待后续整理。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_11342787081785922137120.jpg"
     },
     {
-      "label": "COVER 05",
-      "alt": "张雨生专辑封面收藏 05",
+      "year": "ARCHIVE 05",
+      "title": "封面收藏 05",
+      "note": "作品信息待后续整理。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_13335494111785922167715.jpg"
     },
     {
-      "label": "COVER 06",
-      "alt": "张雨生专辑封面收藏 06",
+      "year": "ARCHIVE 06",
+      "title": "封面收藏 06",
+      "note": "作品信息待后续整理。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_1761184461785922125369.jpg"
     },
     {
-      "label": "COVER 07",
-      "alt": "张雨生专辑封面收藏 07",
+      "year": "ARCHIVE 07",
+      "title": "封面收藏 07",
+      "note": "作品信息待后续整理。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_1880105451785922085420.jpg"
     },
     {
-      "label": "COVER 08",
-      "alt": "张雨生专辑封面收藏 08",
+      "year": "ARCHIVE 08",
+      "title": "封面收藏 08",
+      "note": "作品信息待后续整理。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_21462888321785922154965.jpg"
     }
   ],
