@@ -9,6 +9,8 @@ on:
       - 'games/**'
       - 'music/**'
       - 'data/**'
+      - 'scripts/**'
+      - 'assets/Music/**'
       - 'js/**'
       - 'css/**'
       - '*.html'
@@ -61,6 +63,9 @@ jobs:
       - name: Build 3D app
         working-directory: apps/solar-universe
         run: npm run build
+
+      - name: Generate Music pages
+        run: node scripts/build-music-pages.mjs
 
       - name: Publish pull request preview
         if: github.event_name == 'pull_request'
