@@ -2,7 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const MAX_MASSES = 5;
+const MAX_MASSES = 6;
 
 export default function GravityGrid({ interests, planetRefs, quality }) {
   const material = useRef();
@@ -11,8 +11,8 @@ export default function GravityGrid({ interests, planetRefs, quality }) {
     () => Array.from({ length: MAX_MASSES }, () => new THREE.Vector2()),
     []
   );
-  const strengths = useMemo(() => new Float32Array([2.8, 0.62, 0.42, 0.48, 0.44]), []);
-  const radii = useMemo(() => new Float32Array([3.25, 1.18, 1.0, 1.08, 1.04]), []);
+  const strengths = useMemo(() => new Float32Array([2.8, 0.62, 0.42, 0.48, 0.44, 0.18]), []);
+  const radii = useMemo(() => new Float32Array([3.25, 1.18, 1.0, 1.08, 1.04, 0.58]), []);
   const uniforms = useMemo(() => ({
     uCenters: { value: centers },
     uStrengths: { value: strengths },
@@ -32,11 +32,11 @@ export default function GravityGrid({ interests, planetRefs, quality }) {
     material.current.uniforms.uOpacity.value = quality === 'quality' ? 0.72 : 0.52;
   });
 
-  const segments = quality === 'quality' ? 128 : 64;
+  const segments = quality === 'quality' ? 160 : 80;
 
   return (
     <mesh rotation-x={-Math.PI / 2} position-y={0.035} renderOrder={-3}>
-      <planeGeometry args={[54, 54, segments, segments]} />
+      <planeGeometry args={[96, 96, segments, segments]} />
       <shaderMaterial
         ref={material}
         uniforms={uniforms}
@@ -82,8 +82,8 @@ export default function GravityGrid({ interests, planetRefs, quality }) {
           }
 
           void main() {
-            float minor = gridLine(vCoordinate, .52, 1.1);
-            float major = gridLine(vCoordinate, 2.08, 1.5);
+            float minor = gridLine(vCoordinate, .72, 1.1);
+            float major = gridLine(vCoordinate, 2.88, 1.5);
             float depthGlow = smoothstep(.08, 2.8, vDepth);
             float line = max(minor * .42, major * .95);
             vec3 flatColor = vec3(.19, .28, .42);

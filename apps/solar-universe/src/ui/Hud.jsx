@@ -6,12 +6,14 @@ export default function Hud({
   selectedId,
   showOrbits,
   showEcliptic,
+  showLabels,
   sunBrightness,
   onSunBrightnessChange,
   onToggleLanguage,
   onToggleQuality,
   onToggleOrbits,
   onToggleEcliptic,
+  onToggleLabels,
   onReset
 }) {
   const sunlightPercent = Math.round(sunBrightness * 100);
@@ -88,6 +90,14 @@ export default function Hud({
           {translate(language, 'controls.gravityGrid')}{' '}
           <strong>
             {showEcliptic
+              ? translate(language, 'controls.on')
+              : translate(language, 'controls.off')}
+          </strong>
+        </button>
+        <button type="button" aria-pressed={showLabels} onClick={onToggleLabels}>
+          {translate(language, 'controls.labels')}{' '}
+          <strong>
+            {showLabels
               ? translate(language, 'controls.on')
               : translate(language, 'controls.off')}
           </strong>

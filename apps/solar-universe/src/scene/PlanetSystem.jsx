@@ -3,20 +3,29 @@ import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { Select } from '@react-three/postprocessing';
 import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
+import { useLabelVisibility } from '../context/LabelVisibilityContext.jsx';
+import MusicPuppetCelestial from '../music/MusicPuppetCelestial.jsx';
 import BasketballWorld from '../worlds/BasketballWorld.jsx';
+import MusicWorld from '../worlds/MusicWorld.jsx';
 import PlaceholderWorld from '../worlds/PlaceholderWorld.jsx';
 
 export default function PlanetSystem({
   interest,
+  celestials = [],
   selected,
+  selectedId,
   onSelect,
   registerPlanet,
   quality,
   showOrbits
 }) {
+  const showLabels = useLabelVisibility();
   const orbitalPivot = useRef();
   const carrier = useRef();
   const axialBody = useRef();
+  const musicPuppet = interest.id === 'music'
+    ? celestials.find((body) => body.parentId === interest.id)
+    : null;
 
   useEffect(() => {
     registerPlanet(interest.id, carrier);
@@ -51,6 +60,18 @@ export default function PlanetSystem({
             />
           )}
 
+          {musicPuppet && (
+            <MusicPuppetCelestial
+              body={musicPuppet}
+              quality={quality}
+              selectedId={selectedId}
+              parentSelected={showLabels}
+              showOrbit={showOrbits}
+              onSelect={onSelect}
+              registerPlanet={registerPlanet}
+            />
+          )}
+
           <group
             ref={axialBody}
             rotation-y={interest.initialAxial}
@@ -58,15 +79,17 @@ export default function PlanetSystem({
             onDoubleClick={enter}
           >
             {interest.id === 'basketball' ? (
-              <Select enabled>
+              <Select enabled={selected}>
                 <BasketballWorld radius={interest.size} quality={quality} />
               </Select>
+            ) : interest.id === 'music' ? (
+              <MusicWorld radius={interest.size} quality={quality} />
             ) : (
               <PlaceholderWorld interest={interest} quality={quality} />
             )}
           </group>
 
-          {!selected && (
+          {showLabels && (
             <Html
               center
               distanceFactor={12}
