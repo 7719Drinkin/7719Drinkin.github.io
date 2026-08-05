@@ -18,7 +18,7 @@
     "route": "/music/artists/zhang-yusheng/",
     "status": "published",
     "order": 1,
-    "cover": null,
+    "cover": "/assets/Music/Artists/ZhangYusheng/hero/SingerPortrait_142_-7592093631785922030210.jpg",
     "tags": ["华语流行", "创作歌手"],
     "theme": {
       "accent": "#d8a84e",
