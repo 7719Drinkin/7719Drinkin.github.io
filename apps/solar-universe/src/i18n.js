@@ -40,6 +40,14 @@ const COPY = {
       solarOutput: 'SOLAR OUTPUT',
       solarAria: 'Solar output visual intensity {percent}%'
     },
+    loading: {
+      aria: 'Loading the 3D Solar Universe',
+      title: 'ASSEMBLING THE UNIVERSE',
+      boot: 'PREPARING INTERFACE',
+      module: 'LOADING 3D ENGINE',
+      canvas: 'COMPILING PLANETS AND SHADERS',
+      ready: 'ORBITAL SYSTEM READY'
+    },
     panel: {
       close: 'Close celestial information',
       star: 'STAR',
@@ -98,6 +106,14 @@ const COPY = {
       off: '关',
       solarOutput: '太阳输出',
       solarAria: '太阳输出视觉强度 {percent}%'
+    },
+    loading: {
+      aria: '正在加载 3D 太阳宇宙',
+      title: '正在构建宇宙',
+      boot: '准备界面',
+      module: '加载 3D 引擎',
+      canvas: '编译行星与着色器',
+      ready: '轨道系统已就绪'
     },
     panel: {
       close: '关闭天体信息',
