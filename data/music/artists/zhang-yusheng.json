@@ -10,10 +10,10 @@
     "en": "A growing personal listening archive rather than an encyclopedia entry."
   },
   "personalNote": {
-    "zh": "第一阶段先建立主页结构，之后再补充专辑封面、演出影像、照片与更具体的听歌记录。",
-    "en": "The first release establishes the page structure; albums, performances and notes will be added later."
+    "zh": "首批人物照片与专辑封面已经进入收藏页；后续会继续补充演出影像、作品信息与更具体的听歌记录。",
+    "en": "The first portraits and album covers are now part of the archive, with more performances, metadata and listening notes to follow."
   },
-  "heroImage": null,
+  "heroImage": "/assets/Music/Artists/ZhangYusheng/hero/SingerPortrait_142_-7592093631785922030210.jpg",
   "selectedSongs": [
     {
       "title": "如果你要離開我",
@@ -47,6 +47,80 @@
       "url": null
     }
   ],
-  "albums": [],
-  "gallery": []
+  "albums": [
+    {
+      "label": "COVER 01",
+      "alt": "张雨生专辑封面收藏 01",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_-10361447721785922148047.jpg"
+    },
+    {
+      "label": "COVER 02",
+      "alt": "张雨生专辑封面收藏 02",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_-10486774451785922096419.jpg"
+    },
+    {
+      "label": "COVER 03",
+      "alt": "张雨生专辑封面收藏 03",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_-14543430391785922101862.jpg"
+    },
+    {
+      "label": "COVER 04",
+      "alt": "张雨生专辑封面收藏 04",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_11342787081785922137120.jpg"
+    },
+    {
+      "label": "COVER 05",
+      "alt": "张雨生专辑封面收藏 05",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_13335494111785922167715.jpg"
+    },
+    {
+      "label": "COVER 06",
+      "alt": "张雨生专辑封面收藏 06",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_1761184461785922125369.jpg"
+    },
+    {
+      "label": "COVER 07",
+      "alt": "张雨生专辑封面收藏 07",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_1880105451785922085420.jpg"
+    },
+    {
+      "label": "COVER 08",
+      "alt": "张雨生专辑封面收藏 08",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_21462888321785922154965.jpg"
+    }
+  ],
+  "gallery": [
+    {
+      "src": "/assets/Music/Artists/ZhangYusheng/gallery/SingerPortrait_142_-1219145961785922041676.jpg",
+      "alt": "张雨生人物影像收藏 01"
+    },
+    {
+      "src": "/assets/Music/Artists/ZhangYusheng/gallery/SingerPortrait_142_-19073876221785922037209.jpg",
+      "alt": "张雨生人物影像收藏 02"
+    },
+    {
+      "src": "/assets/Music/Artists/ZhangYusheng/gallery/SingerPortrait_142_-2828275191785922043729.jpg",
+      "alt": "张雨生人物影像收藏 03"
+    },
+    {
+      "src": "/assets/Music/Artists/ZhangYusheng/gallery/SingerPortrait_142_11597356661785922039383.jpg",
+      "alt": "张雨生人物影像收藏 04"
+    },
+    {
+      "src": "/assets/Music/Artists/ZhangYusheng/gallery/SingerPortrait_142_12684552691785922036063.jpg",
+      "alt": "张雨生人物影像收藏 05"
+    },
+    {
+      "src": "/assets/Music/Artists/ZhangYusheng/gallery/SingerPortrait_142_16154434501785922045069.jpg",
+      "alt": "张雨生人物影像收藏 06"
+    },
+    {
+      "src": "/assets/Music/Artists/ZhangYusheng/gallery/SingerPortrait_142_17987511441785922033507.jpg",
+      "alt": "张雨生人物影像收藏 07"
+    },
+    {
+      "src": "/assets/Music/Artists/ZhangYusheng/gallery/SingerPortrait_142_4957710621785922034915.jpg",
+      "alt": "张雨生人物影像收藏 08"
+    }
+  ]
 }
