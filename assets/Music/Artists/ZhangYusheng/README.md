@@ -1,6 +1,6 @@
-# 张雨生 / Zhang Yusheng
+# 张雨生 / Tom Chang
 
-This directory stores media used by the Zhang Yusheng artist page.
+This directory stores media used by the Tom Chang artist page.
 
 Planned asset groups:
 
