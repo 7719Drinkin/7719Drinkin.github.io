@@ -108,6 +108,35 @@ function LegacyAtmosphereDisabler({ quality }) {
   return null;
 }
 
+function SceneReadySignal({ onReady }) {
+  const { gl, scene, camera } = useThree();
+  const started = useRef(false);
+  const cancelled = useRef(false);
+
+  useEffect(() => () => {
+    cancelled.current = true;
+  }, []);
+
+  useFrame(() => {
+    if (started.current) return;
+    started.current = true;
+
+    const compilation = typeof gl.compileAsync === 'function'
+      ? gl.compileAsync(scene, camera)
+      : Promise.resolve();
+
+    Promise.resolve(compilation)
+      .catch(() => undefined)
+      .then(() => {
+        window.requestAnimationFrame(() => {
+          if (!cancelled.current) onReady?.();
+        });
+      });
+  });
+
+  return null;
+}
+
 function CameraController({ selectedId, planetRefs }) {
   const controlsRef = useRef();
   const { camera } = useThree();
@@ -236,7 +265,8 @@ function Scene({
   quality,
   showOrbits,
   showEcliptic,
-  sunBrightness
+  sunBrightness,
+  onSceneReady
 }) {
   const bloomIntensity = 0.82 + Math.pow(sunBrightness, 0.82) * 0.74;
   const gravityBodies = [...interests, ...celestials];
@@ -301,6 +331,7 @@ function Scene({
       ))}
 
       <CameraController selectedId={selectedId} planetRefs={planetRefs} />
+      <SceneReadySignal onReady={onSceneReady} />
 
       <EffectComposer
         multisampling={quality === 'quality' ? 4 : 0}
@@ -354,6 +385,7 @@ export default function UniverseCanvas(props) {
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = initialExposure;
+        props.onCanvasCreated?.();
       }}
       onPointerMissed={(event) => {
         if (event.type === 'click') props.onSelect(null);
