@@ -53,7 +53,7 @@
   grid-template-columns: 52px minmax(0,1fr);
   align-items: center;
   gap: 12px;
-  overflow: hidden;
+  overflow: visible;
   transition:
     grid-template-columns var(--player-motion-duration) var(--player-motion-easing),
     gap var(--player-motion-duration) var(--player-motion-easing);
@@ -67,7 +67,7 @@
   place-items: center;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--artist-accent) 34%, transparent);
-  border-radius: 14px;
+  border-radius: 50%;
   color: var(--artist-accent-soft);
   background:
     radial-gradient(circle at 50% 50%, transparent 0 12%, color-mix(in srgb, var(--artist-accent) 24%, transparent) 13% 17%, transparent 18% 28%, rgba(255,255,255,.055) 29% 31%, transparent 32% 43%, rgba(255,255,255,.045) 44% 46%, transparent 47%),
@@ -75,6 +75,7 @@
   font-family: var(--music-serif);
   font-size: 17px;
   flex: 0 0 auto;
+  transform-origin: center;
   transition:
     width var(--player-motion-duration) var(--player-motion-easing),
     height var(--player-motion-duration) var(--player-motion-easing),
@@ -138,7 +139,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  overflow: hidden;
+  overflow: visible;
   transition: gap var(--player-motion-duration) var(--player-motion-easing);
 }
 
@@ -175,15 +176,29 @@
 }
 
 .site-player-controls .site-player-toggle {
+  position: relative;
+  isolation: isolate;
   width: 44px;
   height: 44px;
+  overflow: visible;
   border-color: var(--artist-accent);
   color: var(--artist-bg);
   background: var(--artist-accent);
-  box-shadow: 0 0 0 0 color-mix(in srgb, var(--artist-accent) 24%, transparent);
 }
 
-.site-music-player.is-playing .site-player-toggle {
+.site-player-controls .site-player-toggle::after {
+  position: absolute;
+  inset: 3px;
+  z-index: -1;
+  border: 1px solid color-mix(in srgb, var(--artist-accent-soft) 45%, transparent);
+  border-radius: inherit;
+  content: "";
+  opacity: 0;
+  transform: scale(.86);
+  pointer-events: none;
+}
+
+.site-music-player.is-playing .site-player-toggle::after {
   animation: player-button-pulse 2.2s ease-out infinite;
 }
 
@@ -271,6 +286,7 @@
 .site-player-volume svg {
   width: 17px;
   height: 17px;
+  overflow: visible;
   pointer-events: none;
   transition: transform .2s ease;
 }
@@ -370,8 +386,8 @@
 }
 
 @keyframes player-button-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--artist-accent) 24%, transparent); }
-  55% { box-shadow: 0 0 0 7px transparent; }
+  0%, 100% { opacity: .08; transform: scale(.86); }
+  55% { opacity: .62; transform: scale(1); }
 }
 
 @media (max-width: 980px) {
@@ -488,7 +504,7 @@
   }
 
   .site-music-player.is-playing .site-player-cover,
-  .site-music-player.is-playing .site-player-toggle {
+  .site-music-player.is-playing .site-player-toggle::after {
     animation: none;
   }
 }
