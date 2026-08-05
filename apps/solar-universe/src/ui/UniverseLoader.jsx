@@ -1,4 +1,5 @@
 import { translate } from '../i18n.js';
+import './UniverseLoader.css';
 
 const STAGE_PROGRESS = {
   boot: 12,
