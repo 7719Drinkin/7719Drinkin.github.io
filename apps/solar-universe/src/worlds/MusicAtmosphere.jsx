@@ -37,8 +37,8 @@ const CLOUD_GLSL = `
     float amplitude = 0.5;
     mat3 transform = mat3(
       0.00, 0.80, 0.60,
-     -0.80, 0.36,-0.48,
-     -0.60,-0.48, 0.64
+     -0.80, 0.36, -0.48,
+     -0.60, -0.48, 0.64
     );
 
     for (int octave = 0; octave < 5; octave += 1) {
@@ -154,7 +154,7 @@ const CLOUD_GLSL = `
     );
   }
 
-  vec2 sunLighting(
+  vec3 solarTerms(
     vec3 normal,
     vec3 worldPosition,
     vec3 sunPosition,
@@ -163,14 +163,17 @@ const CLOUD_GLSL = `
     vec3 sunDirection = normalize(sunPosition - worldPosition);
     float normalDotLight = dot(normalize(normal), sunDirection);
 
-    // Broad atmospheric scattering around the terminator, plus a stricter
-    // direct-light term for highlights. Neither term depends on the camera.
-    float daySide = smoothstep(-0.22, 0.34, normalDotLight);
-    float directLight = smoothstep(0.02, 0.78, normalDotLight);
-    daySide *= mix(0.78, 1.12, clamp(sunPower, 0.0, 1.6));
-    directLight *= clamp(sunPower, 0.45, 1.55);
+    // Twilight is deliberately narrow. The far side must remain genuinely dark
+    // rather than receiving a camera-independent wrapped-light fill.
+    float twilight = smoothstep(-0.13, 0.045, normalDotLight);
+    float daylight = smoothstep(-0.015, 0.29, normalDotLight);
+    float directLight = smoothstep(0.28, 0.9, normalDotLight);
 
-    return vec2(clamp(daySide, 0.0, 1.0), clamp(directLight, 0.0, 1.0));
+    float power = clamp(sunPower, 0.45, 1.55);
+    daylight = clamp(daylight * mix(0.82, 1.08, power), 0.0, 1.0);
+    directLight = clamp(directLight * power, 0.0, 1.0);
+
+    return vec3(twilight, daylight, directLight);
   }
 `;
 
@@ -192,9 +195,6 @@ const CLOUD_VERTEX_SHADER = `
 
     vec4 worldPosition = modelMatrix * vec4(displacedPosition, 1.0);
     vWorldPosition = worldPosition.xyz;
-
-    // The displacement is radial, so the displaced radial direction is a
-    // better lighting normal than the original, undisplaced sphere normal.
     vWorldNormal = normalize(mat3(modelMatrix) * direction);
     vObjectPosition = displacedPosition;
     gl_Position = projectionMatrix * viewMatrix * worldPosition;
@@ -224,27 +224,25 @@ const DENSE_BASE_FRAGMENT_SHADER = `
     float cloud = planetaryCloudField(point, uTime);
     float trailingCloud = planetaryCloudField(point, uTime - 0.32);
     float movingFront = clamp((cloud - trailingCloud) * 2.8 + 0.5, 0.0, 1.0);
-    vec2 lighting = sunLighting(normal, vWorldPosition, uSunPosition, uSunPower);
-    float daySide = lighting.x;
-    float directLight = lighting.y;
+    vec3 solar = solarTerms(normal, vWorldPosition, uSunPosition, uSunPower);
+    float twilight = solar.x;
+    float daylight = solar.y;
+    float directLight = solar.z;
     float broadCloud = smoothstep(0.18, 0.7, cloud);
     float illuminatedCloud = smoothstep(0.6, 0.9, cloud) * directLight;
 
-    vec3 color = mix(
-      uShadowColor,
-      uBaseColor,
-      0.18 + broadCloud * 0.47 + daySide * 0.2
-    );
-    color = mix(color, uHighlightColor, illuminatedCloud * 0.38);
+    vec3 nightColor = uShadowColor * (0.38 + broadCloud * 0.07);
+    vec3 dayColor = mix(uBaseColor * 0.7, uBaseColor, broadCloud);
+    dayColor = mix(dayColor, uHighlightColor, illuminatedCloud * 0.48);
+    dayColor *= 0.72 + daylight * 0.28;
 
-    // Moving fronts only alter albedo very slightly and only on the day side;
-    // they no longer create camera-independent flashes on the night side.
-    color *= 1.0 + (movingFront - 0.5) * 0.035 * daySide;
+    vec3 color = mix(nightColor, dayColor, daylight);
+    color += uBaseColor * twilight * (1.0 - daylight) * 0.025;
+    color *= 1.0 + (movingFront - 0.5) * 0.026 * daylight;
 
-    // The limb is gently darkened instead of brightened, preventing a false
-    // reflection that follows the camera.
+    // The atmospheric limb is darker on the night side and never emits light.
     float limb = pow(1.0 - abs(dot(normal, viewDirection)), 2.5);
-    color *= 1.0 - limb * mix(0.1, 0.035, daySide);
+    color *= 1.0 - limb * mix(0.16, 0.035, daylight);
 
     gl_FragColor = vec4(color, 1.0);
     #include <tonemapping_fragment>
@@ -279,20 +277,18 @@ const MAIN_CLOUD_FRAGMENT_SHADER = `
       + vec3(uTime * 0.04, 0.0, -uTime * 0.025)
     );
     float coverage = smoothstep(0.4, 0.77, cloud * 0.76 + middleDetail * 0.24);
-    vec2 lighting = sunLighting(normal, vWorldPosition, uSunPosition, uSunPower);
-    float daySide = lighting.x;
-    float directLight = lighting.y;
+    vec3 solar = solarTerms(normal, vWorldPosition, uSunPosition, uSunPower);
+    float daylight = solar.y;
+    float directLight = solar.z;
 
-    vec3 color = mix(
-      uShadowColor,
-      uBaseColor,
-      0.25 + coverage * 0.36 + daySide * 0.18
-    );
-    color = mix(
-      color,
+    vec3 nightColor = uShadowColor * (0.3 + coverage * 0.06);
+    vec3 dayColor = mix(uBaseColor * 0.72, uBaseColor, coverage);
+    dayColor = mix(
+      dayColor,
       uHighlightColor,
-      smoothstep(0.56, 0.92, cloud) * directLight * 0.44
+      smoothstep(0.56, 0.92, cloud) * directLight * 0.5
     );
+    vec3 color = mix(nightColor, dayColor, daylight);
 
     float clearing = irregularClearing(
       point,
@@ -302,7 +298,7 @@ const MAIN_CLOUD_FRAGMENT_SHADER = `
       uTime
     );
 
-    float alpha = 0.07 + coverage * 0.55;
+    float alpha = (0.07 + coverage * 0.55) * mix(0.06, 1.0, daylight);
     alpha *= 1.0 - clearing * 0.93;
     alpha = clamp(alpha, 0.0, 0.65);
 
@@ -343,12 +339,13 @@ const HIGH_CLOUD_FRAGMENT_SHADER = `
       + vec3(5.0, uTime * 0.052, 1.0 + uTime * 0.03)
     );
     float wisps = smoothstep(0.55, 0.8, longWisps * 0.76 + fineWisps * 0.24);
-    vec2 lighting = sunLighting(normal, vWorldPosition, uSunPosition, uSunPower);
-    float daySide = lighting.x;
-    float directLight = lighting.y;
+    vec3 solar = solarTerms(normal, vWorldPosition, uSunPosition, uSunPower);
+    float daylight = solar.y;
+    float directLight = solar.z;
 
-    vec3 color = mix(uShadowColor, uBaseColor, 0.3 + daySide * 0.35);
-    color = mix(color, uHighlightColor, directLight * 0.5);
+    vec3 nightColor = uShadowColor * 0.25;
+    vec3 dayColor = mix(uBaseColor, uHighlightColor, directLight * 0.58);
+    vec3 color = mix(nightColor, dayColor, daylight);
 
     float clearing = irregularClearing(
       point,
@@ -358,7 +355,8 @@ const HIGH_CLOUD_FRAGMENT_SHADER = `
       uTime + 13.0
     );
 
-    float alpha = wisps * 0.28 * (1.0 - clearing * 0.96);
+    float alpha = wisps * 0.28 * mix(0.015, 1.0, daylight);
+    alpha *= 1.0 - clearing * 0.96;
 
     gl_FragColor = vec4(color, alpha);
     #include <tonemapping_fragment>
@@ -396,25 +394,25 @@ export default function MusicAtmosphere({ radius, quality, vinylDirection }) {
   const denseUniforms = useMemo(() => createLayerUniforms({
     displacement: 0.01,
     vinylDirection,
-    shadowColor: '#342c27',
-    baseColor: '#856640',
-    highlightColor: '#c09a63'
+    shadowColor: '#070605',
+    baseColor: '#765735',
+    highlightColor: '#c6a36d'
   }), [vinylDirection]);
 
   const mainUniforms = useMemo(() => createLayerUniforms({
     displacement: 0.016,
     vinylDirection,
-    shadowColor: '#4b392d',
-    baseColor: '#a27d4f',
-    highlightColor: '#d9b77b'
+    shadowColor: '#090705',
+    baseColor: '#946d43',
+    highlightColor: '#d9b77c'
   }), [vinylDirection]);
 
   const highUniforms = useMemo(() => createLayerUniforms({
     displacement: 0.009,
     vinylDirection,
-    shadowColor: '#6d5137',
-    baseColor: '#b58d5c',
-    highlightColor: '#dfc18c'
+    shadowColor: '#0a0806',
+    baseColor: '#a27a4f',
+    highlightColor: '#e2c691'
   }), [vinylDirection]);
 
   useFrame((_, delta) => {
