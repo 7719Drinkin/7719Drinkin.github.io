@@ -310,7 +310,7 @@ function renderArtistPage(artist, detail, artists) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/music.css?v=20260805-2">
-  <link rel="stylesheet" href="/css/music-player.css?v=20260805-2">
+  <link rel="stylesheet" href="/css/music-player.css?v=20260805-4">
 </head>
 <body class="music-page music-artist-page"
   style="--artist-accent:${escapeHtml(artist.theme.accent)};--artist-accent-soft:${escapeHtml(artist.theme.accentSoft)};--artist-bg:${escapeHtml(artist.theme.background)};--artist-fg:${escapeHtml(artist.theme.foreground)}">
