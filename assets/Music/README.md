@@ -18,3 +18,5 @@ assets/Music/
 ```
 
 Each artist is registered in `data/music/artists.json` and has a matching detail file in `data/music/artists/`.
+
+Audio files are hosted outside the GitHub repository in Cloudflare R2. The player reads complete encoded object URLs from the artist detail JSON, so original Chinese object names can be preserved without changing the website routing model.
