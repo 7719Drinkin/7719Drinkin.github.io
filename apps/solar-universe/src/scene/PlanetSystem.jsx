@@ -6,7 +6,7 @@ import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
 import { useLabelVisibility } from '../context/LabelVisibilityContext.jsx';
 import MusicPuppetCelestial from '../music/MusicPuppetCelestial.jsx';
 import BasketballWorld from '../worlds/BasketballWorld.jsx';
-import RealisticMusicWorld from '../worlds/RealisticMusicWorld.jsx';
+import MusicWorld from '../worlds/MusicWorld.jsx';
 import PlaceholderWorld from '../worlds/PlaceholderWorld.jsx';
 
 export default function PlanetSystem({
@@ -65,7 +65,6 @@ export default function PlanetSystem({
               body={musicPuppet}
               quality={quality}
               selectedId={selectedId}
-              parentSelected={selected}
               showOrbit={showOrbits}
               onSelect={onSelect}
               registerPlanet={registerPlanet}
@@ -79,19 +78,19 @@ export default function PlanetSystem({
             onDoubleClick={enter}
           >
             {interest.id === 'basketball' ? (
-              <Select enabled>
+              <Select enabled={selected}>
                 <BasketballWorld radius={interest.size} quality={quality} />
               </Select>
             ) : interest.id === 'music' ? (
-              <Select enabled>
-                <RealisticMusicWorld radius={interest.size} quality={quality} />
-              </Select>
+              // The atmosphere intentionally stays outside the post-processing
+              // outline selection so a cyan rim cannot read as self-emission.
+              <MusicWorld radius={interest.size} quality={quality} />
             ) : (
               <PlaceholderWorld interest={interest} quality={quality} />
             )}
           </group>
 
-          {showLabels && !selected && selectedId !== musicPuppet?.id && (
+          {showLabels && (
             <Html
               center
               distanceFactor={12}
