@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { LabelVisibilityProvider } from './context/LabelVisibilityContext.js';
+import { LabelVisibilityProvider } from './context/LabelVisibilityContext.jsx';
 import { INTERESTS, SUN } from './data/interests.js';
 import { MUSIC_PUPPET_CELESTIAL } from './data/musicPuppetCelestial.js';
 import {
