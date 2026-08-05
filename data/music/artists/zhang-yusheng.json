@@ -10,8 +10,8 @@
     "en": "A growing personal listening archive rather than an encyclopedia entry."
   },
   "personalNote": {
-    "zh": "首批人物照片与专辑封面已经进入收藏页；后续会继续补充演出影像、作品信息与更具体的听歌记录。",
-    "en": "The first portraits and album covers are now part of the archive, with more performances, metadata and listening notes to follow."
+    "zh": "已使用重新命名的专辑封面整理作品档案；后续会继续补充发行年份、作品说明、演出影像与更具体的听歌记录。",
+    "en": "The album archive now uses clearly named cover files, with release years, notes, performances and listening memories to follow."
   },
   "heroImage": "/assets/Music/Artists/ZhangYusheng/hero/SingerPortrait_142_-7592093631785922030210.jpg",
   "selectedSongs": [
@@ -49,52 +49,94 @@
   ],
   "albums": [
     {
-      "year": "ARCHIVE 01",
-      "title": "封面收藏 01",
-      "note": "作品信息待后续整理。",
-      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_-10361447721785922148047.jpg"
+      "year": "ALBUM ARCHIVE",
+      "title": "一天到晚游泳的鱼",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《一天到晚游泳的鱼》.jpg"
     },
     {
-      "year": "ARCHIVE 02",
-      "title": "封面收藏 02",
-      "note": "作品信息待后续整理。",
-      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_-10486774451785922096419.jpg"
+      "year": "ALBUM ARCHIVE",
+      "title": "两伊战争白色才情",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《两伊战争白色才情》.jpg"
     },
     {
-      "year": "ARCHIVE 03",
-      "title": "封面收藏 03",
-      "note": "作品信息待后续整理。",
-      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_-14543430391785922101862.jpg"
+      "year": "ALBUM ARCHIVE",
+      "title": "两伊战争红色热情",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《两伊战争红色热情》.jpg"
     },
     {
-      "year": "ARCHIVE 04",
-      "title": "封面收藏 04",
-      "note": "作品信息待后续整理。",
-      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_11342787081785922137120.jpg"
+      "year": "ALBUM ARCHIVE",
+      "title": "卡拉OK·台北·我",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《卡拉OK·台北·我》.jpg"
     },
     {
-      "year": "ARCHIVE 05",
-      "title": "封面收藏 05",
-      "note": "作品信息待后续整理。",
-      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_13335494111785922167715.jpg"
+      "year": "ALBUM ARCHIVE",
+      "title": "口是心非",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《口是心非》.jpg"
     },
     {
-      "year": "ARCHIVE 06",
-      "title": "封面收藏 06",
-      "note": "作品信息待后续整理。",
-      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_1761184461785922125369.jpg"
+      "year": "ALBUM ARCHIVE",
+      "title": "吻我吧娜娜",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《吻我吧娜娜》.jpg"
     },
     {
-      "year": "ARCHIVE 07",
-      "title": "封面收藏 07",
-      "note": "作品信息待后续整理。",
-      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_1880105451785922085420.jpg"
+      "year": "ALBUM ARCHIVE",
+      "title": "大海",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《大海》.jpg"
     },
     {
-      "year": "ARCHIVE 08",
-      "title": "封面收藏 08",
-      "note": "作品信息待后续整理。",
-      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_21462888321785922154965.jpg"
+      "year": "ALBUM ARCHIVE",
+      "title": "天天想你",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《天天想你》.jpg"
+    },
+    {
+      "year": "ALBUM ARCHIVE",
+      "title": "如燕盘旋而来的思念",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《如燕盘旋而来的思念》.jpg"
+    },
+    {
+      "year": "CREATIVE ALBUM",
+      "title": "带我去月球",
+      "note": "张雨生创作专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《带我去月球》（张雨生创作专辑）0.jpg"
+    },
+    {
+      "year": "ALBUM ARCHIVE",
+      "title": "想念我",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《想念我》.jpg"
+    },
+    {
+      "year": "SELECTED COLLECTION",
+      "title": "自由歌",
+      "note": "张雨生精选集封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《自由歌》（张雨生精选集）.jpg"
+    },
+    {
+      "year": "ALBUM ARCHIVE",
+      "title": "还是朋友",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《还是朋友》.jpg"
+    },
+    {
+      "year": "ALBUM ARCHIVE",
+      "title": "雨后星空",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《雨后星空》.jpg"
+    },
+    {
+      "year": "ALBUM ARCHIVE",
+      "title": "雨生欢禧城",
+      "note": "张雨生专辑封面收藏。",
+      "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《雨生欢禧城》.jpg"
     }
   ],
   "gallery": [
