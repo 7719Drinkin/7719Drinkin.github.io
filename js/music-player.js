@@ -1,5 +1,109 @@
 (() => {
   const LUCIDE_CDN = 'https://unpkg.com/lucide@1.27.0/dist/umd/lucide.js';
+  const ACTIVATION_DURATION = 760;
+
+  const PLAYER_STATE_CSS = `
+    .site-music-player {
+      transition:
+        width var(--player-motion-duration) var(--player-motion-easing),
+        height var(--player-motion-duration) var(--player-motion-easing),
+        grid-template-columns var(--player-motion-duration) var(--player-motion-easing),
+        gap var(--player-motion-duration) var(--player-motion-easing),
+        padding var(--player-motion-duration) var(--player-motion-easing),
+        border-radius var(--player-motion-duration) var(--player-motion-easing),
+        box-shadow var(--player-motion-duration) ease,
+        border-color .42s ease,
+        opacity .46s ease,
+        transform .58s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .site-music-player:not(.is-mounted) {
+      opacity: 0;
+      transform: translateY(14px) scale(.985);
+      pointer-events: none;
+    }
+
+    .site-music-player.is-mounted {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .site-music-player.is-idle {
+      border-color: color-mix(in srgb, var(--artist-accent) 20%, rgba(255,255,255,.1));
+      box-shadow: 0 14px 42px rgba(0,0,0,.3);
+      opacity: .78;
+    }
+
+    .site-music-player.is-idle:hover {
+      opacity: .96;
+      border-color: color-mix(in srgb, var(--artist-accent) 34%, rgba(255,255,255,.13));
+    }
+
+    .site-music-player.is-idle .site-player-cover {
+      filter: saturate(.58) brightness(.88);
+      animation: none;
+    }
+
+    .site-music-player.is-idle .site-player-toggle,
+    .site-music-player.is-idle .site-player-expand {
+      opacity: .38;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .site-music-player.is-idle .site-player-copy strong {
+      color: color-mix(in srgb, var(--artist-fg) 76%, transparent);
+    }
+
+    .site-music-player.is-idle .site-player-copy small {
+      color: color-mix(in srgb, var(--music-muted) 82%, transparent);
+    }
+
+    .site-music-player button:disabled,
+    .site-music-player input:disabled {
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .site-music-player.is-activating .site-player-copy {
+      animation: player-copy-activate .58s cubic-bezier(.16, 1, .3, 1) both;
+    }
+
+    .site-music-player.is-activating .site-player-cover {
+      animation: player-cover-activate .7s cubic-bezier(.16, 1, .3, 1) both;
+    }
+
+    @keyframes player-copy-activate {
+      0% { opacity: .26; transform: translateY(4px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes player-cover-activate {
+      0% { filter: saturate(.58) brightness(.88); transform: scale(.94); }
+      100% { filter: none; transform: scale(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .site-music-player:not(.is-mounted),
+      .site-music-player.is-mounted {
+        opacity: 1;
+        transform: none;
+      }
+
+      .site-music-player.is-activating .site-player-copy,
+      .site-music-player.is-activating .site-player-cover {
+        animation: none;
+      }
+    }
+  `;
+
+  const installPlayerStateStyles = () => {
+    if (document.querySelector('style[data-player-state-styles]')) return;
+    const style = document.createElement('style');
+    style.dataset.playerStateStyles = '';
+    style.textContent = PLAYER_STATE_CSS;
+    document.head.append(style);
+  };
 
   const loadLucide = () => {
     if (window.lucide?.createIcons) return Promise.resolve(true);
@@ -27,6 +131,7 @@
       this.root = root;
       this.rows = rows;
       this.audio = root.querySelector('[data-player-audio]');
+      this.stateLabel = root.querySelector('.site-player-copy > span');
       this.title = root.querySelector('[data-player-title]');
       this.artist = root.querySelector('[data-player-artist]');
       this.album = root.querySelector('[data-player-album]');
@@ -42,15 +147,65 @@
       this.expand = root.querySelector('[data-player-expand]');
       this.activeIndex = -1;
       this.seeking = false;
+      this.activationTimer = null;
 
+      installPlayerStateStyles();
       this.prepareIcons();
       this.bind();
-      this.setCollapsed(true);
+      this.initializeIdleDock();
       this.audio.volume = Number(this.volume.value);
 
       loadLucide().then((loaded) => {
         if (loaded) this.refreshIcons();
       });
+    }
+
+    initializeIdleDock() {
+      this.root.classList.add('is-idle');
+      this.root.classList.remove('is-mounted');
+      this.root.hidden = false;
+      this.stateLabel.textContent = 'READY';
+      this.title.textContent = '选择一首歌曲';
+      this.artist.textContent = '从上方收藏开始播放';
+      this.album.textContent = '';
+      this.status.textContent = '';
+      this.setCollapsed(true);
+      this.setControlsEnabled(false);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.root.classList.add('is-mounted');
+        });
+      });
+    }
+
+    setControlsEnabled(enabled) {
+      [this.previous, this.toggle, this.next, this.expand].forEach((control) => {
+        control.disabled = !enabled;
+        control.setAttribute('aria-disabled', String(!enabled));
+      });
+      this.seek.disabled = !enabled;
+      this.volume.disabled = !enabled;
+    }
+
+    activateDock() {
+      if (!this.root.classList.contains('is-idle')) return;
+
+      this.root.classList.remove('is-idle');
+      this.root.classList.add('is-activating');
+      this.stateLabel.textContent = 'NOW PLAYING';
+      this.setControlsEnabled(true);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.setCollapsed(false);
+        });
+      });
+
+      window.clearTimeout(this.activationTimer);
+      this.activationTimer = window.setTimeout(() => {
+        this.root.classList.remove('is-activating');
+      }, ACTIVATION_DURATION);
     }
 
     formatTime(seconds) {
@@ -143,8 +298,8 @@
       this.activeIndex = (index + this.rows.length) % this.rows.length;
       const row = this.rows[this.activeIndex];
       const source = row.dataset.audioSrc;
+      const wasIdle = this.root.classList.contains('is-idle');
 
-      this.root.hidden = false;
       this.title.textContent = row.dataset.songTitle || 'Untitled';
       this.artist.textContent = row.dataset.songArtist || '7719 Music';
       this.album.textContent = row.dataset.songAlbum ? ` · ${row.dataset.songAlbum}` : '';
@@ -159,7 +314,9 @@
         this.duration.textContent = '0:00';
       }
 
-      if (expand) this.setCollapsed(false);
+      if (wasIdle) this.activateDock();
+      else if (expand) this.setCollapsed(false);
+
       this.rows.forEach((item, itemIndex) => {
         item.classList.toggle('is-active', itemIndex === this.activeIndex);
       });
@@ -193,10 +350,7 @@
       });
 
       this.toggle.addEventListener('click', () => {
-        if (this.activeIndex < 0) {
-          this.selectTrack(0);
-          return;
-        }
+        if (this.activeIndex < 0) return;
         if (this.audio.paused) {
           this.audio.play().catch(() => {
             this.status.textContent = '音频暂时无法播放，请检查对象地址。';
@@ -215,6 +369,7 @@
       });
 
       this.expand.addEventListener('click', () => {
+        if (this.root.classList.contains('is-idle')) return;
         this.setCollapsed(!this.root.classList.contains('is-collapsed'));
       });
 
