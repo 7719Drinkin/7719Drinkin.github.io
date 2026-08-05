@@ -1,0 +1,42 @@
+{
+  "id": "zhang-yusheng",
+  "eyebrow": "MUSIC / ARTIST 01",
+  "headline": {
+    "zh": "声音不会消失",
+    "en": "THE VOICE REMAINS"
+  },
+  "introduction": {
+    "zh": "这里收集我与张雨生音乐之间的连接。它不是百科条目，而是一份会持续补充的私人聆听档案。",
+    "en": "A growing personal listening archive rather than an encyclopedia entry."
+  },
+  "personalNote": {
+    "zh": "第一阶段先建立主页结构，之后再补充专辑封面、演出影像、照片与更具体的听歌记录。",
+    "en": "The first release establishes the page structure; albums, performances and notes will be added later."
+  },
+  "heroImage": null,
+  "selectedSongs": [
+    {
+      "title": "我的未来不是梦",
+      "album": null,
+      "year": null,
+      "note": "理想主义与行动感的入口。",
+      "url": null
+    },
+    {
+      "title": "大海",
+      "album": null,
+      "year": null,
+      "note": "辽阔、直接，也保留了很强的情绪记忆。",
+      "url": null
+    },
+    {
+      "title": "一天到晚游泳的鱼",
+      "album": null,
+      "year": null,
+      "note": "轻盈表面下有独特的表达与想象。",
+      "url": null
+    }
+  ],
+  "albums": [],
+  "gallery": []
+}

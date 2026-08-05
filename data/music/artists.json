@@ -1,0 +1,58 @@
+[
+  {
+    "id": "zhang-yusheng",
+    "slug": "zhang-yusheng",
+    "assetKey": "ZhangYusheng",
+    "name": {
+      "zh": "张雨生",
+      "en": "Zhang Yusheng"
+    },
+    "subtitle": {
+      "zh": "让理想与声音继续远行",
+      "en": "A voice carrying ideals forward"
+    },
+    "description": {
+      "zh": "个人收藏中的张雨生：歌曲、专辑、影像与聆听记忆。",
+      "en": "Songs, albums, images and listening memories from a personal collection."
+    },
+    "route": "/music/artists/zhang-yusheng/",
+    "status": "published",
+    "order": 1,
+    "cover": null,
+    "tags": ["华语流行", "创作歌手"],
+    "theme": {
+      "accent": "#d8a84e",
+      "accentSoft": "#f1ddb0",
+      "background": "#08111f",
+      "foreground": "#f6f0e5"
+    }
+  },
+  {
+    "id": "tan-yonglin",
+    "slug": "tan-yonglin",
+    "assetKey": "TanYonglin",
+    "name": {
+      "zh": "谭咏麟",
+      "en": "Alan Tam"
+    },
+    "subtitle": {
+      "zh": "把经典留在每一次重播里",
+      "en": "Classics that return with every replay"
+    },
+    "description": {
+      "zh": "个人收藏中的谭咏麟：粤语流行、舞台记忆与跨时代旋律。",
+      "en": "Cantopop, stage memories and melodies that cross generations."
+    },
+    "route": "/music/artists/tan-yonglin/",
+    "status": "published",
+    "order": 2,
+    "cover": null,
+    "tags": ["粤语流行", "经典流行"],
+    "theme": {
+      "accent": "#6ed4cc",
+      "accentSoft": "#bcece6",
+      "background": "#07141a",
+      "foreground": "#eef8f6"
+    }
+  }
+]

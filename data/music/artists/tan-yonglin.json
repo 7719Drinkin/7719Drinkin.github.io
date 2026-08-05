@@ -1,0 +1,42 @@
+{
+  "id": "tan-yonglin",
+  "eyebrow": "MUSIC / ARTIST 02",
+  "headline": {
+    "zh": "旋律跨越时间",
+    "en": "MELODIES OUTLIVE TIME"
+  },
+  "introduction": {
+    "zh": "这里整理我喜欢的谭咏麟作品、舞台印象和反复聆听的时刻，并逐步形成一个个人化的音乐档案。",
+    "en": "A personal archive of songs, stage impressions and repeated listening moments."
+  },
+  "personalNote": {
+    "zh": "第一阶段先完成通用歌手主页，后续再加入专辑脉络、精选现场、图片墙和个人短评。",
+    "en": "The first release focuses on the shared artist-page system; richer collections will follow."
+  },
+  "heroImage": null,
+  "selectedSongs": [
+    {
+      "title": "讲不出再见",
+      "album": null,
+      "year": null,
+      "note": "具有告别感，也有继续前行的力量。",
+      "url": null
+    },
+    {
+      "title": "一生中最爱",
+      "album": null,
+      "year": null,
+      "note": "旋律与情绪都非常完整。",
+      "url": null
+    },
+    {
+      "title": "朋友",
+      "album": null,
+      "year": null,
+      "note": "适合在不同人生阶段重新理解。",
+      "url": null
+    }
+  ],
+  "albums": [],
+  "gallery": []
+}
