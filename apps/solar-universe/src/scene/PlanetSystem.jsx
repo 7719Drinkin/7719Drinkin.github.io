@@ -3,6 +3,7 @@ import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { Select } from '@react-three/postprocessing';
 import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
+import { useLabelVisibility } from '../context/LabelVisibilityContext.js';
 import MusicPuppetCelestial from '../music/MusicPuppetCelestial.jsx';
 import BasketballWorld from '../worlds/BasketballWorld.jsx';
 import RealisticMusicWorld from '../worlds/RealisticMusicWorld.jsx';
@@ -18,6 +19,7 @@ export default function PlanetSystem({
   quality,
   showOrbits
 }) {
+  const showLabels = useLabelVisibility();
   const orbitalPivot = useRef();
   const carrier = useRef();
   const axialBody = useRef();
@@ -89,7 +91,7 @@ export default function PlanetSystem({
             )}
           </group>
 
-          {!selected && selectedId !== musicPuppet?.id && (
+          {showLabels && !selected && selectedId !== musicPuppet?.id && (
             <Html
               center
               distanceFactor={12}
