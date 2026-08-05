@@ -1,0 +1,37 @@
+name: One-time Music player cache bump
+
+on:
+  push:
+    paths:
+      - '.github/workflows/one-time-bump-music-player-cache.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump player stylesheet version and regenerate pages
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/build-music-pages.mjs')
+          text = path.read_text(encoding='utf-8')
+          text = text.replace('music-player.css?v=20260805-2', 'music-player.css?v=20260805-4')
+          path.write_text(text, encoding='utf-8')
+          PY
+          node scripts/build-music-pages.mjs
+          rm .github/workflows/one-time-bump-music-player-cache.yml
+
+      - name: Commit generated pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/build-music-pages.mjs music .github/workflows/one-time-bump-music-player-cache.yml
+          git commit -m "build: publish synchronized player animation" || exit 0
+          git push
