@@ -1,0 +1,59 @@
+name: Bootstrap R2 music player
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/bootstrap-r2-music-player.yml'
+      - '.github/scripts/add_r2_music_player.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bootstrap-r2-music-player
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Add R2-backed player
+        run: python .github/scripts/add_r2_music_player.py
+
+      - name: Regenerate Music pages
+        run: node scripts/build-music-pages.mjs
+
+      - name: Commit player implementation
+        run: |
+          rm -f .github/workflows/bootstrap-r2-music-player.yml
+          rm -f .github/scripts/add_r2_music_player.py
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No R2 player changes were produced."
+            exit 0
+          fi
+
+          git commit -m "feat: add R2-backed custom music player"
+          git push origin HEAD:main
