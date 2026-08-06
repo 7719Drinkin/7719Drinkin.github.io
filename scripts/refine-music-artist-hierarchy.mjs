@@ -4,18 +4,18 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(fileURLToPath(new URL('..', import.meta.url)));
 const ARTISTS_ROOT = join(ROOT, 'music', 'artists');
-const STYLE_HREF = '/css/music-section-clean.css?v=20260806-1';
+const STYLE_HREF = '/css/music-section-clean.css?v=20260807-1';
 
 function simplifySectionHeaders(html) {
   return html.replace(
     /<div class="music-section-header reveal">\s*<div>\s*(?:<p>[\s\S]*?<\/p>\s*)?<h2>([\s\S]*?)<\/h2>\s*<\/div>\s*(?:<span>[\s\S]*?<\/span>\s*)?(?:<a[\s\S]*?<\/a>\s*)?<\/div>/g,
-    '<header class="music-section-header music-section-header--clean reveal"><h2>$1</h2></header>'
+    '<header class="music-section-header music-section-header--unified reveal"><h2>$1</h2></header>'
   );
 }
 
 function removeGalleryHeading(html) {
   return html.replace(
-    /(<section id="gallery" class="music-content-section">\s*)<header class="music-section-header music-section-header--clean reveal">[\s\S]*?<\/header>\s*/,
+    /(<section id="gallery" class="music-content-section">\s*)<header class="music-section-header music-section-header--(?:clean|system|unified) reveal">[\s\S]*?<\/header>\s*/,
     '$1'
   );
 }
@@ -57,6 +57,10 @@ function installStyle(html) {
 
 function refine(html) {
   let output = simplifySectionHeaders(html);
+  output = output.replace(
+    /music-section-header--(?:clean|system)/g,
+    'music-section-header--unified'
+  );
   output = removeGalleryHeading(output);
   output = simplifyVisualSubheaders(output);
   output = simplifyArtistNote(output);
