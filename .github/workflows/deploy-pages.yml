@@ -69,6 +69,7 @@ jobs:
           node scripts/build-music-pages.mjs
           node scripts/enhance-music-albums.mjs
           node scripts/enhance-music-visual-videos.mjs
+          node scripts/refine-music-playlists.mjs
           node scripts/remove-music-secondary-nav.mjs
           node scripts/version-music-album-assets.mjs
           node scripts/version-music-visual-assets.mjs
