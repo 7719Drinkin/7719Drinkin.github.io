@@ -1,16 +1,26 @@
 (() => {
   const CONFIG_URL = '/data/music/catalog.json';
-  const CATALOG_STYLE_URL = '/css/music-catalog.css?v=20260806-1';
-  const PLAYER_SCRIPT_URL = '/js/music-player.js?v=20260806-catalog-1';
+  const CATALOG_STYLE_URL = '/css/music-catalog.css?v=20260806-2';
+  const PLAYER_SCRIPT_URL = '/js/music-player.js?v=20260806-compact-2';
 
-  const artistPageMatch = window.location.pathname.match(/\/music\/artists\/([^/]+)\/?/);
-  const songList = document.querySelector('.artist-song-column .song-list');
-  if (!artistPageMatch || !songList) return;
+  const pageType = document.body.dataset.musicCatalogPage;
+  const artistSlug = document.body.dataset.artistSlug;
+  const requestedAlbumName = document.body.dataset.albumName || '';
+  const songList = pageType === 'album'
+    ? document.querySelector('.album-song-list')
+    : document.querySelector('.artist-song-column .song-list');
 
-  const artistSlug = decodeURIComponent(artistPageMatch[1]);
-  const artistName = document.querySelector('.artist-hero-copy h2')?.textContent?.trim() || '7719 Music';
+  if (!pageType || !artistSlug || !songList) return;
+
+  const artistName = document.querySelector('.artist-hero-copy h2, .album-detail-artist')?.textContent?.trim()
+    || '7719 Music';
   const playerRoot = document.querySelector('[data-music-player]');
   const playerAudio = document.querySelector('[data-player-audio]');
+  const featuredEntries = [...songList.querySelectorAll('[data-featured-title]')].map((row) => ({
+    title: row.dataset.featuredTitle || '',
+    album: row.dataset.featuredAlbum || '',
+    note: row.dataset.featuredNote || ''
+  }));
 
   if (playerAudio) {
     playerAudio.preload = 'none';
@@ -37,15 +47,12 @@
     return state;
   };
 
-  const showLoading = () => {
-    songList.replaceChildren(createState(
-      'LOADING CATALOG',
-      '正在读取缓存曲目目录。歌曲音频不会在此时加载。',
-      'music-catalog-state--loading'
-    ));
-  };
+  const normalize = (value) => String(value || '')
+    .normalize('NFKC')
+    .toLocaleLowerCase('zh-CN')
+    .replace(/[《》〈〉「」『』【】（）()·•\s_\-—–:：'".,，。!?！？]/g, '');
 
-  const cacheKey = (prefix) => `music-catalog-browser:v1:${prefix}`;
+  const cacheKey = (prefix) => `music-catalog-browser:v2:${prefix}`;
 
   const readCache = (prefix) => {
     try {
@@ -58,16 +65,58 @@
 
   const writeCache = (prefix, catalog) => {
     try {
-      localStorage.setItem(cacheKey(prefix), JSON.stringify({
-        savedAt: Date.now(),
-        catalog
-      }));
+      localStorage.setItem(cacheKey(prefix), JSON.stringify({ savedAt: Date.now(), catalog }));
     } catch {
-      // The Worker-side KV cache still works when browser storage is unavailable.
+      // Worker/KV caching remains available when browser storage is disabled.
     }
   };
 
-  const createSongRow = (track, albumName, index) => {
+  const catalogAlbums = (catalog) => (Array.isArray(catalog?.albums) ? catalog.albums : [])
+    .map((album) => ({
+      name: String(album?.name || '未分类专辑'),
+      tracks: Array.isArray(album?.tracks)
+        ? album.tracks.filter((track) => track?.src && (track?.title || track?.fileName))
+        : []
+    }))
+    .filter((album) => album.tracks.length > 0);
+
+  const findAlbum = (albums, targetName) => {
+    const target = normalize(targetName);
+    if (!target) return null;
+
+    const exact = albums.find((album) => normalize(album.name) === target);
+    if (exact) return exact;
+
+    return albums.find((album) => {
+      const candidate = normalize(album.name);
+      return candidate.length >= 3 && (candidate.includes(target) || target.includes(candidate));
+    }) || null;
+  };
+
+  const findTrack = (albums, entry) => {
+    const title = normalize(entry.title);
+    if (!title) return null;
+
+    const preferredAlbum = entry.album ? findAlbum(albums, entry.album) : null;
+    const searchAlbums = preferredAlbum ? [preferredAlbum] : albums;
+
+    for (const album of searchAlbums) {
+      const exact = album.tracks.find((track) => normalize(track.title || track.fileName) === title);
+      if (exact) return { album, track: exact };
+    }
+
+    for (const album of searchAlbums) {
+      const partial = album.tracks.find((track) => {
+        const candidate = normalize(track.title || track.fileName);
+        return candidate.length >= 2 && (candidate.includes(title) || title.includes(candidate));
+      });
+      if (partial) return { album, track: partial };
+    }
+
+    return null;
+  };
+
+  const createSongRow = (track, albumName, index, note = '') => {
     const row = document.createElement('button');
     row.className = 'song-row song-row--playable';
     row.type = 'button';
@@ -90,95 +139,115 @@
     meta.textContent = albumName;
     primary.append(title, meta);
 
-    const note = document.createElement('small');
-    note.textContent = track.fileName || 'R2 AUDIO OBJECT';
+    const description = document.createElement('small');
+    description.textContent = note || track.fileName || 'R2 AUDIO OBJECT';
 
     const action = document.createElement('b');
     action.className = 'song-row-action';
     action.setAttribute('aria-hidden', 'true');
     action.textContent = '▶';
 
-    row.append(number, primary, note, action);
+    row.append(number, primary, description, action);
     return row;
   };
 
-  const renderCatalog = (catalog, sourceLabel = 'WORKER CACHE') => {
-    const albums = Array.isArray(catalog?.albums) ? catalog.albums : [];
-    const validAlbums = albums
-      .map((album) => ({
-        name: String(album?.name || '未分类专辑'),
-        tracks: Array.isArray(album?.tracks)
-          ? album.tracks.filter((track) => track?.src && (track?.title || track?.fileName))
-          : []
-      }))
-      .filter((album) => album.tracks.length > 0);
+  const hydrateAlbumCards = (albums) => {
+    document.querySelectorAll('.album-card[data-album-name]').forEach((card) => {
+      const album = findAlbum(albums, card.dataset.albumName);
+      const count = card.querySelector('[data-album-track-count]');
+      if (!count) return;
 
-    if (!validAlbums.length) {
+      if (album) {
+        count.textContent = `${album.tracks.length} TRACK${album.tracks.length === 1 ? '' : 'S'}`;
+        card.classList.add('has-catalog-tracks');
+      } else {
+        count.textContent = 'DETAIL PAGE';
+        card.classList.remove('has-catalog-tracks');
+      }
+    });
+  };
+
+  const renderFeatured = (albums) => {
+    if (!featuredEntries.length) {
       songList.replaceChildren(createState(
-        'NO PLAYABLE TRACKS',
-        '当前歌手目录中没有符合“歌手 / 专辑 / 音频文件”结构的可播放歌曲。'
+        'CURATOR PICKS',
+        '这里不会自动堆放全部歌曲；网页创建者尚未选择本页的反复聆听曲目。'
       ));
       return false;
     }
 
-    const albumsRoot = document.createElement('div');
-    albumsRoot.className = 'music-catalog-albums';
+    const rows = featuredEntries
+      .map((entry) => ({ entry, match: findTrack(albums, entry) }))
+      .filter(({ match }) => Boolean(match))
+      .map(({ entry, match }, index) => createSongRow(match.track, match.album.name, index, entry.note));
 
-    validAlbums.forEach((album, albumIndex) => {
-      const section = document.createElement('section');
-      section.className = 'music-catalog-album';
+    if (!rows.length) {
+      songList.replaceChildren(createState(
+        'CURATOR PICKS UNAVAILABLE',
+        '已选择的歌曲暂时没有在当前 R2 专辑目录中匹配到，因此不会显示失效的播放项。'
+      ));
+      return false;
+    }
 
-      const header = document.createElement('header');
-      header.className = 'music-catalog-album-header';
-      const index = document.createElement('span');
-      index.textContent = `ALBUM ${String(albumIndex + 1).padStart(2, '0')}`;
-      const title = document.createElement('h3');
-      title.textContent = album.name;
-      const count = document.createElement('small');
-      count.textContent = `${album.tracks.length} TRACK${album.tracks.length > 1 ? 'S' : ''}`;
-      header.append(index, title, count);
-
-      const trackList = document.createElement('div');
-      trackList.className = 'music-catalog-track-list';
-      album.tracks.forEach((track, trackIndex) => {
-        trackList.append(createSongRow(track, album.name, trackIndex));
-      });
-
-      section.append(header, trackList);
-      albumsRoot.append(section);
-    });
-
-    const meta = document.createElement('div');
-    meta.className = 'music-catalog-meta';
-    const total = document.createElement('span');
-    total.textContent = `${catalog.totalTracks ?? validAlbums.reduce((sum, album) => sum + album.tracks.length, 0)} TRACKS / ${validAlbums.length} ALBUMS`;
-    const source = document.createElement('span');
-    source.textContent = sourceLabel;
-    meta.append(total, source);
-
-    songList.replaceChildren(albumsRoot, meta);
-    window.dispatchEvent(new CustomEvent('music:catalog-ready', {
-      detail: { artistSlug, catalog }
-    }));
+    songList.replaceChildren(...rows);
     return true;
+  };
+
+  const renderAlbumTracks = (albums, sourceLabel) => {
+    const album = findAlbum(albums, requestedAlbumName);
+    const countLabels = document.querySelectorAll('[data-album-track-count]');
+    const source = document.querySelector('[data-catalog-source]');
+
+    if (!album) {
+      countLabels.forEach((label) => { label.textContent = '0 TRACKS'; });
+      if (source) source.textContent = sourceLabel;
+      songList.replaceChildren(createState(
+        'ALBUM NOT FOUND',
+        `当前缓存目录中没有匹配“${requestedAlbumName}”的专辑文件夹。请检查 R2 文件夹名称或 album.catalogName。`
+      ));
+      return false;
+    }
+
+    const rows = album.tracks.map((track, index) => createSongRow(track, album.name, index));
+    countLabels.forEach((label) => {
+      label.textContent = `${rows.length} TRACK${rows.length === 1 ? '' : 'S'}`;
+    });
+    if (source) source.textContent = sourceLabel;
+    songList.replaceChildren(...rows);
+    return rows.length > 0;
   };
 
   const ensurePlayer = () => {
     if (!playerRoot || !document.querySelector('.song-row--playable')) return;
+    if (playerRoot.dataset.playerReady === 'true') return;
+    if (document.querySelector('script[data-dynamic-music-player]')) return;
 
-    window.setTimeout(() => {
-      if (!playerRoot.hidden) return;
-      if (document.querySelector('script[data-dynamic-music-player]')) return;
-      const script = document.createElement('script');
-      script.src = PLAYER_SCRIPT_URL;
-      script.dataset.dynamicMusicPlayer = '';
-      document.body.append(script);
-    }, 0);
+    const script = document.createElement('script');
+    script.src = PLAYER_SCRIPT_URL;
+    script.dataset.dynamicMusicPlayer = '';
+    script.addEventListener('load', () => {
+      playerRoot.dataset.playerReady = 'true';
+    }, { once: true });
+    document.body.append(script);
+  };
+
+  const renderCatalog = (catalog, sourceLabel = 'WORKER CACHE') => {
+    const albums = catalogAlbums(catalog);
+    hydrateAlbumCards(albums);
+
+    const rendered = pageType === 'album'
+      ? renderAlbumTracks(albums, sourceLabel)
+      : renderFeatured(albums);
+
+    if (rendered) ensurePlayer();
+    window.dispatchEvent(new CustomEvent('music:catalog-ready', {
+      detail: { artistSlug, pageType, catalog }
+    }));
+    return rendered;
   };
 
   const loadCatalog = async () => {
     installStylesheet();
-    showLoading();
 
     let config;
     try {
@@ -208,14 +277,10 @@
     const cached = readCache(prefix);
     const hasCachedCatalog = Boolean(cached?.catalog);
     const cacheIsFresh = hasCachedCatalog && Date.now() - Number(cached.savedAt || 0) < localTtl;
-    let staleCatalogRendered = false;
 
     if (hasCachedCatalog) {
-      staleCatalogRendered = renderCatalog(cached.catalog, cacheIsFresh ? 'BROWSER CACHE' : 'STALE CACHE');
-      if (cacheIsFresh) {
-        if (staleCatalogRendered) ensurePlayer();
-        return;
-      }
+      renderCatalog(cached.catalog, cacheIsFresh ? 'BROWSER CACHE' : 'STALE BROWSER CACHE');
+      if (cacheIsFresh) return;
     }
 
     try {
@@ -227,17 +292,15 @@
         headers: { Accept: 'application/json' }
       });
       if (!response.ok) throw new Error(`Catalog request ${response.status}`);
+
       const catalog = await response.json();
       writeCache(prefix, catalog);
-      const rendered = renderCatalog(catalog, response.headers.get('X-Music-Catalog-Cache') || 'WORKER CACHE');
-      if (rendered) ensurePlayer();
+      renderCatalog(catalog, response.headers.get('X-Music-Catalog-Cache') || 'WORKER CACHE');
     } catch {
-      if (staleCatalogRendered) {
-        ensurePlayer();
-      } else {
+      if (!hasCachedCatalog) {
         songList.replaceChildren(createState(
           'CATALOG UNAVAILABLE',
-          '曲目目录服务暂时无法访问。页面没有直接扫描 R2，也不会尝试逐个探测音频文件。'
+          '曲目目录服务暂时无法访问。页面不会直接扫描 R2，也不会逐个探测音频文件。'
         ));
       }
     }
