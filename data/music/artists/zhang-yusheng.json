@@ -155,12 +155,25 @@
   ],
   "gallery": [
     {
-      "type": "video",
-      "provider": "bilibili",
-      "bvid": "BV1QN411g7E8",
-      "url": "https://www.bilibili.com/video/BV1QN411g7E8/",
+      "type": "bilibili-playlist",
       "title": "张雨生影像记录",
-      "caption": "收藏自哔哩哔哩"
+      "videos": [
+        {
+          "bvid": "BV1QN411g7E8",
+          "url": "https://www.bilibili.com/video/BV1QN411g7E8/",
+          "title": "影像记录 01"
+        },
+        {
+          "bvid": "BV1Emd6YbEpT",
+          "url": "https://www.bilibili.com/video/BV1Emd6YbEpT/",
+          "title": "影像记录 02"
+        },
+        {
+          "bvid": "BV1zg4y1d7Xv",
+          "url": "https://www.bilibili.com/video/BV1zg4y1d7Xv/",
+          "title": "影像记录 03"
+        }
+      ]
     },
     {
       "src": "/assets/Music/Artists/ZhangYusheng/gallery/SingerPortrait_142_-1219145961785922041676.jpg",
