@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="7719 Solar Universe — explore personal interests as miniature 3D worlds." />
     <title>7719 Solar Universe</title>
+    <script>
+      try {
+        sessionStorage.removeItem('7719:persistent-player:v1');
+      } catch {
+        // The 3D experience remains available when browser storage is disabled.
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
