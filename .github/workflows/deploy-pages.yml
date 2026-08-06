@@ -65,7 +65,9 @@ jobs:
         run: npm run build
 
       - name: Generate Music pages
-        run: node scripts/build-music-pages.mjs
+        run: |
+          node scripts/build-music-pages.mjs
+          node scripts/enhance-music-albums.mjs
 
       - name: Publish pull request preview
         if: github.event_name == 'pull_request'
