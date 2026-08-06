@@ -3,7 +3,22 @@
   "browserCacheTtlSeconds": 600,
   "artists": {
     "zhang-yusheng": {
-      "prefix": "tom-chang"
+      "prefix": "tom-chang",
+      "albumOrders": {
+        "口是心非": [
+          "如果你要离开我",
+          "口是心非",
+          "Cappuccino",
+          "玫瑰的名字",
+          "河",
+          "爱情……",
+          "……的图案",
+          "随你",
+          "神采",
+          "在黄昏融化了世界的色彩以前",
+          "若我告诉你其实我爱的只是你"
+        ]
+      }
     },
     "tan-yonglin": {
       "prefix": "alan-tam"
