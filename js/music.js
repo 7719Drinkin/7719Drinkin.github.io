@@ -1,43 +1,30 @@
 const playerAudio = document.querySelector('[data-player-audio]');
 
-// R2 is never scanned or probed when the page opens. The audio element has no
-// source until the visitor explicitly selects a playable track.
 if (playerAudio) {
   playerAudio.preload = 'none';
   playerAudio.removeAttribute('src');
 }
 
-const createEmptyTrackState = () => {
-  const empty = document.createElement('div');
-  empty.className = 'music-empty';
-  empty.innerHTML = '<span>NO PLAYABLE TRACKS</span><p>当前没有配置可播放音频；接入真实音频源后曲目会自动显示。</p>';
-  return empty;
-};
-
-// A song is visible only when the generated row contains a real audio source.
-// This is a local manifest check and does not issue any request to R2.
-document.querySelectorAll('.song-list').forEach((list) => {
-  [...list.querySelectorAll('.song-row')].forEach((row) => {
-    if (!row.dataset.audioSrc?.trim()) row.remove();
-  });
-
-  const playableRows = [...list.querySelectorAll('.song-row[data-audio-src]')];
-  playableRows.forEach((row, index) => {
-    const number = row.querySelector('.song-index');
-    if (number) number.textContent = String(index + 1).padStart(2, '0');
-  });
-
-  if (!playableRows.length && !list.querySelector('.music-empty')) {
-    list.replaceChildren(createEmptyTrackState());
+if (document.body.classList.contains('music-artist-page')) {
+  const songList = document.querySelector('.artist-song-column .song-list');
+  if (songList) {
+    const state = document.createElement('div');
+    state.className = 'music-empty';
+    state.innerHTML = '<span>LOADING CATALOG</span><p>正在读取曲目目录；音频只会在点击播放后加载。</p>';
+    songList.replaceChildren(state);
   }
-});
 
-// The collection landing page follows the same rule: archive-only or mock
-// entries are not surfaced as playable music.
-document.querySelectorAll('.collection-song-row').forEach((row) => {
-  const state = row.querySelector('em')?.textContent.trim();
-  if (state !== 'PLAYABLE') row.remove();
-});
+  if (!document.querySelector('script[data-music-catalog-loader]')) {
+    const script = document.createElement('script');
+    script.src = '/js/music-catalog.js?v=20260806-1';
+    script.dataset.musicCatalogLoader = '';
+    document.body.append(script);
+  }
+} else {
+  document.querySelectorAll('.collection-song-row').forEach((row) => row.remove());
+  const listening = document.querySelector('#listening');
+  if (listening) listening.hidden = true;
+}
 
 const revealItems = [...document.querySelectorAll('.reveal')];
 
