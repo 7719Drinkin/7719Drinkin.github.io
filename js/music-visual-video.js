@@ -135,8 +135,12 @@
     };
 
     items.forEach((item) => {
+      const metadata = item.querySelector('small');
+      const bvid = item.dataset.playlistBvid || metadata?.textContent?.trim() || '';
+      if (bvid) item.dataset.playlistBvid = bvid;
+
       item.querySelector(':scope > span')?.remove();
-      item.querySelector('small')?.remove();
+      metadata?.remove();
 
       const label = item.querySelector('strong');
       if (label) {
@@ -144,7 +148,6 @@
         label.textContent = '正在读取视频标题…';
       }
 
-      const bvid = item.dataset.playlistBvid || item.querySelector('small')?.textContent?.trim();
       if (bvid) {
         requestBilibiliTitle(bvid).then((title) => applyTitle(item, title));
       } else {
