@@ -153,11 +153,23 @@
       const label = item.querySelector('strong');
       if (label) {
         label.dataset.playlistLabel = '';
-        label.textContent = '正在读取视频标题…';
+        const existingTitle = label.textContent.trim();
+        const unresolved = !existingTitle || /^影像记录\s*\d*$/u.test(existingTitle);
+        if (unresolved) label.textContent = '正在读取视频标题…';
+        else {
+          item.dataset.playlistTitle = existingTitle;
+          item.setAttribute('aria-label', `播放 ${existingTitle}`);
+          if (item.classList.contains('is-active')) iframe.title = existingTitle;
+        }
       }
 
       if (bvid) {
-        requestBilibiliTitle(bvid).then((title) => applyTitle(item, title));
+        requestBilibiliTitle(bvid).then((title) => {
+          if (title) applyTitle(item, title);
+          else if (!item.dataset.playlistTitle || item.dataset.playlistTitle === '正在读取视频标题…') {
+            applyTitle(item, '视频标题暂不可用');
+          }
+        });
       } else {
         applyTitle(item, '视频标题暂不可用');
       }
