@@ -16,5 +16,36 @@
   "heroImage": null,
   "selectedSongs": [],
   "albums": [],
-  "gallery": []
+  "gallery": [
+    {
+      "type": "bilibili-playlist",
+      "title": "播放列表",
+      "videos": [
+        {
+          "bvid": "BV1J94y1d7Xa",
+          "url": "https://www.bilibili.com/video/BV1J94y1d7Xa/"
+        },
+        {
+          "bvid": "BV1x54y177kz",
+          "url": "https://www.bilibili.com/video/BV1x54y177kz/"
+        },
+        {
+          "bvid": "BV1EmNEeHEGr",
+          "url": "https://www.bilibili.com/video/BV1EmNEeHEGr/"
+        },
+        {
+          "bvid": "BV1zJ4m1p7jd",
+          "url": "https://www.bilibili.com/video/BV1zJ4m1p7jd/"
+        },
+        {
+          "bvid": "BV1S5411T7XK",
+          "url": "https://www.bilibili.com/video/BV1S5411T7XK/"
+        },
+        {
+          "bvid": "BV1kr421V7mn",
+          "url": "https://www.bilibili.com/video/BV1kr421V7mn/"
+        }
+      ]
+    }
+  ]
 }
