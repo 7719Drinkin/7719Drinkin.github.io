@@ -21,8 +21,17 @@ const BOOTSTRAP = `<script data-site-shell-bootstrap>
   const path = window.location.pathname;
   const excluded = path === '/site-shell.html'
     || /^\\/(?:preview\\/)?solar-universe(?:\\/|$)/.test(path);
-  if (excluded || window.self !== window.top) return;
 
+  if (window.self !== window.top) {
+    document.documentElement.classList.add('site-shell-frame-document');
+    const style = document.createElement('style');
+    style.dataset.siteFrameBootstrapStyle = '';
+    style.textContent = 'html.site-shell-frame-document .site-music-player{display:none!important}';
+    document.head.append(style);
+    return;
+  }
+
+  if (excluded) return;
   const url = new URL(window.location.href);
   if (url.searchParams.get(FRAME_PARAM) === '1') return;
   const route = \`${'${url.pathname}${url.search}${url.hash}'}\`;
