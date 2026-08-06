@@ -1,6 +1,7 @@
 (() => {
   const cards = [...document.querySelectorAll('.visual-card--video[data-video-embed]')];
-  if (!cards.length) return;
+  const playlists = [...document.querySelectorAll('[data-bilibili-playlist]')];
+  if (!cards.length && !playlists.length) return;
 
   const appendAutoplay = (url) => {
     const parsed = new URL(url, window.location.href);
@@ -26,6 +27,29 @@
       stage.append(iframe);
       card.classList.add('is-playing');
       iframe.focus({ preventScroll: true });
+    });
+  });
+
+  playlists.forEach((playlist) => {
+    const iframe = playlist.querySelector('[data-playlist-player]');
+    const items = [...playlist.querySelectorAll('[data-playlist-src]')];
+    if (!iframe || !items.length) return;
+
+    items.forEach((item) => {
+      item.addEventListener('click', () => {
+        if (item.classList.contains('is-active')) return;
+
+        items.forEach((candidate) => {
+          const active = candidate === item;
+          candidate.classList.toggle('is-active', active);
+          candidate.setAttribute('aria-pressed', String(active));
+        });
+
+        iframe.src = appendAutoplay(item.dataset.playlistSrc);
+        iframe.title = item.dataset.playlistTitle || '哔哩哔哩播放列表视频';
+        playlist.dataset.activeVideo = item.dataset.playlistTitle || '';
+        iframe.focus({ preventScroll: true });
+      });
     });
   });
 })();
