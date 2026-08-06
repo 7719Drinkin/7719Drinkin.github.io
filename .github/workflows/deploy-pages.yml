@@ -47,6 +47,12 @@ jobs:
         with:
           node-version: 22
 
+      - name: Validate site shell runtime
+        run: |
+          node --check js/site-shell.js
+          node --check js/site-frame-bridge.js
+          node --check scripts/install-site-shell.mjs
+
       - name: Select deployment path
         shell: bash
         run: |
