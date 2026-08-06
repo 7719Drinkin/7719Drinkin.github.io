@@ -104,10 +104,30 @@
     else notifyParent({ type: 'site:navigate', href: url.href });
   };
 
+  const applyPlayerState = (message = {}) => {
+    const activeSource = message.track?.src || '';
+    const playing = Boolean(message.playing);
+
+    document.querySelectorAll('.song-row--playable[data-audio-src]').forEach((row) => {
+      const rowSource = new URL(row.dataset.audioSrc, window.location.href).href;
+      const active = Boolean(activeSource && rowSource === activeSource);
+      row.classList.toggle('is-active', active);
+      row.classList.toggle('is-playing', active && playing);
+      row.setAttribute('aria-pressed', String(active && playing));
+
+      const action = row.querySelector('.song-row-action');
+      const nextLabel = active && playing ? 'Ⅱ' : '▶';
+      if (action && action.textContent !== nextLabel) action.textContent = nextLabel;
+    });
+  };
+
   document.addEventListener('click', (event) => {
     if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 
-    const row = event.target.closest('.song-row--playable[data-audio-src]');
+    const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+    if (!target) return;
+
+    const row = target.closest('.song-row--playable[data-audio-src]');
     if (row) {
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -115,7 +135,7 @@
       return;
     }
 
-    const link = event.target.closest('a[href]');
+    const link = target.closest('a[href]');
     if (!link || link.hasAttribute('download') || link.target) return;
     if (link.hasAttribute('data-full-navigation')) return;
 
@@ -141,33 +161,21 @@
   window.addEventListener('message', (event) => {
     if (event.origin !== window.location.origin || event.source !== window.parent) return;
     const message = event.data || {};
-    if (message.type !== 'site:player-state') return;
-
-    const activeSource = message.track?.src || '';
-    document.querySelectorAll('.song-row--playable[data-audio-src]').forEach((row) => {
-      const rowSource = new URL(row.dataset.audioSrc, window.location.href).href;
-      const active = Boolean(activeSource && rowSource === activeSource);
-      row.classList.toggle('is-active', active);
-      row.classList.toggle('is-playing', active && Boolean(message.playing));
-      row.setAttribute('aria-pressed', String(active && Boolean(message.playing)));
-
-      const action = row.querySelector('.song-row-action');
-      if (action) action.textContent = active && message.playing ? 'Ⅱ' : '▶';
-    });
+    if (message.type === 'site:player-state') applyPlayerState(message);
   });
 
+  let stateRefreshFrame = 0;
+  const refreshFromParent = () => {
+    stateRefreshFrame = 0;
+    const playerState = shell()?.getPlayerState?.();
+    if (playerState) applyPlayerState(playerState);
+  };
+
   const observer = new MutationObserver(() => {
-    const parentShell = shell();
-    const playerState = parentShell?.getPlayerState?.();
-    if (playerState) {
-      window.dispatchEvent(new MessageEvent('message', {
-        origin: window.location.origin,
-        source: window.parent,
-        data: { type: 'site:player-state', ...playerState }
-      }));
-    }
+    if (!stateRefreshFrame) stateRefreshFrame = requestAnimationFrame(refreshFromParent);
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
+  refreshFromParent();
   sendReady();
 })();
