@@ -11,7 +11,7 @@
     document.head.append(link);
   }
 
-  const TITLE_CACHE_PREFIX = 'music:bilibili-title:v1:';
+  const TITLE_CACHE_PREFIX = 'music:bilibili-title:v2:';
   const TITLE_CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
 
   const appendAutoplay = (url) => {
@@ -20,9 +20,23 @@
     return parsed.toString();
   };
 
-  const readCachedTitle = (bvid) => {
+  const playlistPage = (item) => {
+    const explicit = Number.parseInt(item.dataset.playlistPage, 10);
+    if (Number.isInteger(explicit) && explicit > 0) return explicit;
+
     try {
-      const raw = localStorage.getItem(`${TITLE_CACHE_PREFIX}${bvid}`);
+      const url = new URL(item.dataset.playlistSrc, window.location.href);
+      return Math.max(1, Number.parseInt(url.searchParams.get('p'), 10) || 1);
+    } catch {
+      return 1;
+    }
+  };
+
+  const titleCacheKey = (bvid, page) => `${TITLE_CACHE_PREFIX}${bvid}:p${page}`;
+
+  const readCachedTitle = (bvid, page) => {
+    try {
+      const raw = localStorage.getItem(titleCacheKey(bvid, page));
       if (!raw) return '';
       const cached = JSON.parse(raw);
       if (!cached?.title || Date.now() - Number(cached.savedAt || 0) > TITLE_CACHE_TTL) return '';
@@ -32,9 +46,9 @@
     }
   };
 
-  const cacheTitle = (bvid, title) => {
+  const cacheTitle = (bvid, page, title) => {
     try {
-      localStorage.setItem(`${TITLE_CACHE_PREFIX}${bvid}`, JSON.stringify({
+      localStorage.setItem(titleCacheKey(bvid, page), JSON.stringify({
         title,
         savedAt: Date.now()
       }));
@@ -43,7 +57,19 @@
     }
   };
 
-  const requestTitleWithJsonp = (bvid) => new Promise((resolve, reject) => {
+  const resolveTitle = (payload, page) => {
+    if (payload?.code !== 0 || !payload?.data) return '';
+
+    const pages = Array.isArray(payload.data.pages) ? payload.data.pages : [];
+    const pageRow = pages.find((entry) => Number(entry?.page) === page);
+    const partTitle = String(pageRow?.part || '').trim();
+    const videoTitle = String(payload.data.title || '').trim();
+
+    if (pages.length > 1 && partTitle) return partTitle;
+    return videoTitle || partTitle;
+  };
+
+  const requestTitleWithJsonp = (bvid, page) => new Promise((resolve, reject) => {
     const callbackName = `__musicBilibiliTitle_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const script = document.createElement('script');
     const timeout = window.setTimeout(() => finish('', new Error('Bilibili title request timed out.')), 6500);
@@ -56,10 +82,7 @@
       else resolve(title);
     };
 
-    window[callbackName] = (payload) => {
-      const title = payload?.code === 0 ? String(payload?.data?.title || '').trim() : '';
-      finish(title);
-    };
+    window[callbackName] = (payload) => finish(resolveTitle(payload, page));
 
     script.async = true;
     script.onerror = () => finish('', new Error('Bilibili title request failed.'));
@@ -67,8 +90,8 @@
     document.head.append(script);
   });
 
-  const requestBilibiliTitle = async (bvid) => {
-    const cached = readCachedTitle(bvid);
+  const requestBilibiliTitle = async (bvid, page) => {
+    const cached = readCachedTitle(bvid, page);
     if (cached) return cached;
 
     try {
@@ -81,9 +104,9 @@
       });
       if (!response.ok) throw new Error(`Bilibili metadata ${response.status}`);
       const payload = await response.json();
-      const title = payload?.code === 0 ? String(payload?.data?.title || '').trim() : '';
+      const title = resolveTitle(payload, page);
       if (title) {
-        cacheTitle(bvid, title);
+        cacheTitle(bvid, page, title);
         return title;
       }
     } catch {
@@ -91,8 +114,8 @@
     }
 
     try {
-      const title = await requestTitleWithJsonp(bvid);
-      if (title) cacheTitle(bvid, title);
+      const title = await requestTitleWithJsonp(bvid, page);
+      if (title) cacheTitle(bvid, page, title);
       return title;
     } catch {
       return '';
@@ -145,7 +168,9 @@
     items.forEach((item) => {
       const metadata = item.querySelector('small');
       const bvid = item.dataset.playlistBvid || metadata?.textContent?.trim() || '';
+      const page = playlistPage(item);
       if (bvid) item.dataset.playlistBvid = bvid;
+      item.dataset.playlistPage = String(page);
 
       item.querySelector(':scope > span')?.remove();
       metadata?.remove();
@@ -164,7 +189,7 @@
       }
 
       if (bvid) {
-        requestBilibiliTitle(bvid).then((title) => {
+        requestBilibiliTitle(bvid, page).then((title) => {
           if (title) applyTitle(item, title);
           else if (!item.dataset.playlistTitle || item.dataset.playlistTitle === '正在读取视频标题…') {
             applyTitle(item, '视频标题暂不可用');
