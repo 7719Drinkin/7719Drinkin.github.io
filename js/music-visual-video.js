@@ -3,6 +3,14 @@
   const playlists = [...document.querySelectorAll('[data-bilibili-playlist]')];
   if (!cards.length && !playlists.length) return;
 
+  if (playlists.length && !document.querySelector('link[data-music-playlist-style]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/css/music-playlist-clean.css?v=20260806-1';
+    link.dataset.musicPlaylistStyle = '';
+    document.head.append(link);
+  }
+
   const TITLE_CACHE_PREFIX = 'music:bilibili-title:v1:';
   const TITLE_CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
 
