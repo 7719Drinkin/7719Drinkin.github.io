@@ -155,6 +155,14 @@
   ],
   "gallery": [
     {
+      "type": "video",
+      "provider": "bilibili",
+      "bvid": "BV1QN411g7E8",
+      "url": "https://www.bilibili.com/video/BV1QN411g7E8/",
+      "title": "张雨生影像记录",
+      "caption": "收藏自哔哩哔哩"
+    },
+    {
       "src": "/assets/Music/Artists/ZhangYusheng/gallery/SingerPortrait_142_-1219145961785922041676.jpg",
       "alt": "张雨生人物影像收藏 01"
     },
