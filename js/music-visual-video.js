@@ -3,10 +3,92 @@
   const playlists = [...document.querySelectorAll('[data-bilibili-playlist]')];
   if (!cards.length && !playlists.length) return;
 
+  const TITLE_CACHE_PREFIX = 'music:bilibili-title:v1:';
+  const TITLE_CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
+
   const appendAutoplay = (url) => {
     const parsed = new URL(url, window.location.href);
     parsed.searchParams.set('autoplay', '1');
     return parsed.toString();
+  };
+
+  const readCachedTitle = (bvid) => {
+    try {
+      const raw = localStorage.getItem(`${TITLE_CACHE_PREFIX}${bvid}`);
+      if (!raw) return '';
+      const cached = JSON.parse(raw);
+      if (!cached?.title || Date.now() - Number(cached.savedAt || 0) > TITLE_CACHE_TTL) return '';
+      return String(cached.title).trim();
+    } catch {
+      return '';
+    }
+  };
+
+  const cacheTitle = (bvid, title) => {
+    try {
+      localStorage.setItem(`${TITLE_CACHE_PREFIX}${bvid}`, JSON.stringify({
+        title,
+        savedAt: Date.now()
+      }));
+    } catch {
+      // The playlist still works when browser storage is unavailable.
+    }
+  };
+
+  const requestTitleWithJsonp = (bvid) => new Promise((resolve, reject) => {
+    const callbackName = `__musicBilibiliTitle_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const script = document.createElement('script');
+    const timeout = window.setTimeout(() => finish('', new Error('Bilibili title request timed out.')), 6500);
+
+    const finish = (title, error = null) => {
+      window.clearTimeout(timeout);
+      script.remove();
+      try { delete window[callbackName]; } catch { window[callbackName] = undefined; }
+      if (error) reject(error);
+      else resolve(title);
+    };
+
+    window[callbackName] = (payload) => {
+      const title = payload?.code === 0 ? String(payload?.data?.title || '').trim() : '';
+      finish(title);
+    };
+
+    script.async = true;
+    script.onerror = () => finish('', new Error('Bilibili title request failed.'));
+    script.src = `https://api.bilibili.com/x/web-interface/view?bvid=${encodeURIComponent(bvid)}&jsonp=jsonp&callback=${encodeURIComponent(callbackName)}`;
+    document.head.append(script);
+  });
+
+  const requestBilibiliTitle = async (bvid) => {
+    const cached = readCachedTitle(bvid);
+    if (cached) return cached;
+
+    try {
+      const response = await fetch(`https://api.bilibili.com/x/web-interface/view?bvid=${encodeURIComponent(bvid)}`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit',
+        cache: 'force-cache',
+        headers: { Accept: 'application/json' }
+      });
+      if (!response.ok) throw new Error(`Bilibili metadata ${response.status}`);
+      const payload = await response.json();
+      const title = payload?.code === 0 ? String(payload?.data?.title || '').trim() : '';
+      if (title) {
+        cacheTitle(bvid, title);
+        return title;
+      }
+    } catch {
+      // Fall back to JSONP because browser CORS behavior can vary.
+    }
+
+    try {
+      const title = await requestTitleWithJsonp(bvid);
+      if (title) cacheTitle(bvid, title);
+      return title;
+    } catch {
+      return '';
+    }
   };
 
   cards.forEach((card) => {
@@ -35,7 +117,21 @@
     const items = [...playlist.querySelectorAll('[data-playlist-src]')];
     if (!iframe || !items.length) return;
 
+    const applyTitle = (item, title) => {
+      const label = item.querySelector('[data-playlist-label]');
+      if (!title || !label) return;
+      label.textContent = title;
+      item.dataset.playlistTitle = title;
+      item.setAttribute('aria-label', `播放 ${title}`);
+      if (item.classList.contains('is-active')) iframe.title = title;
+    };
+
     items.forEach((item) => {
+      const bvid = item.dataset.playlistBvid;
+      if (bvid) {
+        requestBilibiliTitle(bvid).then((title) => applyTitle(item, title));
+      }
+
       item.addEventListener('click', () => {
         if (item.classList.contains('is-active')) return;
 
