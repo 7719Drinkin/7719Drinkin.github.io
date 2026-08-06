@@ -10,6 +10,36 @@ document.querySelectorAll('.collection-song-row em').forEach((label) => {
 });
 
 const catalogPage = document.body.dataset.musicCatalogPage;
+
+if (catalogPage === 'album') {
+  const trackSection = document.querySelector('.album-track-section');
+  const redundantHeader = trackSection?.querySelector(':scope > .music-section-header');
+  redundantHeader?.remove();
+
+  if (trackSection) {
+    trackSection.style.paddingTop = '28px';
+  }
+
+  const albumSongList = document.querySelector('.album-song-list');
+  const applyEmptyAlbumMessage = () => {
+    const state = albumSongList?.querySelector('.music-catalog-state');
+    const label = state?.querySelector('span');
+    const message = state?.querySelector('p');
+
+    if (!label || !message || label.textContent.trim() !== 'ALBUM NOT FOUND') return;
+    label.textContent = 'EMPTY ALBUM';
+    message.textContent = '盘旋归燕树待栖~';
+  };
+
+  applyEmptyAlbumMessage();
+  window.addEventListener('music:catalog-ready', applyEmptyAlbumMessage);
+
+  if (albumSongList && 'MutationObserver' in window) {
+    const emptyStateObserver = new MutationObserver(applyEmptyAlbumMessage);
+    emptyStateObserver.observe(albumSongList, { childList: true, subtree: true });
+  }
+}
+
 if (catalogPage && !document.querySelector('script[data-music-catalog-loader]')) {
   const script = document.createElement('script');
   script.src = '/js/music-catalog.js?v=20260806-albums-2';
