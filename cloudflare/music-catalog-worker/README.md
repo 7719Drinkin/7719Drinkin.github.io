@@ -8,11 +8,47 @@ Expected object key structure:
 <artist-prefix>/<album-name>/<audio-file>
 ```
 
-Example:
+Recommended single-disc naming:
 
 ```text
-tom-chang/想念我/张雨生 - 如果你要離開我.mp3
+tom-chang/想念我/01 - 张雨生 - 如果你要離開我.mp3
+tom-chang/想念我/02 - 张雨生 - 第二首歌.mp3
 ```
+
+Recommended multi-disc naming:
+
+```text
+tom-chang/某双碟专辑/1-01 - 张雨生 - 第一首歌.mp3
+tom-chang/某双碟专辑/1-02 - 张雨生 - 第二首歌.mp3
+tom-chang/某双碟专辑/2-01 - 张雨生 - 第二碟第一首.mp3
+```
+
+The Worker also accepts `CD1-01`, `DISC1-01`, `01. 歌名` and `01 - 歌名` prefixes.
+
+## Album track ordering
+
+Track order is derived from the filename during the same R2 object-list operation used to build the catalog. No audio object or extra manifest file is read.
+
+Sorting priority:
+
+1. Disc number.
+2. Track number.
+3. Song title as a stable fallback.
+
+Numbered tracks always appear before unnumbered tracks. The numeric prefix is removed from the displayed song title, while the catalog response preserves `discNumber`, `trackNumber`, and `orderLabel`.
+
+Example response item:
+
+```json
+{
+  "title": "如果你要離開我",
+  "discNumber": 1,
+  "trackNumber": 1,
+  "orderLabel": "01"
+}
+```
+
+This naming convention is the preferred source of truth because it keeps the original album sequence next to the audio file and does not create additional R2 reads.
 
 ## Why this Worker exists
 
@@ -63,7 +99,9 @@ The result groups tracks by album based on the R2 key:
 
 ```json
 {
+  "version": 2,
   "artistPrefix": "tom-chang",
+  "ordering": "disc-track-title",
   "totalTracks": 1,
   "albums": [
     {
@@ -71,6 +109,9 @@ The result groups tracks by album based on the R2 key:
       "tracks": [
         {
           "title": "如果你要離開我",
+          "discNumber": 1,
+          "trackNumber": 1,
+          "orderLabel": "01",
           "src": "https://pub-...r2.dev/tom-chang/...mp3",
           "type": "audio/mpeg"
         }
@@ -80,7 +121,7 @@ The result groups tracks by album based on the R2 key:
 }
 ```
 
-Force a refresh immediately after uploading or deleting songs:
+Force a refresh immediately after uploading, deleting, or renaming songs:
 
 ```bash
 curl -X POST \
