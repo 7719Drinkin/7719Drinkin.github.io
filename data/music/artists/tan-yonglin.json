@@ -13,7 +13,7 @@
     "zh": "当前还没有配置可播放音频；后续接入真实音频源后，曲目会自动进入页面。",
     "en": "No playable audio source is configured yet; tracks will appear after real audio sources are added."
   },
-  "heroImage": null,
+  "heroImage": "/assets/Music/Artists/TanYonglin/hero/SingerPortrait_149_-2694000341785996801988.jpg",
   "selectedSongs": [],
   "albums": [],
   "gallery": [
@@ -46,6 +46,78 @@
           "url": "https://www.bilibili.com/video/BV1kr421V7mn/"
         }
       ]
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/1784186770260.jpg",
+      "alt": "谭咏麟人物影像收藏 01"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/9299a005f2383a2f0952e4514b1b04af10860dc3_raw.jpg",
+      "alt": "谭咏麟人物影像收藏 02"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/Camera_1040g3k031u2euo4u1g6g5op16sc8sriledu62r8.jpg",
+      "alt": "谭咏麟人物影像收藏 03"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/Camera_1040g3k8321v4ikevne00439b96s0otdmd7dn1qg.jpg",
+      "alt": "谭咏麟人物影像收藏 04"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/Camera_1040g3k8321v4ikh67u00439b96s0otdmv1ru25g.jpg",
+      "alt": "谭咏麟人物影像收藏 05"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/Camera_XHS_17841886977671040g00831vdpfgqaia005ps.jpg",
+      "alt": "谭咏麟人物影像收藏 06"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/Camera_XHS_17841887274901040g0083220bc3rlne2g439.jpg",
+      "alt": "谭咏麟人物影像收藏 07"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/SingerPortrait_149_-1395649211785996775978.jpg",
+      "alt": "谭咏麟人物影像收藏 08"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/SingerPortrait_149_-16662999441785996795344.jpg",
+      "alt": "谭咏麟人物影像收藏 09"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/SingerPortrait_149_-2694000341785996801988.jpg",
+      "alt": "谭咏麟人物影像收藏 10"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/SingerPortrait_149_-3837776141785996757904.jpg",
+      "alt": "谭咏麟人物影像收藏 11"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/SingerPortrait_149_-9837114051785996791178.jpg",
+      "alt": "谭咏麟人物影像收藏 12"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/SingerPortrait_149_12476445991785996763001.jpg",
+      "alt": "谭咏麟人物影像收藏 13"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/SingerPortrait_149_12929971161785996754770.jpg",
+      "alt": "谭咏麟人物影像收藏 14"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/SingerPortrait_149_1567589271785996786931.jpg",
+      "alt": "谭咏麟人物影像收藏 15"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/comment_34401ef975e8bd139dcd555cdf28ddc6.png",
+      "alt": "谭咏麟人物影像收藏 16"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/e6af3d7a2c39e8d06c82f9c1e9321c6a3f7c57eb_raw.jpg",
+      "alt": "谭咏麟人物影像收藏 17"
+    },
+    {
+      "src": "/assets/Music/Artists/TanYonglin/gallery/f291b6b7a0032ddc74626870d4e255eeb27d6529_raw.jpg",
+      "alt": "谭咏麟人物影像收藏 18"
     }
   ]
 }
