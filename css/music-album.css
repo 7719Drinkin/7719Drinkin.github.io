@@ -4,7 +4,7 @@
   color: inherit;
   text-decoration: none;
   transform: translateY(0);
-  transition: transform .32s cubic-bezier(.16,1,.3,1), border-color .25s ease, box-shadow .32s ease, background-color .25s ease;
+  transition: transform .32s cubic-bezier(.16,1,.3,1), border-color .25s ease, box-shadow .32s ease, background-color .25s ease, opacity .25s ease;
 }
 
 .album-card::after {
@@ -24,6 +24,28 @@
   opacity: 0;
   transform: translate(-4px, 4px);
   transition: opacity .25s ease, transform .32s cubic-bezier(.16,1,.3,1);
+}
+
+.album-card.is-empty-album::before {
+  position: absolute;
+  top: 17px;
+  left: -38px;
+  z-index: 3;
+  display: grid;
+  width: 148px;
+  height: 28px;
+  place-items: center;
+  border-top: 1px solid color-mix(in srgb, var(--artist-accent-soft) 34%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--artist-accent-soft) 26%, transparent);
+  color: color-mix(in srgb, var(--artist-accent-soft) 86%, white);
+  background: color-mix(in srgb, var(--artist-bg) 62%, var(--artist-accent) 38%);
+  box-shadow: 0 8px 22px rgba(0,0,0,.28);
+  content: "待收录";
+  font: 700 8px/1 var(--music-mono);
+  letter-spacing: .18em;
+  text-indent: .18em;
+  transform: rotate(-42deg);
+  transform-origin: center;
 }
 
 .album-card:hover,
@@ -51,6 +73,28 @@
 }
 
 .album-card:hover img { transform: scale(1.025); }
+
+.album-card.is-empty-album {
+  opacity: .74;
+}
+
+.album-card.is-empty-album:hover,
+.album-card.is-empty-album:focus-visible {
+  opacity: .92;
+}
+
+.album-card.is-empty-album img {
+  filter: saturate(.52) brightness(.78) contrast(.94);
+}
+
+.album-card.is-empty-album:hover img,
+.album-card.is-empty-album:focus-visible img {
+  filter: saturate(.72) brightness(.86) contrast(.98);
+}
+
+.album-card.is-empty-album .album-card-track-count {
+  color: color-mix(in srgb, var(--artist-accent-soft) 72%, var(--music-muted)) !important;
+}
 
 .album-card-copy {
   position: relative;
@@ -204,6 +248,11 @@
 @media (max-width: 620px) {
   .album-card-copy { min-height: 116px; }
   .album-card::after { opacity: 1; transform: none; }
+  .album-card.is-empty-album::before {
+    top: 14px;
+    left: -42px;
+    width: 152px;
+  }
   .music-album-page { --album-cover-size: min(88vw, 440px); }
   .album-detail-hero { gap: 38px; padding: 96px 18px 48px; }
   .album-detail-cover { border-radius: 18px; }
