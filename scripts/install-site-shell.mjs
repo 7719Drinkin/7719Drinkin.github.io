@@ -3,13 +3,14 @@ import { dirname, extname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const BRIDGE_SRC = '/js/site-frame-bridge.js?v=20260806-1';
+const BRIDGE_SRC = '/js/site-frame-bridge.js?v=20260806-2';
 const SKIP_DIRECTORIES = new Set([
   '.git',
   '.github',
   'node_modules',
   '_site',
   'apps',
+  'main-site',
   'solar-universe',
   'preview'
 ]);
