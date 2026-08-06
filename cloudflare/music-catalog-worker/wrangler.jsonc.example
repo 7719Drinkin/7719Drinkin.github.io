@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "drinkins-music-catalog",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-06",
+  "r2_buckets": [
+    {
+      "binding": "MUSIC_BUCKET",
+      "bucket_name": "drinkins-music"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "MUSIC_CATALOG",
+      "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+    }
+  ],
+  "vars": {
+    "R2_PUBLIC_BASE": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev",
+    "ALLOWED_ORIGIN": "https://7719drinkin.github.io",
+    "ALLOWED_ARTIST_PREFIXES": "tom-chang,alan-tam",
+    "CATALOG_TTL_SECONDS": "43200"
+  }
+}
