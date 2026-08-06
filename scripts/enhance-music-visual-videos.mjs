@@ -147,7 +147,7 @@ function renderVideo(item, index) {
   }
 
   if (spec.provider === 'bilibili') {
-    return `<figure class="visual-card visual-card--video visual-card--bilibili">
+    return `<figure class="visual-card visual-card--video visual-card--bilibili" aria-label="${escapeHtml(title)}">
       <div class="visual-video-stage visual-video-stage--native">
         <iframe
           src="${escapeHtml(spec.embedUrl)}"
@@ -158,10 +158,6 @@ function renderVideo(item, index) {
           referrerpolicy="strict-origin-when-cross-origin"
           allowfullscreen></iframe>
       </div>
-      <figcaption>
-        <div><strong>${escapeHtml(title)}</strong>${caption ? `<span>${escapeHtml(caption)}</span>` : ''}</div>
-        <a href="${escapeHtml(originalUrl)}" target="_blank" rel="noreferrer">SOURCE ↗</a>
-      </figcaption>
     </figure>`;
   }
 
