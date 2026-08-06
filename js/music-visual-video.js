@@ -6,7 +6,7 @@
   if (playlists.length && !document.querySelector('link[data-music-playlist-style]')) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = '/css/music-playlist-clean.css?v=20260806-1';
+    link.href = '/css/music-playlist-clean.css?v=20260806-2';
     link.dataset.musicPlaylistStyle = '';
     document.head.append(link);
   }
