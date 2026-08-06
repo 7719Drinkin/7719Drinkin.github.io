@@ -156,22 +156,100 @@
   "gallery": [
     {
       "type": "bilibili-playlist",
-      "title": "张雨生影像记录",
+      "title": "播放列表",
       "videos": [
         {
-          "bvid": "BV1QN411g7E8",
-          "url": "https://www.bilibili.com/video/BV1QN411g7E8/",
-          "title": "影像记录 01"
+          "bvid": "BV1Emd6YbEpT",
+          "url": "https://www.bilibili.com/video/BV1Emd6YbEpT/"
         },
         {
-          "bvid": "BV1Emd6YbEpT",
-          "url": "https://www.bilibili.com/video/BV1Emd6YbEpT/",
-          "title": "影像记录 02"
+          "bvid": "BV1HiL4zqEQV",
+          "url": "https://www.bilibili.com/video/BV1HiL4zqEQV/"
+        },
+        {
+          "bvid": "BV1DC4y1P7kk",
+          "url": "https://www.bilibili.com/video/BV1DC4y1P7kk/"
+        },
+        {
+          "bvid": "BV1T94y1c7Pc",
+          "url": "https://www.bilibili.com/video/BV1T94y1c7Pc/"
+        },
+        {
+          "bvid": "BV1roLxzPERk",
+          "url": "https://www.bilibili.com/video/BV1roLxzPERk/"
+        },
+        {
+          "bvid": "BV12vmdBXEn3",
+          "url": "https://www.bilibili.com/video/BV12vmdBXEn3/"
+        },
+        {
+          "bvid": "BV1QN411g7E8",
+          "url": "https://www.bilibili.com/video/BV1QN411g7E8/"
+        },
+        {
+          "bvid": "BV12ALvzwE7h",
+          "url": "https://www.bilibili.com/video/BV12ALvzwE7h/"
+        },
+        {
+          "bvid": "BV1pddNYKEQL",
+          "url": "https://www.bilibili.com/video/BV1pddNYKEQL/"
+        },
+        {
+          "bvid": "BV1ua4y1f7dk",
+          "url": "https://www.bilibili.com/video/BV1ua4y1f7dk/"
         },
         {
           "bvid": "BV1zg4y1d7Xv",
-          "url": "https://www.bilibili.com/video/BV1zg4y1d7Xv/",
-          "title": "影像记录 03"
+          "url": "https://www.bilibili.com/video/BV1zg4y1d7Xv/"
+        },
+        {
+          "bvid": "BV1PbQ9B9EAf",
+          "url": "https://www.bilibili.com/video/BV1PbQ9B9EAf/"
+        },
+        {
+          "bvid": "BV1S3AczyE9Q",
+          "url": "https://www.bilibili.com/video/BV1S3AczyE9Q/?p=1",
+          "page": 1
+        },
+        {
+          "bvid": "BV1S3AczyE9Q",
+          "url": "https://www.bilibili.com/video/BV1S3AczyE9Q/?p=2",
+          "page": 2
+        },
+        {
+          "bvid": "BV1S3AczyE9Q",
+          "url": "https://www.bilibili.com/video/BV1S3AczyE9Q/?p=3",
+          "page": 3
+        },
+        {
+          "bvid": "BV1S3AczyE9Q",
+          "url": "https://www.bilibili.com/video/BV1S3AczyE9Q/?p=4",
+          "page": 4
+        },
+        {
+          "bvid": "BV1S3AczyE9Q",
+          "url": "https://www.bilibili.com/video/BV1S3AczyE9Q/?p=5",
+          "page": 5
+        },
+        {
+          "bvid": "BV1S3AczyE9Q",
+          "url": "https://www.bilibili.com/video/BV1S3AczyE9Q/?p=6",
+          "page": 6
+        },
+        {
+          "bvid": "BV1S3AczyE9Q",
+          "url": "https://www.bilibili.com/video/BV1S3AczyE9Q/?p=7",
+          "page": 7
+        },
+        {
+          "bvid": "BV1S3AczyE9Q",
+          "url": "https://www.bilibili.com/video/BV1S3AczyE9Q/?p=8",
+          "page": 8
+        },
+        {
+          "bvid": "BV1S3AczyE9Q",
+          "url": "https://www.bilibili.com/video/BV1S3AczyE9Q/?p=9",
+          "page": 9
         }
       ]
     },
