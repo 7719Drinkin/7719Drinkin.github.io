@@ -54,5 +54,33 @@
       "background": "#07141a",
       "foreground": "#eef8f6"
     }
+  },
+  {
+    "id": "zhang-guorong",
+    "slug": "zhang-guorong",
+    "assetKey": "ZhangGuorong",
+    "name": {
+      "zh": "张国荣",
+      "en": "Leslie Cheung"
+    },
+    "subtitle": {
+      "zh": "风华与歌声仍在回响",
+      "en": "Grace and voice still echo"
+    },
+    "description": {
+      "zh": "个人收藏中的张国荣：歌曲、舞台、影像与跨越时间的记忆。",
+      "en": "Songs, performances, images and memories that continue across time."
+    },
+    "route": "/music/artists/zhang-guorong/",
+    "status": "published",
+    "order": 3,
+    "cover": null,
+    "tags": ["粤语流行", "舞台艺术"],
+    "theme": {
+      "accent": "#d8879a",
+      "accentSoft": "#f0c8d2",
+      "background": "#160b13",
+      "foreground": "#f8eff2"
+    }
   }
 ]
