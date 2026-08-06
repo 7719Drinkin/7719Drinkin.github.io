@@ -10,97 +10,143 @@
     "en": "A growing personal listening archive rather than an encyclopedia entry."
   },
   "personalNote": {
-    "zh": "已使用重新命名的专辑封面整理作品档案；可播放曲目由 R2 目录按专辑动态生成。",
-    "en": "The album archive uses clearly named covers, while playable tracks are generated dynamically from the R2 catalog."
+    "zh": "完整曲目按专辑进入独立详情页；反复聆听只保留网页创建者主动挑选的少量歌曲。",
+    "en": "Complete tracks live on album detail pages, while repeated listening remains a small curator-selected set."
   },
   "heroImage": "/assets/Music/Artists/ZhangYusheng/hero/SingerPortrait_142_-7592093631785922030210.jpg",
-  "selectedSongs": [],
+  "selectedSongs": [
+    {
+      "title": "如果你要離開我",
+      "album": "想念我",
+      "note": "第一首接入本站播放体验的张雨生收藏。"
+    },
+    {
+      "title": "大海",
+      "album": "大海",
+      "note": "辽阔、直接，也保留了很强的情绪记忆。"
+    },
+    {
+      "title": "一天到晚游泳的鱼",
+      "album": "一天到晚游泳的鱼",
+      "note": "轻盈表面下有独特的表达与想象。"
+    }
+  ],
   "albums": [
     {
+      "slug": "yi-tian-dao-wan-you-yong-de-yu",
+      "catalogName": "一天到晚游泳的鱼",
       "year": "ALBUM ARCHIVE",
       "title": "一天到晚游泳的鱼",
       "note": "张雨生专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《一天到晚游泳的鱼》.jpg"
     },
     {
+      "slug": "liang-yi-zhan-zheng-bai-se-cai-qing",
+      "catalogName": "两伊战争白色才情",
       "year": "ALBUM ARCHIVE",
       "title": "两伊战争白色才情",
       "note": "张雨生专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《两伊战争白色才情》.jpg"
     },
     {
+      "slug": "liang-yi-zhan-zheng-hong-se-re-qing",
+      "catalogName": "两伊战争红色热情",
       "year": "ALBUM ARCHIVE",
       "title": "两伊战争红色热情",
       "note": "张雨生专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《两伊战争红色热情》.jpg"
     },
     {
+      "slug": "karaoke-taipei-me",
+      "catalogName": "卡拉OK·台北·我",
       "year": "ALBUM ARCHIVE",
       "title": "卡拉OK·台北·我",
       "note": "张雨生专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《卡拉OK·台北·我》.jpg"
     },
     {
+      "slug": "kou-shi-xin-fei",
+      "catalogName": "口是心非",
       "year": "ALBUM ARCHIVE",
       "title": "口是心非",
       "note": "张雨生专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《口是心非》.jpg"
     },
     {
+      "slug": "wen-wo-ba-na-na",
+      "catalogName": "吻我吧娜娜",
       "year": "ALBUM ARCHIVE",
       "title": "吻我吧娜娜",
       "note": "张雨生专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《吻我吧娜娜》.jpg"
     },
     {
+      "slug": "da-hai",
+      "catalogName": "大海",
       "year": "ALBUM ARCHIVE",
       "title": "大海",
       "note": "张雨生专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《大海》.jpg"
     },
     {
+      "slug": "tian-tian-xiang-ni",
+      "catalogName": "天天想你",
       "year": "ALBUM ARCHIVE",
       "title": "天天想你",
       "note": "张雨生专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《天天想你》.jpg"
     },
     {
+      "slug": "ru-yan-pan-xuan-er-lai-de-si-nian",
+      "catalogName": "如燕盘旋而来的思念",
       "year": "ALBUM ARCHIVE",
       "title": "如燕盘旋而来的思念",
       "note": "张雨生专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《如燕盘旋而来的思念》.jpg"
     },
     {
+      "slug": "dai-wo-qu-yue-qiu",
+      "catalogName": "带我去月球",
       "year": "CREATIVE ALBUM",
       "title": "带我去月球",
       "note": "张雨生创作专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《带我去月球》（张雨生创作专辑）0.jpg"
     },
     {
+      "slug": "xiang-nian-wo",
+      "catalogName": "想念我",
       "year": "ALBUM ARCHIVE",
       "title": "想念我",
       "note": "张雨生专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《想念我》.jpg"
     },
     {
+      "slug": "zi-you-ge",
+      "catalogName": "自由歌",
       "year": "SELECTED COLLECTION",
       "title": "自由歌",
       "note": "张雨生精选集封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《自由歌》（张雨生精选集）.jpg"
     },
     {
+      "slug": "hai-shi-peng-you",
+      "catalogName": "还是朋友",
       "year": "ALBUM ARCHIVE",
       "title": "还是朋友",
       "note": "张雨生专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《还是朋友》.jpg"
     },
     {
+      "slug": "yu-hou-xing-kong",
+      "catalogName": "雨后星空",
       "year": "ALBUM ARCHIVE",
       "title": "雨后星空",
       "note": "张雨生专辑封面收藏。",
       "cover": "/assets/Music/Artists/ZhangYusheng/albums/AlbumCover_《雨后星空》.jpg"
     },
     {
+      "slug": "yu-sheng-huan-xi-cheng",
+      "catalogName": "雨生欢禧城",
       "year": "ALBUM ARCHIVE",
       "title": "雨生欢禧城",
       "note": "张雨生专辑封面收藏。",
