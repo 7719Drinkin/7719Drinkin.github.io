@@ -1,13 +1,81 @@
-.visual-card--video {
+.visual-archive-layout {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: clamp(72px, 9vw, 132px);
+}
+
+.visual-archive-group {
+  min-width: 0;
+}
+
+.visual-archive-subheader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, .48fr);
+  align-items: end;
+  gap: 42px;
+  margin-bottom: 30px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--music-line);
+}
+
+.visual-archive-subheader p {
+  margin: 0;
+  color: var(--artist-accent);
+  font: 9px/1 var(--music-mono);
+  letter-spacing: .16em;
+}
+
+.visual-archive-subheader h3 {
+  margin: 13px 0 0;
+  color: var(--artist-fg);
+  font-family: var(--music-serif);
+  font-size: clamp(34px, 4.6vw, 68px);
+  font-weight: 600;
+  line-height: .96;
+  letter-spacing: -.035em;
+}
+
+.visual-archive-subheader > span {
+  color: var(--music-muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.visual-video-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.visual-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.visual-photo-grid .visual-card {
+  grid-column: span 4;
+}
+
+.visual-photo-grid .visual-card:nth-child(4n+1) {
   grid-column: span 8;
+}
+
+.visual-card--video {
+  grid-column: auto;
   background: color-mix(in srgb, var(--artist-bg) 88%, black);
+}
+
+.visual-card--video:only-child {
+  grid-column: 1 / -1;
+  width: min(100%, 1120px);
 }
 
 .visual-video-stage {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  min-height: 300px;
+  min-height: 0;
   overflow: hidden;
   background:
     radial-gradient(circle at 72% 24%, color-mix(in srgb, var(--artist-accent) 20%, transparent), transparent 34%),
@@ -22,8 +90,12 @@
     linear-gradient(90deg, rgba(255,255,255,.018) 50%, transparent 50%);
   background-size: 100% 4px, 4px 100%;
   content: "";
-  opacity: .35;
+  opacity: .25;
   pointer-events: none;
+}
+
+.visual-video-stage--native::before {
+  display: none;
 }
 
 .visual-video-stage > img {
@@ -31,12 +103,12 @@
   height: 100%;
   min-height: 0;
   object-fit: cover;
-  filter: saturate(.82) contrast(1.03) brightness(.76);
+  filter: saturate(.92) contrast(1.03) brightness(.82);
   transition: filter .35s ease, transform .55s cubic-bezier(.16,1,.3,1);
 }
 
 .visual-card--video:hover .visual-video-stage > img {
-  filter: saturate(.95) contrast(1.02) brightness(.84);
+  filter: saturate(1) contrast(1.02) brightness(.9);
   transform: scale(1.018);
 }
 
@@ -176,6 +248,8 @@
 }
 
 .visual-video-stage iframe {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -183,9 +257,33 @@
   background: #000;
 }
 
+.visual-card--bilibili {
+  border-color: color-mix(in srgb, #fb7299 28%, var(--music-line));
+}
+
+.visual-card--bilibili figcaption::before {
+  align-self: center;
+  justify-self: start;
+  padding: 6px 8px;
+  border: 1px solid color-mix(in srgb, #fb7299 42%, transparent);
+  border-radius: 999px;
+  color: #ff9fbc;
+  content: "BILIBILI PLAYER";
+  font: 7px/1 var(--music-mono);
+  letter-spacing: .12em;
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 980px) {
+  .visual-video-grid { grid-template-columns: 1fr; }
+  .visual-card--video:only-child { width: 100%; }
+  .visual-archive-subheader { grid-template-columns: 1fr; gap: 16px; }
+}
+
 @media (max-width: 760px) {
-  .visual-card--video { grid-column: 1 / -1; }
-  .visual-video-stage { min-height: 0; }
+  .visual-archive-layout { gap: 72px; }
+  .visual-photo-grid .visual-card,
+  .visual-photo-grid .visual-card:nth-child(4n+1) { grid-column: 1 / -1; }
   .visual-video-play-icon { width: 58px; height: 58px; }
   .visual-card--video figcaption { grid-template-columns: 1fr; }
 }
