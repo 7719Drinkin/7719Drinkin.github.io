@@ -1,0 +1,12 @@
+{
+  "workerBase": "https://drinkins-music-catalog.drinkinhuang.workers.dev",
+  "browserCacheTtlSeconds": 600,
+  "artists": {
+    "zhang-yusheng": {
+      "prefix": "tom-chang"
+    },
+    "tan-yonglin": {
+      "prefix": "alan-tam"
+    }
+  }
+}
