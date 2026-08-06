@@ -63,7 +63,7 @@
         catalog
       }));
     } catch {
-      // Storage can be unavailable in private browsing; the Worker cache still applies.
+      // The Worker-side KV cache still works when browser storage is unavailable.
     }
   };
 
@@ -208,11 +208,14 @@
     const cached = readCache(prefix);
     const hasCachedCatalog = Boolean(cached?.catalog);
     const cacheIsFresh = hasCachedCatalog && Date.now() - Number(cached.savedAt || 0) < localTtl;
+    let staleCatalogRendered = false;
 
     if (hasCachedCatalog) {
-      const rendered = renderCatalog(cached.catalog, cacheIsFresh ? 'BROWSER CACHE' : 'STALE CACHE');
-      if (rendered) ensurePlayer();
-      if (cacheIsFresh) return;
+      staleCatalogRendered = renderCatalog(cached.catalog, cacheIsFresh ? 'BROWSER CACHE' : 'STALE CACHE');
+      if (cacheIsFresh) {
+        if (staleCatalogRendered) ensurePlayer();
+        return;
+      }
     }
 
     try {
@@ -229,7 +232,9 @@
       const rendered = renderCatalog(catalog, response.headers.get('X-Music-Catalog-Cache') || 'WORKER CACHE');
       if (rendered) ensurePlayer();
     } catch {
-      if (!hasCachedCatalog) {
+      if (staleCatalogRendered) {
+        ensurePlayer();
+      } else {
         songList.replaceChildren(createState(
           'CATALOG UNAVAILABLE',
           '曲目目录服务暂时无法访问。页面没有直接扫描 R2，也不会尝试逐个探测音频文件。'
