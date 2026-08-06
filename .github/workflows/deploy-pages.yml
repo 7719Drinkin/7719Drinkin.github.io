@@ -77,6 +77,7 @@ jobs:
           node scripts/version-music-album-assets.mjs
           node scripts/version-music-visual-assets.mjs
           node scripts/apply-music-design-system.mjs
+          node scripts/install-site-shell.mjs
 
       - name: Publish pull request preview
         if: github.event_name == 'pull_request'
