@@ -2,7 +2,15 @@
   const FRAME_PARAM = '__site_frame';
   const THREE_D_PATH = /^\/(?:preview\/)?solar-universe(?:\/|$)/;
   const params = new URLSearchParams(window.location.search);
-  const framed = window.self !== window.top && params.get(FRAME_PARAM) === '1';
+  const hasParentShell = () => {
+    try {
+      return Boolean(window.parent.__SITE_SHELL__);
+    } catch {
+      return false;
+    }
+  };
+  const framed = window.self !== window.top
+    && (params.get(FRAME_PARAM) === '1' || hasParentShell());
 
   const cleanUrl = (value) => {
     const url = new URL(value, window.location.href);
