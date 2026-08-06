@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MUSIC_ARTISTS_ROOT = join(ROOT, 'music', 'artists');
-const VISUAL_RUNTIME_VERSION = '20260806-4';
+const VISUAL_RUNTIME_VERSION = '20260806-5';
 
 async function htmlFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
