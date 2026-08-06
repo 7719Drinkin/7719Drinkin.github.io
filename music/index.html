@@ -9,6 +9,49 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/music.css?v=20260805-2">
+  <style>
+    body.music-collection-page .collection-hero-impression {
+      max-width: 26em;
+      margin: 24px 0 0;
+      padding-left: 18px;
+      border-left: 1px solid color-mix(in srgb, var(--music-gold) 72%, transparent);
+      color: color-mix(in srgb, var(--music-text) 86%, var(--music-muted));
+      font-family: "Noto Serif SC", "Playfair Display", serif;
+      font-size: clamp(17px, 1.45vw, 23px);
+      font-weight: 500;
+      line-height: 1.75;
+      letter-spacing: .015em;
+    }
+
+    body.music-collection-page .collection-home-return {
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 24px;
+      padding-bottom: 72px;
+      border-top: 1px solid var(--music-line);
+    }
+
+    body.music-collection-page .collection-home-return a {
+      color: var(--music-gold-soft);
+      font-family: "DM Mono", monospace;
+      font-size: 10px;
+      letter-spacing: .1em;
+      text-decoration: none;
+    }
+
+    @media (max-width: 760px) {
+      body.music-collection-page .collection-hero-impression {
+        max-width: 22em;
+        margin-top: 20px;
+        padding-left: 14px;
+        font-size: 16px;
+      }
+
+      body.music-collection-page .collection-home-return {
+        padding-bottom: 54px;
+      }
+    }
+  </style>
 </head>
 <body class="music-page music-collection-page">
   <header class="music-site-header">
@@ -24,6 +67,7 @@
         <p class="music-eyebrow">03 / PERSONAL COLLECTION</p>
         <h1><span>Music</span><strong>Collection</strong></h1>
         <h2>音乐收藏</h2>
+        <blockquote class="collection-hero-impression">⌈只是狂歌一曲，恍惚间就化入无穷⌋。</blockquote>
         <a class="music-text-link" href="#artists">进入收藏 <b>↓</b></a>
       </div>
       <div class="collection-record" aria-hidden="true">
@@ -137,9 +181,7 @@
   </a></div>
     </section>
 
-    <section class="music-content-section collection-manifesto reveal">
-      <p>COLLECTION PRINCIPLE</p>
-      <blockquote>⌈只是狂歌一曲，恍惚间就化入无穷⌋。</blockquote>
+    <section class="music-content-section collection-home-return reveal" aria-label="返回主页">
       <a href="/">返回 7719 Universe <b>↗</b></a>
     </section>
   </main>
