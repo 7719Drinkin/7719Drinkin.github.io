@@ -5,6 +5,10 @@ if (playerAudio) {
   playerAudio.removeAttribute('src');
 }
 
+document.querySelectorAll('.collection-song-row em').forEach((label) => {
+  if (label.textContent.trim() === 'ARCHIVE') label.textContent = 'CURATED';
+});
+
 const catalogPage = document.body.dataset.musicCatalogPage;
 if (catalogPage && !document.querySelector('script[data-music-catalog-loader]')) {
   const script = document.createElement('script');
