@@ -70,6 +70,7 @@ jobs:
           node scripts/enhance-music-albums.mjs
           node scripts/enhance-music-visual-videos.mjs
           node scripts/remove-music-secondary-nav.mjs
+          node scripts/version-music-album-assets.mjs
 
       - name: Publish pull request preview
         if: github.event_name == 'pull_request'
