@@ -46,7 +46,7 @@
     "route": "/music/artists/tan-yonglin/",
     "status": "published",
     "order": 2,
-    "cover": null,
+    "cover": "/assets/Music/Artists/TanYonglin/hero/SingerPortrait_149_-2694000341785996801988.jpg",
     "tags": ["粤语流行", "经典流行"],
     "theme": {
       "accent": "#6ed4cc",
