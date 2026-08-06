@@ -15,7 +15,7 @@ async function htmlFiles(directory) {
   return nested.flat();
 }
 
-async function fetchBilibiliTitle(bvid) {
+async function fetchBilibiliMetadata(bvid) {
   try {
     const response = await fetch(
       `https://api.bilibili.com/x/web-interface/view?bvid=${encodeURIComponent(bvid)}`,
@@ -29,26 +29,69 @@ async function fetchBilibiliTitle(bvid) {
       }
     );
 
-    if (!response.ok) return '';
+    if (!response.ok) return null;
     const payload = await response.json();
-    return payload?.code === 0 ? String(payload?.data?.title || '').trim() : '';
+    if (payload?.code !== 0 || !payload?.data) return null;
+
+    return {
+      title: String(payload.data.title || '').trim(),
+      pages: Array.isArray(payload.data.pages) ? payload.data.pages : []
+    };
   } catch {
-    return '';
+    return null;
   }
 }
 
+function decodeAttribute(value = '') {
+  return String(value)
+    .replaceAll('&amp;', '&')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#039;', "'");
+}
+
+function pageFromAttributes(rawAttributes = '') {
+  const rawUrl = rawAttributes.match(/data-playlist-src="([^"]+)"/)?.[1];
+  if (!rawUrl) return 1;
+
+  try {
+    const url = new URL(decodeAttribute(rawUrl));
+    return Math.max(1, Number.parseInt(url.searchParams.get('p'), 10) || 1);
+  } catch {
+    return 1;
+  }
+}
+
+function titleFromMetadata(metadata, page) {
+  if (!metadata) return '';
+  const pageRow = metadata.pages.find((entry) => Number(entry?.page) === page);
+  const partTitle = String(pageRow?.part || '').trim();
+
+  if (metadata.pages.length > 1 && partTitle) return partTitle;
+  return metadata.title || partTitle;
+}
+
 async function titleMapFor(source) {
-  const bvids = [...new Set(
-    [...source.matchAll(/<small>(BV[0-9A-Za-z]{10})<\/small>/gi)]
-      .map((match) => match[1])
-  )];
+  const entries = [...source.matchAll(/<button([\s\S]*?)<\/button>/g)]
+    .map((match) => {
+      const rawAttributes = match[1];
+      if (!rawAttributes.includes('data-playlist-src=')) return null;
+      const bvid = match[0].match(/<small>(BV[0-9A-Za-z]{10})<\/small>/i)?.[1];
+      if (!bvid) return null;
+      return { bvid, page: pageFromAttributes(rawAttributes) };
+    })
+    .filter(Boolean);
 
-  const entries = await Promise.all(bvids.map(async (bvid) => [
+  const uniqueBvids = [...new Set(entries.map((entry) => entry.bvid))];
+  const metadataEntries = await Promise.all(uniqueBvids.map(async (bvid) => [
     bvid,
-    await fetchBilibiliTitle(bvid)
+    await fetchBilibiliMetadata(bvid)
   ]));
+  const metadata = new Map(metadataEntries);
 
-  return new Map(entries);
+  return new Map(entries.map((entry) => [
+    `${entry.bvid}:p${entry.page}`,
+    titleFromMetadata(metadata.get(entry.bvid), entry.page)
+  ]));
 }
 
 function escapeAttribute(value = '') {
@@ -66,6 +109,15 @@ function escapeText(value = '') {
     .replaceAll('>', '&gt;');
 }
 
+function setAttribute(rawAttributes, name, value) {
+  const encoded = escapeAttribute(value);
+  const pattern = new RegExp(`\\s${name}="[^"]*"`);
+  if (pattern.test(rawAttributes)) {
+    return rawAttributes.replace(pattern, `\n      ${name}="${encoded}"`);
+  }
+  return `${rawAttributes}\n      ${name}="${encoded}"`;
+}
+
 function refinePlaylist(block, titles) {
   let output = block.replace(
     /<header>\s*<p>BILIBILI PLAYLIST<\/p>\s*<h4>[\s\S]*?<\/h4>\s*<span>\d+ VIDEOS<\/span>\s*<\/header>/,
@@ -76,15 +128,14 @@ function refinePlaylist(block, titles) {
     /<button([\s\S]*?)>\s*<span>[\s\S]*?<\/span>\s*<strong>[\s\S]*?<\/strong>\s*<small>([^<]+)<\/small>\s*<i([^>]*)>[\s\S]*?<\/i>\s*<\/button>/g,
     (match, rawAttributes, rawId, iconAttributes) => {
       const id = String(rawId || '').trim();
-      const title = titles.get(id) || '正在读取视频标题…';
-      let attributes = rawAttributes.replace(
-        /\sdata-playlist-title="[^"]*"/,
-        `\n      data-playlist-title="${escapeAttribute(title)}"`
-      );
+      const page = pageFromAttributes(rawAttributes);
+      const title = titles.get(`${id}:p${page}`) || '正在读取视频标题…';
 
-      if (/^BV[0-9A-Za-z]{10}$/i.test(id) && !attributes.includes('data-playlist-bvid=')) {
-        attributes += `\n      data-playlist-bvid="${id}"`;
+      let attributes = setAttribute(rawAttributes, 'data-playlist-title', title);
+      if (/^BV[0-9A-Za-z]{10}$/i.test(id)) {
+        attributes = setAttribute(attributes, 'data-playlist-bvid', id);
       }
+      attributes = setAttribute(attributes, 'data-playlist-page', String(page));
 
       return `<button${attributes}>
     <strong data-playlist-label>${escapeText(title)}</strong>
