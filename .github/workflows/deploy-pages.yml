@@ -66,7 +66,9 @@ jobs:
 
       - name: Generate Music pages
         run: |
+          cp music/index.html /tmp/music-index.manual.html
           node scripts/build-music-pages.mjs
+          cp /tmp/music-index.manual.html music/index.html
           node scripts/enhance-music-albums.mjs
           node scripts/enhance-music-visual-videos.mjs
           node scripts/refine-music-playlists.mjs
