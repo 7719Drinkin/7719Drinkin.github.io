@@ -88,6 +88,7 @@ function videoSpec(item) {
     if (!id) return null;
     return {
       provider,
+      videoId: id,
       embedUrl: `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?rel=0&playsinline=1`
     };
   }
@@ -96,17 +97,22 @@ function videoSpec(item) {
     const identity = bilibiliIdentity(item);
     if (!identity) return null;
     const page = Math.max(1, Number.parseInt(item.page, 10) || 1);
+    const quality = Math.max(16, Number.parseInt(item.quality, 10) || 80);
     return {
       provider,
-      embedUrl: `https://player.bilibili.com/player.html?${identity.key}=${encodeURIComponent(identity.value)}&page=${page}&high_quality=1&danmaku=0`
+      embedUrl: `https://player.bilibili.com/player.html?${identity.key}=${encodeURIComponent(identity.value)}&p=${page}&poster=1&autoplay=0&danmaku=0&high_quality=1&qn=${quality}`
     };
   }
 
   return null;
 }
 
+function isVideo(item) {
+  return item?.type === 'video' || Boolean(item?.provider || item?.embedUrl || item?.videoId || item?.bvid || item?.aid);
+}
+
 function renderImage(item, index) {
-  return `<figure class="visual-card">
+  return `<figure class="visual-card visual-card--photo">
     <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.alt ?? `Artist archive image ${index + 1}`)}" loading="lazy" decoding="async">
     ${item.caption ? `<figcaption>${escapeHtml(item.caption)}</figcaption>` : ''}
   </figure>`;
@@ -122,14 +128,11 @@ function renderVideo(item, index) {
       ? 'BILIBILI'
       : 'EXTERNAL VIDEO';
   const originalUrl = item.url || item.embedUrl || '#';
-  const poster = item.poster
-    ? `<img src="${escapeHtml(item.poster)}" alt="" loading="lazy" decoding="async">`
-    : '<div class="visual-video-placeholder" aria-hidden="true"></div>';
 
   if (!spec) {
-    return `<figure class="visual-card visual-card--video">
+    return `<figure class="visual-card visual-card--video visual-card--external">
       <div class="visual-video-stage">
-        ${poster}
+        <div class="visual-video-placeholder" aria-hidden="true"></div>
         <a class="visual-video-play" href="${escapeHtml(originalUrl)}" target="_blank" rel="noreferrer" aria-label="在外部网站观看 ${escapeHtml(title)}">
           <span class="visual-video-provider">${providerLabel}</span>
           <span class="visual-video-play-icon" aria-hidden="true"></span>
@@ -143,6 +146,32 @@ function renderVideo(item, index) {
     </figure>`;
   }
 
+  if (spec.provider === 'bilibili') {
+    return `<figure class="visual-card visual-card--video visual-card--bilibili">
+      <div class="visual-video-stage visual-video-stage--native">
+        <iframe
+          src="${escapeHtml(spec.embedUrl)}"
+          title="${escapeHtml(title)}"
+          loading="lazy"
+          scrolling="no"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen></iframe>
+      </div>
+      <figcaption>
+        <div><strong>${escapeHtml(title)}</strong>${caption ? `<span>${escapeHtml(caption)}</span>` : ''}</div>
+        <a href="${escapeHtml(originalUrl)}" target="_blank" rel="noreferrer">SOURCE ↗</a>
+      </figcaption>
+    </figure>`;
+  }
+
+  const derivedPoster = item.poster || (spec.videoId
+    ? `https://i.ytimg.com/vi/${encodeURIComponent(spec.videoId)}/hqdefault.jpg`
+    : '');
+  const poster = derivedPoster
+    ? `<img src="${escapeHtml(derivedPoster)}" alt="${escapeHtml(title)} 视频封面" loading="lazy" decoding="async" referrerpolicy="no-referrer">`
+    : '<div class="visual-video-placeholder" aria-hidden="true"></div>';
+
   return `<figure class="visual-card visual-card--video"
       data-video-embed="${escapeHtml(spec.embedUrl)}"
       data-video-title="${escapeHtml(title)}">
@@ -151,7 +180,7 @@ function renderVideo(item, index) {
       <button class="visual-video-play" type="button" data-video-play aria-label="播放 ${escapeHtml(title)}">
         <span class="visual-video-provider">${providerLabel}</span>
         <span class="visual-video-play-icon" aria-hidden="true"></span>
-        <span class="visual-video-open">CLICK TO LOAD</span>
+        <span class="visual-video-open">PLAY IN PAGE</span>
       </button>
     </div>
     <figcaption>
@@ -161,15 +190,37 @@ function renderVideo(item, index) {
   </figure>`;
 }
 
+function renderArchiveHeader(index, eyebrow, title, description) {
+  return `<header class="visual-archive-subheader">
+    <div><p>${escapeHtml(index)} / ${escapeHtml(eyebrow)}</p><h3>${escapeHtml(title)}</h3></div>
+    <span>${escapeHtml(description)}</span>
+  </header>`;
+}
+
 function renderGallery(gallery = []) {
   if (!gallery.length) {
     return '<div class="music-empty music-empty--visual"><span>VISUAL ARCHIVE / RESERVED</span><p>盘旋归燕树待栖~</p></div>';
   }
 
-  return gallery.map((item, index) => {
-    const isVideo = item?.type === 'video' || Boolean(item?.provider || item?.embedUrl || item?.videoId || item?.bvid || item?.aid);
-    return isVideo ? renderVideo(item, index) : renderImage(item, index);
-  }).join('');
+  const videos = gallery.filter(isVideo);
+  const photos = gallery.filter((item) => !isVideo(item));
+  const sections = [];
+
+  if (videos.length) {
+    sections.push(`<section class="visual-archive-group visual-archive-group--videos">
+      ${renderArchiveHeader('03A', 'VIDEO ARCHIVE', '影像放映', '视频使用独立的宽屏展映区，与照片档案分开呈现。')}
+      <div class="visual-video-grid">${videos.map(renderVideo).join('')}</div>
+    </section>`);
+  }
+
+  if (photos.length) {
+    sections.push(`<section class="visual-archive-group visual-archive-group--photos">
+      ${renderArchiveHeader(videos.length ? '03B' : '03A', 'PHOTO ARCHIVE', '照片记录', '人物照片继续使用不对称画廊进行陈列。')}
+      <div class="visual-photo-grid">${photos.map(renderImage).join('')}</div>
+    </section>`);
+  }
+
+  return `<div class="visual-archive-layout">${sections.join('')}</div>`;
 }
 
 function enhancePage(html, gallery) {
@@ -179,24 +230,28 @@ function enhancePage(html, gallery) {
   let output = html.replace(galleryPattern, `$1${galleryHtml}$2`);
   output = output.replace(
     /素材目录：\/assets\/Music\/Artists\/[^<]+\//,
-    '支持本地图片、YouTube 与哔哩哔哩链接；外部播放器仅在点击后加载。'
+    '视频与照片分区展示；支持 YouTube、哔哩哔哩及本地图片。'
   );
 
-  const hasVideo = gallery.some((item) => item?.type === 'video' || item?.provider || item?.embedUrl || item?.videoId || item?.bvid || item?.aid);
+  const hasVideo = gallery.some(isVideo);
   if (!hasVideo) return output;
 
   if (!output.includes('/css/music-visual-video.css')) {
     output = output.replace(
       '</head>',
-      '  <link rel="stylesheet" href="/css/music-visual-video.css?v=20260806-1">\n</head>'
+      '  <link rel="stylesheet" href="/css/music-visual-video.css?v=20260806-2">\n</head>'
     );
+  } else {
+    output = output.replace(/\/css\/music-visual-video\.css\?v=[^"]+/, '/css/music-visual-video.css?v=20260806-2');
   }
 
   if (!output.includes('/js/music-visual-video.js')) {
     output = output.replace(
       '</body>',
-      '  <script src="/js/music-visual-video.js?v=20260806-1"></script>\n</body>'
+      '  <script src="/js/music-visual-video.js?v=20260806-2"></script>\n</body>'
     );
+  } else {
+    output = output.replace(/\/js\/music-visual-video\.js\?v=[^"]+/, '/js/music-visual-video.js?v=20260806-2');
   }
 
   return output;
