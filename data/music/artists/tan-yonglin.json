@@ -10,33 +10,11 @@
     "en": "A personal archive of songs, stage impressions and repeated listening moments."
   },
   "personalNote": {
-    "zh": "第一阶段先完成通用歌手主页，后续再加入专辑脉络、精选现场、图片墙和个人短评。",
-    "en": "The first release focuses on the shared artist-page system; richer collections will follow."
+    "zh": "当前还没有配置可播放音频；后续接入真实音频源后，曲目会自动进入页面。",
+    "en": "No playable audio source is configured yet; tracks will appear after real audio sources are added."
   },
   "heroImage": null,
-  "selectedSongs": [
-    {
-      "title": "讲不出再见",
-      "album": null,
-      "year": null,
-      "note": "具有告别感，也有继续前行的力量。",
-      "url": null
-    },
-    {
-      "title": "一生中最爱",
-      "album": null,
-      "year": null,
-      "note": "旋律与情绪都非常完整。",
-      "url": null
-    },
-    {
-      "title": "朋友",
-      "album": null,
-      "year": null,
-      "note": "适合在不同人生阶段重新理解。",
-      "url": null
-    }
-  ],
+  "selectedSongs": [],
   "albums": [],
   "gallery": []
 }
