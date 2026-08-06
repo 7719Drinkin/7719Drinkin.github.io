@@ -42,7 +42,7 @@ if (catalogPage === 'album') {
 
 if (catalogPage && !document.querySelector('script[data-music-catalog-loader]')) {
   const script = document.createElement('script');
-  script.src = '/js/music-catalog.js?v=20260806-albums-2';
+  script.src = '/js/music-catalog.js?v=20260806-albums-3';
   script.dataset.musicCatalogLoader = '';
   document.body.append(script);
 }
