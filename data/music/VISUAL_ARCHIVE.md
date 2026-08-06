@@ -6,7 +6,12 @@
 data/music/artists/<artist-slug>.json
 ```
 
-`gallery` 数组可以同时放置本地图片、YouTube 视频和哔哩哔哩视频。页面不会在初次打开时创建外部播放器；访客点击视频卡片后才加载 iframe。
+`gallery` 数组可以同时放置本地图片、YouTube 视频和哔哩哔哩视频。生成后的页面会把视频与照片分成两个独立区域：
+
+```text
+影像放映 / VIDEO ARCHIVE
+照片记录 / PHOTO ARCHIVE
+```
 
 ## 本地图片
 
@@ -33,7 +38,7 @@ data/music/artists/<artist-slug>.json
 }
 ```
 
-`poster` 可省略。省略时使用网站自身的抽象视频占位图，不会在页面加载阶段请求 YouTube 缩略图。
+`poster` 可以省略。省略时使用 YouTube 的视频缩略图，点击后才加载播放器。
 
 也可以直接提供 ID：
 
@@ -57,11 +62,16 @@ data/music/artists/<artist-slug>.json
   "provider": "bilibili",
   "url": "https://www.bilibili.com/video/BVxxxxxxxxxx/",
   "title": "视频标题",
-  "caption": "可选说明文字"
+  "caption": "可选说明文字",
+  "quality": 80
 }
 ```
 
-多 P 视频可增加 `page`：
+哔哩哔哩卡片直接嵌入官方外链播放器，并启用播放器自身的 `poster=1` 封面，因此未播放时显示视频原始封面，而不是网站生成的抽象占位图。
+
+`quality` 默认是 `80`，页面会同时传递 `high_quality=1` 和 `qn=80` 作为高清偏好。但是哔哩哔哩外链播放器最终仍会依据访客网络、登录状态、视频可用清晰度和平台策略选择实际档位；站外页面无法跨域强制修改播放器内部的清晰度菜单。
+
+多 P 视频可以增加 `page`：
 
 ```json
 {
@@ -69,6 +79,7 @@ data/music/artists/<artist-slug>.json
   "provider": "bilibili",
   "url": "https://www.bilibili.com/video/BVxxxxxxxxxx/",
   "page": 2,
+  "quality": 80,
   "title": "第二部分"
 }
 ```
@@ -100,14 +111,16 @@ data/music/artists/<artist-slug>.json
   "type": "video",
   "provider": "bilibili",
   "url": "原始视频页面地址",
-  "embedUrl": "https://player.bilibili.com/player.html?bvid=BVxxxxxxxxxx&page=1",
+  "embedUrl": "https://player.bilibili.com/player.html?bvid=BVxxxxxxxxxx&p=1&poster=1",
   "title": "视频标题"
 }
 ```
 
 ## 展示与性能
 
+- 视频和照片使用独立的布局，不再混入同一个不对称网格。
 - 图片继续使用延迟加载。
-- 外部视频播放器只有在用户点击卡片后才创建。
+- 哔哩哔哩播放器使用浏览器原生 `loading="lazy"`，接近视口时再加载。
+- YouTube 使用视频缩略图，点击后才创建播放器。
 - YouTube 默认使用隐私增强域名 `youtube-nocookie.com`。
-- 视频卡片始终保留原始来源链接，嵌入受限时可以跳转到原网站观看。
+- 每个视频卡片保留原始来源链接，嵌入受限或需要手动选择更高清晰度时可以跳转原网站。
