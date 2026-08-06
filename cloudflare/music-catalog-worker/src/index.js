@@ -10,6 +10,7 @@ const AUDIO_TYPES = new Map([
 
 const DEFAULT_TTL_SECONDS = 43_200;
 const LOCK_TTL_SECONDS = 90;
+const UNNUMBERED_ORDER = Number.MAX_SAFE_INTEGER;
 
 export default {
   async fetch(request, env, ctx) {
@@ -125,15 +126,16 @@ async function buildCatalog(env, artistPrefix) {
   const albumRows = [...albums.entries()]
     .map(([name, tracks]) => ({
       name,
-      tracks: tracks.sort((left, right) => left.title.localeCompare(right.title, 'zh-CN'))
+      tracks: tracks.sort(compareTracks)
     }))
     .sort((left, right) => left.name.localeCompare(right.name, 'zh-CN'));
 
   const generatedAt = new Date().toISOString();
   const catalog = {
-    version: 1,
+    version: 2,
     artistPrefix,
     generatedAt,
+    ordering: 'disc-track-title',
     totalTracks: albumRows.reduce((sum, album) => sum + album.tracks.length, 0),
     ignoredObjects,
     albums: albumRows
@@ -154,14 +156,17 @@ function parseTrack(object, artistPrefix, publicBase) {
 
   const album = parts.slice(1, -1).join(' / ');
   const stem = fileName.slice(0, -(extension.length + 1));
-  const separatorIndex = stem.indexOf(' - ');
-  const title = separatorIndex >= 0 ? stem.slice(separatorIndex + 3).trim() : stem.trim();
+  const orderedName = parseOrderedName(stem);
+  const title = stripArtistPrefix(orderedName.name) || orderedName.name || stem;
   const encodedKey = object.key.split('/').map(encodeURIComponent).join('/');
 
   return {
     album,
     track: {
-      title: title || stem,
+      title,
+      discNumber: orderedName.discNumber,
+      trackNumber: orderedName.trackNumber,
+      orderLabel: formatOrderLabel(orderedName.discNumber, orderedName.trackNumber),
       fileName,
       key: object.key,
       src: `${publicBase}/${encodedKey}`,
@@ -172,8 +177,77 @@ function parseTrack(object, artistPrefix, publicBase) {
   };
 }
 
+function parseOrderedName(stem) {
+  const value = String(stem || '').trim();
+
+  const namedDisc = value.match(/^(?:cd|disc|disk)\s*(\d{1,2})\s*[-_.]\s*(\d{1,3})\s*(?:[-_.、]\s*|\s+)/i);
+  if (namedDisc) {
+    return {
+      discNumber: Number(namedDisc[1]),
+      trackNumber: Number(namedDisc[2]),
+      name: value.slice(namedDisc[0].length).trim()
+    };
+  }
+
+  const numericDisc = value.match(/^(\d{1,2})\s*[-_.]\s*(\d{2,3})\s*(?:[-_.、]\s*|\s+)/);
+  if (numericDisc) {
+    return {
+      discNumber: Number(numericDisc[1]),
+      trackNumber: Number(numericDisc[2]),
+      name: value.slice(numericDisc[0].length).trim()
+    };
+  }
+
+  const singleTrack = value.match(/^(\d{1,3})\s*(?:[-_.、]\s+|\.\s+)/);
+  if (singleTrack) {
+    return {
+      discNumber: 1,
+      trackNumber: Number(singleTrack[1]),
+      name: value.slice(singleTrack[0].length).trim()
+    };
+  }
+
+  return {
+    discNumber: null,
+    trackNumber: null,
+    name: value
+  };
+}
+
+function stripArtistPrefix(value) {
+  const segments = String(value || '')
+    .split(/\s+-\s+/)
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+
+  return segments.length >= 2 ? segments.slice(1).join(' - ') : segments[0] || '';
+}
+
+function compareTracks(left, right) {
+  const leftDisc = Number.isInteger(left.discNumber) ? left.discNumber : UNNUMBERED_ORDER;
+  const rightDisc = Number.isInteger(right.discNumber) ? right.discNumber : UNNUMBERED_ORDER;
+  if (leftDisc !== rightDisc) return leftDisc - rightDisc;
+
+  const leftTrack = Number.isInteger(left.trackNumber) ? left.trackNumber : UNNUMBERED_ORDER;
+  const rightTrack = Number.isInteger(right.trackNumber) ? right.trackNumber : UNNUMBERED_ORDER;
+  if (leftTrack !== rightTrack) return leftTrack - rightTrack;
+
+  return left.title.localeCompare(right.title, 'zh-CN', {
+    numeric: true,
+    sensitivity: 'base'
+  });
+}
+
+function formatOrderLabel(discNumber, trackNumber) {
+  if (!Number.isInteger(trackNumber)) return null;
+  const track = String(trackNumber).padStart(2, '0');
+  return Number.isInteger(discNumber) && discNumber > 1
+    ? `${discNumber}-${track}`
+    : track;
+}
+
 function catalogKey(artistPrefix) {
-  return `music-catalog:v1:${artistPrefix}`;
+  return `music-catalog:v2:${artistPrefix}`;
 }
 
 function isFresh(catalog, ttlSeconds) {
