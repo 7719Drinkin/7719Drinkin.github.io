@@ -231,7 +231,7 @@
     document.body.append(script);
   };
 
-  const renderCatalog = (catalog, sourceLabel = 'WORKER CACHE') => {
+  const renderCatalog = (catalog, sourceLabel = 'WORKER CACHE', initializePlayer = true) => {
     const albums = catalogAlbums(catalog);
     hydrateAlbumCards(albums);
 
@@ -239,7 +239,7 @@
       ? renderAlbumTracks(albums, sourceLabel)
       : renderFeatured(albums);
 
-    if (rendered) ensurePlayer();
+    if (rendered && initializePlayer) ensurePlayer();
     window.dispatchEvent(new CustomEvent('music:catalog-ready', {
       detail: { artistSlug, pageType, catalog }
     }));
@@ -279,7 +279,11 @@
     const cacheIsFresh = hasCachedCatalog && Date.now() - Number(cached.savedAt || 0) < localTtl;
 
     if (hasCachedCatalog) {
-      renderCatalog(cached.catalog, cacheIsFresh ? 'BROWSER CACHE' : 'STALE BROWSER CACHE');
+      renderCatalog(
+        cached.catalog,
+        cacheIsFresh ? 'BROWSER CACHE' : 'STALE BROWSER CACHE',
+        cacheIsFresh
+      );
       if (cacheIsFresh) return;
     }
 
@@ -295,9 +299,11 @@
 
       const catalog = await response.json();
       writeCache(prefix, catalog);
-      renderCatalog(catalog, response.headers.get('X-Music-Catalog-Cache') || 'WORKER CACHE');
+      renderCatalog(catalog, response.headers.get('X-Music-Catalog-Cache') || 'WORKER CACHE', true);
     } catch {
-      if (!hasCachedCatalog) {
+      if (hasCachedCatalog) {
+        ensurePlayer();
+      } else {
         songList.replaceChildren(createState(
           'CATALOG UNAVAILABLE',
           '曲目目录服务暂时无法访问。页面不会直接扫描 R2，也不会逐个探测音频文件。'
