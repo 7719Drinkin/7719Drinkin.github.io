@@ -117,19 +117,38 @@
     const items = [...playlist.querySelectorAll('[data-playlist-src]')];
     if (!iframe || !items.length) return;
 
+    const panelHeader = playlist.querySelector('.visual-playlist-panel > header');
+    panelHeader?.querySelector('p')?.remove();
+    panelHeader?.querySelector('span')?.remove();
+    const playlistHeading = panelHeader?.querySelector('h4');
+    if (playlistHeading) playlistHeading.textContent = '播放列表';
+
     const applyTitle = (item, title) => {
       const label = item.querySelector('[data-playlist-label]');
-      if (!title || !label) return;
-      label.textContent = title;
-      item.dataset.playlistTitle = title;
-      item.setAttribute('aria-label', `播放 ${title}`);
-      if (item.classList.contains('is-active')) iframe.title = title;
+      if (!label) return;
+
+      const resolvedTitle = title || '视频标题暂不可用';
+      label.textContent = resolvedTitle;
+      item.dataset.playlistTitle = resolvedTitle;
+      item.setAttribute('aria-label', `播放 ${resolvedTitle}`);
+      if (item.classList.contains('is-active')) iframe.title = resolvedTitle;
     };
 
     items.forEach((item) => {
-      const bvid = item.dataset.playlistBvid;
+      item.querySelector(':scope > span')?.remove();
+      item.querySelector('small')?.remove();
+
+      const label = item.querySelector('strong');
+      if (label) {
+        label.dataset.playlistLabel = '';
+        label.textContent = '正在读取视频标题…';
+      }
+
+      const bvid = item.dataset.playlistBvid || item.querySelector('small')?.textContent?.trim();
       if (bvid) {
         requestBilibiliTitle(bvid).then((title) => applyTitle(item, title));
+      } else {
+        applyTitle(item, '视频标题暂不可用');
       }
 
       item.addEventListener('click', () => {
