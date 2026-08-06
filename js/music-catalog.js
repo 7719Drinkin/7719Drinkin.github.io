@@ -151,20 +151,69 @@
     return row;
   };
 
+  const animateAlbumReorder = (cards, previousPositions) => {
+    if (!('animate' in Element.prototype)) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    requestAnimationFrame(() => {
+      cards.forEach((card) => {
+        const previous = previousPositions.get(card);
+        const current = card.getBoundingClientRect();
+        if (!previous) return;
+
+        const x = previous.left - current.left;
+        const y = previous.top - current.top;
+        if (Math.abs(x) < 1 && Math.abs(y) < 1) return;
+
+        card.animate([
+          { transform: `translate(${x}px, ${y}px)` },
+          { transform: 'translate(0, 0)' }
+        ], {
+          duration: 560,
+          easing: 'cubic-bezier(.16, 1, .3, 1)'
+        });
+      });
+    });
+  };
+
   const hydrateAlbumCards = (albums) => {
-    document.querySelectorAll('.album-card[data-album-name]').forEach((card) => {
+    const grid = document.querySelector('.album-grid');
+    if (!grid) return;
+
+    const cards = [...grid.querySelectorAll('.album-card[data-album-name]')];
+    if (!cards.length) return;
+
+    const previousPositions = new Map(cards.map((card) => [card, card.getBoundingClientRect()]));
+
+    cards.forEach((card, index) => {
+      if (!card.dataset.archiveIndex) card.dataset.archiveIndex = String(index);
+
       const album = findAlbum(albums, card.dataset.albumName);
       const count = card.querySelector('[data-album-track-count]');
-      if (!count) return;
+      const hasTracks = Boolean(album?.tracks?.length);
 
-      if (album) {
-        count.textContent = `${album.tracks.length} TRACK${album.tracks.length === 1 ? '' : 'S'}`;
-        card.classList.add('has-catalog-tracks');
-      } else {
-        count.textContent = 'DETAIL PAGE';
-        card.classList.remove('has-catalog-tracks');
+      card.classList.toggle('has-catalog-tracks', hasTracks);
+      card.classList.toggle('is-empty-album', !hasTracks);
+      card.dataset.catalogState = hasTracks ? 'populated' : 'empty';
+
+      if (count) {
+        count.textContent = hasTracks
+          ? `${album.tracks.length} TRACK${album.tracks.length === 1 ? '' : 'S'}`
+          : '0 TRACKS';
       }
     });
+
+    cards
+      .sort((left, right) => {
+        const stateDifference = Number(right.dataset.catalogState === 'populated')
+          - Number(left.dataset.catalogState === 'populated');
+        if (stateDifference) return stateDifference;
+        return Number(left.dataset.archiveIndex) - Number(right.dataset.archiveIndex);
+      })
+      .forEach((card) => grid.append(card));
+
+    grid.classList.add('is-catalog-sorted');
+    animateAlbumReorder(cards, previousPositions);
   };
 
   const renderFeatured = (albums) => {
