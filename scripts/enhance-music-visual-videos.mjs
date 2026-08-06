@@ -68,6 +68,15 @@ function detectProvider(item) {
   return '';
 }
 
+function bilibiliEmbedUrl(item) {
+  const identity = bilibiliIdentity(item);
+  if (!identity) return null;
+
+  const page = Math.max(1, Number.parseInt(item.page, 10) || 1);
+  const quality = Math.max(16, Number.parseInt(item.quality, 10) || 80);
+  return `https://player.bilibili.com/player.html?${identity.key}=${encodeURIComponent(identity.value)}&p=${page}&poster=1&autoplay=0&danmaku=0&high_quality=1&qn=${quality}`;
+}
+
 function videoSpec(item) {
   const provider = detectProvider(item);
 
@@ -94,21 +103,22 @@ function videoSpec(item) {
   }
 
   if (provider === 'bilibili') {
-    const identity = bilibiliIdentity(item);
-    if (!identity) return null;
-    const page = Math.max(1, Number.parseInt(item.page, 10) || 1);
-    const quality = Math.max(16, Number.parseInt(item.quality, 10) || 80);
-    return {
-      provider,
-      embedUrl: `https://player.bilibili.com/player.html?${identity.key}=${encodeURIComponent(identity.value)}&p=${page}&poster=1&autoplay=0&danmaku=0&high_quality=1&qn=${quality}`
-    };
+    const embedUrl = bilibiliEmbedUrl(item);
+    if (!embedUrl) return null;
+    return { provider, embedUrl };
   }
 
   return null;
 }
 
+function isPlaylist(item) {
+  return item?.type === 'bilibili-playlist' && Array.isArray(item?.videos);
+}
+
 function isVideo(item) {
-  return item?.type === 'video' || Boolean(item?.provider || item?.embedUrl || item?.videoId || item?.bvid || item?.aid);
+  return isPlaylist(item)
+    || item?.type === 'video'
+    || Boolean(item?.provider || item?.embedUrl || item?.videoId || item?.bvid || item?.aid);
 }
 
 function renderImage(item, index) {
@@ -118,7 +128,65 @@ function renderImage(item, index) {
   </figure>`;
 }
 
+function renderPlaylist(item, index) {
+  const videos = (item.videos ?? [])
+    .map((video, videoIndex) => {
+      const embedUrl = bilibiliEmbedUrl(video);
+      if (!embedUrl) return null;
+      const identity = bilibiliIdentity(video);
+      return {
+        embedUrl,
+        title: video.title || `影像记录 ${String(videoIndex + 1).padStart(2, '0')}`,
+        id: identity?.value || '',
+        url: video.url || `https://www.bilibili.com/video/${identity?.value || ''}/`
+      };
+    })
+    .filter(Boolean);
+
+  if (!videos.length) {
+    return `<div class="music-empty music-empty--visual"><span>PLAYLIST EMPTY</span><p>当前播放列表中没有可用的哔哩哔哩视频。</p></div>`;
+  }
+
+  const title = item.title || `影像播放列表 ${String(index + 1).padStart(2, '0')}`;
+  const first = videos[0];
+  const buttons = videos.map((video, videoIndex) => `<button
+      class="visual-playlist-item${videoIndex === 0 ? ' is-active' : ''}"
+      type="button"
+      data-playlist-src="${escapeHtml(video.embedUrl)}"
+      data-playlist-title="${escapeHtml(video.title)}"
+      aria-pressed="${videoIndex === 0 ? 'true' : 'false'}">
+    <span>${String(videoIndex + 1).padStart(2, '0')}</span>
+    <strong>${escapeHtml(video.title)}</strong>
+    <small>${escapeHtml(video.id)}</small>
+    <i aria-hidden="true">▶</i>
+  </button>`).join('');
+
+  return `<article class="visual-playlist" data-bilibili-playlist>
+    <div class="visual-playlist-player">
+      <iframe
+        data-playlist-player
+        src="${escapeHtml(first.embedUrl)}"
+        title="${escapeHtml(first.title)}"
+        loading="lazy"
+        scrolling="no"
+        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen></iframe>
+    </div>
+    <aside class="visual-playlist-panel">
+      <header>
+        <p>BILIBILI PLAYLIST</p>
+        <h4>${escapeHtml(title)}</h4>
+        <span>${videos.length} VIDEOS</span>
+      </header>
+      <div class="visual-playlist-items" role="list" aria-label="${escapeHtml(title)}">${buttons}</div>
+    </aside>
+  </article>`;
+}
+
 function renderVideo(item, index) {
+  if (isPlaylist(item)) return renderPlaylist(item, index);
+
   const spec = videoSpec(item);
   const title = item.title || item.alt || `影像记录 ${String(index + 1).padStart(2, '0')}`;
   const caption = item.caption || item.note || '';
@@ -235,19 +303,19 @@ function enhancePage(html, gallery) {
   if (!output.includes('/css/music-visual-video.css')) {
     output = output.replace(
       '</head>',
-      '  <link rel="stylesheet" href="/css/music-visual-video.css?v=20260806-2">\n</head>'
+      '  <link rel="stylesheet" href="/css/music-visual-video.css?v=20260806-3">\n</head>'
     );
   } else {
-    output = output.replace(/\/css\/music-visual-video\.css\?v=[^"]+/, '/css/music-visual-video.css?v=20260806-2');
+    output = output.replace(/\/css\/music-visual-video\.css\?v=[^"]+/, '/css/music-visual-video.css?v=20260806-3');
   }
 
   if (!output.includes('/js/music-visual-video.js')) {
     output = output.replace(
       '</body>',
-      '  <script src="/js/music-visual-video.js?v=20260806-2"></script>\n</body>'
+      '  <script src="/js/music-visual-video.js?v=20260806-3"></script>\n</body>'
     );
   } else {
-    output = output.replace(/\/js\/music-visual-video\.js\?v=[^"]+/, '/js/music-visual-video.js?v=20260806-2');
+    output = output.replace(/\/js\/music-visual-video\.js\?v=[^"]+/, '/js/music-visual-video.js?v=20260806-3');
   }
 
   return output;
