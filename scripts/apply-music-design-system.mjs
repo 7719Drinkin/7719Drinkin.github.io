@@ -6,8 +6,9 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MUSIC_ROOT = join(ROOT, 'music');
 const REGISTRY_PATH = join(ROOT, 'data/music/artists.json');
 const DETAILS_ROOT = join(ROOT, 'data/music/artists');
-const STYLE_HREF = '/css/music-design-system.css?v=20260806-1';
-const SCRIPT_SRC = '/js/music-motion.js?v=20260806-1';
+const STYLE_HREF = '/css/music-design-system.css?v=20260807-1';
+const HEADING_STYLE_HREF = '/css/music-heading-system.css?v=20260807-1';
+const SCRIPT_SRC = '/js/music-motion.js?v=20260807-1';
 const VISUAL_STYLE_HREF = '/css/music-visual-video.css?v=20260806-3';
 const VISUAL_SCRIPT_SRC = '/js/music-visual-video.js?v=20260806-5';
 const FONT_HREF = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap';
@@ -31,11 +32,18 @@ async function htmlFiles(directory) {
   return nested.flat();
 }
 
-function simplifySectionHeaders(html) {
-  return html.replace(
+function normalizeSectionHeaders(html) {
+  let output = html.replace(
     /<div class="music-section-header reveal">\s*<div>\s*(?:<p>[\s\S]*?<\/p>\s*)?<h2>([\s\S]*?)<\/h2>\s*<\/div>\s*(?:<span>[\s\S]*?<\/span>\s*)?(?:<a[\s\S]*?<\/a>\s*)?<\/div>/g,
-    '<header class="music-section-header music-section-header--system reveal"><h2>$1</h2></header>'
+    '<header class="music-section-header music-section-header--unified reveal"><h2>$1</h2></header>'
   );
+
+  output = output.replace(
+    /music-section-header--(?:system|clean)/g,
+    'music-section-header--unified'
+  );
+
+  return output;
 }
 
 function installFont(html) {
@@ -46,17 +54,31 @@ function installFont(html) {
   return html.replace('</head>', `  ${link}\n</head>`);
 }
 
-function installStyle(html) {
-  if (html.includes('/css/music-design-system.css')) {
-    return html.replace(
+function installStyles(html) {
+  let output = html;
+
+  if (output.includes('/css/music-design-system.css')) {
+    output = output.replace(
       /\/css\/music-design-system\.css\?v=[^"]+/g,
       STYLE_HREF
     );
+  } else {
+    output = output.replace(
+      '</head>',
+      `  <link rel="stylesheet" href="${STYLE_HREF}">\n</head>`
+    );
   }
 
-  return html.replace(
+  if (output.includes('/css/music-heading-system.css')) {
+    return output.replace(
+      /\/css\/music-heading-system\.css\?v=[^"]+/g,
+      HEADING_STYLE_HREF
+    );
+  }
+
+  return output.replace(
     '</head>',
-    `  <link rel="stylesheet" href="${STYLE_HREF}">\n</head>`
+    `  <link rel="stylesheet" href="${HEADING_STYLE_HREF}">\n</head>`
   );
 }
 
@@ -74,11 +96,19 @@ function installScript(html) {
   );
 }
 
-function markUnified(html) {
-  if (/data-music-design="unified"/.test(html)) return html;
+function markMusicModule(html) {
   return html.replace(
-    /<body class="([^"]*music-page[^"]*)"/,
-    '<body class="$1" data-music-design="unified"'
+    /<body class="([^"]*music-page[^"]*)"([^>]*)>/,
+    (match, className, rawAttributes) => {
+      let attributes = rawAttributes;
+      if (!/data-music-design=/.test(attributes)) {
+        attributes += ' data-music-design="unified"';
+      }
+      if (!/data-site-module=/.test(attributes)) {
+        attributes += ' data-site-module="music"';
+      }
+      return `<body class="${className}"${attributes}>`;
+    }
   );
 }
 
@@ -203,11 +233,11 @@ function ensureArtistPlaylist(html, detail) {
 }
 
 function refine(html) {
-  let output = simplifySectionHeaders(html);
+  let output = normalizeSectionHeaders(html);
   output = installFont(output);
-  output = installStyle(output);
+  output = installStyles(output);
   output = installScript(output);
-  output = markUnified(output);
+  output = markMusicModule(output);
   return output;
 }
 
@@ -245,7 +275,7 @@ async function main() {
     updated += 1;
   }
 
-  console.log(`Applied unified Music design system and repaired ${updated} Music page(s).`);
+  console.log(`Applied isolated Music design system to ${updated} Music page(s).`);
 }
 
 main().catch((error) => {
