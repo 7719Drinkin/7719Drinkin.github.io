@@ -2,8 +2,17 @@ function setupSectionHeadingLanguagePairs() {
   const bindSection = (selector, primaryValues, secondaryValues) => {
     const header = document.querySelector(selector);
     if (!header) return;
-    const primary = header.querySelector(':scope > div > h2, :scope > div > h3');
-    const secondary = header.querySelector(':scope > div > p');
+
+    const primary = header.querySelector(':scope > h2, :scope > h3, :scope > div > h2, :scope > div > h3');
+    if (!primary) return;
+
+    let secondary = header.querySelector(':scope > .music-heading-secondary, :scope > div > p');
+    if (!secondary) {
+      secondary = document.createElement('small');
+      secondary.className = 'music-heading-secondary';
+      primary.insertAdjacentElement('afterend', secondary);
+    }
+
     bindBilingualElement(primary, primaryValues, 'primary');
     bindBilingualElement(secondary, secondaryValues, 'secondary');
   };
@@ -32,8 +41,16 @@ function setupSectionHeadingLanguagePairs() {
 
   document.querySelectorAll('.visual-archive-subheader').forEach((header) => {
     const primary = header.querySelector('h3');
-    const secondary = header.querySelector('p');
-    const raw = secondary?.textContent?.trim() || '';
+    if (!primary) return;
+
+    let secondary = header.querySelector('.music-heading-secondary, p');
+    if (!secondary) {
+      secondary = document.createElement('small');
+      secondary.className = 'music-heading-secondary';
+      primary.insertAdjacentElement('afterend', secondary);
+    }
+
+    const raw = secondary.textContent?.trim() || '';
     const index = raw.match(/^(03[A-Z])/i)?.[1]?.toUpperCase() || '03A';
     const isVideo = header.closest('.visual-archive-group--videos');
     bindBilingualElement(
