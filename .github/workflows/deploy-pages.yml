@@ -26,7 +26,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -47,13 +47,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Validate site build runtimes
+      - name: Validate persistent shell runtime
         run: |
           node --check js/site-shell.js
           node --check js/site-frame-bridge.js
           node --check scripts/install-site-shell.mjs
-          node --check scripts/refine-music-artist-hierarchy.mjs
-          node --check scripts/apply-music-design-system.mjs
 
       - name: Select deployment path
         shell: bash
