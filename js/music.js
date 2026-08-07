@@ -11,6 +11,93 @@ document.querySelectorAll('.collection-song-row em').forEach((label) => {
 
 const catalogPage = document.body.dataset.musicCatalogPage;
 
+if (catalogPage === 'artist') {
+  const albumGrid = document.querySelector('.album-grid');
+
+  if (albumGrid) {
+    const cards = [...albumGrid.querySelectorAll('.album-card[data-album-name]')];
+
+    const releaseTime = (card) => {
+      const label = card.querySelector('.album-card-meta span')?.textContent?.trim() || '';
+      const match = label.match(/^(\d{4})-(\d{2})/);
+      if (!match) return Number.POSITIVE_INFINITY;
+      return Date.UTC(Number(match[1]), Number(match[2]) - 1, 1);
+    };
+
+    const compareTime = (left, right, direction = 'asc') => {
+      const leftTime = releaseTime(left);
+      const rightTime = releaseTime(right);
+      const leftMissing = !Number.isFinite(leftTime);
+      const rightMissing = !Number.isFinite(rightTime);
+
+      if (leftMissing !== rightMissing) return leftMissing ? 1 : -1;
+      if (!leftMissing && leftTime !== rightTime) {
+        return direction === 'desc' ? rightTime - leftTime : leftTime - rightTime;
+      }
+      return Number(left.dataset.albumSourceIndex || 0) - Number(right.dataset.albumSourceIndex || 0);
+    };
+
+    cards.forEach((card, index) => {
+      card.dataset.albumSourceIndex = String(index);
+    });
+
+    let sortMode = 'default';
+
+    const sortCards = () => {
+      [...albumGrid.querySelectorAll('.album-card[data-album-name]')]
+        .sort((left, right) => {
+          if (sortMode === 'default') {
+            const trackDifference = Number(right.classList.contains('has-catalog-tracks'))
+              - Number(left.classList.contains('has-catalog-tracks'));
+            if (trackDifference) return trackDifference;
+            return compareTime(left, right, 'asc');
+          }
+
+          return compareTime(left, right, sortMode);
+        })
+        .forEach((card) => albumGrid.append(card));
+    };
+
+    if (cards.length > 1) {
+      const controls = document.createElement('div');
+      controls.className = 'album-sort-controls';
+      controls.setAttribute('aria-label', '专辑排序');
+      controls.innerHTML = `
+        <span>排序</span>
+        <div>
+          <button type="button" class="is-active" data-album-sort="default" aria-pressed="true">默认排序</button>
+          <button type="button" data-album-sort="asc" aria-pressed="false">时间正序</button>
+          <button type="button" data-album-sort="desc" aria-pressed="false">时间倒序</button>
+        </div>
+      `;
+
+      albumGrid.before(controls);
+
+      const style = document.createElement('link');
+      style.rel = 'stylesheet';
+      style.href = '/css/music-album-sort.css?v=20260807-1';
+      style.dataset.musicAlbumSortStyle = '';
+      document.head.append(style);
+
+      controls.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-album-sort]');
+        if (!button) return;
+
+        sortMode = button.dataset.albumSort || 'default';
+        controls.querySelectorAll('[data-album-sort]').forEach((item) => {
+          const active = item === button;
+          item.classList.toggle('is-active', active);
+          item.setAttribute('aria-pressed', String(active));
+        });
+        sortCards();
+      });
+
+      sortCards();
+      window.addEventListener('music:catalog-ready', sortCards);
+    }
+  }
+}
+
 if (catalogPage === 'album') {
   const trackSection = document.querySelector('.album-track-section');
   const redundantHeader = trackSection?.querySelector(':scope > .music-section-header');

@@ -1,0 +1,70 @@
+.album-sort-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: -18px 0 28px;
+  padding: 12px 0;
+  border-top: 1px solid var(--music-line);
+  border-bottom: 1px solid var(--music-line);
+}
+
+.album-sort-controls > span {
+  color: var(--music-muted);
+  font: 700 8px/1 var(--music-mono);
+  letter-spacing: .16em;
+}
+
+.album-sort-controls > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.album-sort-controls button {
+  appearance: none;
+  padding: 8px 12px;
+  border: 1px solid var(--music-line);
+  border-radius: 999px;
+  color: var(--music-muted);
+  background: transparent;
+  cursor: pointer;
+  font: 700 9px/1 var(--music-mono);
+  letter-spacing: .06em;
+  transition: border-color .2s ease, color .2s ease, background-color .2s ease;
+}
+
+.album-sort-controls button:hover,
+.album-sort-controls button:focus-visible {
+  border-color: color-mix(in srgb, var(--artist-accent) 48%, var(--music-line));
+  color: var(--artist-accent-soft);
+}
+
+.album-sort-controls button:focus-visible {
+  outline: 2px solid var(--artist-accent);
+  outline-offset: 2px;
+}
+
+.album-sort-controls button.is-active {
+  border-color: color-mix(in srgb, var(--artist-accent) 58%, var(--music-line));
+  color: var(--artist-fg);
+  background: color-mix(in srgb, var(--artist-accent) 14%, transparent);
+}
+
+@media (max-width: 620px) {
+  .album-sort-controls {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .album-sort-controls > div {
+    justify-content: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .album-sort-controls button {
+    transition: none;
+  }
+}
