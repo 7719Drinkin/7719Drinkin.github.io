@@ -1,0 +1,1028 @@
+/*
+ * Basketball module design system.
+ * Inspired by Chicago red / black arena graphics without using team marks.
+ * Scoped to data-site-module="basketball" so other site modules remain independent.
+ */
+
+body[data-site-module="basketball"] {
+  --basketball-red: #ce1141;
+  --basketball-red-bright: #ef174f;
+  --basketball-red-deep: #77001f;
+  --basketball-black: #050505;
+  --basketball-panel: #0d0d0f;
+  --basketball-panel-raised: #151518;
+  --basketball-ivory: #f5f2ed;
+  --basketball-silver: #c4ced4;
+  --basketball-muted: #9a989d;
+  --basketball-line: rgba(255, 255, 255, .14);
+  --basketball-line-strong: rgba(255, 255, 255, .26);
+  --basketball-display: "Anton", sans-serif;
+  --basketball-ui: "Montserrat", sans-serif;
+  --basketball-ease: cubic-bezier(.16, 1, .3, 1);
+  --basketball-fast: 220ms;
+  --basketball-slow: 760ms;
+  min-width: 320px;
+  color: var(--basketball-ivory);
+  background:
+    radial-gradient(circle at 86% 12%, rgba(206, 17, 65, .2), transparent 27%),
+    radial-gradient(circle at 8% 82%, rgba(119, 0, 31, .18), transparent 33%),
+    linear-gradient(145deg, #050505 0%, #09090b 42%, #050505 100%);
+  font-family: var(--basketball-ui);
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+
+body[data-site-module="basketball"]::before {
+  position: fixed;
+  inset: 0;
+  z-index: -4;
+  content: "";
+  pointer-events: none;
+  opacity: .2;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.38) 62%, transparent 100%);
+}
+
+body[data-site-module="basketball"]::after {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  content: "";
+  pointer-events: none;
+  opacity: .07;
+  background-image: repeating-radial-gradient(circle at 0 0, transparent 0 2px, rgba(255,255,255,.26) 3px, transparent 4px 7px);
+  mix-blend-mode: soft-light;
+}
+
+body[data-site-module="basketball"] :is(.universe-noise, .grain) {
+  opacity: .07;
+}
+
+body[data-site-module="basketball"] .basketball-court-lines {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: .13;
+}
+
+body[data-site-module="basketball"] .basketball-court-lines::before {
+  position: absolute;
+  top: 7%;
+  right: -18vw;
+  width: min(70vw, 980px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 50%;
+  content: "";
+  box-shadow:
+    0 0 0 12vw rgba(255,255,255,.018),
+    0 0 0 24vw rgba(255,255,255,.012);
+  transform: translate3d(0, var(--court-shift, 0), 0);
+}
+
+body[data-site-module="basketball"] .basketball-court-lines::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 16%;
+  width: 1px;
+  content: "";
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,.3) 18%, rgba(255,255,255,.3) 80%, transparent);
+  box-shadow: 34vw 0 0 rgba(255,255,255,.14), 68vw 0 0 rgba(255,255,255,.09);
+}
+
+/* Shared module navigation */
+body[data-site-module="basketball"] :is(.universe-header, .site-header, .archive-header) {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 60;
+  display: flex;
+  height: 70px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(18px, 4vw, 68px);
+  border-bottom: 1px solid transparent;
+  background: linear-gradient(180deg, rgba(5,5,5,.82), rgba(5,5,5,.46));
+  backdrop-filter: blur(16px);
+  transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+
+body[data-site-module="basketball"] :is(.universe-header.is-scrolled, .site-header.scrolled, .archive-header.is-scrolled) {
+  border-bottom-color: var(--basketball-line);
+  background: rgba(5,5,5,.93);
+  box-shadow: 0 14px 38px rgba(0,0,0,.3);
+}
+
+body[data-site-module="basketball"] :is(.universe-brand, .brand, .archive-brand) {
+  position: relative;
+  color: var(--basketball-ivory);
+  font-family: var(--basketball-display);
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: .04em;
+  text-decoration: none;
+}
+
+body[data-site-module="basketball"] :is(.universe-brand, .brand, .archive-brand)::after {
+  position: absolute;
+  right: -11px;
+  bottom: -4px;
+  width: 18px;
+  height: 4px;
+  content: "";
+  background: var(--basketball-red);
+  transform: skewX(-28deg);
+}
+
+body[data-site-module="basketball"] :is(.universe-nav, .site-header nav, .archive-header nav) {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.6vw, 36px);
+}
+
+body[data-site-module="basketball"] :is(.universe-nav a, .site-header nav a, .archive-header nav a) {
+  position: relative;
+  color: rgba(245,242,237,.7);
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .18em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color .22s ease;
+}
+
+body[data-site-module="basketball"] :is(.universe-nav a, .site-header nav a, .archive-header nav a)::after {
+  position: absolute;
+  right: 0;
+  bottom: -11px;
+  left: 0;
+  height: 2px;
+  content: "";
+  background: var(--basketball-red);
+  transform: scaleX(0) skewX(-24deg);
+  transform-origin: right center;
+  transition: transform .32s var(--basketball-ease);
+}
+
+body[data-site-module="basketball"] :is(.universe-nav a, .site-header nav a, .archive-header nav a):hover,
+body[data-site-module="basketball"] :is(.universe-nav a, .site-header nav a, .archive-header nav a):focus-visible {
+  color: var(--basketball-ivory);
+}
+
+body[data-site-module="basketball"] :is(.universe-nav a, .site-header nav a, .archive-header nav a):hover::after,
+body[data-site-module="basketball"] :is(.universe-nav a, .site-header nav a, .archive-header nav a):focus-visible::after {
+  transform: scaleX(1) skewX(-24deg);
+  transform-origin: left center;
+}
+
+/* Shared heading language */
+body[data-site-module="basketball"] :is(.section-heading, .archive-hero) {
+  --heading-accent: var(--basketball-red);
+}
+
+body[data-site-module="basketball"] :is(.section-heading > p, .section-heading div > p, .eyebrow) {
+  position: relative;
+  width: fit-content;
+  margin-bottom: 16px;
+  padding-left: 46px;
+  color: var(--basketball-red-bright);
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+}
+
+body[data-site-module="basketball"] :is(.section-heading > p, .section-heading div > p, .eyebrow)::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 32px;
+  height: 2px;
+  content: "";
+  background: var(--basketball-red);
+  transform: translateY(-50%) skewX(-28deg);
+}
+
+body[data-site-module="basketball"] .section-heading {
+  position: relative;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 36px;
+  margin-bottom: clamp(40px, 5vw, 68px);
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--basketball-line);
+}
+
+body[data-site-module="basketball"] .section-heading::after {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: min(190px, 34vw);
+  height: 3px;
+  content: "";
+  background: var(--basketball-red);
+  transform: skewX(-28deg);
+  transform-origin: left center;
+}
+
+body[data-site-module="basketball"] .section-heading h2 {
+  margin: 0;
+  color: var(--basketball-ivory);
+  font-family: var(--basketball-display);
+  font-size: clamp(48px, 7.3vw, 108px);
+  font-weight: 400;
+  line-height: .88;
+  letter-spacing: -.025em;
+  text-transform: uppercase;
+}
+
+body[data-site-module="basketball"] .section-heading > span {
+  max-width: 390px;
+  padding-bottom: 7px;
+  color: var(--basketball-muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.75;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+/* Basketball landing */
+body.basketball-landing-page[data-site-module="basketball"] .interest-hero {
+  position: relative;
+  display: grid;
+  min-height: min(920px, 96svh);
+  grid-template-columns: minmax(0, 1fr) minmax(280px, .42fr);
+  align-items: end;
+  gap: clamp(28px, 5vw, 84px);
+  padding: 134px clamp(22px, 6.5vw, 104px) 72px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .interest-hero::before {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  content: "";
+  background:
+    linear-gradient(90deg, rgba(5,5,5,.97) 0%, rgba(5,5,5,.78) 48%, rgba(5,5,5,.24) 100%),
+    radial-gradient(circle at 76% 34%, rgba(206,17,65,.35), transparent 32%),
+    linear-gradient(145deg, #111115, #050505 62%);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .interest-hero::after {
+  position: absolute;
+  top: -18%;
+  right: -14%;
+  z-index: -2;
+  width: min(64vw, 880px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255,255,255,.19);
+  border-radius: 50%;
+  content: "";
+  box-shadow:
+    inset 0 0 0 5px rgba(206,17,65,.12),
+    0 0 0 8vw rgba(255,255,255,.018),
+    0 0 0 16vw rgba(255,255,255,.012);
+  transform: translate3d(calc(var(--hero-x, 0) * 1px), calc(var(--hero-y, 0) * 1px), 0);
+  transition: transform .7s var(--basketball-ease);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .interest-hero-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 1050px;
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .breadcrumb {
+  margin-bottom: 24px;
+  color: rgba(245,242,237,.48);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .interest-hero h1 {
+  position: relative;
+  margin: 0;
+  color: var(--basketball-ivory);
+  font-family: var(--basketball-display);
+  font-size: clamp(82px, 16vw, 232px);
+  font-weight: 400;
+  line-height: .75;
+  letter-spacing: -.045em;
+  text-transform: uppercase;
+  text-shadow: 0 18px 70px rgba(0,0,0,.38);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .interest-hero h1::after {
+  display: block;
+  width: min(520px, 62vw);
+  height: clamp(10px, 1.3vw, 18px);
+  margin-top: 20px;
+  content: "";
+  background: linear-gradient(90deg, var(--basketball-red) 0 76%, transparent 76%);
+  clip-path: polygon(0 0, 100% 0, 96% 100%, 0 100%);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .interest-hero-copy > p:last-child {
+  max-width: 660px;
+  margin: 28px 0 0;
+  color: rgba(245,242,237,.66);
+  font-size: clamp(13px, 1.15vw, 16px);
+  line-height: 1.85;
+}
+
+body[data-site-module="basketball"] .basketball-scoreboard {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  align-self: end;
+  border: 1px solid var(--basketball-line-strong);
+  background: rgba(5,5,5,.72);
+  box-shadow: 0 22px 70px rgba(0,0,0,.28);
+  backdrop-filter: blur(16px);
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
+}
+
+body[data-site-module="basketball"] .basketball-scoreboard > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 20px;
+  padding: 22px 24px;
+  border-bottom: 1px solid var(--basketball-line);
+}
+
+body[data-site-module="basketball"] .basketball-scoreboard > div:last-child {
+  border-bottom: 0;
+}
+
+body[data-site-module="basketball"] .basketball-scoreboard small {
+  color: var(--basketball-muted);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .2em;
+}
+
+body[data-site-module="basketball"] .basketball-scoreboard strong {
+  color: var(--basketball-ivory);
+  font-family: var(--basketball-display);
+  font-size: clamp(34px, 4vw, 60px);
+  font-weight: 400;
+  line-height: .85;
+}
+
+body[data-site-module="basketball"] .basketball-scoreboard b {
+  grid-column: 1 / -1;
+  color: var(--basketball-red-bright);
+  font-size: 9px;
+  letter-spacing: .14em;
+}
+
+body[data-site-module="basketball"] .basketball-ticker {
+  display: flex;
+  overflow: hidden;
+  border-block: 1px solid var(--basketball-line);
+  background: var(--basketball-red);
+  color: white;
+}
+
+body[data-site-module="basketball"] .basketball-ticker-track {
+  display: flex;
+  width: max-content;
+  flex: 0 0 auto;
+  align-items: center;
+  animation: basketball-ticker 24s linear infinite;
+}
+
+body[data-site-module="basketball"] .basketball-ticker span {
+  display: inline-flex;
+  align-items: center;
+  gap: 22px;
+  padding: 13px 30px;
+  font-family: var(--basketball-display);
+  font-size: 18px;
+  letter-spacing: .08em;
+  white-space: nowrap;
+}
+
+body[data-site-module="basketball"] .basketball-ticker span::after {
+  content: "◆";
+  font-size: 9px;
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .universe-section {
+  width: min(1420px, calc(100% - 40px));
+  padding-block: clamp(76px, 8vw, 118px);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr);
+  gap: 16px;
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  position: relative;
+  min-height: 420px;
+  overflow: hidden;
+  border: 1px solid var(--basketball-line);
+  background: var(--basketball-panel);
+  text-decoration: none;
+  isolation: isolate;
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
+  transition: transform .5s var(--basketball-ease), border-color .3s ease, box-shadow .5s var(--basketball-ease);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card:first-child {
+  min-height: 856px;
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: "";
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at var(--pointer-x) var(--pointer-y), rgba(206,17,65,.24), transparent 32%);
+  transition: opacity .35s ease;
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card::after {
+  background:
+    linear-gradient(180deg, transparent 20%, rgba(5,5,5,.94) 88%),
+    linear-gradient(120deg, rgba(206,17,65,.24), transparent 42%);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card:hover,
+body.basketball-landing-page[data-site-module="basketball"] .topic-card:focus-visible {
+  border-color: rgba(206,17,65,.72);
+  box-shadow: 0 28px 78px rgba(0,0,0,.38);
+  transform: translateY(-6px);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card:hover::before,
+body.basketball-landing-page[data-site-module="basketball"] .topic-card:focus-visible::before {
+  opacity: 1;
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card > img {
+  filter: grayscale(.2) contrast(1.08) brightness(.42);
+  transition: transform .9s var(--basketball-ease), filter .55s ease;
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card:hover > img {
+  filter: grayscale(0) contrast(1.08) brightness(.56);
+  transform: scale(1.035);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card-placeholder {
+  background:
+    linear-gradient(135deg, rgba(206,17,65,.14), transparent 50%),
+    repeating-linear-gradient(-36deg, transparent 0 26px, rgba(255,255,255,.035) 26px 27px),
+    var(--basketball-panel);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card-content {
+  padding: clamp(28px, 4vw, 56px);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card-content small {
+  color: var(--basketball-red-bright);
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card-content h2 {
+  font-family: var(--basketball-display);
+  font-size: clamp(46px, 6.4vw, 94px);
+  font-weight: 400;
+  line-height: .86;
+  letter-spacing: -.02em;
+}
+
+body.basketball-landing-page[data-site-module="basketball"] .topic-card-content p {
+  max-width: 520px;
+  color: var(--basketball-muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+/* Michael Jordan feature page */
+body.basketball-mj-page[data-site-module="basketball"] .cursor-glow {
+  width: 420px;
+  height: 420px;
+  opacity: .18;
+  filter: blur(100px);
+  background: rgba(206,17,65,.72);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .hero {
+  min-height: min(980px, 100svh);
+  border-bottom: 1px solid var(--basketball-line);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .hero-image {
+  filter: grayscale(.14) contrast(1.1) brightness(.64);
+  transform: scale(1.025) translate3d(calc(var(--hero-x, 0) * .2px), calc(var(--hero-y, 0) * .2px), 0);
+  transition: transform 1.1s var(--basketball-ease), filter .5s ease;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .hero-backdrop {
+  background:
+    linear-gradient(90deg, rgba(5,5,5,.97) 0%, rgba(5,5,5,.64) 48%, rgba(5,5,5,.42) 100%),
+    radial-gradient(circle at 72% 36%, rgba(206,17,65,.28), transparent 31%);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .hero-overlay {
+  background:
+    linear-gradient(180deg, rgba(5,5,5,.06) 0%, rgba(5,5,5,.1) 58%, #050505 100%),
+    linear-gradient(90deg, rgba(5,5,5,.93) 0%, transparent 78%);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .hero-copy {
+  padding: 128px clamp(24px, 7vw, 112px) 76px;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .hero h1 {
+  max-width: 920px;
+  font-size: clamp(76px, 14vw, 210px);
+  line-height: .76;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .hero h1 span {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(245,242,237,.42);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .hero h1 strong {
+  position: relative;
+  width: fit-content;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .hero h1 strong::after {
+  position: absolute;
+  right: -4%;
+  bottom: -.08em;
+  left: 0;
+  height: .075em;
+  content: "";
+  background: var(--basketball-red);
+  clip-path: polygon(0 0, 100% 0, 97% 100%, 0 100%);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .hero-line {
+  color: rgba(245,242,237,.7);
+  font-size: 11px;
+  letter-spacing: .28em;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .hero-number {
+  right: -1vw;
+  bottom: -12vw;
+  color: rgba(206,17,65,.09);
+  -webkit-text-stroke: 1px rgba(245,242,237,.08);
+  transform: translate3d(0, var(--number-shift, 0), 0);
+}
+
+body[data-site-module="basketball"] .basketball-scorebug {
+  position: absolute;
+  right: clamp(22px, 5vw, 80px);
+  bottom: clamp(24px, 5vw, 72px);
+  z-index: 4;
+  display: grid;
+  min-width: 210px;
+  grid-template-columns: auto 1fr;
+  border: 1px solid var(--basketball-line-strong);
+  background: rgba(5,5,5,.78);
+  box-shadow: 0 20px 60px rgba(0,0,0,.32);
+  backdrop-filter: blur(14px);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+}
+
+body[data-site-module="basketball"] .basketball-scorebug span {
+  display: grid;
+  place-items: center;
+  padding: 14px 16px;
+  color: white;
+  background: var(--basketball-red);
+  font-family: var(--basketball-display);
+  font-size: 30px;
+}
+
+body[data-site-module="basketball"] .basketball-scorebug div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 11px 16px;
+}
+
+body[data-site-module="basketball"] .basketball-scorebug strong {
+  font-size: 9px;
+  letter-spacing: .18em;
+}
+
+body[data-site-module="basketball"] .basketball-scorebug small {
+  margin-top: 5px;
+  color: var(--basketball-muted);
+  font-size: 8px;
+  letter-spacing: .12em;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .section-shell {
+  width: min(1280px, calc(100% - 40px));
+  padding-block: clamp(86px, 9vw, 132px);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .section-shell--wide {
+  width: min(1500px, calc(100% - 32px));
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .legacy-grid {
+  gap: clamp(34px, 6vw, 86px);
+  margin-top: 64px;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .portrait-image {
+  min-height: 0;
+  border: 1px solid var(--basketball-line);
+  filter: grayscale(.15) contrast(1.06);
+  clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .red-rule {
+  width: 106px;
+  height: 8px;
+  margin-bottom: 30px;
+  background: var(--basketball-red);
+  transform: skewX(-28deg);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .display-copy {
+  font-size: clamp(44px, 5.8vw, 84px);
+  line-height: .94;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .small-copy {
+  color: var(--basketball-muted);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .gallery-wall {
+  gap: 12px;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .gallery-card {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  border: 1px solid rgba(255,255,255,.09);
+  background: var(--basketball-panel);
+  box-shadow: none;
+  transition: transform .48s var(--basketball-ease), border-color .3s ease, box-shadow .48s var(--basketball-ease);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .gallery-card::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  content: "";
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at var(--pointer-x) var(--pointer-y), rgba(206,17,65,.22), transparent 35%);
+  transition: opacity .35s ease;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .gallery-card:hover {
+  z-index: 4;
+  border-color: rgba(206,17,65,.62);
+  box-shadow: 0 24px 60px rgba(0,0,0,.34);
+  transform: translateY(-5px);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .gallery-card:hover::after {
+  opacity: 1;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .gallery-card img {
+  filter: grayscale(.08) contrast(1.04);
+  transition: transform .75s var(--basketball-ease), filter .45s ease;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .gallery-card:hover img {
+  filter: grayscale(0) contrast(1.08);
+  transform: scale(1.018);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .card-label {
+  background: linear-gradient(90deg, rgba(5,5,5,.9), rgba(5,5,5,.25));
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .card-label span,
+body.basketball-mj-page[data-site-module="basketball"] .card-label small {
+  color: var(--basketball-red-bright);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .archive-entry {
+  border: 1px solid var(--basketball-line);
+  background:
+    linear-gradient(125deg, rgba(206,17,65,.22), transparent 42%),
+    var(--basketball-panel);
+  clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 0 100%);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .video-frame {
+  overflow: hidden;
+  border: 1px solid var(--basketball-line);
+  box-shadow: 0 28px 90px rgba(0,0,0,.35);
+  clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%);
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .finale {
+  min-height: 70svh;
+  background:
+    linear-gradient(105deg, rgba(206,17,65,.86), rgba(119,0,31,.62)),
+    #790022;
+}
+
+body.basketball-mj-page[data-site-module="basketball"] .finale-content span {
+  color: rgba(255,255,255,.15);
+  -webkit-text-stroke-color: rgba(255,255,255,.34);
+}
+
+/* Archive */
+body.basketball-archive-page[data-site-module="basketball"] .archive-hero {
+  position: relative;
+  width: min(1460px, calc(100% - 40px));
+  padding: 138px 0 72px;
+  border-bottom: 1px solid var(--basketball-line);
+  overflow: hidden;
+}
+
+body.basketball-archive-page[data-site-module="basketball"] .archive-hero::after {
+  position: absolute;
+  right: 2%;
+  bottom: -42%;
+  width: min(48vw, 620px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 50%;
+  content: "";
+  box-shadow: 0 0 0 72px rgba(255,255,255,.012), 0 0 0 144px rgba(255,255,255,.009);
+}
+
+body.basketball-archive-page[data-site-module="basketball"] .archive-hero h1 {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(84px, 17vw, 250px);
+  line-height: .73;
+}
+
+body.basketball-archive-page[data-site-module="basketball"] .archive-hero h1 span {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(206,17,65,.7);
+}
+
+body.basketball-archive-page[data-site-module="basketball"] .archive-meta {
+  position: relative;
+  z-index: 2;
+  margin-top: 44px;
+  padding-top: 18px;
+  border-top: 1px solid var(--basketball-line);
+  color: var(--basketball-muted);
+}
+
+body.basketball-archive-page[data-site-module="basketball"] .archive-section {
+  width: min(1460px, calc(100% - 28px));
+  padding-block: 58px 110px;
+}
+
+body.basketball-archive-page[data-site-module="basketball"] .archive-grid {
+  column-gap: 12px;
+}
+
+body.basketball-archive-page[data-site-module="basketball"] .archive-card {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255,255,255,.09);
+  background: var(--basketball-panel);
+  transition: transform .45s var(--basketball-ease), border-color .3s ease, box-shadow .45s var(--basketball-ease);
+}
+
+body.basketball-archive-page[data-site-module="basketball"] .archive-card::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  content: "";
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at var(--pointer-x) var(--pointer-y), rgba(206,17,65,.18), transparent 38%);
+  transition: opacity .3s ease;
+}
+
+body.basketball-archive-page[data-site-module="basketball"] .archive-card:hover {
+  z-index: 3;
+  border-color: rgba(206,17,65,.62);
+  box-shadow: 0 22px 56px rgba(0,0,0,.38);
+  transform: translateY(-4px);
+}
+
+body.basketball-archive-page[data-site-module="basketball"] .archive-card:hover::after {
+  opacity: 1;
+}
+
+body.basketball-archive-page[data-site-module="basketball"] .archive-card-index {
+  right: 8px;
+  bottom: 8px;
+  padding: 5px 8px;
+  color: white;
+  background: var(--basketball-red);
+  font-size: 15px;
+  transform: skewX(-8deg);
+}
+
+body[data-site-module="basketball"] :is(.universe-footer, footer) {
+  border-top-color: var(--basketball-line);
+  color: rgba(245,242,237,.5);
+}
+
+/* Unified motion */
+body[data-site-module="basketball"].basketball-motion-ready .reveal,
+body[data-site-module="basketball"].basketball-motion-ready .basketball-reveal {
+  opacity: 0;
+  clip-path: inset(0 0 18% 0);
+  filter: blur(3px);
+  transform: translate3d(0, 24px, 0);
+  transition:
+    opacity .72s var(--basketball-ease),
+    clip-path .82s var(--basketball-ease),
+    filter .72s var(--basketball-ease),
+    transform .82s var(--basketball-ease);
+  transition-delay: calc(var(--basketball-order, 0) * 60ms);
+  will-change: opacity, transform, clip-path;
+}
+
+body[data-site-module="basketball"].basketball-motion-ready .reveal:is(.visible, .is-visible),
+body[data-site-module="basketball"].basketball-motion-ready .basketball-reveal.is-visible {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+  filter: none;
+  transform: translate3d(0, 0, 0);
+}
+
+body[data-site-module="basketball"].basketball-motion-ready .section-heading::after {
+  transform: scaleX(0) skewX(-28deg);
+  transition: transform .85s var(--basketball-ease) .1s;
+}
+
+body[data-site-module="basketball"].basketball-motion-ready .section-heading:is(.visible, .is-visible)::after {
+  transform: scaleX(1) skewX(-28deg);
+}
+
+body[data-site-module="basketball"].basketball-motion-ready .interest-hero h1,
+body[data-site-module="basketball"].basketball-motion-ready .hero h1,
+body[data-site-module="basketball"].basketball-motion-ready .archive-hero h1 {
+  animation: basketball-title-in 1s var(--basketball-ease) both;
+}
+
+@keyframes basketball-title-in {
+  from { opacity: 0; letter-spacing: .02em; transform: translate3d(-24px, 0, 0); }
+  to { opacity: 1; letter-spacing: -.04em; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes basketball-ticker {
+  to { transform: translateX(-50%); }
+}
+
+@media (max-width: 920px) {
+  body.basketball-landing-page[data-site-module="basketball"] .interest-hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  body[data-site-module="basketball"] .basketball-scoreboard {
+    width: min(100%, 620px);
+  }
+
+  body.basketball-landing-page[data-site-module="basketball"] .topic-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body.basketball-landing-page[data-site-module="basketball"] .topic-card:first-child {
+    min-height: 640px;
+    grid-row: auto;
+  }
+
+  body.basketball-mj-page[data-site-module="basketball"] .basketball-scorebug {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  body[data-site-module="basketball"] :is(.universe-header, .site-header, .archive-header) {
+    height: 62px;
+    padding-inline: 16px;
+  }
+
+  body[data-site-module="basketball"] :is(.universe-nav, .site-header nav, .archive-header nav) {
+    max-width: calc(100vw - 92px);
+    gap: 15px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  body[data-site-module="basketball"] :is(.universe-nav, .site-header nav, .archive-header nav)::-webkit-scrollbar {
+    display: none;
+  }
+
+  body[data-site-module="basketball"] :is(.universe-nav a, .site-header nav a, .archive-header nav a) {
+    flex: 0 0 auto;
+    font-size: 8px;
+    letter-spacing: .12em;
+  }
+
+  body.basketball-landing-page[data-site-module="basketball"] .interest-hero {
+    padding: 108px 18px 48px;
+  }
+
+  body.basketball-landing-page[data-site-module="basketball"] .interest-hero h1 {
+    font-size: clamp(74px, 24vw, 118px);
+  }
+
+  body[data-site-module="basketball"] .basketball-scoreboard > div {
+    padding: 17px 18px;
+  }
+
+  body[data-site-module="basketball"] .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-bottom: 34px;
+  }
+
+  body[data-site-module="basketball"] .section-heading h2 {
+    font-size: clamp(44px, 15vw, 70px);
+  }
+
+  body[data-site-module="basketball"] .section-heading > span {
+    max-width: none;
+  }
+
+  body.basketball-mj-page[data-site-module="basketball"] .hero-copy {
+    padding: 104px 18px 48px;
+  }
+
+  body.basketball-mj-page[data-site-module="basketball"] .hero h1 {
+    font-size: clamp(68px, 23vw, 112px);
+  }
+
+  body.basketball-mj-page[data-site-module="basketball"] .hero-line {
+    max-width: 290px;
+    line-height: 1.7;
+  }
+
+  body.basketball-mj-page[data-site-module="basketball"] .section-shell,
+  body.basketball-mj-page[data-site-module="basketball"] .section-shell--wide {
+    width: min(100% - 28px, 1280px);
+    padding-block: 70px;
+  }
+
+  body.basketball-archive-page[data-site-module="basketball"] .archive-hero {
+    width: min(100% - 28px, 1460px);
+    padding-top: 112px;
+  }
+
+  body.basketball-archive-page[data-site-module="basketball"] .archive-grid {
+    columns: 2 145px;
+    column-gap: 8px;
+  }
+
+  body.basketball-archive-page[data-site-module="basketball"] .archive-card {
+    margin-bottom: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-site-module="basketball"] *,
+  body[data-site-module="basketball"] *::before,
+  body[data-site-module="basketball"] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+
+  body[data-site-module="basketball"].basketball-motion-ready .reveal,
+  body[data-site-module="basketball"].basketball-motion-ready .basketball-reveal {
+    opacity: 1;
+    clip-path: none;
+    filter: none;
+    transform: none;
+  }
+}
