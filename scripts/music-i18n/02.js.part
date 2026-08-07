@@ -1,0 +1,180 @@
+    textNode.nodeValue = `${value} `;
+  } else {
+    element.textContent = value;
+  }
+  setElementLanguage(element, musicLanguage);
+}
+
+function decorateExactCopy(root = document) {
+  const candidates = root.querySelectorAll('a, p, span, h2, h3, h4, small, em, button, i');
+  candidates.forEach((element) => {
+    if (element.dataset.musicI18n || element.dataset.musicBilingualRole) return;
+    if (element.children.length) return;
+    const text = element.textContent.trim();
+    const key = text === 'ARCHIVE' ? 'status.curated' : textKeyByValue.get(text);
+    if (key) bindStaticCopy(element, key);
+  });
+}
+
+function collectionArtistDataForCard(card) {
+  if (musicPageData?.pageType !== 'collection') return null;
+  const href = card.getAttribute('href');
+  return musicPageData.artists?.find((artist) => artist.route === href) || null;
+}
+
+function setupBilingualPresentation() {
+  const collectionHero = document.querySelector('.collection-hero-copy');
+  if (collectionHero) {
+    const title = collectionHero.querySelector('h1');
+    const titleFirst = title?.querySelector('span');
+    const titleSecond = title?.querySelector('strong');
+    const secondary = collectionHero.querySelector('h2');
+    bindBilingualElement(titleFirst, { zh: '音乐', en: 'Music' }, 'primary');
+    bindBilingualElement(titleSecond, { zh: '收藏', en: 'Collection' }, 'primary');
+    bindBilingualElement(secondary, { zh: '音乐收藏', en: 'Music Collection' }, 'secondary');
+  }
+
+  document.querySelectorAll('.collection-artist-card[href]').forEach((card) => {
+    const small = card.querySelector('.collection-artist-copy > p');
+    const large = card.querySelector('.collection-artist-copy > h3');
+    const artistData = collectionArtistDataForCard(card);
+    const values = artistData?.name || inferBilingualValues(large?.textContent, small?.textContent);
+    bindPair(large, small, values);
+
+    const subtitle = card.querySelector('.collection-artist-copy > span');
+    if (subtitle && artistData?.subtitle) {
+      const current = subtitle.textContent.trim();
+      const canonicalZh = localized(artistData.subtitle, 'zh').trim();
+      const canonicalEn = localized(artistData.subtitle, 'en').trim();
+      if (current === canonicalZh || current === canonicalEn) {
+        subtitle.dataset.musicLocalizedZh = canonicalZh;
+        subtitle.dataset.musicLocalizedEn = canonicalEn;
+      }
+    }
+  });
+
+  if (document.body.classList.contains('music-artist-page') && !document.body.classList.contains('music-album-page')) {
+    const name = musicPageData?.artist?.name || inferBilingualValues(
+      document.querySelector('.artist-hero-copy h1')?.textContent,
+      document.querySelector('.artist-hero-copy h2')?.textContent
+    );
+    bindPair(document.querySelector('.artist-hero-copy h1'), document.querySelector('.artist-hero-copy h2'), name);
+
+    const headline = musicPageData?.detail?.headline || inferBilingualValues(
+      document.querySelector('.artist-hero-copy blockquote')?.textContent,
+      document.querySelector('.artist-note h2')?.textContent
+    );
+    bindPair(document.querySelector('.artist-note h2'), document.querySelector('.artist-hero-copy blockquote'), headline);
+  }
+
+  document.querySelectorAll('.related-artist').forEach((card) => {
+    const small = card.querySelector('span');
+    const large = card.querySelector('strong');
+    bindPair(large, small, inferBilingualValues(large?.textContent, small?.textContent));
+  });
+
+  if (document.body.classList.contains('music-album-page')) {
+    const holder = document.querySelector('.album-detail-artist');
+    const values = musicPageData?.artist?.name;
+    if (holder && values && !holder.dataset.musicBilingualContainer) {
+      const primary = document.createElement('span');
+      const separator = document.createElement('b');
+      const secondary = document.createElement('span');
+      separator.textContent = '·';
+      separator.setAttribute('aria-hidden', 'true');
+      bindPair(primary, secondary, values);
+      holder.replaceChildren(primary, separator, secondary);
+      holder.dataset.musicBilingualContainer = 'true';
+    }
+  }
+}
+
+function applyLocalizedDataElement(element) {
+  if (!element) return;
+  const value = musicLanguage === 'zh'
+    ? element.dataset.musicLocalizedZh
+    : element.dataset.musicLocalizedEn;
+  if (value != null) element.textContent = value;
+  setElementLanguage(element, musicLanguage);
+}
+
+function setupPageDataContent() {
+  if (!musicPageData) return;
+
+  if (musicPageData.pageType === 'artist') {
+    const introduction = document.querySelector('.artist-note > div');
+    const personalNote = document.querySelector('.artist-note > blockquote');
+    if (introduction && musicPageData.detail?.introduction) {
+      introduction.dataset.musicLocalizedZh = localized(musicPageData.detail.introduction, 'zh');
+      introduction.dataset.musicLocalizedEn = localized(musicPageData.detail.introduction, 'en');
+    }
+    if (personalNote && musicPageData.detail?.personalNote) {
+      personalNote.dataset.musicLocalizedZh = localized(musicPageData.detail.personalNote, 'zh');
+      personalNote.dataset.musicLocalizedEn = localized(musicPageData.detail.personalNote, 'en');
+    }
+
+    const songByTitle = new Map((musicPageData.detail?.selectedSongs || []).map((song) => [String(song.title || ''), song]));
+    document.querySelectorAll('[data-featured-title]').forEach((row) => {
+      const song = songByTitle.get(row.dataset.featuredTitle || '');
+      if (!song?.note) return;
+      const zh = localized(song.note, 'zh');
+      const en = localized(song.note, 'en');
+      row.dataset.featuredNoteZh = zh;
+      row.dataset.featuredNoteEn = en;
+      row.dataset.featuredNote = musicLanguage === 'zh' ? zh : en;
+      const note = row.querySelector('small');
+      if (note) {
+        note.dataset.musicLocalizedZh = zh;
+        note.dataset.musicLocalizedEn = en;
+      }
+    });
+
+    const albumByName = new Map((musicPageData.detail?.albums || []).map((album) => [String(album.catalogName || album.title || ''), album]));
+    document.querySelectorAll('.album-card[data-album-name]').forEach((card) => {
+      const album = albumByName.get(card.dataset.albumName || '');
+      const note = card.querySelector('.album-card-copy > p, :scope > div:last-child > p');
+      if (!album?.note || !note) return;
+      note.dataset.musicLocalizedZh = localized(album.note, 'zh');
+      note.dataset.musicLocalizedEn = localized(album.note, 'en');
+    });
+  }
+
+  if (musicPageData.pageType === 'album') {
+    const note = document.querySelector('.album-detail-note');
+    if (note && musicPageData.album?.note) {
+      note.dataset.musicLocalizedZh = localized(musicPageData.album.note, 'zh');
+      note.dataset.musicLocalizedEn = localized(musicPageData.album.note, 'en');
+    }
+  }
+}
+
+function markProperTitles() {
+  document.querySelectorAll('.album-card h3, .song-primary h3, .collection-song-row strong, .album-detail-copy h1, [data-playlist-label]').forEach((element) => {
+    if (element.dataset.musicI18n || element.dataset.musicBilingualRole) return;
+    const language = hasCjk(element.textContent) ? 'zh' : 'en';
+    setElementLanguage(element, language);
+    element.classList.add('music-proper-title');
+  });
+}
+
+function updatePageSpecificCopy() {
+  if (musicPageData?.pageType === 'artist') {
+    const name = localized(musicPageData.artist?.name, musicLanguage);
+    const context = document.querySelector('.music-header-context');
+    if (context && name) {
+      context.textContent = musicLanguage === 'zh' ? `音乐 / ${name}` : `MUSIC / ${name.toUpperCase()}`;
+      setElementLanguage(context, musicLanguage);
+    }
+
+    const footerLabel = document.querySelector('.music-site-footer > span:last-child');
+    if (footerLabel && name) footerLabel.textContent = `${musicLanguage === 'zh' ? name : name.toUpperCase()} / 7719`;
+  }
+
+  if (musicPageData?.pageType === 'album') {
+    const name = localized(musicPageData.artist?.name, musicLanguage);
+    const context = document.querySelector('.music-header-context');
+    if (context && name) {
+      context.textContent = musicLanguage === 'zh'
+        ? `音乐 / ${name} / 专辑`
+        : `MUSIC / ${name.toUpperCase()} / ALBUM`;
+      setElementLanguage(context, musicLanguage);

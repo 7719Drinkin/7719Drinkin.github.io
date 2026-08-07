@@ -1,0 +1,180 @@
+    'artist.visualKicker': '03 / 影像档案',
+    'artist.visualTitle': '影像记录',
+    'artist.visualNote': '视频与照片分区展示；支持 YouTube、哔哩哔哩及本地图片。',
+    'artist.continueKicker': '04 / 继续浏览',
+    'artist.continueTitle': '其他歌手',
+    'artist.continueNote': '返回音乐收藏，或进入其他歌手的独立档案。',
+    'album.defaultNote': '个人收藏中的专辑封面。',
+    'album.zhangYushengNote': '张雨生专辑封面收藏。',
+    'album.tanYonglinNote': '谭咏麟专辑封面收藏。',
+    'album.creativeNote': '张雨生创作专辑封面收藏。',
+    'album.selectedNote': '张雨生精选集封面收藏。',
+    'album.cachedIndex': 'R2 / 缓存索引',
+    'album.readingCatalog': '读取曲目中',
+    'album.loadingCatalog': '正在读取目录',
+    'album.loadingMessage': '正在匹配这张专辑的歌曲。',
+    'album.trackSectionKicker': '01 / 曲目列表',
+    'album.trackSectionTitle': '专辑曲目',
+    'album.trackSectionNote': '目录从 Worker/KV 缓存读取；只有点击歌曲时才访问实际音频对象。',
+    'visual.videoKicker': '影像档案',
+    'visual.videoTitle': '影像放映',
+    'visual.videoNote': '视频使用独立的宽屏展映区，与照片档案分开呈现。',
+    'visual.photoKicker': '照片档案',
+    'visual.photoTitle': '照片记录',
+    'visual.photoNote': '人物照片继续使用不对称画廊进行陈列。',
+    'visual.playlist': '播放列表',
+    'visual.playlistEmpty': '播放列表为空',
+    'visual.playlistEmptyMessage': '当前播放列表中没有可用的哔哩哔哩视频。',
+    'visual.openExternally': '外部打开 ↗',
+    'visual.playInPage': '页内播放',
+    'visual.source': '来源 ↗',
+    'visual.loadingTitle': '正在读取视频标题…',
+    'visual.titleUnavailable': '视频标题暂不可用',
+    'empty.curatorPicks': '私藏精选',
+    'empty.curatorPicksMessage': '这里不会自动堆放全部歌曲；只保留网页创建者主动挑选的少量歌曲。',
+    'empty.curatorUnavailable': '精选曲目暂不可用',
+    'empty.curatorUnavailableMessage': '已选择的歌曲暂时没有在当前 R2 专辑目录中匹配到，因此不会显示失效的播放项。',
+    'empty.albumNotFound': '未找到专辑',
+    'empty.albumNotFoundMessage': '当前缓存目录中没有匹配的专辑文件夹。',
+    'empty.emptyAlbum': '空专辑',
+    'empty.emptyAlbumMessage': '盘旋归燕树待栖~',
+    'empty.catalogConfigError': '曲目配置错误',
+    'empty.catalogConfigErrorMessage': '曲目目录配置暂时无法读取，请稍后刷新页面。',
+    'empty.catalogNotConfigured': '尚未配置曲目目录',
+    'empty.catalogNotConfiguredMessage': '当前歌手还没有绑定 R2 曲目目录。',
+    'empty.catalogUnavailable': '曲目目录暂不可用',
+    'empty.catalogUnavailableMessage': '曲目目录服务暂时无法访问。页面不会直接扫描 R2，也不会逐个探测音频文件。',
+    'tag.mandopop': '华语流行',
+    'tag.singerSongwriter': '创作歌手',
+    'tag.cantopop': '粤语流行',
+    'tag.classicPop': '经典流行',
+    'tag.stageArt': '舞台艺术',
+    'player.ready': '就绪',
+    'player.nowPlaying': '正在播放',
+    'player.chooseSong': '选择一首歌曲',
+    'player.startAbove': '从上方收藏开始播放',
+    'player.expand': '展开播放器',
+    'player.collapse': '收起播放器',
+    'player.play': '播放',
+    'player.pause': '暂停',
+    'player.volume': '音量',
+    'player.loading': '正在读取音频…',
+    'player.autoplayBlocked': '浏览器阻止了自动播放，请再次点击播放按钮。',
+    'player.unavailable': '音频暂时无法播放，请检查对象地址。',
+    'player.buffering': '正在缓冲…',
+    'player.error': '音频暂时无法播放，请检查 R2 公共访问、CORS 或对象路径。',
+    'playlist.play': '播放 {title}',
+    'playlist.externalPlayer': '外部视频播放器',
+    'playlist.bilibiliVideo': '哔哩哔哩播放列表视频'
+  }
+};
+
+const textKeyByValue = new Map();
+Object.entries(MUSIC_COPY).forEach(([, copy]) => {
+  Object.entries(copy).forEach(([key, value]) => {
+    if (typeof value === 'string' && !value.includes('{title}')) textKeyByValue.set(value.trim(), key);
+  });
+});
+
+const hasCjk = (value = '') => /[\u3400-\u9fff\uf900-\ufaff]/u.test(String(value));
+const languageTag = (value) => value === 'zh' ? 'zh-CN' : 'en';
+const otherLanguage = (value) => value === 'zh' ? 'en' : 'zh';
+
+function detectMusicLanguage() {
+  try {
+    const stored = localStorage.getItem(MUSIC_LANGUAGE_KEY);
+    if (stored === 'zh' || stored === 'en') return stored;
+  } catch {}
+
+  const preferred = navigator.languages?.[0] || navigator.language || 'zh-CN';
+  return String(preferred).toLowerCase().startsWith('zh') ? 'zh' : 'en';
+}
+
+let musicLanguage = detectMusicLanguage();
+
+function interpolate(value, variables = {}) {
+  return String(value).replace(/\{(\w+)\}/g, (_, key) => variables[key] ?? '');
+}
+
+function musicTranslate(key, variables = {}, language = musicLanguage) {
+  const value = MUSIC_COPY[language]?.[key] ?? MUSIC_COPY.en?.[key] ?? key;
+  return interpolate(value, variables);
+}
+
+function localized(value, language = musicLanguage) {
+  if (value == null) return '';
+  if (typeof value === 'string') {
+    const key = textKeyByValue.get(value.trim());
+    return key ? musicTranslate(key, {}, language) : value;
+  }
+  if (typeof value === 'object') {
+    return value[language] ?? value.zh ?? value.en ?? '';
+  }
+  return String(value);
+}
+
+function readMusicPageData() {
+  const node = document.querySelector('#music-i18n-page-data[type="application/json"]');
+  if (!node) return null;
+  try { return JSON.parse(node.textContent || '{}'); } catch { return null; }
+}
+
+const musicPageData = readMusicPageData();
+
+function setElementLanguage(element, language) {
+  if (!element) return;
+  element.lang = languageTag(language);
+  element.dataset.musicScript = language;
+}
+
+function bindBilingualElement(element, values, role) {
+  if (!element || !values) return;
+  const zh = localized(values, 'zh');
+  const en = localized(values, 'en');
+  if (!zh && !en) return;
+  element.dataset.musicBilingualRole = role;
+  element.dataset.musicZh = zh || en;
+  element.dataset.musicEn = en || zh;
+}
+
+function applyBilingualElement(element) {
+  const role = element.dataset.musicBilingualRole;
+  if (!role) return;
+  const language = role === 'secondary' ? otherLanguage(musicLanguage) : musicLanguage;
+  const value = language === 'zh' ? element.dataset.musicZh : element.dataset.musicEn;
+  if (value != null) element.textContent = value;
+  setElementLanguage(element, language);
+}
+
+function bindPair(primary, secondary, values) {
+  bindBilingualElement(primary, values, 'primary');
+  bindBilingualElement(secondary, values, 'secondary');
+}
+
+function inferBilingualValues(first, second) {
+  const a = String(first || '').trim();
+  const b = String(second || '').trim();
+  if (!a && !b) return null;
+  if (hasCjk(a) && !hasCjk(b)) return { zh: a, en: b };
+  if (hasCjk(b) && !hasCjk(a)) return { zh: b, en: a };
+  return { zh: a || b, en: b || a };
+}
+
+function bindStaticCopy(element, key, mode = 'text') {
+  if (!element || !key) return;
+  element.dataset.musicI18n = key;
+  element.dataset.musicI18nMode = mode;
+}
+
+function applyStaticCopy(element) {
+  const key = element.dataset.musicI18n;
+  if (!key) return;
+  const value = musicTranslate(key);
+  const mode = element.dataset.musicI18nMode || 'text';
+
+  if (mode === 'leading') {
+    let textNode = [...element.childNodes].find((node) => node.nodeType === Node.TEXT_NODE);
+    if (!textNode) {
+      textNode = document.createTextNode('');
+      element.prepend(textNode);
+    }

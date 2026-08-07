@@ -1,0 +1,121 @@
+:root {
+  --music-font-en-display: "Playfair Display", Georgia, serif;
+  --music-font-en-ui: "Inter", Arial, sans-serif;
+  --music-font-zh-display: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --music-font-zh-ui: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.music-language-toggle {
+  appearance: none;
+  min-width: 42px;
+  padding: 7px 9px;
+  border: 1px solid color-mix(in srgb, var(--music-gold) 34%, var(--music-line));
+  border-radius: 999px;
+  color: var(--music-gold-soft);
+  background: color-mix(in srgb, var(--music-bg) 76%, transparent);
+  cursor: pointer;
+  font: 700 9px/1 var(--music-mono);
+  letter-spacing: .08em;
+  transition: border-color .2s ease, color .2s ease, background-color .2s ease;
+}
+
+.music-language-toggle:hover,
+.music-language-toggle:focus-visible {
+  border-color: color-mix(in srgb, var(--music-gold) 68%, var(--music-line));
+  color: var(--music-text);
+  background: color-mix(in srgb, var(--music-gold) 10%, transparent);
+}
+
+.music-language-toggle:focus-visible {
+  outline: 2px solid var(--music-gold);
+  outline-offset: 3px;
+}
+
+.music-page [data-music-bilingual-role="primary"][lang="zh-CN"] {
+  font-family: var(--music-font-zh-display) !important;
+  font-style: normal !important;
+  letter-spacing: .01em !important;
+  text-transform: none !important;
+}
+
+.music-page [data-music-bilingual-role="primary"][lang="en"] {
+  font-family: var(--music-font-en-display) !important;
+}
+
+.music-page [data-music-bilingual-role="secondary"][lang="zh-CN"] {
+  font-family: var(--music-font-zh-ui) !important;
+  font-style: normal !important;
+  letter-spacing: .04em !important;
+  text-transform: none !important;
+}
+
+.music-page [data-music-i18n][lang="zh-CN"],
+.music-page [data-music-localized-zh][lang="zh-CN"] {
+  font-family: var(--music-font-zh-ui);
+  text-transform: none;
+}
+
+.music-page h1[data-music-i18n][lang="zh-CN"],
+.music-page h2[data-music-i18n][lang="zh-CN"],
+.music-page h3[data-music-i18n][lang="zh-CN"],
+.music-page h4[data-music-i18n][lang="zh-CN"] {
+  font-family: var(--music-font-zh-display) !important;
+  font-style: normal !important;
+  letter-spacing: .01em !important;
+}
+
+.music-page .music-proper-title[lang="zh-CN"] {
+  font-family: var(--music-font-zh-display) !important;
+  font-style: normal !important;
+  letter-spacing: 0 !important;
+}
+
+.music-page .music-proper-title[lang="en"] {
+  font-family: var(--music-font-en-display) !important;
+}
+
+.album-detail-artist[data-music-bilingual-container="true"] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .28em;
+}
+
+.album-detail-artist[data-music-bilingual-container="true"] > span:first-child {
+  font-size: 1em;
+}
+
+.album-detail-artist[data-music-bilingual-container="true"] > span:last-child {
+  color: color-mix(in srgb, var(--artist-accent-soft) 72%, var(--music-muted));
+  font-size: .62em;
+  font-weight: 500;
+}
+
+.album-detail-artist[data-music-bilingual-container="true"] > b {
+  color: var(--music-muted);
+  font-size: .58em;
+  font-weight: 400;
+}
+
+html[data-language="zh"] .collection-hero h1,
+html[data-language="zh"] .artist-hero-copy h1 {
+  line-height: .86;
+}
+
+html[data-language="zh"] .collection-hero h2,
+html[data-language="zh"] .artist-hero-copy h2 {
+  letter-spacing: .03em;
+}
+
+@media (max-width: 760px) {
+  .music-language-toggle {
+    position: sticky;
+    right: 0;
+    flex: 0 0 auto;
+    background: color-mix(in srgb, var(--music-bg-deep) 90%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-language-toggle { transition: none; }
+}

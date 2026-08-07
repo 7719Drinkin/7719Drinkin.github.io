@@ -1,0 +1,180 @@
+    }
+
+    const back = document.querySelector('.album-detail-back');
+    if (back && name) {
+      back.textContent = musicLanguage === 'zh' ? `← 返回 ${name}专辑收藏` : `← Back to ${name} albums`;
+      setElementLanguage(back, musicLanguage);
+    }
+
+    const footerBack = document.querySelector('.music-site-footer a');
+    if (footerBack && name) {
+      footerBack.textContent = musicLanguage === 'zh' ? `← ${name}专辑` : `← ${name.toUpperCase()} ALBUMS`;
+      setElementLanguage(footerBack, musicLanguage);
+    }
+  }
+
+  const enter = document.querySelector('.music-text-link[href="#artists"], .music-text-link[href="#overview"]');
+  if (enter) bindStaticCopy(enter, 'common.enterCollection', 'leading');
+
+  const homeReturn = document.querySelector('.collection-home-return a');
+  if (homeReturn) bindStaticCopy(homeReturn, 'common.backUniverse', 'leading');
+}
+
+function applyDocumentMetadata() {
+  const description = document.querySelector('meta[name="description"]');
+
+  if (musicPageData?.pageType === 'artist') {
+    const name = localized(musicPageData.artist?.name, musicLanguage);
+    document.title = musicLanguage === 'zh'
+      ? `${name} · 音乐收藏 · 7719 Universe`
+      : `${name} · Music Collection · 7719 Universe`;
+    if (description) description.content = localized(musicPageData.artist?.description, musicLanguage);
+    return;
+  }
+
+  if (musicPageData?.pageType === 'album') {
+    const name = localized(musicPageData.artist?.name, musicLanguage);
+    const albumTitle = musicPageData.album?.title || document.querySelector('.album-detail-copy h1')?.textContent || '';
+    document.title = `${albumTitle} · ${name} · 7719 Music`;
+    if (description) description.content = musicLanguage === 'zh'
+      ? `${name}《${albumTitle}》专辑收藏与曲目。`
+      : `${albumTitle} by ${name}: album archive and track list.`;
+    return;
+  }
+
+  if (document.body.classList.contains('music-collection-page')) {
+    document.title = musicLanguage === 'zh' ? '音乐收藏 · 7719 Universe' : 'Music Collection · 7719 Universe';
+    if (description) description.content = musicLanguage === 'zh'
+      ? '7719Drinkin 的个人音乐收藏。'
+      : '7719Drinkin’s personal music collection.';
+  }
+}
+
+function updateTrackCountLabels() {
+  document.querySelectorAll('[data-track-count-value]').forEach((element) => {
+    const count = Number(element.dataset.trackCountValue || 0);
+    element.textContent = musicLanguage === 'zh'
+      ? `${count} 曲`
+      : `${count} TRACK${count === 1 ? '' : 'S'}`;
+    setElementLanguage(element, musicLanguage);
+  });
+}
+
+function applyMusicLanguage({ dispatch = true } = {}) {
+  document.documentElement.lang = languageTag(musicLanguage);
+  document.documentElement.dataset.language = musicLanguage;
+  document.body.dataset.musicLanguage = musicLanguage;
+
+  decorateExactCopy();
+  document.querySelectorAll('[data-music-i18n]').forEach(applyStaticCopy);
+  document.querySelectorAll('[data-music-bilingual-role]').forEach(applyBilingualElement);
+  document.querySelectorAll('[data-music-localized-zh][data-music-localized-en]').forEach(applyLocalizedDataElement);
+  updatePageSpecificCopy();
+  document.querySelectorAll('[data-music-i18n]').forEach(applyStaticCopy);
+  updateTrackCountLabels();
+  markProperTitles();
+  applyDocumentMetadata();
+  updateLanguageToggle();
+  syncPlayerLanguage();
+
+  if (dispatch) {
+    window.dispatchEvent(new CustomEvent('music:language-change', { detail: { language: musicLanguage } }));
+  }
+}
+
+function setMusicLanguage(language) {
+  if (language !== 'zh' && language !== 'en') return;
+  musicLanguage = language;
+  try { localStorage.setItem(MUSIC_LANGUAGE_KEY, language); } catch {}
+  applyMusicLanguage();
+}
+
+function updateLanguageToggle() {
+  const toggle = document.querySelector('[data-music-language-toggle]');
+  if (!toggle) return;
+  toggle.textContent = musicLanguage === 'zh' ? 'EN' : '中文';
+  toggle.setAttribute('aria-label', musicLanguage === 'zh' ? 'Switch to English' : '切换为中文');
+  toggle.lang = musicLanguage === 'zh' ? 'en' : 'zh-CN';
+}
+
+function installLanguageToggle() {
+  const nav = document.querySelector('.music-site-nav');
+  if (!nav || nav.querySelector('[data-music-language-toggle]')) return;
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'music-language-toggle';
+  button.dataset.musicLanguageToggle = '';
+  button.addEventListener('click', () => setMusicLanguage(otherLanguage(musicLanguage)));
+  nav.append(button);
+}
+
+function ensureMusicI18nStyles() {
+  if (document.querySelector('link[data-music-i18n-style]')) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = '/css/music-i18n.css?v=20260807-1';
+  link.dataset.musicI18nStyle = '';
+  document.head.append(link);
+}
+
+
+function translateDynamicAriaLabel(element) {
+  const label = element.getAttribute?.('aria-label');
+  if (!label) return;
+
+  const exactKey = textKeyByValue.get(label.trim());
+  if (exactKey) {
+    const translated = musicTranslate(exactKey);
+    if (translated !== label) element.setAttribute('aria-label', translated);
+    return;
+  }
+
+  if (musicLanguage === 'en' && label.startsWith('播放 ')) {
+    element.setAttribute('aria-label', `Play ${label.slice(3)}`);
+  } else if (musicLanguage === 'zh' && label.startsWith('Play ')) {
+    element.setAttribute('aria-label', `播放 ${label.slice(5)}`);
+  }
+}
+
+function translateDynamicText(root) {
+  if (!root) return;
+  const elements = root.matches?.('span, strong, small, p, h4')
+    ? [root, ...root.querySelectorAll?.('span, strong, small, p, h4') || []]
+    : [...root.querySelectorAll?.('span, strong, small, p, h4') || []];
+
+  elements.forEach((element) => {
+    if (element.children.length || element.dataset.musicBilingualRole || element.dataset.musicLocalizedZh) return;
+    const text = element.textContent.trim();
+    const key = text === 'ARCHIVE' ? 'status.curated' : textKeyByValue.get(text);
+    if (key) {
+      bindStaticCopy(element, key);
+      applyStaticCopy(element);
+      return;
+    }
+
+    const trackMatch = text.match(/^(\d+)\s+TRACKS?$/i) || text.match(/^(\d+)\s*曲$/u);
+    if (trackMatch) {
+      const count = Number(trackMatch[1]);
+      const next = musicLanguage === 'zh' ? `${count} 曲` : `${count} TRACK${count === 1 ? '' : 'S'}`;
+      if (element.textContent !== next) element.textContent = next;
+      setElementLanguage(element, musicLanguage);
+      return;
+    }
+
+    const videoMatch = text.match(/^(\d+)\s+VIDEOS?$/i) || text.match(/^(\d+)\s*个视频$/u);
+    if (videoMatch) {
+      const count = Number(videoMatch[1]);
+      const next = musicLanguage === 'zh' ? `${count} 个视频` : `${count} VIDEO${count === 1 ? '' : 'S'}`;
+      if (element.textContent !== next) element.textContent = next;
+      setElementLanguage(element, musicLanguage);
+      return;
+    }
+
+    const technical = {
+      'BROWSER CACHE': { zh: '浏览器缓存', en: 'BROWSER CACHE' },
+      'STALE BROWSER CACHE': { zh: '旧浏览器缓存', en: 'STALE BROWSER CACHE' },
+      'WORKER CACHE': { zh: 'WORKER 缓存', en: 'WORKER CACHE' },
+      'WAITING FOR CATALOG': { zh: '等待曲目目录', en: 'WAITING FOR CATALOG' },
+      'READING CATALOG': { zh: '读取曲目中', en: 'READING CATALOG' },
+      'VIEW ALBUM': { zh: '查看专辑', en: 'VIEW ALBUM' },
+      'DETAIL PAGE': { zh: '详情页', en: 'DETAIL PAGE' },

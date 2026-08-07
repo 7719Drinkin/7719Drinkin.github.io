@@ -52,6 +52,8 @@ jobs:
           node --check js/site-shell.js
           node --check js/site-frame-bridge.js
           node --check scripts/install-site-shell.mjs
+          node --check scripts/build-music-i18n.mjs
+          node --check scripts/embed-music-i18n-data.mjs
 
       - name: Select deployment path
         shell: bash
@@ -72,6 +74,8 @@ jobs:
 
       - name: Generate site pages
         run: |
+          node scripts/build-music-i18n.mjs
+          node --check js/music-i18n.js
           cp music/index.html /tmp/music-index.manual.html
           node scripts/build-music-pages.mjs
           cp /tmp/music-index.manual.html music/index.html
@@ -83,6 +87,7 @@ jobs:
           node scripts/version-music-album-assets.mjs
           node scripts/version-music-visual-assets.mjs
           node scripts/apply-music-design-system.mjs
+          node scripts/embed-music-i18n-data.mjs
           node scripts/apply-basketball-design-system.mjs
           node scripts/install-site-shell.mjs
 

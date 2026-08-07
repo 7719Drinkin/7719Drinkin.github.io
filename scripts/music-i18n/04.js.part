@@ -1,0 +1,114 @@
+      '浏览器缓存': { zh: '浏览器缓存', en: 'BROWSER CACHE' },
+      '旧浏览器缓存': { zh: '旧浏览器缓存', en: 'STALE BROWSER CACHE' },
+      'WORKER 缓存': { zh: 'WORKER 缓存', en: 'WORKER CACHE' },
+      '等待曲目目录': { zh: '等待曲目目录', en: 'WAITING FOR CATALOG' },
+      '读取曲目中': { zh: '读取曲目中', en: 'READING CATALOG' },
+      '查看专辑': { zh: '查看专辑', en: 'VIEW ALBUM' },
+      '详情页': { zh: '详情页', en: 'DETAIL PAGE' }
+    }[text];
+    if (technical) {
+      const next = technical[musicLanguage];
+      if (element.textContent !== next) element.textContent = next;
+      setElementLanguage(element, musicLanguage);
+    }
+  });
+
+  if (root.matches?.('[aria-label]')) translateDynamicAriaLabel(root);
+  root.querySelectorAll?.('[aria-label]').forEach(translateDynamicAriaLabel);
+}
+
+function installDynamicTranslationObserver(root) {
+  if (!root || root.dataset.musicI18nObserved === 'true' || !('MutationObserver' in window)) return;
+  root.dataset.musicI18nObserved = 'true';
+
+  let applying = false;
+  const observer = new MutationObserver((mutations) => {
+    if (applying) return;
+    applying = true;
+    try {
+      mutations.forEach((mutation) => {
+        const target = mutation.type === 'characterData' ? mutation.target.parentElement : mutation.target;
+        if (target instanceof Element) translateDynamicText(target);
+      });
+    } finally {
+      applying = false;
+    }
+  });
+
+  observer.observe(root, {
+    subtree: true,
+    childList: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: ['aria-label']
+  });
+  translateDynamicText(root);
+}
+
+function syncPlayerLanguage() {
+  const player = document.querySelector('[data-music-player]');
+  if (!player) return;
+
+  const active = document.querySelector('.song-row--playable.is-active');
+  const artist = player.querySelector('[data-player-artist]');
+  if (active && artist) {
+    const value = musicLanguage === 'zh'
+      ? active.dataset.songArtistZh || active.dataset.songArtist
+      : active.dataset.songArtistEn || active.dataset.songArtist;
+    if (value) artist.textContent = value;
+  }
+
+  translateDynamicText(player);
+}
+
+window.MusicI18n = {
+  t: musicTranslate,
+  localized,
+  getLanguage: () => musicLanguage,
+  setLanguage: setMusicLanguage,
+  apply: applyMusicLanguage,
+  applyStatic: (root = document) => {
+    decorateExactCopy(root);
+    root.querySelectorAll?.('[data-music-i18n]').forEach(applyStaticCopy);
+    root.querySelectorAll?.('[data-music-bilingual-role]').forEach(applyBilingualElement);
+    root.querySelectorAll?.('[data-music-localized-zh][data-music-localized-en]').forEach(applyLocalizedDataElement);
+  },
+  bindLocalized: (element, value) => {
+    if (!element || value == null) return;
+    element.dataset.musicLocalizedZh = localized(value, 'zh');
+    element.dataset.musicLocalizedEn = localized(value, 'en');
+    applyLocalizedDataElement(element);
+  },
+  setTrackCount: (element, count) => {
+    if (!element) return;
+    element.dataset.trackCountValue = String(Number(count) || 0);
+    updateTrackCountLabels();
+  },
+  getArtistName: (language = musicLanguage) => localized(musicPageData?.artist?.name, language),
+  getArtistNames: () => musicPageData?.artist?.name || null,
+  pageData: musicPageData
+};
+
+ensureMusicI18nStyles();
+installLanguageToggle();
+setupBilingualPresentation();
+setupPageDataContent();
+updatePageSpecificCopy();
+decorateExactCopy();
+applyMusicLanguage({ dispatch: false });
+installDynamicTranslationObserver(document.querySelector('[data-music-player]'));
+installDynamicTranslationObserver(document.querySelector('.visual-archive-layout'));
+installDynamicTranslationObserver(document.querySelector('#albums'));
+installDynamicTranslationObserver(document.querySelector('.artist-song-column .song-list'));
+installDynamicTranslationObserver(document.querySelector('.album-song-list'));
+window.addEventListener('music:language-change', () => {
+  syncPlayerLanguage();
+  [
+    document.querySelector('[data-music-player]'),
+    document.querySelector('.visual-archive-layout'),
+    document.querySelector('#albums'),
+    document.querySelector('.artist-song-column .song-list'),
+    document.querySelector('.album-song-list')
+  ].filter(Boolean).forEach(translateDynamicText);
+});
+
