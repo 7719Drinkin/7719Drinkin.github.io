@@ -15,7 +15,168 @@
   },
   "heroImage": "/assets/Music/Artists/TanYonglin/hero/SingerPortrait_149_-2694000341785996801988.jpg",
   "selectedSongs": [],
-  "albums": [],
+  "albums": [
+    {
+      "title": "7890后",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_7890后.jpg"
+    },
+    {
+      "title": "世外桃源",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_世外桃源.jpg"
+    },
+    {
+      "title": "伴我飞翔",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_伴我飞翔.jpg"
+    },
+    {
+      "title": "倾听",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_倾听.jpg"
+    },
+    {
+      "title": "再度感动",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_再度感动.jpg"
+    },
+    {
+      "title": "再见吧浪漫",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_再见吧浪漫.jpg"
+    },
+    {
+      "title": "反斗星",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_反斗星.jpg"
+    },
+    {
+      "title": "喜爱",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_喜爱.jpg"
+    },
+    {
+      "title": "在乎",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_在乎.jpg"
+    },
+    {
+      "title": "墙上的肖像",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_墙上的肖像.jpg"
+    },
+    {
+      "title": "天地",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_天地.jpg"
+    },
+    {
+      "title": "实在男人",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_实在男人.jpg"
+    },
+    {
+      "title": "忘不了您",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_忘不了您.jpg"
+    },
+    {
+      "title": "忘情都市",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_忘情都市.jpg"
+    },
+    {
+      "title": "思前想后",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_思前想后.jpg"
+    },
+    {
+      "title": "情人",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_情人.jpg"
+    },
+    {
+      "title": "我们一起走过的日子",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_我们一起走过的日子.jpg"
+    },
+    {
+      "title": "我在意",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_我在意.jpg"
+    },
+    {
+      "title": "我的生命我的爱",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_我的生命我的爱.jpg"
+    },
+    {
+      "title": "拥抱",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_拥抱.jpg"
+    },
+    {
+      "title": "星光大道",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_星光大道.jpg"
+    },
+    {
+      "title": "暴风女神lorelei",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_暴风女神lorelei.jpg"
+    },
+    {
+      "title": "梦幻的笑容",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_梦幻的笑容.jpg"
+    },
+    {
+      "title": "梦幻舞台",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_梦幻舞台.jpg"
+    },
+    {
+      "title": "爱人女神",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_爱人女神.jpg"
+    },
+    {
+      "title": "爱念",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_爱念.jpg"
+    },
+    {
+      "title": "爱情故事",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_爱情故事.jpg"
+    },
+    {
+      "title": "爱情陷阱",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_爱情陷阱.jpg"
+    },
+    {
+      "title": "爱的根源",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_爱的根源.jpg"
+    },
+    {
+      "title": "爱自己",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_爱自己.jpg"
+    },
+    {
+      "title": "独一无二",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_独一无二.jpg"
+    },
+    {
+      "title": "神话1991",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_神话1991.jpg"
+    },
+    {
+      "title": "笑看人生",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_笑看人生.jpg"
+    },
+    {
+      "title": "第一滴泪",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_第一滴泪.jpg"
+    },
+    {
+      "title": "自选角度",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_自选角度.jpg"
+    },
+    {
+      "title": "迟来的春天",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_迟来的春天.jpg"
+    },
+    {
+      "title": "迷情",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_迷情.jpg"
+    },
+    {
+      "title": "迷惑",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_迷惑.jpg"
+    },
+    {
+      "title": "雾之恋",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_雾之恋.jpg"
+    },
+    {
+      "title": "飞马",
+      "cover": "/assets/Music/Artists/TanYonglin/albums/AlbumCover_飞马.jpg"
+    }
+  ],
   "gallery": [
     {
       "type": "bilibili-playlist",
