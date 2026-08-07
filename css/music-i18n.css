@@ -1,7 +1,7 @@
 :root {
-  --music-font-en-display: "Playfair Display", Georgia, serif;
+  --music-font-en-display: "Cormorant Garamond", "Playfair Display", Georgia, serif;
   --music-font-en-ui: "Inter", Arial, sans-serif;
-  --music-font-zh-display: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --music-font-zh-display: "Noto Serif SC", "Cormorant Garamond", serif;
   --music-font-zh-ui: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
@@ -43,9 +43,9 @@
 }
 
 .music-page [data-music-bilingual-role="secondary"][lang="zh-CN"] {
-  font-family: var(--music-font-zh-ui) !important;
+  font-family: var(--music-font-zh-display) !important;
   font-style: normal !important;
-  letter-spacing: .04em !important;
+  letter-spacing: .02em !important;
   text-transform: none !important;
 }
 
@@ -72,6 +72,29 @@
 
 .music-page .music-proper-title[lang="en"] {
   font-family: var(--music-font-en-display) !important;
+}
+
+.music-heading-secondary {
+  flex: 0 0 auto;
+  margin: 0 0 1px 3px;
+  color: var(--music-muted);
+  font-family: var(--music-code, "DM Mono", monospace);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  opacity: .72;
+}
+
+.music-heading-secondary[lang="zh-CN"] {
+  font-family: var(--music-font-zh-ui) !important;
+  letter-spacing: .04em !important;
+  text-transform: none !important;
+}
+
+.music-heading-secondary[lang="en"] {
+  font-family: var(--music-code, "DM Mono", monospace) !important;
 }
 
 .album-detail-artist[data-music-bilingual-container="true"] {
@@ -113,6 +136,11 @@ html[data-language="zh"] .artist-hero-copy h2 {
     right: 0;
     flex: 0 0 auto;
     background: color-mix(in srgb, var(--music-bg-deep) 90%, transparent);
+  }
+
+  .music-heading-secondary {
+    font-size: 8px;
+    letter-spacing: .08em;
   }
 }
 
