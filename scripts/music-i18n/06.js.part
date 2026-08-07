@@ -1,0 +1,20 @@
+function normalizeArtistHeadlineLocalization() {
+  if (musicPageData?.pageType !== 'artist' || !musicPageData.detail?.headline) return;
+
+  const zh = localized(musicPageData.detail.headline, 'zh');
+  const en = localized(musicPageData.detail.headline, 'en');
+
+  [
+    document.querySelector('.artist-hero-copy blockquote'),
+    document.querySelector('.artist-note h2')
+  ].filter(Boolean).forEach((element) => {
+    delete element.dataset.musicBilingualRole;
+    delete element.dataset.musicZh;
+    delete element.dataset.musicEn;
+    element.dataset.musicLocalizedZh = zh;
+    element.dataset.musicLocalizedEn = en;
+    applyLocalizedDataElement(element);
+  });
+}
+
+normalizeArtistHeadlineLocalization();
