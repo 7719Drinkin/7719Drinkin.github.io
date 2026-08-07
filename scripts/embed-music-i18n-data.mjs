@@ -6,7 +6,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MUSIC_ROOT = join(ROOT, 'music');
 const DETAILS_ROOT = join(ROOT, 'data', 'music', 'artists');
 const REGISTRY_PATH = join(ROOT, 'data', 'music', 'artists.json');
-const MUSIC_I18N_VERSION = '20260807-2';
+const MUSIC_I18N_VERSION = '20260807-3';
 
 const fallbackAlbumSlug = (album, index) => {
   const ascii = String(album.title || '')
