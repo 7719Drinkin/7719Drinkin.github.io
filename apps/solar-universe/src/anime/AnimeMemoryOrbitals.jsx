@@ -11,7 +11,7 @@ const FRAME_ORBITS = [
     speed: 0.11,
     initial: 0.45,
     spin: 0.2,
-    scale: 0.19,
+    scale: 0.72,
     frame: '#d7c58f',
     paper: '#eee7d7'
   },
@@ -23,7 +23,7 @@ const FRAME_ORBITS = [
     speed: -0.075,
     initial: 2.52,
     spin: -0.14,
-    scale: 0.165,
+    scale: 0.63,
     frame: '#9fb8c5',
     paper: '#dce5e7'
   },
@@ -35,7 +35,7 @@ const FRAME_ORBITS = [
     speed: 0.056,
     initial: 4.7,
     spin: 0.1,
-    scale: 0.145,
+    scale: 0.56,
     frame: '#c6ae73',
     paper: '#e8dfcf'
   }
