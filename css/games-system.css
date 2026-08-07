@@ -1,31 +1,27 @@
 /*
- * Games module — subtractive Civilization VI visual language.
- * Keep only the strongest cues: a readable hex map, parchment fog of war,
- * restrained cobalt UI chrome and a small brass accent.
+ * Games module — image-first shell.
+ * The real background will be supplied later by the user.
+ * To install it, set --games-hero-image to url('/assets/Games/...').
  */
 
 body[data-site-module="games"] {
-  --games-sea: #5d9bb7;
-  --games-sea-deep: #417c9b;
-  --games-land: #7d9568;
-  --games-land-light: #9cab7b;
-  --games-earth: #a18b61;
-  --games-parchment: #dfd1ad;
-  --games-parchment-light: #eee1c1;
-  --games-navy: #173e5e;
-  --games-navy-deep: #0d2d48;
-  --games-gold: #c7a55d;
-  --games-gold-light: #e2ca87;
-  --games-ivory: #f6eedb;
-  --games-text: #243543;
-  --games-muted: rgba(246, 238, 219, .68);
+  --games-hero-image: none;
+  --games-hero-position-x: 50%;
+  --games-hero-position-y: 50%;
+  --games-navy: #10283a;
+  --games-navy-deep: #081824;
+  --games-blue: #285f82;
+  --games-gold: #c6a45d;
+  --games-gold-light: #ead79e;
+  --games-ivory: #f7f1e4;
+  --games-muted: rgba(247, 241, 228, .66);
   --games-display: "Cinzel", serif;
   --games-ui: "Inter", "Noto Sans SC", sans-serif;
   min-width: 320px;
   margin: 0;
   overflow-x: hidden;
   color: var(--games-ivory);
-  background: var(--games-sea);
+  background: var(--games-navy-deep);
   font-family: var(--games-ui);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -34,74 +30,47 @@ body[data-site-module="games"] {
 body[data-site-module="games"] a { color: inherit; }
 body[data-site-module="games"] .universe-noise { display: none; }
 
-/* One visual field only: map + hexes + parchment fog. */
-body[data-site-module="games"] .games-civ6-field {
+/* Reserved full-bleed screenshot area. */
+body[data-site-module="games"] .games-hero-media {
   position: fixed;
   inset: 0;
   z-index: -3;
-  overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse at 22% 26%, rgba(126,151,103,.98) 0 10%, rgba(101,132,85,.94) 11% 18%, transparent 19%),
-    radial-gradient(ellipse at 46% 61%, rgba(158,154,101,.96) 0 11%, rgba(119,139,83,.94) 12% 20%, transparent 21%),
-    radial-gradient(ellipse at 76% 39%, rgba(128,149,94,.92) 0 9%, rgba(95,127,83,.9) 10% 16%, transparent 17%),
-    radial-gradient(ellipse at 84% 76%, rgba(158,137,92,.9) 0 8%, rgba(119,127,77,.88) 9% 14%, transparent 15%),
-    linear-gradient(180deg, #78b6cf 0%, var(--games-sea) 56%, var(--games-sea-deep) 100%);
-  transform: translate3d(var(--games-map-x, 0), var(--games-map-y, 0), 0) scale(1.025);
+  background-color: #17394f;
+  background-image:
+    linear-gradient(90deg, rgba(5, 18, 28, .76) 0%, rgba(5, 18, 28, .44) 34%, rgba(5, 18, 28, .08) 64%, rgba(5, 18, 28, .12) 100%),
+    linear-gradient(180deg, rgba(5, 18, 28, .12) 0%, transparent 52%, rgba(5, 18, 28, .42) 100%),
+    var(--games-hero-image);
+  background-position:
+    center,
+    center,
+    var(--games-hero-position-x) var(--games-hero-position-y);
+  background-size: cover, cover, cover;
+  background-repeat: no-repeat;
+  transform: translate3d(0, var(--games-image-y, 0), 0) scale(1.015);
+  transform-origin: center;
   transition: transform .18s linear;
 }
 
-body[data-site-module="games"] .games-civ6-field::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background:
-    linear-gradient(90deg, rgba(8,37,59,.46) 0%, rgba(8,37,59,.18) 33%, transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.08), transparent 55%, rgba(36,54,59,.08));
-}
-
-body[data-site-module="games"] .games-hex-grid {
-  position: absolute;
-  inset: -7%;
-  opacity: .24;
-  background-image:
-    linear-gradient(30deg, transparent 24%, rgba(244,239,214,.62) 25%, rgba(244,239,214,.62) 26%, transparent 27%, transparent 74%, rgba(244,239,214,.52) 75%, rgba(244,239,214,.52) 76%, transparent 77%),
-    linear-gradient(150deg, transparent 24%, rgba(244,239,214,.62) 25%, rgba(244,239,214,.62) 26%, transparent 27%, transparent 74%, rgba(244,239,214,.52) 75%, rgba(244,239,214,.52) 76%, transparent 77%);
-  background-size: 94px 163px;
-}
-
-body[data-site-module="games"] .games-fog-of-war {
-  position: absolute;
-  right: -5%;
-  bottom: -12%;
-  left: 38%;
-  height: 62%;
-  opacity: .97;
-  background:
-    repeating-radial-gradient(ellipse at 42% 24%, transparent 0 33px, rgba(91,78,54,.055) 34px 35px, transparent 36px 65px),
-    linear-gradient(180deg, rgba(238,225,193,.32), var(--games-parchment-light) 28%, var(--games-parchment) 100%);
-  clip-path: polygon(0 22%, 8% 18%, 17% 24%, 26% 14%, 36% 20%, 47% 11%, 58% 17%, 70% 8%, 81% 15%, 90% 9%, 100% 14%, 100% 100%, 0 100%);
-}
-
-/* Minimal Civilization-style top chrome. */
+/* Keep the site navigation restrained so the future screenshot remains dominant. */
 body[data-site-module="games"] .universe-header {
   position: fixed;
   inset: 0 0 auto;
   z-index: 40;
   display: flex;
-  height: 62px;
+  min-height: 64px;
   align-items: center;
   justify-content: space-between;
   padding: 0 clamp(18px, 4vw, 64px);
-  border-bottom: 1px solid rgba(226,202,135,.72);
-  background: linear-gradient(180deg, rgba(27,75,111,.98), rgba(13,45,72,.98));
-  box-shadow: 0 5px 18px rgba(8,31,48,.16);
-  transition: background .25s ease, box-shadow .25s ease;
+  border-bottom: 1px solid transparent;
+  background: linear-gradient(180deg, rgba(6, 20, 31, .64), rgba(6, 20, 31, .12));
+  backdrop-filter: blur(8px);
+  transition: background .25s ease, border-color .25s ease;
 }
 
 body[data-site-module="games"] .universe-header.is-scrolled {
-  background: linear-gradient(180deg, #19466a, #0c2d48);
-  box-shadow: 0 8px 24px rgba(8,31,48,.24);
+  border-bottom-color: rgba(234, 215, 158, .24);
+  background: rgba(8, 24, 36, .86);
 }
 
 body[data-site-module="games"] .universe-brand {
@@ -117,12 +86,12 @@ body[data-site-module="games"] .universe-brand {
 body[data-site-module="games"] .universe-nav {
   display: flex;
   align-items: center;
-  gap: clamp(13px, 2.4vw, 30px);
+  gap: clamp(14px, 2.4vw, 30px);
 }
 
 body[data-site-module="games"] .universe-nav a {
   position: relative;
-  color: rgba(246,238,219,.7);
+  color: rgba(247, 241, 228, .7);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: .15em;
@@ -142,31 +111,42 @@ body[data-site-module="games"] .universe-nav a::after {
 }
 
 body[data-site-module="games"] .universe-nav a:hover,
-body[data-site-module="games"] .universe-nav a:focus-visible { color: #fff9e9; }
+body[data-site-module="games"] .universe-nav a:focus-visible { color: #fff; }
 body[data-site-module="games"] .universe-nav a:hover::after,
 body[data-site-module="games"] .universe-nav a:focus-visible::after { right: 0; left: 0; }
 
-/* The page is intentionally almost empty: the map is the interface. */
-body.games-landing-page[data-site-module="games"] main { min-height: 100svh; }
+/* Hero content intentionally stays minimal. */
+body.games-landing-page[data-site-module="games"] main,
+body.games-landing-page[data-site-module="games"] .games-hero {
+  min-height: 100svh;
+}
 
 body.games-landing-page[data-site-module="games"] .games-hero {
   position: relative;
   display: flex;
-  min-height: 100svh;
   align-items: flex-end;
-  padding: 112px clamp(24px, 7vw, 108px) clamp(88px, 11vh, 128px);
+  padding: 112px clamp(24px, 7vw, 108px) clamp(92px, 12vh, 138px);
 }
 
 body.games-landing-page[data-site-module="games"] .games-hero-copy {
   position: relative;
   z-index: 2;
-  max-width: 640px;
-  padding-left: 22px;
-  border-left: 2px solid var(--games-gold-light);
+  max-width: 620px;
+  padding-left: 20px;
+}
+
+body.games-landing-page[data-site-module="games"] .games-hero-copy::before {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: 2px;
+  content: "";
+  background: var(--games-gold-light);
 }
 
 body.games-landing-page[data-site-module="games"] .games-eyebrow {
-  margin: 0 0 13px;
+  margin: 0 0 12px;
   color: var(--games-gold-light);
   font-size: 9px;
   font-weight: 700;
@@ -181,13 +161,13 @@ body.games-landing-page[data-site-module="games"] .games-hero h1 {
   font-weight: 600;
   line-height: .9;
   letter-spacing: -.035em;
-  text-shadow: 0 3px 18px rgba(4,25,40,.28);
+  text-shadow: 0 3px 18px rgba(0, 0, 0, .3);
 }
 
 body.games-landing-page[data-site-module="games"] .coming-soon-mark {
   display: inline-block;
-  margin-top: 22px;
-  color: rgba(246,238,219,.78);
+  margin-top: 20px;
+  color: var(--games-muted);
   font-size: 9px;
   font-weight: 600;
   letter-spacing: .16em;
@@ -201,9 +181,9 @@ body[data-site-module="games"] .universe-footer {
   justify-content: space-between;
   gap: 18px;
   padding: 22px clamp(18px, 4vw, 64px);
-  border-top: 1px solid rgba(226,202,135,.55);
-  color: rgba(246,238,219,.6);
-  background: rgba(13,45,72,.94);
+  border-top: 1px solid rgba(234, 215, 158, .18);
+  color: rgba(247, 241, 228, .52);
+  background: rgba(8, 24, 36, .92);
   font-size: 9px;
   font-weight: 600;
   letter-spacing: .15em;
@@ -213,8 +193,8 @@ body[data-site-module="games"] .universe-footer a { text-decoration: none; }
 
 body[data-site-module="games"].games-motion-ready .reveal {
   opacity: 0;
-  transform: translate3d(0, 12px, 0);
-  transition: opacity .55s ease, transform .55s ease;
+  transform: translate3d(0, 10px, 0);
+  transition: opacity .5s ease, transform .5s ease;
 }
 
 body[data-site-module="games"].games-motion-ready .reveal:is(.visible, .is-visible) {
@@ -224,7 +204,6 @@ body[data-site-module="games"].games-motion-ready .reveal:is(.visible, .is-visib
 
 @media (max-width: 720px) {
   body[data-site-module="games"] .universe-header {
-    height: auto;
     min-height: 60px;
     align-items: flex-start;
     flex-direction: column;
@@ -237,11 +216,6 @@ body[data-site-module="games"].games-motion-ready .reveal:is(.visible, .is-visib
     width: 100%;
     overflow-x: auto;
     padding-bottom: 2px;
-  }
-
-  body[data-site-module="games"] .games-fog-of-war {
-    left: 22%;
-    height: 48%;
   }
 
   body.games-landing-page[data-site-module="games"] .games-hero {
@@ -259,7 +233,7 @@ body[data-site-module="games"].games-motion-ready .reveal:is(.visible, .is-visib
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body[data-site-module="games"] .games-civ6-field,
+  body[data-site-module="games"] .games-hero-media,
   body[data-site-module="games"] .reveal {
     transform: none !important;
     transition: none !important;
