@@ -1,11 +1,5 @@
-import GameCivilizationLayer from '../game/GameCivilizationLayer.jsx';
-import GameWorld from './GameWorld.jsx';
+import GamePlanetTerrain from '../game/GamePlanetTerrain.jsx';
 
 export default function GameWorldV2({ radius, quality }) {
-  return (
-    <group>
-      <GameWorld radius={radius} quality={quality} />
-      <GameCivilizationLayer radius={radius} quality={quality} />
-    </group>
-  );
+  return <GamePlanetTerrain radius={radius} quality={quality} />;
 }
