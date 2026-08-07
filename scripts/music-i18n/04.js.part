@@ -21,28 +21,39 @@ function installDynamicTranslationObserver(root) {
   if (!root || root.dataset.musicI18nObserved === 'true' || !('MutationObserver' in window)) return;
   root.dataset.musicI18nObserved = 'true';
 
-  let applying = false;
-  const observer = new MutationObserver((mutations) => {
-    if (applying) return;
-    applying = true;
-    try {
-      mutations.forEach((mutation) => {
-        const target = mutation.type === 'characterData' ? mutation.target.parentElement : mutation.target;
-        if (target instanceof Element) translateDynamicText(target);
-      });
-    } finally {
-      applying = false;
-    }
-  });
-
-  observer.observe(root, {
+  const options = {
     subtree: true,
     childList: true,
     characterData: true,
     attributes: true,
     attributeFilter: ['aria-label']
+  };
+
+  let scheduledFrame = 0;
+  const observer = new MutationObserver((mutations) => {
+    if (scheduledFrame) return;
+
+    const targets = new Set();
+    mutations.forEach((mutation) => {
+      const target = mutation.type === 'characterData' ? mutation.target.parentElement : mutation.target;
+      if (target instanceof Element) targets.add(target);
+    });
+
+    scheduledFrame = requestAnimationFrame(() => {
+      scheduledFrame = 0;
+      observer.disconnect();
+      try {
+        targets.forEach((target) => translateDynamicText(target));
+      } finally {
+        observer.observe(root, options);
+      }
+    });
   });
+
+  // Translate the initial DOM before observing it. This prevents our own first
+  // translation pass from feeding back into the observer and blocking page load.
   translateDynamicText(root);
+  observer.observe(root, options);
 }
 
 function syncPlayerLanguage() {
