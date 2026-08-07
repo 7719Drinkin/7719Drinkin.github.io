@@ -1,0 +1,57 @@
+function setupSectionHeadingLanguagePairs() {
+  const bindSection = (selector, primaryValues, secondaryValues) => {
+    const header = document.querySelector(selector);
+    if (!header) return;
+    const primary = header.querySelector(':scope > div > h2, :scope > div > h3');
+    const secondary = header.querySelector(':scope > div > p');
+    bindBilingualElement(primary, primaryValues, 'primary');
+    bindBilingualElement(secondary, secondaryValues, 'secondary');
+  };
+
+  bindSection('#artists > .music-section-header',
+    { zh: '歌手收藏', en: 'ARTIST COLLECTION' },
+    { zh: '01 / 精选歌手', en: '01 / CURATED ARTISTS' });
+  bindSection('#listening > .music-section-header',
+    { zh: '最近整理', en: 'RECENTLY CURATED' },
+    { zh: '02 / 精选聆听', en: '02 / SELECTED LISTENING' });
+  bindSection('#songs .music-section-header',
+    { zh: '反复聆听', en: 'REPEATED LISTENING' },
+    { zh: '01 / 私藏精选', en: '01 / CURATOR PICKS' });
+  bindSection('#albums > .music-section-header',
+    { zh: '专辑收藏', en: 'ALBUM COLLECTION' },
+    { zh: '02 / 专辑库', en: '02 / ALBUM LIBRARY' });
+  bindSection('#gallery > .music-section-header',
+    { zh: '影像记录', en: 'VISUAL ARCHIVE' },
+    { zh: '03 / 影像档案', en: '03 / VISUAL ARCHIVE' });
+  bindSection('.related-section > .music-section-header',
+    { zh: '其他歌手', en: 'OTHER ARTISTS' },
+    { zh: '04 / 继续浏览', en: '04 / CONTINUE' });
+  bindSection('#tracks > .music-section-header',
+    { zh: '专辑曲目', en: 'ALBUM TRACKS' },
+    { zh: '01 / 曲目列表', en: '01 / TRACK LIST' });
+
+  document.querySelectorAll('.visual-archive-subheader').forEach((header) => {
+    const primary = header.querySelector('h3');
+    const secondary = header.querySelector('p');
+    const raw = secondary?.textContent?.trim() || '';
+    const index = raw.match(/^(03[A-Z])/i)?.[1]?.toUpperCase() || '03A';
+    const isVideo = header.closest('.visual-archive-group--videos');
+    bindBilingualElement(
+      primary,
+      isVideo
+        ? { zh: '影像放映', en: 'VIDEO SCREENING' }
+        : { zh: '照片记录', en: 'PHOTO RECORDS' },
+      'primary'
+    );
+    bindBilingualElement(
+      secondary,
+      isVideo
+        ? { zh: `${index} / 影像档案`, en: `${index} / VIDEO ARCHIVE` }
+        : { zh: `${index} / 照片档案`, en: `${index} / PHOTO ARCHIVE` },
+      'secondary'
+    );
+  });
+}
+
+setupSectionHeadingLanguagePairs();
+applyMusicLanguage({ dispatch: false });
