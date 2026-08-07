@@ -2,12 +2,13 @@ import { useEffect, useRef } from 'react';
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { Select } from '@react-three/postprocessing';
+import AnimeMemoryOrbitals from '../anime/AnimeMemoryOrbitals.jsx';
 import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
 import { useLabelVisibility } from '../context/LabelVisibilityContext.jsx';
 import MusicPuppetCelestial from '../music/MusicPuppetCelestial.jsx';
-import AnimeWorld from '../worlds/AnimeWorld.jsx';
+import AnimeWorldV2 from '../worlds/AnimeWorldV2.jsx';
 import BasketballWorld from '../worlds/BasketballWorld.jsx';
-import GameWorld from '../worlds/GameWorld.jsx';
+import GameWorldV2 from '../worlds/GameWorldV2.jsx';
 import MusicWorld from '../worlds/MusicWorld.jsx';
 import PlaceholderWorld from '../worlds/PlaceholderWorld.jsx';
 
@@ -54,11 +55,11 @@ export default function PlanetSystem({
       <BasketballWorld radius={interest.size} quality={quality} />
     </Select>
   ) : interest.id === 'games' ? (
-    <GameWorld radius={interest.size} quality={quality} />
+    <GameWorldV2 radius={interest.size} quality={quality} />
   ) : interest.id === 'music' ? (
     <MusicWorld radius={interest.size} quality={quality} />
   ) : interest.id === 'anime' ? (
-    <AnimeWorld radius={interest.size} quality={quality} />
+    <AnimeWorldV2 radius={interest.size} quality={quality} />
   ) : (
     <PlaceholderWorld interest={interest} quality={quality} />
   );
@@ -69,6 +70,15 @@ export default function PlanetSystem({
         <group ref={carrier} position={[interest.orbitRadius, 0, 0]}>
           {interest.id === 'basketball' && (
             <BasketballOrbitals
+              radius={interest.size}
+              quality={quality}
+              showOrbit={showOrbits}
+              onSelect={() => onSelect(interest.id)}
+            />
+          )}
+
+          {interest.id === 'anime' && (
+            <AnimeMemoryOrbitals
               radius={interest.size}
               quality={quality}
               showOrbit={showOrbits}
