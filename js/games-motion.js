@@ -3,16 +3,16 @@
   if (!body || body.dataset.siteModule !== 'games') return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const finePointer = window.matchMedia('(pointer: fine)').matches;
   const header = document.querySelector('.universe-header');
-  const hero = document.querySelector('.games-hero');
 
   body.classList.add('games-motion-ready');
 
   const updateScrollState = () => {
     const y = window.scrollY;
     header?.classList.toggle('is-scrolled', y > 16);
-    if (!reducedMotion) body.style.setProperty('--games-map-y', `${Math.min(y * .02, 24)}px`);
+    if (!reducedMotion) {
+      body.style.setProperty('--games-image-y', `${Math.min(y * .012, 12)}px`);
+    }
   };
 
   updateScrollState();
@@ -30,27 +30,5 @@
     revealItems.forEach((item) => observer.observe(item));
   } else {
     revealItems.forEach((item) => item.classList.add('visible', 'is-visible'));
-  }
-
-  if (!reducedMotion && finePointer && hero) {
-    let frame = 0;
-    let x = 0;
-
-    const paint = () => {
-      frame = 0;
-      body.style.setProperty('--games-map-x', `${x.toFixed(2)}px`);
-    };
-
-    hero.addEventListener('pointermove', (event) => {
-      const bounds = hero.getBoundingClientRect();
-      if (!bounds.width) return;
-      x = (((event.clientX - bounds.left) / bounds.width) - .5) * 5;
-      if (!frame) frame = requestAnimationFrame(paint);
-    }, { passive: true });
-
-    hero.addEventListener('pointerleave', () => {
-      x = 0;
-      if (!frame) frame = requestAnimationFrame(paint);
-    }, { passive: true });
   }
 })();
