@@ -1,17 +1,143 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Games collection preview in 7719 Universe."><title>Games · 7719 Universe</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="7719 Universe 的游戏收藏，以 Civilization VI 为核心，并以 Civilization VII 的时代与地图语言作为视觉灵感。">
+  <meta name="theme-color" content="#07111f">
+  <title>Games · Civilization Archive · 7719 Universe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/universe.css?v=20260730-1">
+  <link rel="stylesheet" href="/css/games-system.css?v=20260807-1">
 </head>
-<body class="theme-games interest-page">
+<body class="theme-games interest-page games-page games-landing-page" data-site-module="games">
   <div class="universe-noise" aria-hidden="true"></div>
-  <header class="universe-header"><a class="universe-brand" href="/">7719</a><nav class="universe-nav"><a href="/">UNIVERSE</a><a href="/basketball/">BASKETBALL</a><a href="/music/">MUSIC</a></nav></header>
-  <main><section class="interest-hero coming-soon-hero"><div class="interest-hero-copy reveal"><div class="breadcrumb"><a href="/">HOME</a><span>/</span><span>GAMES</span></div><p class="eyebrow">02 / INTEREST</p><h1>GAMES</h1><p>Strategy games, Civilization, screenshots, campaigns and the worlds built through decisions.</p><span class="coming-soon-mark">COLLECTION IN DEVELOPMENT</span></div></section></main>
-  <footer class="universe-footer"><span>7719 / GAMES</span><a href="/">BACK TO UNIVERSE →</a></footer>
+  <div class="games-map-layer" aria-hidden="true"></div>
+
+  <header class="universe-header">
+    <a class="universe-brand" href="/" aria-label="返回 7719 Universe">7719</a>
+    <nav class="universe-nav" aria-label="游戏收藏导航">
+      <a href="/">UNIVERSE</a>
+      <a href="#archive">ARCHIVE</a>
+      <a href="#ages">AGES</a>
+      <a href="#civ-vi">CIV VI</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="games-hero" data-games-hero>
+      <div class="games-hero-roman" aria-hidden="true">VI</div>
+      <div class="games-hero-copy reveal">
+        <div class="breadcrumb"><a href="/">HOME</a><span>/</span><span>GAMES</span></div>
+        <p class="games-eyebrow">02 / STRATEGY ARCHIVE</p>
+        <h1><span>Games</span><strong>Civilization</strong></h1>
+        <p class="games-hero-intro">从一格地图开始，把城市、制度、科技与文化慢慢推向下一个时代。这里首先记录我反复游玩的《文明 VI》，并用更接近《文明 VII》的地图、时代与典藏感来组织整个游戏收藏。</p>
+        <a class="games-scroll-cue" href="#archive">进入编年史 <i>↓</i></a>
+      </div>
+
+      <aside class="games-dossier reveal" aria-label="游戏收藏概览">
+        <div class="games-dossier-head"><span>PLAYER DOSSIER</span><small>7719 / GAMES</small></div>
+        <div class="games-dossier-row"><small>MOST PLAYED</small><strong>Civilization VI</strong></div>
+        <div class="games-dossier-row"><small>VISUAL REFERENCE</small><strong>Civilization VII</strong></div>
+        <div class="games-dossier-row"><small>CORE INTEREST</small><strong>Turn-based Strategy</strong></div>
+        <div class="games-dossier-row"><small>COLLECTION MODE</small><strong>Campaigns · Maps · Decisions</strong></div>
+      </aside>
+    </section>
+
+    <div class="games-chronicle-strip" aria-hidden="true">
+      <div class="games-chronicle-track">
+        <span>FOUND A CITY</span><span>EXPLORE THE MAP</span><span>BUILD A WONDER</span><span>WRITE A HISTORY</span><span>ADVANCE THE AGE</span>
+        <span>FOUND A CITY</span><span>EXPLORE THE MAP</span><span>BUILD A WONDER</span><span>WRITE A HISTORY</span><span>ADVANCE THE AGE</span>
+      </div>
+    </div>
+
+    <section id="archive" class="games-section">
+      <div class="section-heading reveal">
+        <div><p>01 / GAME ARCHIVE</p><h2>MY STRATEGY<br>CHRONICLE.</h2></div>
+        <span>游戏模块不会沿用 Music 或 Basketball 的视觉规则；这里以地图、文明档案和时代推进作为独立设计语言。</span>
+      </div>
+
+      <div class="games-archive-grid">
+        <article id="civ-vi" class="game-archive-card reveal">
+          <div class="game-archive-card-inner">
+            <div class="game-archive-meta"><span>01 / FAVORITE</span><strong>ACTIVE COLLECTION</strong></div>
+            <div class="game-archive-copy">
+              <h3>CIVILIZATION VI<span>THE GAME I RETURN TO</span></h3>
+              <p>最喜欢、也最适合作为这个收藏起点的作品。后续可以在这里继续加入文明选择、胜利路线、地图种子、战报、截图和真正值得记住的一局。</p>
+            </div>
+            <span class="game-archive-seal" aria-hidden="true">VI</span>
+          </div>
+        </article>
+
+        <article class="game-archive-card reveal">
+          <div class="game-archive-card-inner">
+            <div class="game-archive-meta"><span>02 / INFLUENCE</span><strong>DESIGN LANGUAGE</strong></div>
+            <div class="game-archive-copy">
+              <h3>CIVILIZATION VII<span>AGES / MAP / LEGACY</span></h3>
+              <p>借用它更强的时代分层、地图叙事与文明档案感，作为 Games 模块的视觉参考，而不是照搬游戏界面。</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="game-archive-card reveal">
+          <div class="game-archive-card-inner">
+            <div class="game-archive-meta"><span>03 / NEXT</span><strong>OPEN SLOT</strong></div>
+            <div class="game-archive-copy">
+              <h3>MORE WORLDS<span>FUTURE COLLECTIONS</span></h3>
+              <p>为其他策略、模拟与世界构建类游戏保留位置，并保持 Games 模块内部统一的档案体系。</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="ages" class="games-section">
+      <div class="section-heading reveal">
+        <div><p>02 / AGE TRANSITION</p><h2>THROUGH<br>THE AGES.</h2></div>
+        <span>以《文明 VII》的三时代结构为灵感，把“时代推进”转化为网站里的交互式导航语言。</span>
+      </div>
+
+      <div class="games-ages-shell">
+        <div class="games-age-tabs reveal" role="group" aria-label="选择时代">
+          <button class="games-age-tab is-active" type="button" data-age="antiquity" aria-pressed="true"><span>I</span><strong>ANTIQUITY</strong><i aria-hidden="true"></i></button>
+          <button class="games-age-tab" type="button" data-age="exploration" aria-pressed="false"><span>II</span><strong>EXPLORATION</strong><i aria-hidden="true"></i></button>
+          <button class="games-age-tab" type="button" data-age="modern" aria-pressed="false"><span>III</span><strong>MODERN</strong><i aria-hidden="true"></i></button>
+        </div>
+
+        <article class="games-age-panel reveal" data-age-panel data-active-age="antiquity" aria-live="polite">
+          <span class="games-age-kicker">AGE I / ANTIQUITY</span>
+          <h3>FOUNDATIONS</h3>
+          <p>从第一座城市与最初的制度开始。页面用更厚重的金色、石刻感和地图纹理表达“建立秩序”的阶段。</p>
+          <div class="games-age-values">
+            <div class="games-age-value"><small>PRIMARY DRIVE</small><strong>Expansion</strong></div>
+            <div class="games-age-value"><small>VISUAL TONE</small><strong>Stone / Gold</strong></div>
+            <div class="games-age-value"><small>ARCHIVE IDEA</small><strong>Origins</strong></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="games-section">
+      <div class="section-heading reveal">
+        <div><p>03 / CIVILIZATION VI</p><h2>HOW I BUILD<br>A WORLD.</h2></div>
+        <span>先把 Civilization VI 的收藏结构定下来，后续真实内容可以直接填入，不需要重新设计页面骨架。</span>
+      </div>
+
+      <div class="games-strategy-grid">
+        <article class="games-strategy-cell reveal"><span>01</span><h3>CIVILIZATIONS</h3><p>喜欢使用的文明、领袖与不同玩法。</p></article>
+        <article class="games-strategy-cell reveal"><span>02</span><h3>CAMPAIGNS</h3><p>真正值得保存的对局、地图与发展路线。</p></article>
+        <article class="games-strategy-cell reveal"><span>03</span><h3>VICTORIES</h3><p>科技、文化、统治与外交方向的记录。</p></article>
+        <article class="games-strategy-cell reveal"><span>04</span><h3>WONDERS</h3><p>奇观、城市规划与那些想截图留下的瞬间。</p></article>
+        <article class="games-strategy-cell reveal"><span>05</span><h3>MAPS</h3><p>地图种子、地形与从未知到完整世界的过程。</p></article>
+        <article class="games-strategy-cell reveal"><span>06</span><h3>DECISIONS</h3><p>一局游戏真正有趣的地方：每个回合做出的选择。</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="universe-footer"><span>7719 / GAMES / CIVILIZATION ARCHIVE</span><a href="/">BACK TO UNIVERSE →</a></footer>
   <script src="/js/universe.js?v=20260730-1"></script>
+  <script src="/js/games-motion.js?v=20260807-1"></script>
 </body>
 </html>
