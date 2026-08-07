@@ -70,7 +70,7 @@ jobs:
         working-directory: apps/solar-universe
         run: npm run build
 
-      - name: Generate Music pages
+      - name: Generate site pages
         run: |
           cp music/index.html /tmp/music-index.manual.html
           node scripts/build-music-pages.mjs
@@ -83,6 +83,7 @@ jobs:
           node scripts/version-music-album-assets.mjs
           node scripts/version-music-visual-assets.mjs
           node scripts/apply-music-design-system.mjs
+          node scripts/apply-basketball-design-system.mjs
           node scripts/install-site-shell.mjs
 
       - name: Publish pull request preview
