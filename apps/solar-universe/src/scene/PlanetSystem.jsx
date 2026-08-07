@@ -5,7 +5,9 @@ import { Select } from '@react-three/postprocessing';
 import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
 import { useLabelVisibility } from '../context/LabelVisibilityContext.jsx';
 import MusicPuppetCelestial from '../music/MusicPuppetCelestial.jsx';
+import AnimeWorld from '../worlds/AnimeWorld.jsx';
 import BasketballWorld from '../worlds/BasketballWorld.jsx';
+import GameWorld from '../worlds/GameWorld.jsx';
 import MusicWorld from '../worlds/MusicWorld.jsx';
 import PlaceholderWorld from '../worlds/PlaceholderWorld.jsx';
 
@@ -47,6 +49,20 @@ export default function PlanetSystem({
     window.location.href = interest.route;
   };
 
+  const world = interest.id === 'basketball' ? (
+    <Select enabled={selected}>
+      <BasketballWorld radius={interest.size} quality={quality} />
+    </Select>
+  ) : interest.id === 'games' ? (
+    <GameWorld radius={interest.size} quality={quality} />
+  ) : interest.id === 'music' ? (
+    <MusicWorld radius={interest.size} quality={quality} />
+  ) : interest.id === 'anime' ? (
+    <AnimeWorld radius={interest.size} quality={quality} />
+  ) : (
+    <PlaceholderWorld interest={interest} quality={quality} />
+  );
+
   return (
     <group rotation-z={interest.axialTilt * 0.25}>
       <group ref={orbitalPivot} rotation-y={interest.initialOrbit}>
@@ -78,15 +94,7 @@ export default function PlanetSystem({
             onClick={select}
             onDoubleClick={enter}
           >
-            {interest.id === 'basketball' ? (
-              <Select enabled={selected}>
-                <BasketballWorld radius={interest.size} quality={quality} />
-              </Select>
-            ) : interest.id === 'music' ? (
-              <MusicWorld radius={interest.size} quality={quality} />
-            ) : (
-              <PlaceholderWorld interest={interest} quality={quality} />
-            )}
+            {world}
           </group>
 
           {showLabels && (
