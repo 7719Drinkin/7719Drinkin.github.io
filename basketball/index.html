@@ -4,14 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Basketball collections in 7719 Universe.">
+  <meta name="theme-color" content="#050505">
   <title>Basketball · 7719 Universe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/universe.css?v=20260730-1">
+  <link rel="stylesheet" href="/css/basketball-system.css?v=20260807-1">
 </head>
-<body class="theme-basketball interest-page">
+<body class="theme-basketball interest-page basketball-page basketball-landing-page" data-site-module="basketball">
   <div class="universe-noise" aria-hidden="true"></div>
+  <div class="basketball-court-lines" aria-hidden="true"></div>
+
   <header class="universe-header">
     <a class="universe-brand" href="/">7719</a>
     <nav class="universe-nav" aria-label="篮球页面导航">
@@ -22,28 +26,41 @@
   </header>
 
   <main>
-    <section class="interest-hero">
+    <section class="interest-hero" data-basketball-hero>
       <div class="interest-hero-copy reveal">
         <div class="breadcrumb"><a href="/">HOME</a><span>/</span><span>BASKETBALL</span></div>
-        <p class="eyebrow">01 / INTEREST</p>
+        <p class="eyebrow">01 / COURT CULTURE</p>
         <h1>BASKETBALL</h1>
-        <p>The rhythm of the court, the pressure of a final possession and the players whose moments became permanent.</p>
+        <p>速度、对抗、节奏与最后一攻。这里收藏那些让比赛超越比分、让瞬间成为记忆的球员与画面。</p>
       </div>
+
+      <aside class="basketball-scoreboard reveal" aria-label="篮球收藏概览">
+        <div><small>FEATURED COLLECTION</small><strong>23</strong><b>MICHAEL JORDAN</b></div>
+        <div><small>VISUAL LANGUAGE</small><strong>RED</strong><b>BLACK / IVORY</b></div>
+        <div><small>STATUS</small><strong>LIVE</strong><b>ARCHIVE IN MOTION</b></div>
+      </aside>
     </section>
+
+    <div class="basketball-ticker" aria-hidden="true">
+      <div class="basketball-ticker-track">
+        <span>COURT CULTURE</span><span>FLIGHT</span><span>PRESSURE</span><span>FOCUS</span><span>LEGACY</span>
+        <span>COURT CULTURE</span><span>FLIGHT</span><span>PRESSURE</span><span>FOCUS</span><span>LEGACY</span>
+      </div>
+    </div>
 
     <section id="collections" class="universe-section">
       <div class="section-heading reveal">
         <div><p>COLLECTIONS</p><h2>CHOOSE A<br>STORY.</h2></div>
-        <span>Michael Jordan is the first complete basketball collection. More sections can be added without changing the site core.</span>
+        <span>从一个人物专题开始，逐步扩展到球队、时代、比赛与属于自己的篮球记忆。</span>
       </div>
 
       <div class="topic-grid">
         <a class="topic-card reveal" href="/basketball/michael-jordan/">
           <img src="/assets/Basketball/MJ/15815936170156050909.GIF" alt="Michael Jordan tribute animation">
           <div class="topic-card-content">
-            <small>OPEN COLLECTION</small>
+            <small>FEATURED / OPEN COLLECTION</small>
             <h2>MICHAEL<br>JORDAN</h2>
-            <p>Selected frames, a complete photo archive and a film tribute to the legacy of 23.</p>
+            <p>精选画面、完整照片档案与影像致敬，围绕 23 号留下的专注、飞行与传奇。</p>
           </div>
         </a>
 
@@ -52,7 +69,7 @@
           <div class="topic-card-content">
             <small>COMING SOON</small>
             <h2>NBA<br>ARCHIVE</h2>
-            <p>Teams, eras and memorable games.</p>
+            <p>球队、时代与那些值得反复回看的比赛。</p>
           </div>
         </article>
 
@@ -61,7 +78,7 @@
           <div class="topic-card-content">
             <small>COMING SOON</small>
             <h2>MY<br>GAME</h2>
-            <p>Your own basketball photos, memories and videos.</p>
+            <p>个人比赛、球场照片、视频与篮球记忆。</p>
           </div>
         </article>
       </div>
@@ -70,5 +87,6 @@
 
   <footer class="universe-footer"><span>7719 / BASKETBALL</span><a href="/">BACK TO UNIVERSE →</a></footer>
   <script src="/js/universe.js?v=20260730-1"></script>
+  <script src="/js/basketball-motion.js?v=20260807-1"></script>
 </body>
 </html>
