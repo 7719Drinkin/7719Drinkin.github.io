@@ -4,17 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Games collection in 7719 Universe.">
-  <meta name="theme-color" content="#164d78">
+  <meta name="theme-color" content="#143f63">
   <title>Games · 7719 Universe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/universe.css?v=20260730-1">
-  <link rel="stylesheet" href="/css/games-system.css?v=20260807-2">
+  <link rel="stylesheet" href="/css/games-system.css?v=20260807-3">
 </head>
 <body class="theme-games interest-page games-page games-landing-page" data-site-module="games">
   <div class="universe-noise" aria-hidden="true"></div>
-  <div class="games-civ6-field" aria-hidden="true"></div>
+
+  <div class="games-civ6-field" aria-hidden="true">
+    <div class="games-terrain"></div>
+    <div class="games-hex-grid"></div>
+    <div class="games-fog-of-war"></div>
+  </div>
 
   <header class="universe-header">
     <a class="universe-brand" href="/" aria-label="返回 7719 Universe">7719</a>
@@ -27,18 +32,27 @@
 
   <main>
     <section class="games-hero" data-games-hero>
-      <div class="games-hero-panel reveal">
+      <div class="games-side-tools" aria-hidden="true">
+        <i></i><i></i><i></i>
+      </div>
+
+      <div class="games-hero-copy reveal">
         <div class="breadcrumb"><a href="/">HOME</a><span>/</span><span>GAMES</span></div>
         <p class="games-eyebrow">02 / INTEREST</p>
         <h1>GAMES</h1>
         <span class="coming-soon-mark">COLLECTION IN DEVELOPMENT</span>
       </div>
-      <div class="games-turn-ornament" aria-hidden="true"></div>
+
+      <div class="games-turn-control" aria-hidden="true"><i></i></div>
+
+      <div class="games-bottom-hud" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
     </section>
   </main>
 
   <footer class="universe-footer"><span>7719 / GAMES</span><a href="/">BACK TO UNIVERSE →</a></footer>
   <script src="/js/universe.js?v=20260730-1"></script>
-  <script src="/js/games-motion.js?v=20260807-2"></script>
+  <script src="/js/games-motion.js?v=20260807-3"></script>
 </body>
 </html>
