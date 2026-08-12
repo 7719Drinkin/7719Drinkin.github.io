@@ -6,12 +6,12 @@ import {
 } from './animeCityLayout.js';
 
 const COLORS = {
-  outside: new THREE.Color('#202b35'),
-  outskirts: new THREE.Color('#32343a'),
-  lower: new THREE.Color('#17181c'),
-  middle: new THREE.Color('#4b4b50'),
-  upper: new THREE.Color('#b9b6af'),
-  crown: new THREE.Color('#f0eee7')
+  outside: new THREE.Color('#273743'),
+  outskirts: new THREE.Color('#3b3d43'),
+  lower: new THREE.Color('#1c1d22'),
+  middle: new THREE.Color('#5a595e'),
+  upper: new THREE.Color('#c8c3b8'),
+  crown: new THREE.Color('#f5f1e8')
 };
 
 function createCityTerrain(radius, quality) {
@@ -33,8 +33,6 @@ function createCityTerrain(radius, quality) {
     const tier = cityTier(normal);
     color.copy(COLORS[tier]);
 
-    // Do not bake a fake directional light into vertex colors. The planet's
-    // day/night shape should be produced by the real system-star PointLight.
     colors[index * 3] = color.r;
     colors[index * 3 + 1] = color.g;
     colors[index * 3 + 2] = color.b;
@@ -54,10 +52,10 @@ export default function AnimeCityTerrain({ radius, quality }) {
     <mesh geometry={geometry} castShadow receiveShadow>
       <meshPhysicalMaterial
         vertexColors
-        roughness={0.7}
-        metalness={0.025}
-        clearcoat={quality === 'quality' ? 0.12 : 0.06}
-        clearcoatRoughness={0.48}
+        roughness={0.62}
+        metalness={0.018}
+        clearcoat={quality === 'quality' ? 0.1 : 0.05}
+        clearcoatRoughness={0.42}
         emissive="#000000"
         emissiveIntensity={0}
         dithering
