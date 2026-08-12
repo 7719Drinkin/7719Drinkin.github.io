@@ -1,19 +1,17 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import {
-  ANIME_CHARCOAL,
-  ANIME_IVORY,
   cityElevation,
   cityTier
 } from './animeCityLayout.js';
 
 const COLORS = {
-  outside: new THREE.Color('#202a32'),
-  outskirts: new THREE.Color('#303238'),
+  outside: new THREE.Color('#202b35'),
+  outskirts: new THREE.Color('#32343a'),
   lower: new THREE.Color('#17181c'),
-  middle: new THREE.Color('#48494f'),
-  upper: new THREE.Color('#b5b3ad'),
-  crown: new THREE.Color('#efede6')
+  middle: new THREE.Color('#4b4b50'),
+  upper: new THREE.Color('#b9b6af'),
+  crown: new THREE.Color('#f0eee7')
 };
 
 function createCityTerrain(radius, quality) {
@@ -35,9 +33,8 @@ function createCityTerrain(radius, quality) {
     const tier = cityTier(normal);
     color.copy(COLORS[tier]);
 
-    const directionalShade = 0.92 + Math.max(normal.y, -0.3) * 0.065 + Math.max(normal.z, 0) * 0.05;
-    color.multiplyScalar(directionalShade);
-
+    // Do not bake a fake directional light into vertex colors. The planet's
+    // day/night shape should be produced by the real system-star PointLight.
     colors[index * 3] = color.r;
     colors[index * 3 + 1] = color.g;
     colors[index * 3 + 2] = color.b;
@@ -55,12 +52,14 @@ export default function AnimeCityTerrain({ radius, quality }) {
 
   return (
     <mesh geometry={geometry} castShadow receiveShadow>
-      <meshStandardMaterial
+      <meshPhysicalMaterial
         vertexColors
-        roughness={0.9}
-        metalness={0.015}
-        emissive={ANIME_CHARCOAL}
-        emissiveIntensity={0.095}
+        roughness={0.7}
+        metalness={0.025}
+        clearcoat={quality === 'quality' ? 0.12 : 0.06}
+        clearcoatRoughness={0.48}
+        emissive="#000000"
+        emissiveIntensity={0}
         dithering
         flatShading={quality !== 'quality'}
       />
