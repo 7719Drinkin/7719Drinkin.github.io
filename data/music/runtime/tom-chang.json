@@ -1,0 +1,147 @@
+{
+  "version": 2,
+  "artistPrefix": "tom-chang",
+  "generatedAt": "2026-08-11T22:20:53.013Z",
+  "ordering": "disc-track-title",
+  "totalTracks": 11,
+  "ignoredObjects": 5,
+  "albums": [
+    {
+      "name": "口是心非",
+      "tracks": [
+        {
+          "title": "如果你要離開我",
+          "discNumber": 1,
+          "trackNumber": 1,
+          "orderLabel": "01",
+          "fileName": "01 - 如果你要離開我.mp3",
+          "key": "tom-chang/口是心非/01 - 如果你要離開我.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%8F%A3%E6%98%AF%E5%BF%83%E9%9D%9E/01%20-%20%E5%A6%82%E6%9E%9C%E4%BD%A0%E8%A6%81%E9%9B%A2%E9%96%8B%E6%88%91.mp3",
+          "type": "audio/mpeg",
+          "size": 7393969,
+          "uploadedAt": "2026-08-06T03:32:20.987Z"
+        },
+        {
+          "title": "口是心非",
+          "discNumber": 1,
+          "trackNumber": 2,
+          "orderLabel": "02",
+          "fileName": "02 - 口是心非.mp3",
+          "key": "tom-chang/口是心非/02 - 口是心非.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%8F%A3%E6%98%AF%E5%BF%83%E9%9D%9E/02%20-%20%E5%8F%A3%E6%98%AF%E5%BF%83%E9%9D%9E.mp3",
+          "type": "audio/mpeg",
+          "size": 6793989,
+          "uploadedAt": "2026-08-06T03:32:18.843Z"
+        },
+        {
+          "title": "Cappuccino",
+          "discNumber": 1,
+          "trackNumber": 3,
+          "orderLabel": "03",
+          "fileName": "03 - Cappuccino.mp3",
+          "key": "tom-chang/口是心非/03 - Cappuccino.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%8F%A3%E6%98%AF%E5%BF%83%E9%9D%9E/03%20-%20Cappuccino.mp3",
+          "type": "audio/mpeg",
+          "size": 4875891,
+          "uploadedAt": "2026-08-06T03:32:19.873Z"
+        },
+        {
+          "title": "玫瑰的名字",
+          "discNumber": 1,
+          "trackNumber": 4,
+          "orderLabel": "04",
+          "fileName": "04 - 玫瑰的名字.mp3",
+          "key": "tom-chang/口是心非/04 - 玫瑰的名字.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%8F%A3%E6%98%AF%E5%BF%83%E9%9D%9E/04%20-%20%E7%8E%AB%E7%91%B0%E7%9A%84%E5%90%8D%E5%AD%97.mp3",
+          "type": "audio/mpeg",
+          "size": 4020191,
+          "uploadedAt": "2026-08-06T03:32:16.791Z"
+        },
+        {
+          "title": "河",
+          "discNumber": 1,
+          "trackNumber": 5,
+          "orderLabel": "05",
+          "fileName": "05 - 河.mp3",
+          "key": "tom-chang/口是心非/05 - 河.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%8F%A3%E6%98%AF%E5%BF%83%E9%9D%9E/05%20-%20%E6%B2%B3.mp3",
+          "type": "audio/mpeg",
+          "size": 5521522,
+          "uploadedAt": "2026-08-06T03:32:17.337Z"
+        },
+        {
+          "title": "愛情...",
+          "discNumber": 1,
+          "trackNumber": 6,
+          "orderLabel": "06",
+          "fileName": "06 - 愛情... .mp3",
+          "key": "tom-chang/口是心非/06 - 愛情... .mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%8F%A3%E6%98%AF%E5%BF%83%E9%9D%9E/06%20-%20%E6%84%9B%E6%83%85...%20.mp3",
+          "type": "audio/mpeg",
+          "size": 944079,
+          "uploadedAt": "2026-08-06T03:32:19.021Z"
+        },
+        {
+          "title": "...的圖案",
+          "discNumber": 1,
+          "trackNumber": 7,
+          "orderLabel": "07",
+          "fileName": "07 - ...的圖案.mp3",
+          "key": "tom-chang/口是心非/07 - ...的圖案.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%8F%A3%E6%98%AF%E5%BF%83%E9%9D%9E/07%20-%20...%E7%9A%84%E5%9C%96%E6%A1%88.mp3",
+          "type": "audio/mpeg",
+          "size": 3610352,
+          "uploadedAt": "2026-08-06T03:32:21.229Z"
+        },
+        {
+          "title": "隨你",
+          "discNumber": 1,
+          "trackNumber": 8,
+          "orderLabel": "08",
+          "fileName": "08 - 隨你.mp3",
+          "key": "tom-chang/口是心非/08 - 隨你.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%8F%A3%E6%98%AF%E5%BF%83%E9%9D%9E/08%20-%20%E9%9A%A8%E4%BD%A0.mp3",
+          "type": "audio/mpeg",
+          "size": 5088300,
+          "uploadedAt": "2026-08-06T03:32:24.161Z"
+        },
+        {
+          "title": "神采",
+          "discNumber": 1,
+          "trackNumber": 9,
+          "orderLabel": "09",
+          "fileName": "09 - 神采.mp3",
+          "key": "tom-chang/口是心非/09 - 神采.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%8F%A3%E6%98%AF%E5%BF%83%E9%9D%9E/09%20-%20%E7%A5%9E%E9%87%87.mp3",
+          "type": "audio/mpeg",
+          "size": 5391516,
+          "uploadedAt": "2026-08-06T03:32:27.199Z"
+        },
+        {
+          "title": "在黃昏融化了世界的色彩以前",
+          "discNumber": 1,
+          "trackNumber": 10,
+          "orderLabel": "10",
+          "fileName": "10 - 在黃昏融化了世界的色彩以前.mp3",
+          "key": "tom-chang/口是心非/10 - 在黃昏融化了世界的色彩以前.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%8F%A3%E6%98%AF%E5%BF%83%E9%9D%9E/10%20-%20%E5%9C%A8%E9%BB%83%E6%98%8F%E8%9E%8D%E5%8C%96%E4%BA%86%E4%B8%96%E7%95%8C%E7%9A%84%E8%89%B2%E5%BD%A9%E4%BB%A5%E5%89%8D.mp3",
+          "type": "audio/mpeg",
+          "size": 4554936,
+          "uploadedAt": "2026-08-06T03:32:24.896Z"
+        },
+        {
+          "title": "若我告訴你其實我愛的只是你",
+          "discNumber": 1,
+          "trackNumber": 11,
+          "orderLabel": "11",
+          "fileName": "11 - 若我告訴你其實我愛的只是你.mp3",
+          "key": "tom-chang/口是心非/11 - 若我告訴你其實我愛的只是你.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%8F%A3%E6%98%AF%E5%BF%83%E9%9D%9E/11%20-%20%E8%8B%A5%E6%88%91%E5%91%8A%E8%A8%B4%E4%BD%A0%E5%85%B6%E5%AF%A6%E6%88%91%E6%84%9B%E7%9A%84%E5%8F%AA%E6%98%AF%E4%BD%A0.mp3",
+          "type": "audio/mpeg",
+          "size": 5808342,
+          "uploadedAt": "2026-08-06T03:32:27.137Z"
+        }
+      ]
+    }
+  ]
+}
