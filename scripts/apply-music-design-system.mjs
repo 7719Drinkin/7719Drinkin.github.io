@@ -9,7 +9,7 @@ const DETAILS_ROOT = join(ROOT, 'data/music/artists');
 const STYLE_HREF = '/css/music-design-system.css?v=20260807-1';
 const HEADING_STYLE_HREF = '/css/music-heading-system.css?v=20260807-1';
 const SCRIPT_SRC = '/js/music-motion.js?v=20260807-1';
-const MUSIC_SCRIPT_SRC = '/js/music.js?v=20260812-catalog-1';
+const MUSIC_SCRIPT_SRC = '/js/music.js?v=20260812-catalog-2';
 const VISUAL_STYLE_HREF = '/css/music-visual-video.css?v=20260806-3';
 const VISUAL_SCRIPT_SRC = '/js/music-visual-video.js?v=20260806-5';
 const FONT_HREF = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap';

@@ -51,6 +51,8 @@ jobs:
         run: |
           node --check js/site-shell.js
           node --check js/site-frame-bridge.js
+          node --check js/music.js
+          node --check js/music-catalog.js
           node --check scripts/install-site-shell.mjs
           node --check scripts/build-music-i18n.mjs
           node --check scripts/embed-music-i18n-data.mjs

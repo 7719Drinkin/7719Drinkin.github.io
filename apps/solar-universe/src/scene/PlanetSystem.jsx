@@ -72,10 +72,9 @@ export default function PlanetSystem({
   }, [interest.id, registerPlanet]);
 
   useEffect(() => {
-    // Planet meshes live on dedicated solar-light layers so global fill lights
-    // cannot bypass their solar shadows. Keep both the camera and R3F raycaster
-    // subscribed to those layers: camera layers control visibility, while the
-    // raycaster has its own layer mask and otherwise cannot click the planets.
+    // Physical planet meshes live on dedicated solar-light layers so global
+    // ambient/hemisphere light and local decorative lamps cannot bypass solar
+    // occlusion. Camera and raycaster must both see those layers.
     camera.layers.enable(solarLayer);
     raycaster.layers.enable(solarLayer);
     layerSyncFrames.current = 12;
@@ -99,8 +98,7 @@ export default function PlanetSystem({
     light.shadow.mapSize.set(shadowSize, shadowSize);
 
     // A DirectionalLight is the stable approximation for solar rays at planet
-    // scale. Its orthographic shadow camera is tightly fitted around the one
-    // planet instead of spending most shadow-map pixels on empty space.
+    // scale. Its orthographic shadow camera is tightly fitted around one world.
     const shadowCamera = light.shadow.camera;
     shadowCamera.left = -shadowExtent;
     shadowCamera.right = shadowExtent;
@@ -129,10 +127,8 @@ export default function PlanetSystem({
     }
 
     // The central PointLight remains the single runtime brightness control, but
-    // it no longer illuminates planet layers directly. Reproduce its decay at
-    // each real orbit distance and feed that irradiance to the dedicated solar
-    // DirectionalLight. This preserves the intended r^-0.8 distance response
-    // without using a low-resolution six-face PointLight shadow map.
+    // it no longer illuminates planet receiver layers directly. Reproduce its
+    // configured r^-0.8 response at each orbit for the dedicated solar light.
     if (sourceSunlight.current) {
       sourceSunlight.current.castShadow = false;
       if (solarLight.current) {
@@ -143,15 +139,18 @@ export default function PlanetSystem({
 
     if (solarTarget.current) solarTarget.current.updateMatrixWorld();
 
-    if (layerSyncFrames.current > 0 && carrier.current) {
-      carrier.current.traverse((object) => {
-        // Remove planet geometry from layer 0 so ambient/hemisphere and the old
-        // PointLight cannot add unshadowed illumination on the night side.
-        // The R3F raycaster is explicitly enabled for this solar layer above.
+    if (layerSyncFrames.current > 0 && axialBody.current) {
+      axialBody.current.traverse((object) => {
+        // Only move actual planet geometry to the solar receiver layer. The old
+        // carrier-wide traversal also moved Floodlights, trail PointLights,
+        // satellites and other local lights onto this layer. Those lights then
+        // illuminated the nominal night side and defeated solar occlusion.
+        // Lights intentionally remain on layer 0 and therefore cannot illuminate
+        // the physical planet meshes below.
+        if (object.isLight || (!object.isMesh && !object.isInstancedMesh)) return;
+
         object.layers.disable(0);
         object.layers.enable(solarLayer);
-
-        if (!object.isMesh && !object.isInstancedMesh) return;
 
         const materials = Array.isArray(object.material)
           ? object.material

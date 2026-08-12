@@ -47,16 +47,52 @@
     return state;
   };
 
-  const normalize = (value) => String(value || '')
-    .normalize('NFKC')
+  // R2 object/folder names for Cantonese records are commonly written in
+  // Traditional Chinese while the site archive is currently labelled in
+  // Simplified Chinese. NFKC does not convert between those writing systems,
+  // so fold the characters used by this archive before album/track matching.
+  const HAN_FOLD = {
+    '後': '后',
+    '傾': '倾',
+    '聽': '听',
+    '愛': '爱',
+    '飛': '飞',
+    '馬': '马',
+    '牆': '墙',
+    '實': '实',
+    '們': '们',
+    '過': '过',
+    '擁': '拥',
+    '風': '风',
+    '夢': '梦',
+    '獨': '独',
+    '無': '无',
+    '話': '话',
+    '淚': '泪',
+    '選': '选',
+    '遲': '迟',
+    '來': '来',
+    '霧': '雾',
+    '戀': '恋',
+    '見': '见',
+    '動': '动',
+    '譚': '谭',
+    '詠': '咏',
+    '與': '与',
+    '從': '从'
+  };
+
+  const foldHan = (value) => Array.from(String(value || ''), (character) => (
+    HAN_FOLD[character] || character
+  )).join('');
+
+  const normalize = (value) => foldHan(String(value || '').normalize('NFKC'))
     .toLocaleLowerCase('zh-CN')
     .replace(/[《》〈〉「」『』【】（）()·•\s_\-—–:：'".,，。!?！？]/g, '');
 
-  // v3 intentionally invalidates the old browser catalog. More importantly,
-  // browser storage is now only a fast first paint: every visit still checks
-  // the Worker so an R2 upload that has already refreshed the Worker becomes
-  // visible immediately instead of waiting for the local TTL to expire.
-  const cacheKey = (prefix) => `music-catalog-browser:v3:${prefix}`;
+  // v4 invalidates previously persisted matching results. Browser storage is
+  // still only a first-paint fallback; every visit revalidates with the Worker.
+  const cacheKey = (prefix) => `music-catalog-browser:v4:${prefix}`;
 
   const readCache = (prefix) => {
     try {
@@ -246,18 +282,25 @@
     return true;
   };
 
-  const renderAlbumTracks = (albums, sourceLabel) => {
+  const renderAlbumTracks = (albums, sourceLabel, catalog) => {
     const album = findAlbum(albums, requestedAlbumName);
     const countLabels = document.querySelectorAll('[data-album-track-count]');
     const source = document.querySelector('[data-catalog-source]');
+    const totalTracks = Number.isFinite(Number(catalog?.totalTracks))
+      ? Number(catalog.totalTracks)
+      : albums.reduce((sum, item) => sum + item.tracks.length, 0);
 
     if (!album) {
       countLabels.forEach((label) => { label.textContent = '0 TRACKS'; });
-      if (source) source.textContent = sourceLabel;
-      songList.replaceChildren(createState(
-        'ALBUM NOT FOUND',
-        `当前目录中没有匹配“${requestedAlbumName}”的专辑文件夹。请检查 R2 文件夹名称或 album.catalogName。`
-      ));
+      if (source) source.textContent = `${sourceLabel} · ${totalTracks} TRACKS`;
+
+      const availableNames = albums.slice(0, 16).map((item) => `“${item.name}”`).join('、');
+      const generated = catalog?.generatedAt ? `；目录时间 ${catalog.generatedAt}` : '';
+      const message = albums.length
+        ? `Worker 已返回 ${totalTracks} 首歌曲 / ${albums.length} 张专辑，但没有匹配“${requestedAlbumName}”。R2 实际专辑名：${availableNames}${generated}`
+        : `Worker 当前没有返回任何可播放专辑（totalTracks=${totalTracks}）${generated}。这表示问题发生在 R2 → Worker/KV 目录链路，而不是网页专辑匹配。`;
+
+      songList.replaceChildren(createState('ALBUM NOT MATCHED', message));
       return false;
     }
 
@@ -265,7 +308,7 @@
     countLabels.forEach((label) => {
       label.textContent = `${rows.length} TRACK${rows.length === 1 ? '' : 'S'}`;
     });
-    if (source) source.textContent = sourceLabel;
+    if (source) source.textContent = `${sourceLabel} · ${album.name}`;
     songList.replaceChildren(...rows);
     return rows.length > 0;
   };
@@ -289,7 +332,7 @@
     hydrateAlbumCards(albums);
 
     const rendered = pageType === 'album'
-      ? renderAlbumTracks(albums, sourceLabel)
+      ? renderAlbumTracks(albums, sourceLabel, catalog)
       : renderFeatured(albums);
 
     if (rendered && initializePlayer) ensurePlayer();
@@ -329,9 +372,6 @@
     const cached = readCache(prefix);
     const hasCachedCatalog = Boolean(cached?.catalog);
 
-    // Cached data is only a first-paint fallback. Never return early here: the
-    // Worker is the authoritative catalog, and it may already contain albums
-    // uploaded after this browser cache was written.
     if (hasCachedCatalog) {
       renderCatalog(cached.catalog, 'BROWSER CACHE · REVALIDATING', false);
     }
@@ -349,13 +389,16 @@
       const catalog = await response.json();
       writeCache(prefix, catalog);
       renderCatalog(catalog, response.headers.get('X-Music-Catalog-Cache') || 'WORKER CACHE', true);
-    } catch {
+    } catch (error) {
+      const source = document.querySelector('[data-catalog-source]');
+      if (source) source.textContent = 'WORKER REQUEST FAILED';
+
       if (hasCachedCatalog) {
         ensurePlayer();
       } else {
         songList.replaceChildren(createState(
           'CATALOG UNAVAILABLE',
-          '曲目目录服务暂时无法访问。页面不会直接扫描 R2，也不会逐个探测音频文件。'
+          `曲目目录服务暂时无法访问：${error?.message || 'unknown request error'}`
         ));
       }
     }
