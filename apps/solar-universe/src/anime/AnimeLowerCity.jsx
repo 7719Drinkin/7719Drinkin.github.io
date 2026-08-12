@@ -25,28 +25,28 @@ function angleDistance(a, b) {
 
 function buildSpecs(radius, quality) {
   const radialBands = quality === 'quality'
-    ? [29, 33, 37, 41, 45, 49, 53, 57, 61, 65, 69, 73, 77, 81, 84]
-    : [32, 39, 46, 53, 60, 67, 74, 81, 84];
+    ? [30, 34, 38, 42, 46, 50, 54, 58, 62, 66, 70, 74, 78, 82, 86, 90, 94, 97]
+    : [32, 39, 46, 53, 60, 67, 74, 81, 88, 95, 97];
   const specs = [];
 
   radialBands.forEach((degrees, bandIndex) => {
     const baseCount = quality === 'quality'
-      ? 32 + bandIndex * 4
-      : 18 + bandIndex * 2;
+      ? 34 + bandIndex * 4
+      : 19 + bandIndex * 2;
 
     for (let column = 0; column < baseCount; column += 1) {
-      const jitter = (hash(column + bandIndex * 41, 13) - 0.5) * 0.095;
-      const azimuth = column / baseCount * Math.PI * 2 + jitter + bandIndex * 0.061;
+      const jitter = (hash(column + bandIndex * 41, 13) - 0.5) * 0.09;
+      const azimuth = column / baseCount * Math.PI * 2 + jitter + bandIndex * 0.055;
       const sectorDistance = angleDistance(azimuth, AXIS_AZIMUTH);
 
       // Keep the monumental scarlet stair visible through the densest districts.
-      if (sectorDistance < 0.165) continue;
+      if (sectorDistance < 0.18) continue;
 
       const sectorFrontness = THREE.MathUtils.clamp(1 - sectorDistance / Math.PI, 0, 1);
-      const keepProbability = 0.035 + Math.pow(sectorFrontness, 0.92) * 0.965;
+      const keepProbability = 0.025 + Math.pow(sectorFrontness, 0.84) * 0.975;
       if (hash(column + bandIndex * 211, 173) > keepProbability) continue;
 
-      const radialJitter = (hash(column + bandIndex * 17, 29) - 0.5) * 2.15;
+      const radialJitter = (hash(column + bandIndex * 17, 29) - 0.5) * 2.0;
       const direction = cityPolarDirection(
         THREE.MathUtils.degToRad(degrees + radialJitter),
         azimuth
@@ -54,25 +54,35 @@ function buildSpecs(radius, quality) {
 
       const scaleHash = hash(column + bandIndex * 53, 71);
       const typeHash = hash(column + bandIndex * 79, 101);
-      const inner = THREE.MathUtils.clamp(1 - (degrees - 29) / 55, 0, 1);
-      const outer = THREE.MathUtils.clamp((degrees - 29) / 55, 0, 1);
-      const rearScale = 0.48 + sectorFrontness * 0.52;
+      const inner = THREE.MathUtils.clamp(1 - (degrees - 30) / 67, 0, 1);
+      const outer = THREE.MathUtils.clamp((degrees - 30) / 67, 0, 1);
+      const rearScale = 0.5 + sectorFrontness * 0.5;
 
-      // Lower districts are deliberately more crowded and somewhat taller than
-      // before so the planet reads as an inhabited vertical city instead of a
-      // bare terraced hill.
+      // The lower city should read as a continuous urban mass rather than a
+      // field of thin spikes. Outer districts therefore get lower, broader
+      // blocks while the inner districts become progressively more vertical.
       const height = radius * (
-        0.052
-        + scaleHash * 0.074
-        + inner * 0.072
-        + outer * 0.01
+        0.04
+        + scaleHash * 0.058
+        + inner * 0.092
+        - outer * 0.006
       ) * rearScale;
-      const width = radius * (0.019 + hash(column, 83) * 0.026 + inner * 0.005) * (0.72 + sectorFrontness * 0.28);
-      const depth = radius * (0.021 + hash(column, 97) * 0.031 + inner * 0.005);
+      const width = radius * (
+        0.023
+        + hash(column, 83) * 0.031
+        + outer * 0.013
+        + inner * 0.004
+      ) * (0.74 + sectorFrontness * 0.26);
+      const depth = radius * (
+        0.025
+        + hash(column, 97) * 0.034
+        + outer * 0.012
+        + inner * 0.004
+      );
 
       let material = 'dark';
-      if (typeHash > 0.895 && sectorFrontness > 0.24) material = 'ivory';
-      else if (typeHash < 0.045 && sectorFrontness > 0.42) material = 'red';
+      if (typeHash > 0.84 && sectorFrontness > 0.2) material = 'ivory';
+      else if (typeHash < 0.06 && sectorFrontness > 0.36) material = 'red';
 
       specs.push({
         direction,
@@ -80,7 +90,7 @@ function buildSpecs(radius, quality) {
         width,
         depth,
         material,
-        yaw: (hash(column + bandIndex * 131, 151) - 0.5) * 0.18
+        yaw: (hash(column + bandIndex * 131, 151) - 0.5) * 0.24
       });
     }
   });
@@ -110,8 +120,8 @@ function BuildingInstances({ radius, specs, material }) {
   }, [radius, selected]);
 
   const color = material === 'ivory' ? ANIME_IVORY : material === 'red' ? ANIME_RED : ANIME_BLACK;
-  const emissive = material === 'red' ? '#350407' : material === 'dark' ? '#020203' : '#000000';
-  const emissiveIntensity = material === 'red' ? 0.05 : material === 'dark' ? 0.012 : 0;
+  const emissive = material === 'red' ? '#2c0306' : material === 'dark' ? '#010102' : '#000000';
+  const emissiveIntensity = material === 'red' ? 0.035 : material === 'dark' ? 0.006 : 0;
 
   return (
     <instancedMesh ref={ref} args={[null, null, selected.length]} castShadow receiveShadow>
@@ -120,8 +130,8 @@ function BuildingInstances({ radius, specs, material }) {
         color={color}
         emissive={emissive}
         emissiveIntensity={emissiveIntensity}
-        roughness={material === 'ivory' ? 0.7 : 0.82}
-        metalness={material === 'red' ? 0.035 : 0.018}
+        roughness={material === 'ivory' ? 0.66 : 0.8}
+        metalness={material === 'red' ? 0.03 : 0.015}
       />
     </instancedMesh>
   );
