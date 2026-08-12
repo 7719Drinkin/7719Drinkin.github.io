@@ -56,11 +56,10 @@ function LightingController({ sunBrightness, quality }) {
   useFrame(() => {
     if (!sunlight.current) {
       scene.traverse((object) => {
-        if (
-          object.isPointLight
-          && Math.abs(object.distance - 125) < 0.01
-          && Math.abs(object.decay - 1.9) < 0.01
-        ) {
+        // The system-wide solar key light is the only long-range PointLight.
+        // Do not identify it by decay: decay is an artistic scale parameter
+        // and changing it must not silently disable dynamic solar brightness.
+        if (object.isPointLight && object.distance >= 100) {
           sunlight.current = object;
         }
       });
@@ -71,7 +70,12 @@ function LightingController({ sunBrightness, quality }) {
         THREE.MathUtils.clamp(sunBrightness, SUNLIGHT_MIN, SUNLIGHT_MAX),
         1.65
       );
-      sunlight.current.intensity = 680 * physicalResponse;
+
+      // decay=0.8 is intentionally much softer than the previous near-square
+      // falloff. A base intensity of 72 keeps the inner Basketball world at
+      // roughly its former visual energy while giving the outer worlds enough
+      // direct sunlight to remain readable without extra fill lights.
+      sunlight.current.intensity = 72 * physicalResponse;
     }
   });
 
