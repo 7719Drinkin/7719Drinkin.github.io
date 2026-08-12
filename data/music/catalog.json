@@ -2,6 +2,8 @@
   "workerBase": "https://drinkins-music-catalog.drinkinhuang.workers.dev",
   "snapshotBase": "/data/music/runtime",
   "browserCacheTtlSeconds": 600,
+  "workerRevalidateSeconds": 21600,
+  "workerRequestTimeoutMs": 3500,
   "artists": {
     "zhang-yusheng": {
       "prefix": "tom-chang"

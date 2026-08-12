@@ -2,6 +2,8 @@
   const CONFIG_URL = '/data/music/catalog.json';
   const CATALOG_STYLE_URL = '/css/music-catalog.css?v=20260806-2';
   const PLAYER_SCRIPT_URL = '/js/music-player.js?v=20260806-compact-2';
+  const DEFAULT_WORKER_REVALIDATE_MS = 6 * 60 * 60 * 1000;
+  const DEFAULT_WORKER_TIMEOUT_MS = 3500;
 
   const pageType = document.body.dataset.musicCatalogPage;
   const artistSlug = document.body.dataset.artistSlug;
@@ -90,9 +92,9 @@
     .toLocaleLowerCase('zh-CN')
     .replace(/[《》〈〉「」『』【】（）()·•\s_\-—–:：'".,，。!?！？]/g, '');
 
-  // v4 invalidates previously persisted matching results. Browser storage is
-  // still only a first-paint fallback; every visit revalidates with the Worker.
-  const cacheKey = (prefix) => `music-catalog-browser:v4:${prefix}`;
+  // v5 separates the snapshot-first loader from older Worker-first browser data.
+  const cacheKey = (prefix) => `music-catalog-browser:v5:${prefix}`;
+  const workerCheckKey = (prefix) => `music-catalog-worker-check:v1:${prefix}`;
 
   const readCache = (prefix) => {
     try {
@@ -107,8 +109,66 @@
     try {
       localStorage.setItem(cacheKey(prefix), JSON.stringify({ savedAt: Date.now(), catalog }));
     } catch {
-      // Worker/KV caching remains available when browser storage is disabled.
+      // Same-origin snapshot and Worker fallback remain available when storage is disabled.
     }
+  };
+
+  const readLastWorkerCheck = (prefix) => {
+    try {
+      return Number(localStorage.getItem(workerCheckKey(prefix))) || 0;
+    } catch {
+      return 0;
+    }
+  };
+
+  const markWorkerCheck = (prefix) => {
+    try {
+      localStorage.setItem(workerCheckKey(prefix), String(Date.now()));
+    } catch {
+      // A disabled localStorage simply means the Worker may be checked more often.
+    }
+  };
+
+  const catalogTimestamp = (catalog) => {
+    const value = Date.parse(catalog?.generatedAt || '');
+    return Number.isFinite(value) ? value : 0;
+  };
+
+  const catalogSignature = (catalog) => JSON.stringify({
+    version: catalog?.version,
+    artistPrefix: catalog?.artistPrefix,
+    totalTracks: catalog?.totalTracks,
+    ignoredObjects: catalog?.ignoredObjects,
+    albums: catalog?.albums
+  });
+
+  const isUsableCatalog = (catalog, prefix) => Boolean(
+    catalog
+    && typeof catalog === 'object'
+    && catalog.artistPrefix === prefix
+    && Array.isArray(catalog.albums)
+    && Number.isFinite(Number(catalog.totalTracks))
+  );
+
+  const pickFresherCatalog = (left, right) => {
+    if (!left) return right || null;
+    if (!right) return left;
+
+    const leftTime = catalogTimestamp(left);
+    const rightTime = catalogTimestamp(right);
+    if (leftTime && rightTime && leftTime !== rightTime) {
+      return rightTime > leftTime ? right : left;
+    }
+
+    return catalogSignature(left) === catalogSignature(right) ? right : right;
+  };
+
+  const catalogIsNewerOrDifferent = (candidate, current) => {
+    if (!current) return true;
+    const candidateTime = catalogTimestamp(candidate);
+    const currentTime = catalogTimestamp(current);
+    if (candidateTime && currentTime && candidateTime > currentTime) return true;
+    return catalogSignature(candidate) !== catalogSignature(current);
   };
 
   const catalogAlbums = (catalog) => (Array.isArray(catalog?.albums) ? catalog.albums : [])
@@ -273,7 +333,7 @@
     if (!rows.length) {
       songList.replaceChildren(createState(
         'CURATOR PICKS UNAVAILABLE',
-        '已选择的歌曲暂时没有在当前 R2 专辑目录中匹配到，因此不会显示失效的播放项。'
+        '已选择的歌曲暂时没有在当前曲目目录中匹配到，因此不会显示失效的播放项。'
       ));
       return false;
     }
@@ -297,8 +357,8 @@
       const availableNames = albums.slice(0, 16).map((item) => `“${item.name}”`).join('、');
       const generated = catalog?.generatedAt ? `；目录时间 ${catalog.generatedAt}` : '';
       const message = albums.length
-        ? `Worker 已返回 ${totalTracks} 首歌曲 / ${albums.length} 张专辑，但没有匹配“${requestedAlbumName}”。R2 实际专辑名：${availableNames}${generated}`
-        : `Worker 当前没有返回任何可播放专辑（totalTracks=${totalTracks}）${generated}。这表示问题发生在 R2 → Worker/KV 目录链路，而不是网页专辑匹配。`;
+        ? `当前目录已返回 ${totalTracks} 首歌曲 / ${albums.length} 张专辑，但没有匹配“${requestedAlbumName}”。实际专辑名：${availableNames}${generated}`
+        : `当前目录没有返回任何可播放专辑（totalTracks=${totalTracks}）${generated}。`;
 
       songList.replaceChildren(createState('ALBUM NOT MATCHED', message));
       return false;
@@ -327,7 +387,7 @@
     document.body.append(script);
   };
 
-  const renderCatalog = (catalog, sourceLabel = 'WORKER CACHE', initializePlayer = true) => {
+  const renderCatalog = (catalog, sourceLabel = 'CATALOG', initializePlayer = true) => {
     const albums = catalogAlbums(catalog);
     hydrateAlbumCards(albums);
 
@@ -340,6 +400,52 @@
       detail: { artistSlug, pageType, catalog }
     }));
     return rendered;
+  };
+
+  const fetchSnapshot = async (snapshotBase, prefix) => {
+    const base = String(snapshotBase || '/data/music/runtime').replace(/\/+$/, '');
+    const response = await fetch(`${base}/${encodeURIComponent(prefix)}.json`, {
+      method: 'GET',
+      credentials: 'same-origin',
+      cache: 'no-cache',
+      headers: { Accept: 'application/json' }
+    });
+    if (!response.ok) throw new Error(`Snapshot request ${response.status}`);
+
+    const catalog = await response.json();
+    if (!isUsableCatalog(catalog, prefix)) throw new Error('Snapshot catalog is invalid.');
+    return catalog;
+  };
+
+  const fetchWorkerCatalog = async (workerBase, prefix, timeoutMs) => {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      const response = await fetch(`${workerBase}/catalog/${encodeURIComponent(prefix)}`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit',
+        cache: 'no-store',
+        signal: controller.signal,
+        headers: { Accept: 'application/json' }
+      });
+      if (!response.ok) throw new Error(`Worker catalog request ${response.status}`);
+
+      const catalog = await response.json();
+      if (!isUsableCatalog(catalog, prefix)) throw new Error('Worker catalog is invalid.');
+      return catalog;
+    } finally {
+      window.clearTimeout(timer);
+    }
+  };
+
+  const scheduleIdle = (callback) => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(callback, { timeout: 1500 });
+      return;
+    }
+    window.setTimeout(callback, 700);
   };
 
   const loadCatalog = async () => {
@@ -359,9 +465,19 @@
     }
 
     const artistConfig = config?.artists?.[artistSlug];
-    const workerBase = String(config?.workerBase || '').replace(/\/+$/, '');
     const prefix = artistConfig?.prefix;
-    if (!workerBase || !prefix) {
+    const workerBase = String(config?.workerBase || '').replace(/\/+$/, '');
+    const snapshotBase = String(config?.snapshotBase || '/data/music/runtime').replace(/\/+$/, '');
+    const workerRevalidateMs = Math.max(
+      60 * 60 * 1000,
+      Number(config?.workerRevalidateSeconds || 0) * 1000 || DEFAULT_WORKER_REVALIDATE_MS
+    );
+    const workerTimeoutMs = Math.max(
+      1500,
+      Number(config?.workerRequestTimeoutMs) || DEFAULT_WORKER_TIMEOUT_MS
+    );
+
+    if (!prefix) {
       songList.replaceChildren(createState(
         'CATALOG NOT CONFIGURED',
         '当前歌手还没有绑定 R2 曲目目录。'
@@ -370,38 +486,91 @@
     }
 
     const cached = readCache(prefix);
-    const hasCachedCatalog = Boolean(cached?.catalog);
+    const cachedCatalog = isUsableCatalog(cached?.catalog, prefix) ? cached.catalog : null;
+    let activeCatalog = cachedCatalog;
+    let snapshotAvailable = false;
 
-    if (hasCachedCatalog) {
-      renderCatalog(cached.catalog, 'BROWSER CACHE · REVALIDATING', false);
+    // Browser storage is only the fastest possible first paint. Do not bind the
+    // player yet because the same-origin snapshot may replace these rows next.
+    if (cachedCatalog) {
+      renderCatalog(cachedCatalog, 'BROWSER CACHE · CHECKING SNAPSHOT', false);
     }
 
     try {
-      const response = await fetch(`${workerBase}/catalog/${encodeURIComponent(prefix)}`, {
-        method: 'GET',
-        mode: 'cors',
-        credentials: 'omit',
-        cache: 'no-store',
-        headers: { Accept: 'application/json' }
-      });
-      if (!response.ok) throw new Error(`Catalog request ${response.status}`);
+      const snapshot = await fetchSnapshot(snapshotBase, prefix);
+      snapshotAvailable = true;
+      activeCatalog = pickFresherCatalog(cachedCatalog, snapshot);
 
-      const catalog = await response.json();
-      writeCache(prefix, catalog);
-      renderCatalog(catalog, response.headers.get('X-Music-Catalog-Cache') || 'WORKER CACHE', true);
-    } catch (error) {
-      const source = document.querySelector('[data-catalog-source]');
-      if (source) source.textContent = 'WORKER REQUEST FAILED';
+      if (activeCatalog === snapshot || !cachedCatalog) {
+        writeCache(prefix, snapshot);
+      }
 
-      if (hasCachedCatalog) {
-        ensurePlayer();
-      } else {
+      renderCatalog(
+        activeCatalog,
+        activeCatalog === snapshot ? 'SITE SNAPSHOT' : 'BROWSER CACHE · NEWER THAN SNAPSHOT',
+        true
+      );
+    } catch (snapshotError) {
+      if (cachedCatalog) {
+        activeCatalog = cachedCatalog;
+        renderCatalog(cachedCatalog, 'BROWSER CACHE · SNAPSHOT UNAVAILABLE', true);
+      } else if (!workerBase) {
         songList.replaceChildren(createState(
           'CATALOG UNAVAILABLE',
-          `曲目目录服务暂时无法访问：${error?.message || 'unknown request error'}`
+          `站点曲目快照暂时无法访问：${snapshotError?.message || 'unknown snapshot error'}`
         ));
+        return;
       }
     }
+
+    const revalidateWorker = async ({ force = false, renderWhenEmpty = false } = {}) => {
+      if (!workerBase) return;
+      if (!force && Date.now() - readLastWorkerCheck(prefix) < workerRevalidateMs) return;
+
+      markWorkerCheck(prefix);
+      try {
+        const workerCatalog = await fetchWorkerCatalog(workerBase, prefix, workerTimeoutMs);
+        const changed = catalogIsNewerOrDifferent(workerCatalog, activeCatalog);
+        if (!changed) return;
+
+        writeCache(prefix, workerCatalog);
+
+        // The current player binds directly to the rendered row nodes. Once it
+        // is loaded, replacing those nodes would break playback controls. Keep
+        // the newer Worker result for the next navigation; snapshot sync will
+        // publish the same data site-wide on its next run.
+        const playerBoundOrLoading = Boolean(
+          playerRoot?.dataset.playerReady === 'true'
+          || document.querySelector('script[data-dynamic-music-player]')
+        );
+
+        if (renderWhenEmpty && !playerBoundOrLoading) {
+          activeCatalog = workerCatalog;
+          renderCatalog(workerCatalog, 'WORKER FALLBACK', true);
+        } else {
+          const source = document.querySelector('[data-catalog-source]');
+          if (source) source.dataset.workerUpdateAvailable = 'true';
+        }
+      } catch (error) {
+        if (!activeCatalog) {
+          songList.replaceChildren(createState(
+            'CATALOG UNAVAILABLE',
+            `站点快照和曲目目录服务都暂时无法访问：${error?.message || 'unknown request error'}`
+          ));
+        }
+      }
+    };
+
+    if (!snapshotAvailable && !cachedCatalog) {
+      await revalidateWorker({ force: true, renderWhenEmpty: true });
+      return;
+    }
+
+    // A healthy same-origin snapshot means workers.dev is no longer on the
+    // critical path. Revalidate only occasionally and only after the UI settles.
+    scheduleIdle(() => {
+      revalidateWorker({ force: !snapshotAvailable }).catch(() => {});
+    });
   };
 
   loadCatalog();
