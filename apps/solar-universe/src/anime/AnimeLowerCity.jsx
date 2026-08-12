@@ -39,12 +39,8 @@ function buildSpecs(radius, quality) {
       const azimuth = column / baseCount * Math.PI * 2 + jitter + bandIndex * 0.075;
       const sectorDistance = angleDistance(azimuth, AXIS_AZIMUTH);
 
-      // Keep a broader monumental corridor through the densest front slope.
       if (sectorDistance < 0.19) continue;
 
-      // The city is intentionally directional instead of forming a uniform
-      // 360-degree crown: dense on the central slope, lighter on the flanks,
-      // and sparse on the rear hemisphere.
       const sectorFrontness = THREE.MathUtils.clamp(1 - sectorDistance / Math.PI, 0, 1);
       const keepProbability = 0.06 + Math.pow(sectorFrontness, 1.18) * 0.94;
       if (hash(column + bandIndex * 211, 173) > keepProbability) continue;
@@ -109,8 +105,8 @@ function BuildingInstances({ radius, specs, material }) {
   }, [radius, selected]);
 
   const color = material === 'ivory' ? ANIME_IVORY : material === 'red' ? ANIME_RED : ANIME_BLACK;
-  const emissive = material === 'red' ? '#5f070c' : material === 'dark' ? '#0a0a0d' : '#000000';
-  const emissiveIntensity = material === 'red' ? 0.15 : material === 'dark' ? 0.09 : 0;
+  const emissive = material === 'red' ? '#350407' : material === 'dark' ? '#020203' : '#000000';
+  const emissiveIntensity = material === 'red' ? 0.05 : material === 'dark' ? 0.015 : 0;
 
   return (
     <instancedMesh ref={ref} args={[null, null, selected.length]} castShadow receiveShadow>
@@ -119,8 +115,8 @@ function BuildingInstances({ radius, specs, material }) {
         color={color}
         emissive={emissive}
         emissiveIntensity={emissiveIntensity}
-        roughness={material === 'ivory' ? 0.76 : 0.88}
-        metalness={0.018}
+        roughness={material === 'ivory' ? 0.7 : 0.82}
+        metalness={material === 'red' ? 0.035 : 0.018}
       />
     </instancedMesh>
   );
