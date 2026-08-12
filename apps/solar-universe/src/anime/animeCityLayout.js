@@ -9,10 +9,8 @@ export const ANIME_CHARCOAL = '#252a31';
 const REFERENCE = new THREE.Vector3(1, 0, 0);
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
-// The city is now built around the planet's actual north pole. The terrain,
-// crown platform and central spire therefore share one radial/world-up axis
-// instead of mounting the city on a side-facing spherical normal and then
-// forcing the hero architecture upright afterward.
+// The entire Anime city is organized around the actual north pole. Every
+// terrace, road and hero structure therefore shares one physical planetary axis.
 export const CITY_DIRECTION = WORLD_UP.clone();
 
 export const CITY_TIER_DEGREES = {
@@ -48,14 +46,14 @@ function warpedCityAngle(direction) {
   const angle = CITY_DIRECTION.angleTo(normal);
   const azimuth = azimuthForDirection(normal);
   const warp = DEG * (
-    Math.sin(azimuth * 3.0) * 1.95 +
-    Math.sin(azimuth * 7.0 + angle * 4.0) * 0.88 +
-    Math.cos(azimuth * 5.0 - angle * 2.5) * 0.48
+    Math.sin(azimuth * 3.0) * 1.7 +
+    Math.sin(azimuth * 7.0 + angle * 4.0) * 0.72 +
+    Math.cos(azimuth * 5.0 - angle * 2.5) * 0.4
   );
   return { angle: angle + warp, azimuth };
 }
 
-function stepMask(angle, thresholdDegrees, softnessDegrees = 1.5) {
+function stepMask(angle, thresholdDegrees, softnessDegrees = 0.8) {
   const threshold = thresholdDegrees * DEG;
   const softness = softnessDegrees * DEG;
   return 1 - smoothstep(threshold - softness, threshold + softness, angle);
@@ -65,15 +63,18 @@ export function cityElevation(direction, radius) {
   const normal = direction.clone().normalize();
   const { angle } = warpedCityAngle(normal);
 
-  const outer = stepMask(angle, CITY_TIER_DEGREES.outskirts, 1.9) * 0.05;
-  const lower = stepMask(angle, CITY_TIER_DEGREES.lower, 1.7) * 0.085;
-  const middle = stepMask(angle, CITY_TIER_DEGREES.middle, 1.55) * 0.10;
-  const upper = stepMask(angle, CITY_TIER_DEGREES.upper, 1.45) * 0.115;
-  const crown = stepMask(angle, CITY_TIER_DEGREES.crown, 1.3) * 0.105;
+  // Keep each level broad and relatively flat, then make the transition between
+  // levels intentionally abrupt. The city should read as colossal terraces,
+  // not as one smooth artificial mountain.
+  const outer = stepMask(angle, CITY_TIER_DEGREES.outskirts, 1.05) * 0.048;
+  const lower = stepMask(angle, CITY_TIER_DEGREES.lower, 0.9) * 0.088;
+  const middle = stepMask(angle, CITY_TIER_DEGREES.middle, 0.78) * 0.108;
+  const upper = stepMask(angle, CITY_TIER_DEGREES.upper, 0.7) * 0.12;
+  const crown = stepMask(angle, CITY_TIER_DEGREES.crown, 0.62) * 0.112;
 
   const baseRelief = radius * (
-    Math.sin(normal.x * 12.7 + normal.z * 7.9) * 0.0014 +
-    Math.sin(normal.y * 17.3 - normal.x * 5.1) * 0.0009
+    Math.sin(normal.x * 12.7 + normal.z * 7.9) * 0.00065 +
+    Math.sin(normal.y * 17.3 - normal.x * 5.1) * 0.00042
   );
 
   return radius * (outer + lower + middle + upper + crown) + baseRelief;
@@ -119,7 +120,5 @@ export function surfaceQuaternion(direction, tangentHint = null) {
 }
 
 export function heroQuaternion() {
-  // Crown and spire use exactly the same Y axis as the planet's polar city.
-  // Only their horizontal facing is chosen here; no corrective lean remains.
   return quaternionFromUpAndForward(WORLD_UP, CITY_TANGENT_Z);
 }
