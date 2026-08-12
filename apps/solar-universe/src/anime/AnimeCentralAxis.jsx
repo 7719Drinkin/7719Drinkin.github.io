@@ -11,16 +11,16 @@ import {
 const AXIS_AZIMUTH = -Math.PI * 0.52;
 
 function buildAxisSteps(radius, quality) {
-  const count = quality === 'quality' ? 26 : 14;
+  const count = quality === 'quality' ? 32 : 17;
   return Array.from({ length: count }, (_, index) => {
     const t = count === 1 ? 0 : index / (count - 1);
-    const radialAngle = THREE.MathUtils.degToRad(68 - t * 55);
+    const radialAngle = THREE.MathUtils.degToRad(80 - t * 66);
     const direction = cityPolarDirection(radialAngle, AXIS_AZIMUTH);
     return {
       direction,
-      width: radius * (0.155 - t * 0.032),
-      depth: radius * (0.052 - t * 0.007),
-      thickness: radius * 0.0145
+      width: radius * (0.19 - t * 0.057),
+      depth: radius * (0.055 - t * 0.008),
+      thickness: radius * (0.0155 - t * 0.001)
     };
   });
 }
@@ -46,9 +46,9 @@ export default function AnimeCentralAxis({ radius, quality }) {
       stair.updateMatrix();
       stairRef.current.setMatrixAt(index, stair.matrix);
 
-      stripe.position.copy(step.direction).multiplyScalar(surface + step.thickness + radius * 0.0034);
+      stripe.position.copy(step.direction).multiplyScalar(surface + step.thickness + radius * 0.0036);
       stripe.quaternion.copy(quaternion);
-      stripe.scale.set(radius * 0.021, radius * 0.0058, step.depth * 0.94);
+      stripe.scale.set(radius * 0.024, radius * 0.0062, step.depth * 0.95);
       stripe.updateMatrix();
       stripeRef.current.setMatrixAt(index, stripe.matrix);
     });
@@ -61,16 +61,16 @@ export default function AnimeCentralAxis({ radius, quality }) {
     <group>
       <instancedMesh ref={stairRef} args={[null, null, steps.length]} castShadow receiveShadow>
         <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color={ANIME_IVORY} roughness={0.82} metalness={0.01} />
+        <meshStandardMaterial color={ANIME_IVORY} roughness={0.8} metalness={0.01} />
       </instancedMesh>
 
-      <instancedMesh ref={stripeRef} args={[null, null, steps.length]} renderOrder={4}>
+      <instancedMesh ref={stripeRef} args={[null, null, steps.length]} renderOrder={6}>
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial
           color={ANIME_RED}
-          emissive="#5d070c"
-          emissiveIntensity={0.2}
-          roughness={0.56}
+          emissive="#68070d"
+          emissiveIntensity={0.23}
+          roughness={0.53}
           metalness={0.04}
         />
       </instancedMesh>
