@@ -11,7 +11,7 @@ import {
 
 export default function AnimeCentralSpire({ radius }) {
   const transform = useMemo(() => ({
-    position: CITY_DIRECTION.clone().multiplyScalar(citySurfaceRadius(CITY_DIRECTION, radius, radius * 0.014)),
+    position: CITY_DIRECTION.clone().multiplyScalar(citySurfaceRadius(CITY_DIRECTION, radius, radius * 0.075)),
     quaternion: surfaceQuaternion(CITY_DIRECTION)
   }), [radius]);
 
