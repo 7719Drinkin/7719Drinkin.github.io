@@ -1,6 +1,12 @@
 name: Sync Music catalog snapshots
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/music/catalog.json'
+      - 'scripts/sync-music-catalog.mjs'
+      - '.github/workflows/sync-music-catalog.yml'
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
