@@ -12,11 +12,11 @@ import {
 const AXIS_AZIMUTH = -Math.PI * 0.52;
 
 const RINGS = [
-  { degrees: CITY_TIER_DEGREES.crown, material: 'red', height: 0.028, depth: 0.028, halfSpan: 2.7, gapRate: 0.06 },
-  { degrees: CITY_TIER_DEGREES.upper, material: 'ivory', height: 0.024, depth: 0.026, halfSpan: 2.45, gapRate: 0.08 },
-  { degrees: CITY_TIER_DEGREES.middle, material: 'red', height: 0.021, depth: 0.024, halfSpan: 2.25, gapRate: 0.1 },
-  { degrees: CITY_TIER_DEGREES.lower, material: 'ivory', height: 0.018, depth: 0.022, halfSpan: 2.05, gapRate: 0.12 },
-  { degrees: CITY_TIER_DEGREES.outskirts, material: 'red', height: 0.015, depth: 0.02, halfSpan: 1.82, gapRate: 0.16 }
+  { degrees: CITY_TIER_DEGREES.crown, material: 'red', height: 0.05, depth: 0.038, halfSpan: 2.7, gapRate: 0.045 },
+  { degrees: CITY_TIER_DEGREES.upper, material: 'ivory', height: 0.044, depth: 0.035, halfSpan: 2.48, gapRate: 0.065 },
+  { degrees: CITY_TIER_DEGREES.middle, material: 'red', height: 0.039, depth: 0.032, halfSpan: 2.28, gapRate: 0.085 },
+  { degrees: CITY_TIER_DEGREES.lower, material: 'ivory', height: 0.034, depth: 0.03, halfSpan: 2.08, gapRate: 0.105 },
+  { degrees: CITY_TIER_DEGREES.outskirts, material: 'red', height: 0.029, depth: 0.027, halfSpan: 1.86, gapRate: 0.14 }
 ];
 
 function fract(value) {
@@ -36,8 +36,8 @@ function buildSpecs(radius, quality) {
 
   RINGS.forEach((ring, ringIndex) => {
     const segments = quality === 'quality'
-      ? 64 + ringIndex * 8
-      : 34 + ringIndex * 4;
+      ? 72 + ringIndex * 8
+      : 38 + ringIndex * 4;
     const radial = THREE.MathUtils.degToRad(ring.degrees);
 
     for (let index = 0; index < segments; index += 1) {
@@ -45,10 +45,8 @@ function buildSpecs(radius, quality) {
       const sectorDistance = angleDistance(azimuth, AXIS_AZIMUTH);
       if (sectorDistance > ring.halfSpan) continue;
 
-      // Keep the main frontal structure continuous but introduce deliberate
-      // gaps toward the flanks so the tiers read as architecture, not rings.
       if (
-        sectorDistance > 0.38
+        sectorDistance > 0.42
         && hash(index + ringIndex * 97, 31) < ring.gapRate
       ) continue;
 
@@ -56,8 +54,8 @@ function buildSpecs(radius, quality) {
       const surfaceRadius = citySurfaceRadius(direction, radius, radius * 0.004);
       const ringRadius = surfaceRadius * Math.sin(radial);
       const arcWidth = Math.max(
-        radius * 0.025,
-        (Math.PI * 2 * ringRadius / segments) * 1.1
+        radius * 0.026,
+        (Math.PI * 2 * ringRadius / segments) * 1.14
       );
       const edgeTaper = THREE.MathUtils.clamp(1 - sectorDistance / ring.halfSpan, 0, 1);
 
@@ -65,7 +63,7 @@ function buildSpecs(radius, quality) {
         direction,
         material: ring.material,
         width: arcWidth,
-        height: radius * ring.height * (0.72 + edgeTaper * 0.28),
+        height: radius * ring.height * (0.7 + edgeTaper * 0.3),
         depth: radius * ring.depth
       });
     }
@@ -83,8 +81,8 @@ function WallInstances({ radius, specs, material }) {
     const dummy = new THREE.Object3D();
 
     selected.forEach((spec, index) => {
-      const surface = citySurfaceRadius(spec.direction, radius, radius * 0.004);
-      dummy.position.copy(spec.direction).multiplyScalar(surface + spec.height * 0.48);
+      const surface = citySurfaceRadius(spec.direction, radius, radius * 0.002);
+      dummy.position.copy(spec.direction).multiplyScalar(surface + spec.height * 0.5);
       dummy.quaternion.copy(surfaceQuaternion(spec.direction));
       dummy.scale.set(spec.width, spec.height, spec.depth);
       dummy.updateMatrix();
@@ -100,9 +98,9 @@ function WallInstances({ radius, specs, material }) {
       <boxGeometry args={[1, 1, 1]} />
       <meshStandardMaterial
         color={red ? ANIME_RED : ANIME_IVORY}
-        emissive={red ? '#5f070c' : '#000000'}
-        emissiveIntensity={red ? 0.14 : 0}
-        roughness={red ? 0.56 : 0.8}
+        emissive={red ? '#430408' : '#000000'}
+        emissiveIntensity={red ? 0.08 : 0}
+        roughness={red ? 0.56 : 0.78}
         metalness={0.018}
       />
     </instancedMesh>
