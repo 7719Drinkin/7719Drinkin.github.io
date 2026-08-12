@@ -38,6 +38,17 @@ function OrbitLine({ radius, inclination, color }) {
   );
 }
 
+function configureSolarShadow(light, quality) {
+  const shadowSize = quality === 'quality' ? 512 : 256;
+  light.castShadow = true;
+  light.shadow.mapSize.set(shadowSize, shadowSize);
+  light.shadow.camera.near = 0.5;
+  light.shadow.camera.far = 52;
+  light.shadow.bias = -0.00045;
+  light.shadow.normalBias = 0.014;
+  light.shadow.camera.updateProjectionMatrix();
+}
+
 function LightingController({ sunBrightness, quality }) {
   const { gl, scene } = useThree();
   const sunlight = useRef();
@@ -53,6 +64,15 @@ function LightingController({ sunBrightness, quality }) {
     gl.toneMappingExposure = baseExposure * THREE.MathUtils.lerp(0.93, 1.02, normalized);
   }, [gl, quality, sunBrightness]);
 
+  useEffect(() => {
+    gl.shadowMap.enabled = true;
+    gl.shadowMap.type = quality === 'quality'
+      ? THREE.PCFSoftShadowMap
+      : THREE.PCFShadowMap;
+
+    if (sunlight.current) configureSolarShadow(sunlight.current, quality);
+  }, [gl, quality]);
+
   useFrame(() => {
     if (!sunlight.current) {
       scene.traverse((object) => {
@@ -61,6 +81,7 @@ function LightingController({ sunBrightness, quality }) {
         // and changing it must not silently disable dynamic solar brightness.
         if (object.isPointLight && object.distance >= 100) {
           sunlight.current = object;
+          configureSolarShadow(object, quality);
         }
       });
     }
@@ -389,6 +410,10 @@ export default function UniverseCanvas(props) {
         gl.outputColorSpace = THREE.SRGBColorSpace;
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = initialExposure;
+        gl.shadowMap.enabled = true;
+        gl.shadowMap.type = props.quality === 'quality'
+          ? THREE.PCFSoftShadowMap
+          : THREE.PCFShadowMap;
         props.onCanvasCreated?.();
       }}
       onPointerMissed={(event) => {
