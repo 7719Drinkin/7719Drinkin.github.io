@@ -1,5 +1,3 @@
-import * as THREE from 'three';
-
 export const ANIME_INTEREST = {
   id: 'anime',
   number: '04',
@@ -22,9 +20,13 @@ export const ANIME_INTEREST = {
   orbitRadius: 38.5,
   orbitSpeed: 0.003,
   initialOrbit: 5.58,
-  // Keep the Anime world effectively tidally locked: the scarlet crown remains
-  // on the same solar-facing side instead of rotating through the night side.
+  // Anime is presented upright and effectively tidally locked. With the
+  // axial body fixed inside the orbital pivot, the same city face continues
+  // to point toward the system star while the planet travels around it.
   axialSpeed: 0,
-  initialAxial: 0.72,
-  axialTilt: THREE.MathUtils.degToRad(4.5)
+  // Rotate the local crown direction onto the inward, sun-facing hemisphere.
+  initialAxial: -0.92,
+  // Keep this world level. Its monumental spire should never lean because of
+  // an orbital/planetary presentation tilt.
+  axialTilt: 0
 };
