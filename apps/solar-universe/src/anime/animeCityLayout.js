@@ -6,10 +6,14 @@ export const ANIME_IVORY = '#e5e2da';
 export const ANIME_BLACK = '#15161a';
 export const ANIME_CHARCOAL = '#252a31';
 
-// The city remains a broad front-facing urban slope. Hero architecture uses a
-// strict world-up orientation so the crown and spire stay vertical even though
-// the city terrain itself follows the sphere.
-export const CITY_DIRECTION = new THREE.Vector3(-0.52, 0.52, 0.68).normalize();
+const REFERENCE = new THREE.Vector3(1, 0, 0);
+const WORLD_UP = new THREE.Vector3(0, 1, 0);
+
+// The city is now built around the planet's actual north pole. The terrain,
+// crown platform and central spire therefore share one radial/world-up axis
+// instead of mounting the city on a side-facing spherical normal and then
+// forcing the hero architecture upright afterward.
+export const CITY_DIRECTION = WORLD_UP.clone();
 
 export const CITY_TIER_DEGREES = {
   crown: 13,
@@ -19,8 +23,6 @@ export const CITY_TIER_DEGREES = {
   outskirts: 84
 };
 
-const REFERENCE = new THREE.Vector3(1, 0, 0);
-const WORLD_UP = new THREE.Vector3(0, 1, 0);
 export const CITY_TANGENT_X = new THREE.Vector3().crossVectors(REFERENCE, CITY_DIRECTION).normalize();
 export const CITY_TANGENT_Z = new THREE.Vector3().crossVectors(CITY_DIRECTION, CITY_TANGENT_X).normalize();
 
@@ -117,8 +119,7 @@ export function surfaceQuaternion(direction, tangentHint = null) {
 }
 
 export function heroQuaternion() {
-  // Hero structures are architectural, not terrain props. Their vertical axis
-  // is always the global Y axis; CITY_DIRECTION only decides their horizontal
-  // facing. This removes the remaining visible lean from the spire/platform.
-  return quaternionFromUpAndForward(WORLD_UP, CITY_DIRECTION);
+  // Crown and spire use exactly the same Y axis as the planet's polar city.
+  // Only their horizontal facing is chosen here; no corrective lean remains.
+  return quaternionFromUpAndForward(WORLD_UP, CITY_TANGENT_Z);
 }

@@ -20,13 +20,11 @@ export const ANIME_INTEREST = {
   orbitRadius: 38.5,
   orbitSpeed: 0.003,
   initialOrbit: 5.58,
-  // Anime is presented upright and effectively tidally locked. With the
-  // axial body fixed inside the orbital pivot, the same city face continues
-  // to point toward the system star while the planet travels around it.
+  // Keep the polar city level and stable. The orbital pivot supplies the
+  // synchronous world rotation while the axial body itself does not spin.
   axialSpeed: 0,
-  // Rotate the local crown direction onto the inward, sun-facing hemisphere.
-  initialAxial: -0.92,
-  // Keep this world level. Its monumental spire should never lean because of
-  // an orbital/planetary presentation tilt.
+  // With the city centered on +Y, this value only turns the city around its
+  // vertical axis so the monumental stair opens toward the default focus view.
+  initialAxial: 1.9,
   axialTilt: 0
 };
