@@ -9,13 +9,27 @@ import {
   surfaceQuaternion
 } from './animeCityLayout.js';
 
+const AXIS_AZIMUTH = -Math.PI * 0.52;
+
 const RINGS = [
-  { degrees: CITY_TIER_DEGREES.crown, material: 'red', height: 0.028, depth: 0.028 },
-  { degrees: CITY_TIER_DEGREES.upper, material: 'ivory', height: 0.024, depth: 0.026 },
-  { degrees: CITY_TIER_DEGREES.middle, material: 'red', height: 0.021, depth: 0.024 },
-  { degrees: CITY_TIER_DEGREES.lower, material: 'ivory', height: 0.018, depth: 0.022 },
-  { degrees: CITY_TIER_DEGREES.outskirts, material: 'red', height: 0.015, depth: 0.02 }
+  { degrees: CITY_TIER_DEGREES.crown, material: 'red', height: 0.028, depth: 0.028, halfSpan: 2.7, gapRate: 0.06 },
+  { degrees: CITY_TIER_DEGREES.upper, material: 'ivory', height: 0.024, depth: 0.026, halfSpan: 2.45, gapRate: 0.08 },
+  { degrees: CITY_TIER_DEGREES.middle, material: 'red', height: 0.021, depth: 0.024, halfSpan: 2.25, gapRate: 0.1 },
+  { degrees: CITY_TIER_DEGREES.lower, material: 'ivory', height: 0.018, depth: 0.022, halfSpan: 2.05, gapRate: 0.12 },
+  { degrees: CITY_TIER_DEGREES.outskirts, material: 'red', height: 0.015, depth: 0.02, halfSpan: 1.82, gapRate: 0.16 }
 ];
+
+function fract(value) {
+  return value - Math.floor(value);
+}
+
+function hash(value, seed = 0) {
+  return fract(Math.sin(value * 71.37 + seed * 19.11) * 43758.5453123);
+}
+
+function angleDistance(a, b) {
+  return Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)));
+}
 
 function buildSpecs(radius, quality) {
   const specs = [];
@@ -28,19 +42,30 @@ function buildSpecs(radius, quality) {
 
     for (let index = 0; index < segments; index += 1) {
       const azimuth = index / segments * Math.PI * 2;
+      const sectorDistance = angleDistance(azimuth, AXIS_AZIMUTH);
+      if (sectorDistance > ring.halfSpan) continue;
+
+      // Keep the main frontal structure continuous but introduce deliberate
+      // gaps toward the flanks so the tiers read as architecture, not rings.
+      if (
+        sectorDistance > 0.38
+        && hash(index + ringIndex * 97, 31) < ring.gapRate
+      ) continue;
+
       const direction = cityPolarDirection(radial, azimuth);
       const surfaceRadius = citySurfaceRadius(direction, radius, radius * 0.004);
       const ringRadius = surfaceRadius * Math.sin(radial);
       const arcWidth = Math.max(
         radius * 0.025,
-        (Math.PI * 2 * ringRadius / segments) * 1.08
+        (Math.PI * 2 * ringRadius / segments) * 1.1
       );
+      const edgeTaper = THREE.MathUtils.clamp(1 - sectorDistance / ring.halfSpan, 0, 1);
 
       specs.push({
         direction,
         material: ring.material,
         width: arcWidth,
-        height: radius * ring.height,
+        height: radius * ring.height * (0.72 + edgeTaper * 0.28),
         depth: radius * ring.depth
       });
     }
@@ -76,8 +101,8 @@ function WallInstances({ radius, specs, material }) {
       <meshStandardMaterial
         color={red ? ANIME_RED : ANIME_IVORY}
         emissive={red ? '#5f070c' : '#000000'}
-        emissiveIntensity={red ? 0.16 : 0}
-        roughness={red ? 0.58 : 0.8}
+        emissiveIntensity={red ? 0.14 : 0}
+        roughness={red ? 0.56 : 0.8}
         metalness={0.018}
       />
     </instancedMesh>

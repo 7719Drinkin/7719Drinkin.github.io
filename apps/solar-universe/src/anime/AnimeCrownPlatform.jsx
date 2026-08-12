@@ -6,7 +6,7 @@ import {
   ANIME_RED,
   CITY_DIRECTION,
   citySurfaceRadius,
-  surfaceQuaternion
+  heroQuaternion
 } from './animeCityLayout.js';
 
 export default function AnimeCrownPlatform({ radius }) {
@@ -14,7 +14,7 @@ export default function AnimeCrownPlatform({ radius }) {
     position: CITY_DIRECTION.clone().multiplyScalar(
       citySurfaceRadius(CITY_DIRECTION, radius, radius * 0.008)
     ),
-    quaternion: surfaceQuaternion(CITY_DIRECTION)
+    quaternion: heroQuaternion(CITY_DIRECTION)
   }), [radius]);
 
   return (
@@ -32,7 +32,7 @@ export default function AnimeCrownPlatform({ radius }) {
 
       <mesh position-y={radius * 0.071} rotation-y={Math.PI / 8} castShadow receiveShadow>
         <cylinderGeometry args={[radius * 0.31, radius * 0.335, radius * 0.018, 8]} />
-        <meshStandardMaterial color={ANIME_IVORY} roughness={0.78} metalness={0.015} />
+        <meshStandardMaterial color={ANIME_IVORY} roughness={0.76} metalness={0.018} />
       </mesh>
 
       <mesh position={[0, radius * 0.083, radius * 0.025]} castShadow>
@@ -40,9 +40,9 @@ export default function AnimeCrownPlatform({ radius }) {
         <meshStandardMaterial
           color={ANIME_RED}
           emissive="#65070d"
-          emissiveIntensity={0.2}
-          roughness={0.54}
-          metalness={0.035}
+          emissiveIntensity={0.18}
+          roughness={0.5}
+          metalness={0.04}
         />
       </mesh>
 
@@ -54,7 +54,7 @@ export default function AnimeCrownPlatform({ radius }) {
           </mesh>
           <mesh position-y={radius * 0.171}>
             <boxGeometry args={[radius * 0.085, radius * 0.018, radius * 0.20]} />
-            <meshStandardMaterial color={ANIME_IVORY} roughness={0.78} />
+            <meshStandardMaterial color={ANIME_IVORY} roughness={0.76} />
           </mesh>
         </group>
       ))}

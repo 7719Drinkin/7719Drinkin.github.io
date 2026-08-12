@@ -22,7 +22,9 @@ export const ANIME_INTEREST = {
   orbitRadius: 38.5,
   orbitSpeed: 0.003,
   initialOrbit: 5.58,
-  axialSpeed: 0.018,
+  // Keep the Anime world effectively tidally locked: the scarlet crown remains
+  // on the same solar-facing side instead of rotating through the night side.
+  axialSpeed: 0,
   initialAxial: 0.72,
-  axialTilt: THREE.MathUtils.degToRad(10)
+  axialTilt: THREE.MathUtils.degToRad(4.5)
 };
