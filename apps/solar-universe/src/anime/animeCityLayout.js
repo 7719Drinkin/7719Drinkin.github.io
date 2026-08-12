@@ -13,12 +13,15 @@ const WORLD_UP = new THREE.Vector3(0, 1, 0);
 // terrace, road and hero structure therefore shares one physical planetary axis.
 export const CITY_DIRECTION = WORLD_UP.clone();
 
+// Let the lower city cross the equator slightly. From the selected system view
+// this prevents the city from reading like a small cap sitting on a mostly bare
+// sphere, while the southern hemisphere still remains visibly planetary.
 export const CITY_TIER_DEGREES = {
-  crown: 13,
-  upper: 31,
-  middle: 50,
-  lower: 68,
-  outskirts: 84
+  crown: 14,
+  upper: 34,
+  middle: 55,
+  lower: 76,
+  outskirts: 98
 };
 
 export const CITY_TANGENT_X = new THREE.Vector3().crossVectors(REFERENCE, CITY_DIRECTION).normalize();
@@ -46,9 +49,9 @@ function warpedCityAngle(direction) {
   const angle = CITY_DIRECTION.angleTo(normal);
   const azimuth = azimuthForDirection(normal);
   const warp = DEG * (
-    Math.sin(azimuth * 3.0) * 1.7 +
-    Math.sin(azimuth * 7.0 + angle * 4.0) * 0.72 +
-    Math.cos(azimuth * 5.0 - angle * 2.5) * 0.4
+    Math.sin(azimuth * 3.0) * 1.35 +
+    Math.sin(azimuth * 7.0 + angle * 4.0) * 0.56 +
+    Math.cos(azimuth * 5.0 - angle * 2.5) * 0.32
   );
   return { angle: angle + warp, azimuth };
 }
@@ -63,18 +66,18 @@ export function cityElevation(direction, radius) {
   const normal = direction.clone().normalize();
   const { angle } = warpedCityAngle(normal);
 
-  // Keep each level broad and relatively flat, then make the transition between
-  // levels intentionally abrupt. The city should read as colossal terraces,
-  // not as one smooth artificial mountain.
-  const outer = stepMask(angle, CITY_TIER_DEGREES.outskirts, 1.05) * 0.048;
-  const lower = stepMask(angle, CITY_TIER_DEGREES.lower, 0.9) * 0.088;
-  const middle = stepMask(angle, CITY_TIER_DEGREES.middle, 0.78) * 0.108;
-  const upper = stepMask(angle, CITY_TIER_DEGREES.upper, 0.7) * 0.12;
-  const crown = stepMask(angle, CITY_TIER_DEGREES.crown, 0.62) * 0.112;
+  // Broad, hard-edged terraces form the city's macro silhouette. The outer
+  // districts stay relatively shallow, while each successive level adds a
+  // visibly stronger rise toward the crown.
+  const outer = stepMask(angle, CITY_TIER_DEGREES.outskirts, 1.05) * 0.038;
+  const lower = stepMask(angle, CITY_TIER_DEGREES.lower, 0.88) * 0.084;
+  const middle = stepMask(angle, CITY_TIER_DEGREES.middle, 0.74) * 0.108;
+  const upper = stepMask(angle, CITY_TIER_DEGREES.upper, 0.66) * 0.122;
+  const crown = stepMask(angle, CITY_TIER_DEGREES.crown, 0.58) * 0.115;
 
   const baseRelief = radius * (
-    Math.sin(normal.x * 12.7 + normal.z * 7.9) * 0.00065 +
-    Math.sin(normal.y * 17.3 - normal.x * 5.1) * 0.00042
+    Math.sin(normal.x * 12.7 + normal.z * 7.9) * 0.00052 +
+    Math.sin(normal.y * 17.3 - normal.x * 5.1) * 0.00034
   );
 
   return radius * (outer + lower + middle + upper + crown) + baseRelief;
