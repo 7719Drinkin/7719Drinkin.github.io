@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef } from 'react';
 import { Html } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Select } from '@react-three/postprocessing';
-import * as THREE from 'three';
 import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
 import { useLabelVisibility } from '../context/LabelVisibilityContext.jsx';
 import MusicPuppetCelestial from '../music/MusicPuppetCelestial.jsx';
@@ -18,22 +17,13 @@ const SOLAR_LIGHT_LAYERS = {
   music: 3,
   anime: 4
 };
+const SOLAR_DECAY = 0.8;
 
 function solarShadowExtent(interest) {
-  if (interest.id === 'basketball') return interest.size * 2.45;
-  if (interest.id === 'music') return Math.max(interest.size * 1.9, 3.15);
-  if (interest.id === 'anime') return interest.size * 2.55;
-  return interest.size * 1.85;
-}
-
-function solarConeAngle(interest) {
-  const extent = solarShadowExtent(interest);
-  const angularRadius = Math.atan2(extent, interest.orbitRadius);
-  return THREE.MathUtils.clamp(
-    angularRadius * 1.22 + THREE.MathUtils.degToRad(0.8),
-    THREE.MathUtils.degToRad(4),
-    THREE.MathUtils.degToRad(16)
-  );
+  if (interest.id === 'basketball') return interest.size * 2.5;
+  if (interest.id === 'music') return Math.max(interest.size * 2, 3.2);
+  if (interest.id === 'anime') return interest.size * 3;
+  return interest.size * 2;
 }
 
 function isOpaqueMaterial(material) {
@@ -60,7 +50,7 @@ export default function PlanetSystem({
   showOrbits
 }) {
   const showLabels = useLabelVisibility();
-  const { camera, scene } = useThree();
+  const { camera, raycaster, scene } = useThree();
   const orbitalPivot = useRef();
   const carrier = useRef();
   const axialBody = useRef();
@@ -70,8 +60,8 @@ export default function PlanetSystem({
   const layerSyncFrames = useRef(12);
   const solarLayer = SOLAR_LIGHT_LAYERS[interest.id] ?? 5;
   const shadowExtent = useMemo(() => solarShadowExtent(interest), [interest]);
-  const coneAngle = useMemo(() => solarConeAngle(interest), [interest]);
-  const shadowFar = interest.orbitRadius + shadowExtent * 2 + 2;
+  const shadowDistance = useMemo(() => Math.max(6, shadowExtent * 3.2), [shadowExtent]);
+  const shadowFar = shadowDistance + shadowExtent * 2.6;
   const musicPuppet = interest.id === 'music'
     ? celestials.find((body) => body.parentId === interest.id)
     : null;
@@ -82,13 +72,19 @@ export default function PlanetSystem({
   }, [interest.id, registerPlanet]);
 
   useEffect(() => {
+    // Planet meshes live on dedicated solar-light layers so global fill lights
+    // cannot bypass their solar shadows. Keep both the camera and R3F raycaster
+    // subscribed to those layers: camera layers control visibility, while the
+    // raycaster has its own layer mask and otherwise cannot click the planets.
     camera.layers.enable(solarLayer);
+    raycaster.layers.enable(solarLayer);
     layerSyncFrames.current = 12;
 
     return () => {
       camera.layers.disable(solarLayer);
+      raycaster.layers.disable(solarLayer);
     };
-  }, [camera, quality, solarLayer]);
+  }, [camera, quality, raycaster, solarLayer]);
 
   useEffect(() => {
     const light = solarLight.current;
@@ -98,18 +94,27 @@ export default function PlanetSystem({
     light.target = target;
     light.layers.set(solarLayer);
     light.castShadow = true;
-    light.shadow.mapSize.set(
-      quality === 'quality' ? 1024 : 512,
-      quality === 'quality' ? 1024 : 512
-    );
-    light.shadow.camera.near = 0.35;
-    light.shadow.camera.far = shadowFar;
-    light.shadow.camera.layers.set(solarLayer);
-    light.shadow.bias = -0.00008;
-    light.shadow.normalBias = 0.0015;
-    light.shadow.radius = quality === 'quality' ? 1.35 : 1;
-    light.shadow.camera.updateProjectionMatrix();
-  }, [quality, shadowFar, solarLayer]);
+
+    const shadowSize = quality === 'quality' ? 1024 : 512;
+    light.shadow.mapSize.set(shadowSize, shadowSize);
+
+    // A DirectionalLight is the stable approximation for solar rays at planet
+    // scale. Its orthographic shadow camera is tightly fitted around the one
+    // planet instead of spending most shadow-map pixels on empty space.
+    const shadowCamera = light.shadow.camera;
+    shadowCamera.left = -shadowExtent;
+    shadowCamera.right = shadowExtent;
+    shadowCamera.top = shadowExtent;
+    shadowCamera.bottom = -shadowExtent;
+    shadowCamera.near = 0.1;
+    shadowCamera.far = shadowFar;
+    shadowCamera.layers.set(solarLayer);
+    shadowCamera.updateProjectionMatrix();
+
+    light.shadow.bias = -0.00002;
+    light.shadow.normalBias = 0.0005;
+    light.shadow.radius = quality === 'quality' ? 1.2 : 1;
+  }, [quality, shadowExtent, shadowFar, solarLayer]);
 
   useFrame((_, delta) => {
     if (orbitalPivot.current) orbitalPivot.current.rotation.y += interest.orbitSpeed * delta;
@@ -123,22 +128,26 @@ export default function PlanetSystem({
       });
     }
 
-    // The legacy long-range PointLight remains as the master brightness value,
-    // but planet meshes no longer share its layer. Disable its coarse six-face
-    // shadow map; the focused per-planet SpotLights below provide the actual
-    // solar direct light and occlusion.
+    // The central PointLight remains the single runtime brightness control, but
+    // it no longer illuminates planet layers directly. Reproduce its decay at
+    // each real orbit distance and feed that irradiance to the dedicated solar
+    // DirectionalLight. This preserves the intended r^-0.8 distance response
+    // without using a low-resolution six-face PointLight shadow map.
     if (sourceSunlight.current) {
       sourceSunlight.current.castShadow = false;
-      if (solarLight.current) solarLight.current.intensity = sourceSunlight.current.intensity;
+      if (solarLight.current) {
+        solarLight.current.intensity = sourceSunlight.current.intensity
+          / Math.pow(Math.max(interest.orbitRadius, 0.01), SOLAR_DECAY);
+      }
     }
 
     if (solarTarget.current) solarTarget.current.updateMatrixWorld();
 
     if (layerSyncFrames.current > 0 && carrier.current) {
       carrier.current.traverse((object) => {
-        // Keep planets visible to the camera while removing them from layer 0,
-        // so global ambient/hemisphere light and the old PointLight cannot leak
-        // into the night side. Each planet receives only its own solar layer.
+        // Remove planet geometry from layer 0 so ambient/hemisphere and the old
+        // PointLight cannot add unshadowed illumination on the night side.
+        // The R3F raycaster is explicitly enabled for this solar layer above.
         object.layers.disable(0);
         object.layers.enable(solarLayer);
 
@@ -190,15 +199,11 @@ export default function PlanetSystem({
       <group ref={orbitalPivot} rotation-y={interest.initialOrbit}>
         <group ref={carrier} position={[interest.orbitRadius, 0, 0]}>
           <object3D ref={solarTarget} position={[0, 0, 0]} />
-          <spotLight
+          <directionalLight
             ref={solarLight}
-            position={[-interest.orbitRadius, 0, 0]}
+            position={[-shadowDistance, 0, 0]}
             color="#fff1cf"
             intensity={0}
-            distance={0}
-            decay={0.8}
-            angle={coneAngle}
-            penumbra={0}
             castShadow
           />
 

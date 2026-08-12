@@ -52,7 +52,11 @@
     .toLocaleLowerCase('zh-CN')
     .replace(/[《》〈〉「」『』【】（）()·•\s_\-—–:：'".,，。!?！？]/g, '');
 
-  const cacheKey = (prefix) => `music-catalog-browser:v2:${prefix}`;
+  // v3 intentionally invalidates the old browser catalog. More importantly,
+  // browser storage is now only a fast first paint: every visit still checks
+  // the Worker so an R2 upload that has already refreshed the Worker becomes
+  // visible immediately instead of waiting for the local TTL to expire.
+  const cacheKey = (prefix) => `music-catalog-browser:v3:${prefix}`;
 
   const readCache = (prefix) => {
     try {
@@ -252,7 +256,7 @@
       if (source) source.textContent = sourceLabel;
       songList.replaceChildren(createState(
         'ALBUM NOT FOUND',
-        `当前缓存目录中没有匹配“${requestedAlbumName}”的专辑文件夹。请检查 R2 文件夹名称或 album.catalogName。`
+        `当前目录中没有匹配“${requestedAlbumName}”的专辑文件夹。请检查 R2 文件夹名称或 album.catalogName。`
       ));
       return false;
     }
@@ -322,18 +326,14 @@
       return;
     }
 
-    const localTtl = Math.max(60, Number(config.browserCacheTtlSeconds) || 600) * 1000;
     const cached = readCache(prefix);
     const hasCachedCatalog = Boolean(cached?.catalog);
-    const cacheIsFresh = hasCachedCatalog && Date.now() - Number(cached.savedAt || 0) < localTtl;
 
+    // Cached data is only a first-paint fallback. Never return early here: the
+    // Worker is the authoritative catalog, and it may already contain albums
+    // uploaded after this browser cache was written.
     if (hasCachedCatalog) {
-      renderCatalog(
-        cached.catalog,
-        cacheIsFresh ? 'BROWSER CACHE' : 'STALE BROWSER CACHE',
-        cacheIsFresh
-      );
-      if (cacheIsFresh) return;
+      renderCatalog(cached.catalog, 'BROWSER CACHE · REVALIDATING', false);
     }
 
     try {
@@ -341,7 +341,7 @@
         method: 'GET',
         mode: 'cors',
         credentials: 'omit',
-        cache: 'default',
+        cache: 'no-store',
         headers: { Accept: 'application/json' }
       });
       if (!response.ok) throw new Error(`Catalog request ${response.status}`);
