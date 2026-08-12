@@ -6,9 +6,9 @@ export const ANIME_IVORY = '#e5e2da';
 export const ANIME_BLACK = '#15161a';
 export const ANIME_CHARCOAL = '#252a31';
 
-// Aim the city directly into the default selected-planet camera after the
-// Anime world's initial axial rotation. The city should read as the dominant
-// face of the planet, not as a narrow cap near the limb.
+// The city remains a broad front-facing urban slope. Hero architecture uses a
+// separate, more upright orientation so the crown reads as monumental rather
+// than leaning with the local spherical normal.
 export const CITY_DIRECTION = new THREE.Vector3(-0.52, 0.52, 0.68).normalize();
 
 export const CITY_TIER_DEGREES = {
@@ -20,6 +20,7 @@ export const CITY_TIER_DEGREES = {
 };
 
 const REFERENCE = new THREE.Vector3(1, 0, 0);
+const WORLD_UP = new THREE.Vector3(0, 1, 0);
 export const CITY_TANGENT_X = new THREE.Vector3().crossVectors(REFERENCE, CITY_DIRECTION).normalize();
 export const CITY_TANGENT_Z = new THREE.Vector3().crossVectors(CITY_DIRECTION, CITY_TANGENT_X).normalize();
 
@@ -62,9 +63,6 @@ export function cityElevation(direction, radius) {
   const normal = direction.clone().normalize();
   const { angle } = warpedCityAngle(normal);
 
-  // Sharper cumulative artificial shelves. The outer city begins near the
-  // planet's visual equator while the crown rises roughly 0.455R above the
-  // base sphere before architecture is added.
   const outer = stepMask(angle, CITY_TIER_DEGREES.outskirts, 1.9) * 0.05;
   const lower = stepMask(angle, CITY_TIER_DEGREES.lower, 1.7) * 0.085;
   const middle = stepMask(angle, CITY_TIER_DEGREES.middle, 1.55) * 0.10;
@@ -101,24 +99,25 @@ export function citySurfaceRadius(direction, radius, extra = 0) {
   return radius + cityElevation(direction, radius) + extra;
 }
 
-export function surfaceQuaternion(direction, tangentHint = null) {
-  const yAxis = direction.clone().normalize();
-  let zAxis;
-
-  if (tangentHint) {
-    zAxis = tangentHint.clone().sub(yAxis.clone().multiplyScalar(tangentHint.dot(yAxis)));
-  } else {
-    zAxis = CITY_DIRECTION.clone().sub(yAxis.clone().multiplyScalar(CITY_DIRECTION.dot(yAxis)));
-  }
-
+function quaternionFromUpAndForward(yAxis, forwardHint) {
+  let zAxis = forwardHint.clone().sub(yAxis.clone().multiplyScalar(forwardHint.dot(yAxis)));
   if (zAxis.lengthSq() < 1e-8) {
     zAxis = CITY_TANGENT_Z.clone().sub(yAxis.clone().multiplyScalar(CITY_TANGENT_Z.dot(yAxis)));
   }
-
   zAxis.normalize();
   const xAxis = new THREE.Vector3().crossVectors(yAxis, zAxis).normalize();
   zAxis = new THREE.Vector3().crossVectors(xAxis, yAxis).normalize();
+  return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(xAxis, yAxis, zAxis));
+}
 
-  const basis = new THREE.Matrix4().makeBasis(xAxis, yAxis, zAxis);
-  return new THREE.Quaternion().setFromRotationMatrix(basis);
+export function surfaceQuaternion(direction, tangentHint = null) {
+  const yAxis = direction.clone().normalize();
+  const forward = tangentHint || CITY_DIRECTION;
+  return quaternionFromUpAndForward(yAxis, forward);
+}
+
+export function heroQuaternion(direction, upBlend = 0.64) {
+  const surfaceUp = direction.clone().normalize();
+  const yAxis = surfaceUp.clone().lerp(WORLD_UP, upBlend).normalize();
+  return quaternionFromUpAndForward(yAxis, CITY_DIRECTION);
 }
