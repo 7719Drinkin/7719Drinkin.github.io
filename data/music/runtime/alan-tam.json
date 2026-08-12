@@ -1,10 +1,10 @@
 {
   "version": 2,
   "artistPrefix": "alan-tam",
-  "generatedAt": "2026-08-12T13:02:38.800Z",
+  "generatedAt": "2026-08-12T15:02:02.474Z",
   "ordering": "disc-track-title",
-  "totalTracks": 55,
-  "ignoredObjects": 6,
+  "totalTracks": 87,
+  "ignoredObjects": 9,
   "albums": [
     {
       "name": "爱念",
@@ -128,6 +128,143 @@
           "type": "audio/mpeg",
           "size": 3236636,
           "uploadedAt": "2026-08-12T09:33:52.116Z"
+        }
+      ]
+    },
+    {
+      "name": "爱情陷阱",
+      "tracks": [
+        {
+          "title": "愛情陷阱",
+          "discNumber": 1,
+          "trackNumber": 1,
+          "orderLabel": "01",
+          "fileName": "01 - 愛情陷阱.mp3",
+          "key": "alan-tam/爱情陷阱/01 - 愛情陷阱.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%88%B1%E6%83%85%E9%99%B7%E9%98%B1/01%20-%20%E6%84%9B%E6%83%85%E9%99%B7%E9%98%B1.mp3",
+          "type": "audio/mpeg",
+          "size": 5554989,
+          "uploadedAt": "2026-08-12T14:38:08.031Z"
+        },
+        {
+          "title": "幸運星",
+          "discNumber": 1,
+          "trackNumber": 2,
+          "orderLabel": "02",
+          "fileName": "02 - 幸運星.mp3",
+          "key": "alan-tam/爱情陷阱/02 - 幸運星.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%88%B1%E6%83%85%E9%99%B7%E9%98%B1/02%20-%20%E5%B9%B8%E9%81%8B%E6%98%9F.mp3",
+          "type": "audio/mpeg",
+          "size": 5646347,
+          "uploadedAt": "2026-08-12T14:38:08.464Z"
+        },
+        {
+          "title": "愛你太深",
+          "discNumber": 1,
+          "trackNumber": 3,
+          "orderLabel": "03",
+          "fileName": "03 - 愛你太深.mp3",
+          "key": "alan-tam/爱情陷阱/03 - 愛你太深.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%88%B1%E6%83%85%E9%99%B7%E9%98%B1/03%20-%20%E6%84%9B%E4%BD%A0%E5%A4%AA%E6%B7%B1.mp3",
+          "type": "audio/mpeg",
+          "size": 3594350,
+          "uploadedAt": "2026-08-12T14:37:55.648Z"
+        },
+        {
+          "title": "火美人",
+          "discNumber": 1,
+          "trackNumber": 4,
+          "orderLabel": "04",
+          "fileName": "04 - 火美人.mp3",
+          "key": "alan-tam/爱情陷阱/04 - 火美人.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%88%B1%E6%83%85%E9%99%B7%E9%98%B1/04%20-%20%E7%81%AB%E7%BE%8E%E4%BA%BA.mp3",
+          "type": "audio/mpeg",
+          "size": 6041319,
+          "uploadedAt": "2026-08-12T14:38:12.275Z"
+        },
+        {
+          "title": "我愛世界 (電影恭喜發財插曲)",
+          "discNumber": 1,
+          "trackNumber": 5,
+          "orderLabel": "05",
+          "fileName": "05 - 我愛世界 (電影恭喜發財插曲).mp3",
+          "key": "alan-tam/爱情陷阱/05 - 我愛世界 (電影恭喜發財插曲).mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%88%B1%E6%83%85%E9%99%B7%E9%98%B1/05%20-%20%E6%88%91%E6%84%9B%E4%B8%96%E7%95%8C%20(%E9%9B%BB%E5%BD%B1%E6%81%AD%E5%96%9C%E7%99%BC%E8%B2%A1%E6%8F%92%E6%9B%B2).mp3",
+          "type": "audio/mpeg",
+          "size": 3220273,
+          "uploadedAt": "2026-08-12T14:37:53.940Z"
+        },
+        {
+          "title": "恭喜發財 (電影恭喜發財主題曲)",
+          "discNumber": 1,
+          "trackNumber": 6,
+          "orderLabel": "06",
+          "fileName": "06 - 恭喜發財 (電影恭喜發財主題曲).mp3",
+          "key": "alan-tam/爱情陷阱/06 - 恭喜發財 (電影恭喜發財主題曲).mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%88%B1%E6%83%85%E9%99%B7%E9%98%B1/06%20-%20%E6%81%AD%E5%96%9C%E7%99%BC%E8%B2%A1%20(%E9%9B%BB%E5%BD%B1%E6%81%AD%E5%96%9C%E7%99%BC%E8%B2%A1%E4%B8%BB%E9%A1%8C%E6%9B%B2).mp3",
+          "type": "audio/mpeg",
+          "size": 3569335,
+          "uploadedAt": "2026-08-12T14:38:12.939Z"
+        },
+        {
+          "title": "情 (是永願著迷) (電影花仔多情插曲)",
+          "discNumber": 1,
+          "trackNumber": 7,
+          "orderLabel": "07",
+          "fileName": "07 - 情 (是永願著迷) (電影花仔多情插曲).mp3",
+          "key": "alan-tam/爱情陷阱/07 - 情 (是永願著迷) (電影花仔多情插曲).mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%88%B1%E6%83%85%E9%99%B7%E9%98%B1/07%20-%20%E6%83%85%20(%E6%98%AF%E6%B0%B8%E9%A1%98%E8%91%97%E8%BF%B7)%20(%E9%9B%BB%E5%BD%B1%E8%8A%B1%E4%BB%94%E5%A4%9A%E6%83%85%E6%8F%92%E6%9B%B2).mp3",
+          "type": "audio/mpeg",
+          "size": 5887092,
+          "uploadedAt": "2026-08-12T14:38:42.323Z"
+        },
+        {
+          "title": "此刻你在何處 (電影花仔多情插曲)",
+          "discNumber": 1,
+          "trackNumber": 8,
+          "orderLabel": "08",
+          "fileName": "08 - 此刻你在何處 (電影花仔多情插曲).mp3",
+          "key": "alan-tam/爱情陷阱/08 - 此刻你在何處 (電影花仔多情插曲).mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%88%B1%E6%83%85%E9%99%B7%E9%98%B1/08%20-%20%E6%AD%A4%E5%88%BB%E4%BD%A0%E5%9C%A8%E4%BD%95%E8%99%95%20(%E9%9B%BB%E5%BD%B1%E8%8A%B1%E4%BB%94%E5%A4%9A%E6%83%85%E6%8F%92%E6%9B%B2).mp3",
+          "type": "audio/mpeg",
+          "size": 6633149,
+          "uploadedAt": "2026-08-12T14:38:53.593Z"
+        },
+        {
+          "title": "花仔世界 (電影花仔多情主題曲)",
+          "discNumber": 1,
+          "trackNumber": 9,
+          "orderLabel": "09",
+          "fileName": "09 - 花仔世界 (電影花仔多情主題曲).mp3",
+          "key": "alan-tam/爱情陷阱/09 - 花仔世界 (電影花仔多情主題曲).mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%88%B1%E6%83%85%E9%99%B7%E9%98%B1/09%20-%20%E8%8A%B1%E4%BB%94%E4%B8%96%E7%95%8C%20(%E9%9B%BB%E5%BD%B1%E8%8A%B1%E4%BB%94%E5%A4%9A%E6%83%85%E4%B8%BB%E9%A1%8C%E6%9B%B2).mp3",
+          "type": "audio/mpeg",
+          "size": 3763796,
+          "uploadedAt": "2026-08-12T14:38:34.131Z"
+        },
+        {
+          "title": "最愛的你",
+          "discNumber": 1,
+          "trackNumber": 10,
+          "orderLabel": "10",
+          "fileName": "10 - 最愛的你.mp3",
+          "key": "alan-tam/爱情陷阱/10 - 最愛的你.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%88%B1%E6%83%85%E9%99%B7%E9%98%B1/10%20-%20%E6%9C%80%E6%84%9B%E7%9A%84%E4%BD%A0.mp3",
+          "type": "audio/mpeg",
+          "size": 7189244,
+          "uploadedAt": "2026-08-12T14:38:55.023Z"
+        },
+        {
+          "title": "雨夜的浪漫",
+          "discNumber": 1,
+          "trackNumber": 11,
+          "orderLabel": "11",
+          "fileName": "11 - 雨夜的浪漫.mp3",
+          "key": "alan-tam/爱情陷阱/11 - 雨夜的浪漫.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%88%B1%E6%83%85%E9%99%B7%E9%98%B1/11%20-%20%E9%9B%A8%E5%A4%9C%E7%9A%84%E6%B5%AA%E6%BC%AB.mp3",
+          "type": "audio/mpeg",
+          "size": 6164397,
+          "uploadedAt": "2026-08-12T14:38:53.828Z"
         }
       ]
     },
@@ -688,6 +825,268 @@
           "type": "audio/mpeg",
           "size": 3370654,
           "uploadedAt": "2026-08-12T09:07:14.736Z"
+        }
+      ]
+    },
+    {
+      "name": "雾之恋",
+      "tracks": [
+        {
+          "title": "傲骨",
+          "discNumber": 1,
+          "trackNumber": 1,
+          "orderLabel": "01",
+          "fileName": "01 - 傲骨.mp3",
+          "key": "alan-tam/雾之恋/01 - 傲骨.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E9%9B%BE%E4%B9%8B%E6%81%8B/01%20-%20%E5%82%B2%E9%AA%A8.mp3",
+          "type": "audio/mpeg",
+          "size": 5006837,
+          "uploadedAt": "2026-08-12T14:43:15.510Z"
+        },
+        {
+          "title": "愛的替身",
+          "discNumber": 1,
+          "trackNumber": 2,
+          "orderLabel": "02",
+          "fileName": "02 - 愛的替身.mp3",
+          "key": "alan-tam/雾之恋/02 - 愛的替身.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E9%9B%BE%E4%B9%8B%E6%81%8B/02%20-%20%E6%84%9B%E7%9A%84%E6%9B%BF%E8%BA%AB.mp3",
+          "type": "audio/mpeg",
+          "size": 5480835,
+          "uploadedAt": "2026-08-12T14:43:22.294Z"
+        },
+        {
+          "title": "亮了紅燈",
+          "discNumber": 1,
+          "trackNumber": 3,
+          "orderLabel": "03",
+          "fileName": "03 - 亮了紅燈.mp3",
+          "key": "alan-tam/雾之恋/03 - 亮了紅燈.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E9%9B%BE%E4%B9%8B%E6%81%8B/03%20-%20%E4%BA%AE%E4%BA%86%E7%B4%85%E7%87%88.mp3",
+          "type": "audio/mpeg",
+          "size": 3566846,
+          "uploadedAt": "2026-08-12T14:42:49.073Z"
+        },
+        {
+          "title": "霧之戀",
+          "discNumber": 1,
+          "trackNumber": 4,
+          "orderLabel": "04",
+          "fileName": "04 - 霧之戀.mp3",
+          "key": "alan-tam/雾之恋/04 - 霧之戀.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E9%9B%BE%E4%B9%8B%E6%81%8B/04%20-%20%E9%9C%A7%E4%B9%8B%E6%88%80.mp3",
+          "type": "audio/mpeg",
+          "size": 6419363,
+          "uploadedAt": "2026-08-12T14:43:12.691Z"
+        },
+        {
+          "title": "午夜麗人",
+          "discNumber": 1,
+          "trackNumber": 5,
+          "orderLabel": "05",
+          "fileName": "05 - 午夜麗人.mp3",
+          "key": "alan-tam/雾之恋/05 - 午夜麗人.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E9%9B%BE%E4%B9%8B%E6%81%8B/05%20-%20%E5%8D%88%E5%A4%9C%E9%BA%97%E4%BA%BA.mp3",
+          "type": "audio/mpeg",
+          "size": 4288766,
+          "uploadedAt": "2026-08-12T14:43:12.554Z"
+        },
+        {
+          "title": "創造命運 (電影上天救命主題曲)",
+          "discNumber": 1,
+          "trackNumber": 6,
+          "orderLabel": "06",
+          "fileName": "06 - 創造命運 (電影上天救命主題曲).mp3",
+          "key": "alan-tam/雾之恋/06 - 創造命運 (電影上天救命主題曲).mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E9%9B%BE%E4%B9%8B%E6%81%8B/06%20-%20%E5%89%B5%E9%80%A0%E5%91%BD%E9%81%8B%20(%E9%9B%BB%E5%BD%B1%E4%B8%8A%E5%A4%A9%E6%95%91%E5%91%BD%E4%B8%BB%E9%A1%8C%E6%9B%B2).mp3",
+          "type": "audio/mpeg",
+          "size": 3303280,
+          "uploadedAt": "2026-08-12T14:43:28.403Z"
+        },
+        {
+          "title": "愛火",
+          "discNumber": 1,
+          "trackNumber": 7,
+          "orderLabel": "07",
+          "fileName": "07 - 愛火.mp3",
+          "key": "alan-tam/雾之恋/07 - 愛火.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E9%9B%BE%E4%B9%8B%E6%81%8B/07%20-%20%E6%84%9B%E7%81%AB.mp3",
+          "type": "audio/mpeg",
+          "size": 3338519,
+          "uploadedAt": "2026-08-12T14:43:44.544Z"
+        },
+        {
+          "title": "幻影 (電影陰陽錯主題曲)",
+          "discNumber": 1,
+          "trackNumber": 8,
+          "orderLabel": "08",
+          "fileName": "08 - 幻影 (電影陰陽錯主題曲).mp3",
+          "key": "alan-tam/雾之恋/08 - 幻影 (電影陰陽錯主題曲).mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E9%9B%BE%E4%B9%8B%E6%81%8B/08%20-%20%E5%B9%BB%E5%BD%B1%20(%E9%9B%BB%E5%BD%B1%E9%99%B0%E9%99%BD%E9%8C%AF%E4%B8%BB%E9%A1%8C%E6%9B%B2).mp3",
+          "type": "audio/mpeg",
+          "size": 3898276,
+          "uploadedAt": "2026-08-12T14:43:46.827Z"
+        },
+        {
+          "title": "火一般眼波",
+          "discNumber": 1,
+          "trackNumber": 9,
+          "orderLabel": "09",
+          "fileName": "09 - 火一般眼波.mp3",
+          "key": "alan-tam/雾之恋/09 - 火一般眼波.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E9%9B%BE%E4%B9%8B%E6%81%8B/09%20-%20%E7%81%AB%E4%B8%80%E8%88%AC%E7%9C%BC%E6%B3%A2.mp3",
+          "type": "audio/mpeg",
+          "size": 3223197,
+          "uploadedAt": "2026-08-12T14:43:45.155Z"
+        },
+        {
+          "title": "愛是這樣甜",
+          "discNumber": 1,
+          "trackNumber": 10,
+          "orderLabel": "10",
+          "fileName": "10 - 愛是這樣甜.mp3",
+          "key": "alan-tam/雾之恋/10 - 愛是這樣甜.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E9%9B%BE%E4%B9%8B%E6%81%8B/10%20-%20%E6%84%9B%E6%98%AF%E9%80%99%E6%A8%A3%E7%94%9C.mp3",
+          "type": "audio/mpeg",
+          "size": 2417536,
+          "uploadedAt": "2026-08-12T14:43:44.271Z"
+        },
+        {
+          "title": "但願不改變",
+          "discNumber": 1,
+          "trackNumber": 11,
+          "orderLabel": "11",
+          "fileName": "11 - 但願不改變.mp3",
+          "key": "alan-tam/雾之恋/11 - 但願不改變.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E9%9B%BE%E4%B9%8B%E6%81%8B/11%20-%20%E4%BD%86%E9%A1%98%E4%B8%8D%E6%94%B9%E8%AE%8A.mp3",
+          "type": "audio/mpeg",
+          "size": 7727784,
+          "uploadedAt": "2026-08-12T14:43:52.469Z"
+        }
+      ]
+    },
+    {
+      "name": "笑看人生",
+      "tracks": [
+        {
+          "title": "還是你懂得愛我",
+          "discNumber": 1,
+          "trackNumber": 1,
+          "orderLabel": "01",
+          "fileName": "01 - 還是你懂得愛我.mp3",
+          "key": "alan-tam/笑看人生/01 - 還是你懂得愛我.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%AC%91%E7%9C%8B%E4%BA%BA%E7%94%9F/01%20-%20%E9%82%84%E6%98%AF%E4%BD%A0%E6%87%82%E5%BE%97%E6%84%9B%E6%88%91.mp3",
+          "type": "audio/mpeg",
+          "size": 6411839,
+          "uploadedAt": "2026-08-12T14:50:41.308Z"
+        },
+        {
+          "title": "我永遠都愛妳",
+          "discNumber": 1,
+          "trackNumber": 2,
+          "orderLabel": "02",
+          "fileName": "02 - 我永遠都愛妳.mp3",
+          "key": "alan-tam/笑看人生/02 - 我永遠都愛妳.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%AC%91%E7%9C%8B%E4%BA%BA%E7%94%9F/02%20-%20%E6%88%91%E6%B0%B8%E9%81%A0%E9%83%BD%E6%84%9B%E5%A6%B3.mp3",
+          "type": "audio/mpeg",
+          "size": 3816870,
+          "uploadedAt": "2026-08-12T14:50:49.535Z"
+        },
+        {
+          "title": "片刻的無題",
+          "discNumber": 1,
+          "trackNumber": 3,
+          "orderLabel": "03",
+          "fileName": "03 - 片刻的無題.mp3",
+          "key": "alan-tam/笑看人生/03 - 片刻的無題.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%AC%91%E7%9C%8B%E4%BA%BA%E7%94%9F/03%20-%20%E7%89%87%E5%88%BB%E7%9A%84%E7%84%A1%E9%A1%8C.mp3",
+          "type": "audio/mpeg",
+          "size": 3583847,
+          "uploadedAt": "2026-08-12T14:50:16.942Z"
+        },
+        {
+          "title": "無邊的沉醉",
+          "discNumber": 1,
+          "trackNumber": 4,
+          "orderLabel": "04",
+          "fileName": "04 - 無邊的沉醉.mp3",
+          "key": "alan-tam/笑看人生/04 - 無邊的沉醉.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%AC%91%E7%9C%8B%E4%BA%BA%E7%94%9F/04%20-%20%E7%84%A1%E9%82%8A%E7%9A%84%E6%B2%89%E9%86%89.mp3",
+          "type": "audio/mpeg",
+          "size": 3346705,
+          "uploadedAt": "2026-08-12T14:50:48.444Z"
+        },
+        {
+          "title": "一世風雲",
+          "discNumber": 1,
+          "trackNumber": 5,
+          "orderLabel": "05",
+          "fileName": "05 - 一世風雲.mp3",
+          "key": "alan-tam/笑看人生/05 - 一世風雲.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%AC%91%E7%9C%8B%E4%BA%BA%E7%94%9F/05%20-%20%E4%B8%80%E4%B8%96%E9%A2%A8%E9%9B%B2.mp3",
+          "type": "audio/mpeg",
+          "size": 3674169,
+          "uploadedAt": "2026-08-12T14:50:54.024Z"
+        },
+        {
+          "title": "笑看人生",
+          "discNumber": 1,
+          "trackNumber": 6,
+          "orderLabel": "06",
+          "fileName": "06 - 笑看人生.mp3",
+          "key": "alan-tam/笑看人生/06 - 笑看人生.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%AC%91%E7%9C%8B%E4%BA%BA%E7%94%9F/06%20-%20%E7%AC%91%E7%9C%8B%E4%BA%BA%E7%94%9F.mp3",
+          "type": "audio/mpeg",
+          "size": 5097679,
+          "uploadedAt": "2026-08-12T14:50:56.136Z"
+        },
+        {
+          "title": "愛多一次 痛多一次",
+          "discNumber": 1,
+          "trackNumber": 7,
+          "orderLabel": "07",
+          "fileName": "07 - 愛多一次 痛多一次.mp3",
+          "key": "alan-tam/笑看人生/07 - 愛多一次 痛多一次.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%AC%91%E7%9C%8B%E4%BA%BA%E7%94%9F/07%20-%20%E6%84%9B%E5%A4%9A%E4%B8%80%E6%AC%A1%20%E7%97%9B%E5%A4%9A%E4%B8%80%E6%AC%A1.mp3",
+          "type": "audio/mpeg",
+          "size": 3701207,
+          "uploadedAt": "2026-08-12T14:50:18.207Z"
+        },
+        {
+          "title": "呼呼風中痛楚",
+          "discNumber": 1,
+          "trackNumber": 8,
+          "orderLabel": "08",
+          "fileName": "08 - 呼呼風中痛楚.mp3",
+          "key": "alan-tam/笑看人生/08 - 呼呼風中痛楚.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%AC%91%E7%9C%8B%E4%BA%BA%E7%94%9F/08%20-%20%E5%91%BC%E5%91%BC%E9%A2%A8%E4%B8%AD%E7%97%9B%E6%A5%9A.mp3",
+          "type": "audio/mpeg",
+          "size": 3961847,
+          "uploadedAt": "2026-08-12T14:50:19.912Z"
+        },
+        {
+          "title": "漂亮愛心",
+          "discNumber": 1,
+          "trackNumber": 9,
+          "orderLabel": "09",
+          "fileName": "09 - 漂亮愛心.mp3",
+          "key": "alan-tam/笑看人生/09 - 漂亮愛心.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%AC%91%E7%9C%8B%E4%BA%BA%E7%94%9F/09%20-%20%E6%BC%82%E4%BA%AE%E6%84%9B%E5%BF%83.mp3",
+          "type": "audio/mpeg",
+          "size": 3955710,
+          "uploadedAt": "2026-08-12T14:50:40.569Z"
+        },
+        {
+          "title": "My Love(with 關淑怡)",
+          "discNumber": 1,
+          "trackNumber": 10,
+          "orderLabel": "10",
+          "fileName": "10 - My Love(with 關淑怡).mp3",
+          "key": "alan-tam/笑看人生/10 - My Love(with 關淑怡).mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/alan-tam/%E7%AC%91%E7%9C%8B%E4%BA%BA%E7%94%9F/10%20-%20My%20Love(with%20%E9%97%9C%E6%B7%91%E6%80%A1).mp3",
+          "type": "audio/mpeg",
+          "size": 4192377,
+          "uploadedAt": "2026-08-12T14:50:20.877Z"
         }
       ]
     }
