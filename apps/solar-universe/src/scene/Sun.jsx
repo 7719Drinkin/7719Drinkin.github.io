@@ -400,7 +400,7 @@ export default function Sun({ quality, selected, onSelect, registerPlanet }) {
       </group>
 
       <SolarFlare quality={quality} />
-      <pointLight color="#fff1cf" intensity={255} distance={125} decay={1.9} />
+      <pointLight color="#fff1cf" intensity={22} distance={125} decay={0.8} />
     </group>
   );
 }
