@@ -6,17 +6,17 @@ export const ANIME_IVORY = '#e5e2da';
 export const ANIME_BLACK = '#15161a';
 export const ANIME_CHARCOAL = '#252a31';
 
-// The city is intentionally placed on the front-upper hemisphere rather than
-// near the pole. With the Anime planet's initial axial rotation this exposes
-// the terraced slope to the default camera instead of presenting only its rim.
-export const CITY_DIRECTION = new THREE.Vector3(-0.18, 0.70, 0.69).normalize();
+// Aim the city directly into the default selected-planet camera after the
+// Anime world's initial axial rotation. The city should read as the dominant
+// face of the planet, not as a narrow cap near the limb.
+export const CITY_DIRECTION = new THREE.Vector3(-0.52, 0.52, 0.68).normalize();
 
 export const CITY_TIER_DEGREES = {
-  crown: 12,
-  upper: 27,
-  middle: 43,
-  lower: 59,
-  outskirts: 74
+  crown: 13,
+  upper: 31,
+  middle: 50,
+  lower: 68,
+  outskirts: 84
 };
 
 const REFERENCE = new THREE.Vector3(1, 0, 0);
@@ -45,14 +45,14 @@ function warpedCityAngle(direction) {
   const angle = CITY_DIRECTION.angleTo(normal);
   const azimuth = azimuthForDirection(normal);
   const warp = DEG * (
-    Math.sin(azimuth * 3.0) * 1.8 +
-    Math.sin(azimuth * 7.0 + angle * 4.0) * 0.82 +
-    Math.cos(azimuth * 5.0 - angle * 2.5) * 0.44
+    Math.sin(azimuth * 3.0) * 1.95 +
+    Math.sin(azimuth * 7.0 + angle * 4.0) * 0.88 +
+    Math.cos(azimuth * 5.0 - angle * 2.5) * 0.48
   );
   return { angle: angle + warp, azimuth };
 }
 
-function stepMask(angle, thresholdDegrees, softnessDegrees = 2.1) {
+function stepMask(angle, thresholdDegrees, softnessDegrees = 1.5) {
   const threshold = thresholdDegrees * DEG;
   const softness = softnessDegrees * DEG;
   return 1 - smoothstep(threshold - softness, threshold + softness, angle);
@@ -62,17 +62,18 @@ export function cityElevation(direction, radius) {
   const normal = direction.clone().normalize();
   const { angle } = warpedCityAngle(normal);
 
-  // Cumulative artificial terraces. The crown rises roughly 0.41R above the
-  // base sphere, while the outskirts begin as a broad shallow urban shelf.
-  const outer = stepMask(angle, CITY_TIER_DEGREES.outskirts, 3.1) * 0.045;
-  const lower = stepMask(angle, CITY_TIER_DEGREES.lower, 2.8) * 0.075;
-  const middle = stepMask(angle, CITY_TIER_DEGREES.middle, 2.6) * 0.09;
-  const upper = stepMask(angle, CITY_TIER_DEGREES.upper, 2.35) * 0.105;
-  const crown = stepMask(angle, CITY_TIER_DEGREES.crown, 2.0) * 0.095;
+  // Sharper cumulative artificial shelves. The outer city begins near the
+  // planet's visual equator while the crown rises roughly 0.455R above the
+  // base sphere before architecture is added.
+  const outer = stepMask(angle, CITY_TIER_DEGREES.outskirts, 1.9) * 0.05;
+  const lower = stepMask(angle, CITY_TIER_DEGREES.lower, 1.7) * 0.085;
+  const middle = stepMask(angle, CITY_TIER_DEGREES.middle, 1.55) * 0.10;
+  const upper = stepMask(angle, CITY_TIER_DEGREES.upper, 1.45) * 0.115;
+  const crown = stepMask(angle, CITY_TIER_DEGREES.crown, 1.3) * 0.105;
 
   const baseRelief = radius * (
-    Math.sin(normal.x * 12.7 + normal.z * 7.9) * 0.0018 +
-    Math.sin(normal.y * 17.3 - normal.x * 5.1) * 0.0011
+    Math.sin(normal.x * 12.7 + normal.z * 7.9) * 0.0014 +
+    Math.sin(normal.y * 17.3 - normal.x * 5.1) * 0.0009
   );
 
   return radius * (outer + lower + middle + upper + crown) + baseRelief;
