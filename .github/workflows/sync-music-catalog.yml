@@ -1,0 +1,68 @@
+name: Sync Music catalog snapshots
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+    inputs:
+      allow_empty:
+        description: 'Allow publishing an intentionally empty artist catalog'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: music-catalog-snapshots
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Validate snapshot synchronizer
+        run: node --check scripts/sync-music-catalog.mjs
+
+      - name: Sync catalog snapshots
+        env:
+          MUSIC_CATALOG_REFRESH_TOKEN: ${{ secrets.MUSIC_CATALOG_REFRESH_TOKEN }}
+          MUSIC_CATALOG_ALLOW_EMPTY: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_empty && '1' || '0' }}
+        run: node scripts/sync-music-catalog.mjs
+
+      - name: Commit changed snapshots
+        id: commit
+        shell: bash
+        run: |
+          if [[ -z "$(git status --porcelain -- data/music/runtime)" ]]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Catalog snapshots are already current."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/music/runtime
+          git commit -m "data: sync Music catalog snapshots"
+          git pull --rebase origin main
+          git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy updated snapshots
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main
