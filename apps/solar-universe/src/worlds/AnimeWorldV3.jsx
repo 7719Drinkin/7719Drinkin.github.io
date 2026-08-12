@@ -3,10 +3,10 @@ import AnimeAxisGate from '../anime/AnimeAxisGate.jsx';
 import AnimeCentralAxis from '../anime/AnimeCentralAxis.jsx';
 import AnimeCentralSpire from '../anime/AnimeCentralSpire.jsx';
 import AnimeCityTerrain from '../anime/AnimeCityTerrain.jsx';
-import AnimeCloudBands from '../anime/AnimeCloudBands.jsx';
 import AnimeCrownPlatform from '../anime/AnimeCrownPlatform.jsx';
 import AnimeLowerCity from '../anime/AnimeLowerCity.jsx';
 import AnimeMonumentalBridges from '../anime/AnimeMonumentalBridges.jsx';
+import AnimeScarletBanners from '../anime/AnimeScarletBanners.jsx';
 import AnimeTerraceRims from '../anime/AnimeTerraceRims.jsx';
 import AnimeTerraceWalls from '../anime/AnimeTerraceWalls.jsx';
 import AnimeUpperDistrict from '../anime/AnimeUpperDistrict.jsx';
@@ -22,9 +22,9 @@ export default function AnimeWorldV3({ radius, quality }) {
       <AnimeAxisGate radius={radius} />
       <AnimeMonumentalBridges radius={radius} quality={quality} />
       <AnimeUpperDistrict radius={radius} quality={quality} />
+      <AnimeScarletBanners radius={radius} quality={quality} />
       <AnimeCrownPlatform radius={radius} />
       <AnimeCentralSpire radius={radius} />
-      <AnimeCloudBands radius={radius} quality={quality} />
       <AnimeAtmosphereV3 radius={radius} quality={quality} />
     </group>
   );
