@@ -149,7 +149,7 @@ if (catalogPage === 'album') {
 
 if (catalogPage && !document.querySelector('script[data-music-catalog-loader]')) {
   const script = document.createElement('script');
-  script.src = '/js/music-catalog.js?v=20260812-traditional-match-1';
+  script.src = '/js/music-catalog.js?v=20260812-snapshot-first-1';
   script.dataset.musicCatalogLoader = '';
   document.body.append(script);
 }
