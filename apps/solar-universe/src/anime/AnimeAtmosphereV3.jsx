@@ -15,13 +15,22 @@ const FRAGMENT_SHADER = `
   varying vec3 vNormal;
   varying vec3 vWorldPosition;
   void main() {
+    vec3 normal = normalize(vNormal);
     vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
-    float facing = max(dot(normalize(vNormal), viewDirection), 0.0);
+    vec3 sunDirection = normalize(-vWorldPosition);
+
+    float facing = max(dot(normal, viewDirection), 0.0);
     float rim = pow(1.0 - facing, 3.05);
-    vec3 innerColor = vec3(0.37, 0.62, 0.73);
-    vec3 outerColor = vec3(0.66, 0.85, 0.91);
-    vec3 color = mix(innerColor, outerColor, clamp(rim * 1.15, 0.0, 1.0));
-    gl_FragColor = vec4(color, rim * 0.18);
+    float daylight = smoothstep(-0.08, 0.58, dot(normal, sunDirection));
+
+    vec3 nightColor = vec3(0.16, 0.24, 0.29);
+    vec3 dayInner = vec3(0.37, 0.62, 0.73);
+    vec3 dayOuter = vec3(0.66, 0.85, 0.91);
+    vec3 dayColor = mix(dayInner, dayOuter, clamp(rim * 1.15, 0.0, 1.0));
+    vec3 color = mix(nightColor, dayColor, daylight);
+
+    float opacity = rim * mix(0.035, 0.15, daylight);
+    gl_FragColor = vec4(color, opacity);
   }
 `;
 
