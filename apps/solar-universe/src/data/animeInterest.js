@@ -5,24 +5,24 @@ export const ANIME_INTEREST = {
   number: '04',
   kind: 'planet',
   title: 'Anime',
-  worldName: 'MEMORY FOLIO',
+  worldName: 'SCARLET ASCENT',
   status: 'FORMING',
   route: '/anime/',
-  description: 'Works, characters and scenes kept as a quiet personal archive of drawn worlds.',
+  description: 'A drawn city-world rising through stark terraces, monumental stairs and a scarlet crown.',
   i18n: {
     zh: {
       title: '动漫',
-      worldName: '记忆册页',
+      worldName: '绯红天阶',
       status: '形成中',
-      description: '把作品、角色与场景收拢成一册安静的私人动画记忆档案。'
+      description: '一座沿巨大台地向上攀升的动画都市世界，以黑白建筑、绯红中轴与高塔构成强烈层级。'
     }
   },
-  accent: '#d0b97f',
+  accent: '#cf1824',
   size: 0.8,
   orbitRadius: 38.5,
   orbitSpeed: 0.003,
   initialOrbit: 5.58,
-  axialSpeed: 0.024,
+  axialSpeed: 0.018,
   initialAxial: 0.72,
   axialTilt: THREE.MathUtils.degToRad(10)
 };
