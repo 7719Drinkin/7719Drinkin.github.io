@@ -7,8 +7,8 @@ export const ANIME_BLACK = '#15161a';
 export const ANIME_CHARCOAL = '#252a31';
 
 // The city remains a broad front-facing urban slope. Hero architecture uses a
-// separate, more upright orientation so the crown reads as monumental rather
-// than leaning with the local spherical normal.
+// strict world-up orientation so the crown and spire stay vertical even though
+// the city terrain itself follows the sphere.
 export const CITY_DIRECTION = new THREE.Vector3(-0.52, 0.52, 0.68).normalize();
 
 export const CITY_TIER_DEGREES = {
@@ -116,8 +116,9 @@ export function surfaceQuaternion(direction, tangentHint = null) {
   return quaternionFromUpAndForward(yAxis, forward);
 }
 
-export function heroQuaternion(direction, upBlend = 0.64) {
-  const surfaceUp = direction.clone().normalize();
-  const yAxis = surfaceUp.clone().lerp(WORLD_UP, upBlend).normalize();
-  return quaternionFromUpAndForward(yAxis, CITY_DIRECTION);
+export function heroQuaternion() {
+  // Hero structures are architectural, not terrain props. Their vertical axis
+  // is always the global Y axis; CITY_DIRECTION only decides their horizontal
+  // facing. This removes the remaining visible lean from the spire/platform.
+  return quaternionFromUpAndForward(WORLD_UP, CITY_DIRECTION);
 }
