@@ -20,11 +20,10 @@ export const ANIME_INTEREST = {
   orbitRadius: 38.5,
   orbitSpeed: 0.003,
   initialOrbit: 5.58,
-  // Keep the polar city level and stable. The orbital pivot supplies the
-  // synchronous world rotation while the axial body itself does not spin.
-  axialSpeed: 0,
-  // With the city centered on +Y, this value only turns the city around its
-  // vertical axis so the monumental stair opens toward the default focus view.
+  // The city is centered on the north pole, so a slow Y-axis spin preserves
+  // the upright crown while bringing the scarlet city around naturally.
+  axialSpeed: 0.012,
+  // This only chooses the city's initial facing around its vertical axis.
   initialAxial: 1.9,
   axialTilt: 0
 };
