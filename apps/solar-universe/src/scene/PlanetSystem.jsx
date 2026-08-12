@@ -2,11 +2,10 @@ import { useEffect, useRef } from 'react';
 import { Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { Select } from '@react-three/postprocessing';
-import AnimeMemoryOrbitals from '../anime/AnimeMemoryOrbitals.jsx';
 import BasketballOrbitals from '../basketball/BasketballOrbitals.jsx';
 import { useLabelVisibility } from '../context/LabelVisibilityContext.jsx';
 import MusicPuppetCelestial from '../music/MusicPuppetCelestial.jsx';
-import AnimeWorldV2 from '../worlds/AnimeWorldV2.jsx';
+import AnimeWorldV3 from '../worlds/AnimeWorldV3.jsx';
 import BasketballWorld from '../worlds/BasketballWorld.jsx';
 import GameWorldV2 from '../worlds/GameWorldV2.jsx';
 import MusicWorld from '../worlds/MusicWorld.jsx';
@@ -59,10 +58,14 @@ export default function PlanetSystem({
   ) : interest.id === 'music' ? (
     <MusicWorld radius={interest.size} quality={quality} />
   ) : interest.id === 'anime' ? (
-    <AnimeWorldV2 radius={interest.size} quality={quality} />
+    <AnimeWorldV3 radius={interest.size} quality={quality} />
   ) : (
     <PlaceholderWorld interest={interest} quality={quality} />
   );
+
+  const labelHeight = interest.id === 'anime'
+    ? interest.size * 2.12
+    : interest.size + 0.45;
 
   return (
     <group rotation-z={interest.axialTilt * 0.25}>
@@ -70,15 +73,6 @@ export default function PlanetSystem({
         <group ref={carrier} position={[interest.orbitRadius, 0, 0]}>
           {interest.id === 'basketball' && (
             <BasketballOrbitals
-              radius={interest.size}
-              quality={quality}
-              showOrbit={showOrbits}
-              onSelect={() => onSelect(interest.id)}
-            />
-          )}
-
-          {interest.id === 'anime' && (
-            <AnimeMemoryOrbitals
               radius={interest.size}
               quality={quality}
               showOrbit={showOrbits}
@@ -111,7 +105,7 @@ export default function PlanetSystem({
             <Html
               center
               distanceFactor={12}
-              position={[0, interest.size + 0.45, 0]}
+              position={[0, labelHeight, 0]}
               style={{ pointerEvents: 'none' }}
             >
               <div className="planet-label" style={{ '--planet-accent': interest.accent }}>
