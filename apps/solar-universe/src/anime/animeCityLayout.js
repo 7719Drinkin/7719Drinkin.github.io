@@ -6,7 +6,18 @@ export const ANIME_IVORY = '#e5e2da';
 export const ANIME_BLACK = '#15161a';
 export const ANIME_CHARCOAL = '#252a31';
 
-export const CITY_DIRECTION = new THREE.Vector3(0.08, 0.91, 0.405).normalize();
+// The city is intentionally placed on the front-upper hemisphere rather than
+// near the pole. With the Anime planet's initial axial rotation this exposes
+// the terraced slope to the default camera instead of presenting only its rim.
+export const CITY_DIRECTION = new THREE.Vector3(-0.18, 0.70, 0.69).normalize();
+
+export const CITY_TIER_DEGREES = {
+  crown: 12,
+  upper: 27,
+  middle: 43,
+  lower: 59,
+  outskirts: 74
+};
 
 const REFERENCE = new THREE.Vector3(1, 0, 0);
 export const CITY_TANGENT_X = new THREE.Vector3().crossVectors(REFERENCE, CITY_DIRECTION).normalize();
@@ -20,8 +31,9 @@ function smoothstep(edge0, edge1, value) {
 }
 
 function azimuthForDirection(direction) {
-  const tangent = direction.clone().normalize().sub(
-    CITY_DIRECTION.clone().multiplyScalar(direction.clone().normalize().dot(CITY_DIRECTION))
+  const normalized = direction.clone().normalize();
+  const tangent = normalized.clone().sub(
+    CITY_DIRECTION.clone().multiplyScalar(normalized.dot(CITY_DIRECTION))
   );
   if (tangent.lengthSq() < 1e-8) return 0;
   tangent.normalize();
@@ -33,9 +45,9 @@ function warpedCityAngle(direction) {
   const angle = CITY_DIRECTION.angleTo(normal);
   const azimuth = azimuthForDirection(normal);
   const warp = DEG * (
-    Math.sin(azimuth * 3.0) * 1.55 +
-    Math.sin(azimuth * 7.0 + angle * 4.0) * 0.72 +
-    Math.cos(azimuth * 5.0 - angle * 2.5) * 0.38
+    Math.sin(azimuth * 3.0) * 1.8 +
+    Math.sin(azimuth * 7.0 + angle * 4.0) * 0.82 +
+    Math.cos(azimuth * 5.0 - angle * 2.5) * 0.44
   );
   return { angle: angle + warp, azimuth };
 }
@@ -50,15 +62,17 @@ export function cityElevation(direction, radius) {
   const normal = direction.clone().normalize();
   const { angle } = warpedCityAngle(normal);
 
-  const outer = stepMask(angle, 65, 2.8) * 0.035;
-  const lower = stepMask(angle, 51, 2.5) * 0.065;
-  const middle = stepMask(angle, 36, 2.35) * 0.07;
-  const upper = stepMask(angle, 22, 2.15) * 0.08;
-  const crown = stepMask(angle, 10, 1.85) * 0.07;
+  // Cumulative artificial terraces. The crown rises roughly 0.41R above the
+  // base sphere, while the outskirts begin as a broad shallow urban shelf.
+  const outer = stepMask(angle, CITY_TIER_DEGREES.outskirts, 3.1) * 0.045;
+  const lower = stepMask(angle, CITY_TIER_DEGREES.lower, 2.8) * 0.075;
+  const middle = stepMask(angle, CITY_TIER_DEGREES.middle, 2.6) * 0.09;
+  const upper = stepMask(angle, CITY_TIER_DEGREES.upper, 2.35) * 0.105;
+  const crown = stepMask(angle, CITY_TIER_DEGREES.crown, 2.0) * 0.095;
 
   const baseRelief = radius * (
-    Math.sin(normal.x * 12.7 + normal.z * 7.9) * 0.0022 +
-    Math.sin(normal.y * 17.3 - normal.x * 5.1) * 0.0014
+    Math.sin(normal.x * 12.7 + normal.z * 7.9) * 0.0018 +
+    Math.sin(normal.y * 17.3 - normal.x * 5.1) * 0.0011
   );
 
   return radius * (outer + lower + middle + upper + crown) + baseRelief;
@@ -66,11 +80,11 @@ export function cityElevation(direction, radius) {
 
 export function cityTier(direction) {
   const { angle } = warpedCityAngle(direction.clone().normalize());
-  if (angle < 10 * DEG) return 'crown';
-  if (angle < 22 * DEG) return 'upper';
-  if (angle < 36 * DEG) return 'middle';
-  if (angle < 51 * DEG) return 'lower';
-  if (angle < 65 * DEG) return 'outskirts';
+  if (angle < CITY_TIER_DEGREES.crown * DEG) return 'crown';
+  if (angle < CITY_TIER_DEGREES.upper * DEG) return 'upper';
+  if (angle < CITY_TIER_DEGREES.middle * DEG) return 'middle';
+  if (angle < CITY_TIER_DEGREES.lower * DEG) return 'lower';
+  if (angle < CITY_TIER_DEGREES.outskirts * DEG) return 'outskirts';
   return 'outside';
 }
 

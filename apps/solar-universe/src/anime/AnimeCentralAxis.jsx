@@ -11,16 +11,16 @@ import {
 const AXIS_AZIMUTH = -Math.PI * 0.52;
 
 function buildAxisSteps(radius, quality) {
-  const count = quality === 'quality' ? 22 : 12;
+  const count = quality === 'quality' ? 26 : 14;
   return Array.from({ length: count }, (_, index) => {
     const t = count === 1 ? 0 : index / (count - 1);
-    const radialAngle = THREE.MathUtils.degToRad(55 - t * 41);
+    const radialAngle = THREE.MathUtils.degToRad(68 - t * 55);
     const direction = cityPolarDirection(radialAngle, AXIS_AZIMUTH);
     return {
       direction,
-      width: radius * (0.132 - t * 0.022),
-      depth: radius * (0.048 - t * 0.006),
-      thickness: radius * 0.014
+      width: radius * (0.155 - t * 0.032),
+      depth: radius * (0.052 - t * 0.007),
+      thickness: radius * 0.0145
     };
   });
 }
@@ -48,7 +48,7 @@ export default function AnimeCentralAxis({ radius, quality }) {
 
       stripe.position.copy(step.direction).multiplyScalar(surface + step.thickness + radius * 0.0034);
       stripe.quaternion.copy(quaternion);
-      stripe.scale.set(radius * 0.018, radius * 0.0055, step.depth * 0.92);
+      stripe.scale.set(radius * 0.021, radius * 0.0058, step.depth * 0.94);
       stripe.updateMatrix();
       stripeRef.current.setMatrixAt(index, stripe.matrix);
     });
@@ -61,7 +61,7 @@ export default function AnimeCentralAxis({ radius, quality }) {
     <group>
       <instancedMesh ref={stairRef} args={[null, null, steps.length]} castShadow receiveShadow>
         <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color={ANIME_IVORY} roughness={0.84} metalness={0.01} />
+        <meshStandardMaterial color={ANIME_IVORY} roughness={0.82} metalness={0.01} />
       </instancedMesh>
 
       <instancedMesh ref={stripeRef} args={[null, null, steps.length]} renderOrder={4}>
@@ -69,8 +69,8 @@ export default function AnimeCentralAxis({ radius, quality }) {
         <meshStandardMaterial
           color={ANIME_RED}
           emissive="#5d070c"
-          emissiveIntensity={0.16}
-          roughness={0.58}
+          emissiveIntensity={0.2}
+          roughness={0.56}
           metalness={0.04}
         />
       </instancedMesh>

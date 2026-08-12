@@ -8,11 +8,11 @@ import {
 } from './animeCityLayout.js';
 
 const COLORS = {
-  outside: new THREE.Color(ANIME_CHARCOAL),
-  outskirts: new THREE.Color('#202228'),
+  outside: new THREE.Color('#1d252d'),
+  outskirts: new THREE.Color('#26282d'),
   lower: new THREE.Color('#15161a'),
-  middle: new THREE.Color('#24262b'),
-  upper: new THREE.Color('#6c6d70'),
+  middle: new THREE.Color('#38393e'),
+  upper: new THREE.Color('#aaa9a5'),
   crown: new THREE.Color(ANIME_IVORY)
 };
 
@@ -35,7 +35,7 @@ function createCityTerrain(radius, quality) {
     const tier = cityTier(normal);
     color.copy(COLORS[tier]);
 
-    const directionalShade = 0.88 + Math.max(normal.y, -0.25) * 0.08 + Math.max(normal.z, 0) * 0.035;
+    const directionalShade = 0.9 + Math.max(normal.y, -0.3) * 0.07 + Math.max(normal.z, 0) * 0.045;
     color.multiplyScalar(directionalShade);
 
     colors[index * 3] = color.r;
@@ -57,8 +57,10 @@ export default function AnimeCityTerrain({ radius, quality }) {
     <mesh geometry={geometry} castShadow receiveShadow>
       <meshStandardMaterial
         vertexColors
-        roughness={0.91}
+        roughness={0.9}
         metalness={0.015}
+        emissive={ANIME_CHARCOAL}
+        emissiveIntensity={0.09}
         dithering
         flatShading={quality !== 'quality'}
       />

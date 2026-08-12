@@ -64,7 +64,7 @@ export default function PlanetSystem({
   );
 
   const labelHeight = interest.id === 'anime'
-    ? interest.size * 2.12
+    ? interest.size * 2.55
     : interest.size + 0.45;
 
   return (

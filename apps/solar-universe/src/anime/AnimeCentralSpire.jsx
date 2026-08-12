@@ -11,67 +11,67 @@ import {
 
 export default function AnimeCentralSpire({ radius }) {
   const transform = useMemo(() => ({
-    position: CITY_DIRECTION.clone().multiplyScalar(citySurfaceRadius(CITY_DIRECTION, radius, radius * 0.012)),
+    position: CITY_DIRECTION.clone().multiplyScalar(citySurfaceRadius(CITY_DIRECTION, radius, radius * 0.014)),
     quaternion: surfaceQuaternion(CITY_DIRECTION)
   }), [radius]);
 
   return (
     <group position={transform.position} quaternion={transform.quaternion}>
-      <mesh position-y={radius * 0.03} castShadow receiveShadow>
-        <cylinderGeometry args={[radius * 0.19, radius * 0.22, radius * 0.06, 8]} />
-        <meshStandardMaterial color={ANIME_BLACK} roughness={0.86} metalness={0.035} />
+      <mesh position-y={radius * 0.04} castShadow receiveShadow>
+        <cylinderGeometry args={[radius * 0.24, radius * 0.27, radius * 0.08, 8]} />
+        <meshStandardMaterial color={ANIME_BLACK} emissive="#07080a" emissiveIntensity={0.1} roughness={0.86} metalness={0.035} />
       </mesh>
 
-      <mesh position-y={radius * 0.072} rotation-y={Math.PI / 8} castShadow receiveShadow>
-        <cylinderGeometry args={[radius * 0.17, radius * 0.185, radius * 0.026, 8]} />
-        <meshStandardMaterial color={ANIME_IVORY} roughness={0.78} metalness={0.015} />
+      <mesh position-y={radius * 0.092} rotation-y={Math.PI / 8} castShadow receiveShadow>
+        <cylinderGeometry args={[radius * 0.205, radius * 0.225, radius * 0.032, 8]} />
+        <meshStandardMaterial color={ANIME_IVORY} roughness={0.76} metalness={0.015} />
       </mesh>
 
-      <mesh position-y={radius * 0.245} rotation-y={Math.PI / 4} castShadow>
-        <cylinderGeometry args={[radius * 0.052, radius * 0.088, radius * 0.33, 4]} />
-        <meshStandardMaterial color={ANIME_IVORY} roughness={0.74} metalness={0.025} />
+      <mesh position-y={radius * 0.325} rotation-y={Math.PI / 4} castShadow>
+        <cylinderGeometry args={[radius * 0.06, radius * 0.105, radius * 0.46, 4]} />
+        <meshStandardMaterial color={ANIME_IVORY} roughness={0.73} metalness={0.025} />
       </mesh>
 
-      <mesh position={[0, radius * 0.245, radius * 0.061]} castShadow>
-        <boxGeometry args={[radius * 0.022, radius * 0.34, radius * 0.012]} />
+      <mesh position={[0, radius * 0.325, radius * 0.073]} castShadow>
+        <boxGeometry args={[radius * 0.026, radius * 0.47, radius * 0.014]} />
         <meshStandardMaterial
           color={ANIME_RED}
           emissive="#64070d"
-          emissiveIntensity={0.19}
-          roughness={0.52}
+          emissiveIntensity={0.22}
+          roughness={0.5}
           metalness={0.04}
         />
       </mesh>
 
       {[-1, 1].map((side) => (
-        <group key={side} position-x={side * radius * 0.105}>
-          <mesh position-y={radius * 0.247} castShadow>
-            <boxGeometry args={[radius * 0.13, radius * 0.045, radius * 0.15]} />
-            <meshStandardMaterial color={ANIME_BLACK} roughness={0.84} metalness={0.025} />
+        <group key={side} position-x={side * radius * 0.14}>
+          <mesh position-y={radius * 0.33} castShadow>
+            <boxGeometry args={[radius * 0.18, radius * 0.055, radius * 0.19]} />
+            <meshStandardMaterial color={ANIME_BLACK} emissive="#07080a" emissiveIntensity={0.08} roughness={0.84} metalness={0.025} />
           </mesh>
-          <mesh position-y={radius * 0.318} rotation-y={Math.PI / 4} castShadow>
-            <cylinderGeometry args={[radius * 0.024, radius * 0.041, radius * 0.15, 4]} />
-            <meshStandardMaterial color={ANIME_IVORY} roughness={0.76} />
+          <mesh position-y={radius * 0.43} rotation-y={Math.PI / 4} castShadow>
+            <cylinderGeometry args={[radius * 0.029, radius * 0.049, radius * 0.2, 4]} />
+            <meshStandardMaterial color={ANIME_IVORY} roughness={0.74} />
           </mesh>
-          <mesh position-y={radius * 0.405}>
-            <coneGeometry args={[radius * 0.028, radius * 0.065, 4]} />
-            <meshStandardMaterial color={ANIME_RED} roughness={0.56} />
+          <mesh position-y={radius * 0.55}>
+            <coneGeometry args={[radius * 0.034, radius * 0.085, 4]} />
+            <meshStandardMaterial color={ANIME_RED} emissive="#62070c" emissiveIntensity={0.12} roughness={0.54} />
           </mesh>
         </group>
       ))}
 
-      <mesh position-y={radius * 0.49} rotation-y={Math.PI / 4} castShadow>
-        <cylinderGeometry args={[radius * 0.018, radius * 0.042, radius * 0.18, 4]} />
-        <meshStandardMaterial color={ANIME_BLACK} roughness={0.78} metalness={0.04} />
+      <mesh position-y={radius * 0.655} rotation-y={Math.PI / 4} castShadow>
+        <cylinderGeometry args={[radius * 0.022, radius * 0.049, radius * 0.27, 4]} />
+        <meshStandardMaterial color={ANIME_BLACK} emissive="#08090c" emissiveIntensity={0.1} roughness={0.77} metalness={0.04} />
       </mesh>
 
-      <mesh position-y={radius * 0.635} rotation-y={Math.PI / 4} castShadow>
-        <coneGeometry args={[radius * 0.037, radius * 0.11, 4]} />
+      <mesh position-y={radius * 0.86} rotation-y={Math.PI / 4} castShadow>
+        <coneGeometry args={[radius * 0.046, radius * 0.16, 4]} />
         <meshStandardMaterial
           color={ANIME_RED}
           emissive="#7b0910"
-          emissiveIntensity={0.16}
-          roughness={0.5}
+          emissiveIntensity={0.2}
+          roughness={0.48}
           metalness={0.03}
         />
       </mesh>
