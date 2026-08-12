@@ -63,6 +63,10 @@ export default function PlanetSystem({
     <PlaceholderWorld interest={interest} quality={quality} />
   );
 
+  const labelHeight = interest.id === 'anime'
+    ? interest.size * 2.12
+    : interest.size + 0.45;
+
   return (
     <group rotation-z={interest.axialTilt * 0.25}>
       <group ref={orbitalPivot} rotation-y={interest.initialOrbit}>
@@ -101,7 +105,7 @@ export default function PlanetSystem({
             <Html
               center
               distanceFactor={12}
-              position={[0, interest.size + 0.45, 0]}
+              position={[0, labelHeight, 0]}
               style={{ pointerEvents: 'none' }}
             >
               <div className="planet-label" style={{ '--planet-accent': interest.accent }}>
