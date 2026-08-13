@@ -149,13 +149,11 @@
       this.activeIndex = -1;
       this.seeking = false;
       this.activationTimer = null;
-      this.albumCovers = [];
-      this.fallbackCover = '';
+      this.coverFallbackText = this.cover?.textContent?.trim() || '';
 
       installPlayerStateStyles();
       this.prepareIcons();
       this.bind();
-      this.collectCoverSources();
       this.initializeIdleDock();
       this.audio.volume = Number(this.volume.value);
 
@@ -220,55 +218,10 @@
       return `${minutes}:${remainder}`;
     }
 
-    normalizeCoverName(value) {
-      return String(value || '')
-        .normalize('NFKC')
-        .toLocaleLowerCase('zh-CN')
-        .replace(/[\s\p{P}\p{S}_]+/gu, '');
-    }
-
-    imageSource(image) {
-      return image?.getAttribute('src') || image?.currentSrc || image?.src || '';
-    }
-
-    collectCoverSources() {
-      const detailCover = document.querySelector('img.album-detail-cover');
-      const artistCover = document.querySelector('img.artist-hero-image');
-      this.fallbackCover = this.imageSource(detailCover) || this.imageSource(artistCover) || this.fallbackCover;
-
-      this.albumCovers = [...document.querySelectorAll('.album-card[data-album-name]')]
-        .map((card) => ({
-          name: card.dataset.albumName || '',
-          src: this.imageSource(card.querySelector('img'))
-        }))
-        .filter((entry) => entry.name && entry.src);
-
-      if (detailCover && document.body.dataset.albumName) {
-        this.albumCovers.push({
-          name: document.body.dataset.albumName,
-          src: this.imageSource(detailCover)
-        });
-      }
-    }
-
-    coverForAlbum(albumName) {
-      const target = this.normalizeCoverName(albumName);
-      if (!target) return this.fallbackCover;
-
-      const exact = this.albumCovers.find((entry) => this.normalizeCoverName(entry.name) === target);
-      if (exact) return exact.src;
-
-      const partial = this.albumCovers.find((entry) => {
-        const candidate = this.normalizeCoverName(entry.name);
-        return candidate.length >= 3 && (candidate.includes(target) || target.includes(candidate));
-      });
-      return partial?.src || this.fallbackCover;
-    }
-
     syncCover(row = null) {
       if (!this.cover) return;
 
-      const source = this.coverForAlbum(row?.dataset.songAlbum || document.body.dataset.albumName || '');
+      const source = row?.dataset.coverSrc || this.root.dataset.defaultCover || '';
       if (!source) return;
 
       let image = this.cover.querySelector('img[data-player-cover-art]');
@@ -279,6 +232,11 @@
         image.alt = '';
         image.decoding = 'async';
         image.draggable = false;
+        image.addEventListener('error', () => {
+          image.remove();
+          this.cover.classList.remove('has-cover-art');
+          this.cover.textContent = this.coverFallbackText;
+        });
         this.cover.append(image);
       }
 
@@ -392,15 +350,6 @@
       this.rows.forEach((item, itemIndex) => {
         item.classList.toggle('is-active', itemIndex === this.activeIndex);
       });
-
-      window.dispatchEvent(new CustomEvent('music:player-track-change', {
-        detail: {
-          title: row.dataset.songTitle || '',
-          artist: row.dataset.songArtist || '',
-          album: row.dataset.songAlbum || '',
-          source
-        }
-      }));
 
       if (!autoplay) return;
 

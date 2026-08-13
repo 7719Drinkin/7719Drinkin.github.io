@@ -1,3 +1,14 @@
+const musicRuntimeVersion = (() => {
+  try {
+    const source = document.currentScript?.src;
+    return source ? new URL(source, window.location.href).searchParams.get('v') || 'dev' : 'dev';
+  } catch {
+    return 'dev';
+  }
+})();
+
+const musicRuntimeAsset = (path) => `${path}?v=${encodeURIComponent(musicRuntimeVersion)}`;
+
 const playerAudio = document.querySelector('[data-player-audio]');
 
 if (playerAudio) {
@@ -149,7 +160,7 @@ if (catalogPage === 'album') {
 
 if (catalogPage && !document.querySelector('script[data-music-catalog-loader]')) {
   const script = document.createElement('script');
-  script.src = '/js/music-catalog.js?v=20260812-snapshot-first-1';
+  script.src = musicRuntimeAsset('/js/music-catalog.js');
   script.dataset.musicCatalogLoader = '';
   document.body.append(script);
 }

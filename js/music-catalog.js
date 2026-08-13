@@ -1,7 +1,16 @@
 (() => {
   const CONFIG_URL = '/data/music/catalog.json';
   const CATALOG_STYLE_URL = '/css/music-catalog.css?v=20260806-2';
-  const PLAYER_SCRIPT_URL = '/js/music-player.js?v=20260813-cover-state-1';
+  const runtimeVersion = (() => {
+    try {
+      const source = document.currentScript?.src;
+      return source ? new URL(source, window.location.href).searchParams.get('v') || 'dev' : 'dev';
+    } catch {
+      return 'dev';
+    }
+  })();
+  const runtimeAsset = (path) => `${path}?v=${encodeURIComponent(runtimeVersion)}`;
+  const PLAYER_SCRIPT_URL = runtimeAsset('/js/music-player.js');
   const DEFAULT_WORKER_REVALIDATE_MS = 6 * 60 * 60 * 1000;
   const DEFAULT_WORKER_TIMEOUT_MS = 3500;
 
@@ -91,6 +100,51 @@
   const normalize = (value) => foldHan(String(value || '').normalize('NFKC'))
     .toLocaleLowerCase('zh-CN')
     .replace(/[《》〈〉「」『』【】（）()·•\s_\-—–:：'".,，。!?！？]/g, '');
+
+  const imageSource = (image) => image?.getAttribute('src') || image?.currentSrc || image?.src || '';
+
+  // Adapter boundary: static archive metadata is translated once into a compact
+  // cover index. The player receives coverSrc on each TrackViewModel row and
+  // never needs to know how album cards or hero images are structured.
+  const buildCoverIndex = () => {
+    const detailCover = document.querySelector('img.album-detail-cover');
+    const artistCover = document.querySelector('img.artist-hero-image');
+    const fallback = imageSource(detailCover) || imageSource(artistCover);
+    const albums = [...document.querySelectorAll('.album-card[data-album-name]')]
+      .map((card) => ({
+        name: card.dataset.albumName || '',
+        src: imageSource(card.querySelector('img'))
+      }))
+      .filter((entry) => entry.name && entry.src);
+
+    if (detailCover && requestedAlbumName) {
+      albums.push({ name: requestedAlbumName, src: imageSource(detailCover) });
+    }
+
+    return { fallback, albums };
+  };
+
+  const coverIndex = buildCoverIndex();
+
+  const coverForAlbum = (albumName) => {
+    const target = normalize(albumName);
+    if (!target) return coverIndex.fallback || '';
+
+    const exact = coverIndex.albums.find((entry) => normalize(entry.name) === target);
+    if (exact) return exact.src;
+
+    const partial = coverIndex.albums.find((entry) => {
+      const candidate = normalize(entry.name);
+      return candidate.length >= 3 && (candidate.includes(target) || target.includes(candidate));
+    });
+
+    return partial?.src || coverIndex.fallback || '';
+  };
+
+  if (playerRoot) {
+    const defaultCover = coverForAlbum(requestedAlbumName);
+    if (defaultCover) playerRoot.dataset.defaultCover = defaultCover;
+  }
 
   // v5 separates the snapshot-first loader from older Worker-first browser data.
   const cacheKey = (prefix) => `music-catalog-browser:v5:${prefix}`;
@@ -225,6 +279,8 @@
     row.dataset.songTitle = track.title || track.fileName || 'Untitled';
     row.dataset.songArtist = artistName;
     row.dataset.songAlbum = albumName;
+    const coverSrc = coverForAlbum(albumName);
+    if (coverSrc) row.dataset.coverSrc = coverSrc;
     row.setAttribute('aria-label', `播放 ${row.dataset.songTitle}`);
 
     const number = document.createElement('span');
