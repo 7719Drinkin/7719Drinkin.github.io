@@ -57,7 +57,7 @@
 
     let interests = [];
     try {
-      const response = await fetch('/data/interests.json', { cache: 'force-cache' });
+      const response = await fetch('/data/interests.json', { cache: 'no-cache' });
       if (response.ok) interests = await response.json();
     } catch {
       return;
