@@ -41,11 +41,19 @@ assert(frameBridge.includes('coverSrc: row.dataset.coverSrc'), 'Site frame bridg
 assert(shellRuntime.includes("coverSrc: cover?.href || ''"), 'Persistent player track model must retain coverSrc.');
 assert(shellRuntime.includes('renderCover(track)'), 'Persistent player metadata must render cover artwork.');
 assert(shellRuntime.includes("ui.cover.classList.add('has-cover-art')"), 'Persistent player must expose its cover-art state to CSS.');
-assert(shellRuntime.includes("const STATE_KEY = '7719:persistent-player:v2'"), 'Persistent player state schema must be v2 after adding coverSrc.');
+assert(shellRuntime.includes("const STATE_KEY = '7719:persistent-player:v2'"), 'Persistent player playback state schema must remain v2.');
+assert(shellRuntime.includes("const VIEW_KEY = '7719:persistent-player-view:v1'"), 'Persistent player view state must be independent from playback state.');
+assert(shellRuntime.includes('const setCollapsed ='), 'Persistent player must expose a collapse/expand view transition.');
+assert(shellRuntime.includes('restoreViewState();'), 'Persistent player must restore its view state independently.');
+assert(shellRuntime.includes("ui.album.textContent = track.album || ''"), 'Persistent player must not concatenate album metadata into the artist line.');
 assert(shellRuntime.includes('updateMetadata(current);'), 'Persistent player must refresh metadata when selecting the already-loaded track.');
 assert(shellCss.includes('.persistent-player-cover.has-cover-art > img'), 'Persistent player cover image styles must live in site-shell.css.');
-assert(shellPage.includes('/js/site-shell.js?v=20260813-cover-2'), 'Persistent shell JS cache version was not bumped for state v2.');
-assert(shellPage.includes('/css/site-shell.css?v=20260813-cover-2'), 'Persistent shell CSS cache version was not bumped for state v2.');
+assert(shellCss.includes('.persistent-music-player.is-collapsed'), 'Persistent player CSS must define a compact view.');
+assert(shellCss.includes('.persistent-player-meta'), 'Persistent player metadata must have a dedicated layout container.');
+assert(shellPage.includes('data-persistent-collapse'), 'Persistent shell must render an explicit collapse control.');
+assert(shellPage.includes('class="persistent-player-meta"'), 'Persistent shell must separate artist and album metadata structurally.');
+assert(shellPage.includes('/js/site-shell.js?v=20260813-layout-1'), 'Persistent shell JS cache version was not bumped for the layout refactor.');
+assert(shellPage.includes('/css/site-shell.css?v=20260813-layout-1'), 'Persistent shell CSS cache version was not bumped for the layout refactor.');
 
 const [artistPage, albumPage] = await Promise.all([
   read('music/artists/tan-yonglin/index.html'),
