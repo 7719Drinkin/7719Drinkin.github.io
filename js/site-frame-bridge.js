@@ -80,7 +80,8 @@
       type: row.dataset.audioType || 'audio/mpeg',
       title: row.dataset.songTitle || row.querySelector('.song-primary h3')?.textContent?.trim() || 'Untitled',
       artist: row.dataset.songArtist || document.querySelector('.artist-hero-copy h2, .album-detail-artist')?.textContent?.trim() || '7719 Music',
-      album: row.dataset.songAlbum || ''
+      album: row.dataset.songAlbum || '',
+      coverSrc: row.dataset.coverSrc || ''
     };
   };
 
