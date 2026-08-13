@@ -73,9 +73,12 @@
       grid.querySelectorAll('.interest-card[data-theme]').forEach((card) => {
         const cover = coverByTheme.get(card.dataset.theme);
         const visual = card.querySelector('.interest-card-visual');
-        if (!cover || !visual || visual.querySelector('img')) return;
+        if (!cover || !visual || visual.querySelector('img.interest-card-cover')) return;
+
+        visual.querySelectorAll('img').forEach((image) => image.remove());
 
         const image = document.createElement('img');
+        image.className = 'interest-card-cover';
         image.src = cover;
         image.alt = '';
         image.loading = 'lazy';
