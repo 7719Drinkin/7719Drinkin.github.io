@@ -80,13 +80,13 @@ body.site-shell-page {
   bottom: 18px;
   z-index: 60;
   display: grid;
-  grid-template-columns: 46px minmax(0, 1fr) auto;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
   grid-template-areas:
     "cover copy controls"
     "cover progress progress";
-  width: min(560px, calc(100vw - 36px));
-  min-height: 78px;
-  padding: 10px 42px 10px 10px;
+  width: min(620px, calc(100vw - 36px));
+  min-height: 94px;
+  padding: 12px 74px 12px 12px;
   border: 1px solid color-mix(in srgb, var(--shell-accent) 25%, var(--shell-line));
   border-radius: 18px;
   background:
@@ -97,7 +97,13 @@ body.site-shell-page {
   color: var(--shell-text);
   opacity: 0;
   transform: translateY(16px) scale(.985);
-  transition: opacity .42s ease, transform .52s var(--shell-ease), border-color .3s ease;
+  transition:
+    opacity .42s ease,
+    transform .52s var(--shell-ease),
+    border-color .3s ease,
+    width .42s var(--shell-ease),
+    min-height .42s var(--shell-ease),
+    padding .42s var(--shell-ease);
 }
 
 .persistent-music-player:not([hidden]) {
@@ -114,8 +120,8 @@ body.site-shell-page {
   align-self: center;
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   border: 1px solid color-mix(in srgb, var(--shell-accent) 34%, transparent);
   border-radius: 50%;
   background: rgba(255, 255, 255, .025);
@@ -166,11 +172,12 @@ body.site-shell-page {
 
 .persistent-player-copy {
   grid-area: copy;
+  align-self: center;
   min-width: 0;
-  padding: 1px 14px 0 12px;
+  padding: 0 16px 0 14px;
 }
 
-.persistent-player-copy > span {
+.persistent-player-state {
   display: block;
   margin-bottom: 3px;
   color: var(--shell-accent);
@@ -180,7 +187,8 @@ body.site-shell-page {
 }
 
 .persistent-player-copy strong,
-.persistent-player-copy small {
+.persistent-player-artist,
+.persistent-player-album {
   display: block;
   overflow: hidden;
   white-space: nowrap;
@@ -189,15 +197,32 @@ body.site-shell-page {
 
 .persistent-player-copy strong {
   font-family: "Noto Serif SC", serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
+  line-height: 1.3;
+}
+
+.persistent-player-meta {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  margin-top: 4px;
+}
+
+.persistent-player-artist {
+  color: #aab4c3;
+  font-size: 9px;
   line-height: 1.35;
 }
 
-.persistent-player-copy small {
-  margin-top: 2px;
-  color: var(--shell-muted);
-  font-size: 9px;
+.persistent-player-album {
+  color: color-mix(in srgb, var(--shell-accent-soft) 62%, var(--shell-muted));
+  font-size: 8px;
+  line-height: 1.35;
+}
+
+.persistent-player-album:empty {
+  display: none;
 }
 
 .persistent-player-controls {
@@ -209,7 +234,7 @@ body.site-shell-page {
 }
 
 .persistent-player-controls button,
-.persistent-player-close {
+.persistent-player-actions button {
   display: grid;
   place-items: center;
   border: 0;
@@ -220,22 +245,23 @@ body.site-shell-page {
 }
 
 .persistent-player-controls button {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   font-size: 16px;
 }
 
 .persistent-player-controls button:hover,
 .persistent-player-controls button:focus-visible,
-.persistent-player-close:hover,
-.persistent-player-close:focus-visible {
+.persistent-player-actions button:hover,
+.persistent-player-actions button:focus-visible {
   color: var(--shell-accent-soft);
   background: rgba(255, 255, 255, .055);
   outline: none;
 }
 
-.persistent-player-controls button:active {
+.persistent-player-controls button:active,
+.persistent-player-actions button:active {
   transform: scale(.92);
 }
 
@@ -247,11 +273,11 @@ body.site-shell-page {
 .persistent-player-progress {
   grid-area: progress;
   display: grid;
-  grid-template-columns: 28px minmax(80px, 1fr) 28px;
+  grid-template-columns: 32px minmax(100px, 1fr) 32px;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   min-width: 0;
-  padding: 6px 0 0 12px;
+  padding: 8px 0 0 14px;
 }
 
 .persistent-player-progress time {
@@ -269,7 +295,7 @@ body.site-shell-page {
 
 .persistent-player-volume {
   position: absolute;
-  right: 42px;
+  right: 54px;
   bottom: -24px;
   display: flex;
   align-items: center;
@@ -298,26 +324,91 @@ body.site-shell-page {
   font-size: 7px;
 }
 
-.persistent-player-close {
+.persistent-player-actions {
   position: absolute;
   top: 8px;
   right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.persistent-player-actions button {
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  font-size: 16px;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.persistent-player-collapse {
+  font-family: "DM Mono", monospace;
+  font-size: 13px !important;
+}
+
+.persistent-player-close {
+  font-size: 16px !important;
 }
 
 .persistent-player-status {
   position: absolute;
-  right: 42px;
-  bottom: 6px;
+  right: 74px;
+  bottom: 7px;
   max-width: 250px;
   margin: 0;
   color: #e0a3a3;
   font-size: 8px;
   text-align: right;
   pointer-events: none;
+}
+
+/* Compact view is presentation state only: audio/queue state remains untouched. */
+.persistent-music-player.is-collapsed {
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  grid-template-areas: "cover copy controls";
+  width: min(330px, calc(100vw - 36px));
+  min-height: 60px;
+  padding: 8px 40px 8px 8px;
+  border-radius: 15px;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-cover {
+  width: 40px;
+  height: 40px;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-copy {
+  padding: 0 10px;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-copy strong {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-state,
+.persistent-music-player.is-collapsed .persistent-player-meta,
+.persistent-music-player.is-collapsed .persistent-player-progress,
+.persistent-music-player.is-collapsed .persistent-player-volume,
+.persistent-music-player.is-collapsed .persistent-player-status,
+.persistent-music-player.is-collapsed [data-persistent-prev],
+.persistent-music-player.is-collapsed [data-persistent-next],
+.persistent-music-player.is-collapsed .persistent-player-close {
+  display: none;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-controls {
+  gap: 0;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-controls button {
+  width: 30px;
+  height: 30px;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-actions {
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 noscript {
@@ -335,26 +426,34 @@ noscript {
   .persistent-music-player {
     right: 8px;
     bottom: 8px;
-    grid-template-columns: 38px minmax(0, 1fr) auto;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
     width: calc(100vw - 16px);
-    min-height: 68px;
-    padding: 8px 36px 8px 8px;
+    min-height: 88px;
+    padding: 10px 66px 10px 8px;
     border-radius: 15px;
   }
 
   .persistent-player-cover {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     font-size: 13px;
   }
 
   .persistent-player-copy {
-    padding-left: 9px;
-    padding-right: 7px;
+    padding-left: 10px;
+    padding-right: 8px;
   }
 
   .persistent-player-copy strong {
-    font-size: 12px;
+    font-size: 13px;
+  }
+
+  .persistent-player-artist {
+    font-size: 8px;
+  }
+
+  .persistent-player-album {
+    font-size: 7px;
   }
 
   .persistent-player-controls {
@@ -362,22 +461,31 @@ noscript {
   }
 
   .persistent-player-controls button {
-    width: 25px;
-    height: 25px;
+    width: 27px;
+    height: 27px;
     font-size: 14px;
   }
 
   .persistent-player-progress {
-    padding-left: 9px;
+    grid-template-columns: 28px minmax(72px, 1fr) 28px;
+    padding-left: 10px;
     gap: 5px;
   }
 
-  .persistent-player-volume {
+  .persistent-player-volume,
+  .persistent-player-status {
     display: none;
   }
 
-  .persistent-player-status {
-    display: none;
+  .persistent-music-player.is-collapsed {
+    width: min(300px, calc(100vw - 16px));
+    min-height: 56px;
+    padding: 7px 38px 7px 7px;
+  }
+
+  .persistent-music-player.is-collapsed .persistent-player-cover {
+    width: 38px;
+    height: 38px;
   }
 }
 

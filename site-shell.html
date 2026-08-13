@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/site-shell.css?v=20260813-cover-2">
+  <link rel="stylesheet" href="/css/site-shell.css?v=20260813-layout-1">
 </head>
 <body class="site-shell-page">
   <div class="site-shell-loading" data-shell-loading aria-hidden="true">
@@ -29,9 +29,12 @@
     <div class="persistent-player-cover" data-persistent-cover aria-hidden="true">77</div>
 
     <div class="persistent-player-copy">
-      <span data-persistent-state>NOW PLAYING</span>
+      <span class="persistent-player-state" data-persistent-state>NOW PLAYING</span>
       <strong data-persistent-title>尚未选择歌曲</strong>
-      <small><span data-persistent-artist>7719 Music</span><span data-persistent-album></span></small>
+      <div class="persistent-player-meta">
+        <span class="persistent-player-artist" data-persistent-artist>7719 Music</span>
+        <span class="persistent-player-album" data-persistent-album></span>
+      </div>
     </div>
 
     <div class="persistent-player-controls">
@@ -51,11 +54,15 @@
       <input data-persistent-volume type="range" min="0" max="1" value="0.8" step="0.05" aria-label="音量">
     </label>
 
-    <button class="persistent-player-close" type="button" data-persistent-close aria-label="停止并关闭播放器">×</button>
+    <div class="persistent-player-actions">
+      <button class="persistent-player-collapse" type="button" data-persistent-collapse aria-label="收起播放器" aria-expanded="true">⌄</button>
+      <button class="persistent-player-close" type="button" data-persistent-close aria-label="停止并关闭播放器">×</button>
+    </div>
+
     <p class="persistent-player-status" data-persistent-status aria-live="polite"></p>
   </aside>
 
   <noscript>本站的连续播放与页面导航需要启用 JavaScript。</noscript>
-  <script src="/js/site-shell.js?v=20260813-cover-2"></script>
+  <script src="/js/site-shell.js?v=20260813-layout-1"></script>
 </body>
 </html>
