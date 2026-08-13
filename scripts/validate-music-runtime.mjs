@@ -36,13 +36,16 @@ assert(catalogRuntime.includes('playerRoot.dataset.defaultCover'), 'Catalog adap
 assert(playerRuntime.includes('row?.dataset.coverSrc'), 'MusicPlayer must consume coverSrc from the track row.');
 assert(!playerRuntime.includes("querySelectorAll('.album-card[data-album-name]')"), 'MusicPlayer must not scan album-card DOM for covers.');
 assert(playerCss.includes('img[data-player-cover-art]'), 'Player cover art styles must live in music-player.css.');
+
 assert(frameBridge.includes('coverSrc: row.dataset.coverSrc'), 'Site frame bridge must forward track coverSrc to the persistent player.');
 assert(shellRuntime.includes("coverSrc: cover?.href || ''"), 'Persistent player track model must retain coverSrc.');
 assert(shellRuntime.includes('renderCover(track)'), 'Persistent player metadata must render cover artwork.');
 assert(shellRuntime.includes("ui.cover.classList.add('has-cover-art')"), 'Persistent player must expose its cover-art state to CSS.');
+assert(shellRuntime.includes("const STATE_KEY = '7719:persistent-player:v2'"), 'Persistent player state schema must be v2 after adding coverSrc.');
+assert(shellRuntime.includes('updateMetadata(current);'), 'Persistent player must refresh metadata when selecting the already-loaded track.');
 assert(shellCss.includes('.persistent-player-cover.has-cover-art > img'), 'Persistent player cover image styles must live in site-shell.css.');
-assert(shellPage.includes('/js/site-shell.js?v=20260813-cover-1'), 'Persistent shell JS cache version was not bumped.');
-assert(shellPage.includes('/css/site-shell.css?v=20260813-cover-1'), 'Persistent shell CSS cache version was not bumped.');
+assert(shellPage.includes('/js/site-shell.js?v=20260813-cover-2'), 'Persistent shell JS cache version was not bumped for state v2.');
+assert(shellPage.includes('/css/site-shell.css?v=20260813-cover-2'), 'Persistent shell CSS cache version was not bumped for state v2.');
 
 const [artistPage, albumPage] = await Promise.all([
   read('music/artists/tan-yonglin/index.html'),

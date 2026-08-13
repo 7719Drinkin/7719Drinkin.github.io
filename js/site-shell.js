@@ -1,6 +1,6 @@
 (() => {
   const FRAME_PARAM = '__site_frame';
-  const STATE_KEY = '7719:persistent-player:v1';
+  const STATE_KEY = '7719:persistent-player:v2';
   const THREE_D_PATH = /^\/(?:preview\/)?solar-universe(?:\/|$)/;
   const frame = document.querySelector('[data-shell-frame]');
   const loading = document.querySelector('[data-shell-loading]');
@@ -252,6 +252,7 @@
 
     const current = activeTrack();
     if (audio.dataset.source === current.src) {
+      updateMetadata(current);
       if (audio.paused) playCurrent();
       else audio.pause();
       return;
