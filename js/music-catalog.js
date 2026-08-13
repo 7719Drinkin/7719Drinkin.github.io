@@ -1,7 +1,7 @@
 (() => {
   const CONFIG_URL = '/data/music/catalog.json';
   const CATALOG_STYLE_URL = '/css/music-catalog.css?v=20260806-2';
-  const PLAYER_SCRIPT_URL = '/js/music-player.js?v=20260806-compact-2';
+  const PLAYER_SCRIPT_URL = '/js/music-player.js?v=20260813-cover-state-1';
   const DEFAULT_WORKER_REVALIDATE_MS = 6 * 60 * 60 * 1000;
   const DEFAULT_WORKER_TIMEOUT_MS = 3500;
 

@@ -135,6 +135,7 @@
       this.title = root.querySelector('[data-player-title]');
       this.artist = root.querySelector('[data-player-artist]');
       this.album = root.querySelector('[data-player-album]');
+      this.cover = root.querySelector('.site-player-cover');
       this.toggle = root.querySelector('[data-player-toggle]');
       this.previous = root.querySelector('[data-player-prev]');
       this.next = root.querySelector('[data-player-next]');
@@ -148,10 +149,13 @@
       this.activeIndex = -1;
       this.seeking = false;
       this.activationTimer = null;
+      this.albumCovers = [];
+      this.fallbackCover = '';
 
       installPlayerStateStyles();
       this.prepareIcons();
       this.bind();
+      this.collectCoverSources();
       this.initializeIdleDock();
       this.audio.volume = Number(this.volume.value);
 
@@ -171,6 +175,7 @@
       this.status.textContent = '';
       this.setCollapsed(true);
       this.setControlsEnabled(false);
+      this.syncCover();
 
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -213,6 +218,72 @@
       const minutes = Math.floor(seconds / 60);
       const remainder = Math.floor(seconds % 60).toString().padStart(2, '0');
       return `${minutes}:${remainder}`;
+    }
+
+    normalizeCoverName(value) {
+      return String(value || '')
+        .normalize('NFKC')
+        .toLocaleLowerCase('zh-CN')
+        .replace(/[\s\p{P}\p{S}_]+/gu, '');
+    }
+
+    imageSource(image) {
+      return image?.getAttribute('src') || image?.currentSrc || image?.src || '';
+    }
+
+    collectCoverSources() {
+      const detailCover = document.querySelector('img.album-detail-cover');
+      const artistCover = document.querySelector('img.artist-hero-image');
+      this.fallbackCover = this.imageSource(detailCover) || this.imageSource(artistCover) || this.fallbackCover;
+
+      this.albumCovers = [...document.querySelectorAll('.album-card[data-album-name]')]
+        .map((card) => ({
+          name: card.dataset.albumName || '',
+          src: this.imageSource(card.querySelector('img'))
+        }))
+        .filter((entry) => entry.name && entry.src);
+
+      if (detailCover && document.body.dataset.albumName) {
+        this.albumCovers.push({
+          name: document.body.dataset.albumName,
+          src: this.imageSource(detailCover)
+        });
+      }
+    }
+
+    coverForAlbum(albumName) {
+      const target = this.normalizeCoverName(albumName);
+      if (!target) return this.fallbackCover;
+
+      const exact = this.albumCovers.find((entry) => this.normalizeCoverName(entry.name) === target);
+      if (exact) return exact.src;
+
+      const partial = this.albumCovers.find((entry) => {
+        const candidate = this.normalizeCoverName(entry.name);
+        return candidate.length >= 3 && (candidate.includes(target) || target.includes(candidate));
+      });
+      return partial?.src || this.fallbackCover;
+    }
+
+    syncCover(row = null) {
+      if (!this.cover) return;
+
+      const source = this.coverForAlbum(row?.dataset.songAlbum || document.body.dataset.albumName || '');
+      if (!source) return;
+
+      let image = this.cover.querySelector('img[data-player-cover-art]');
+      if (!image) {
+        this.cover.textContent = '';
+        image = document.createElement('img');
+        image.dataset.playerCoverArt = '';
+        image.alt = '';
+        image.decoding = 'async';
+        image.draggable = false;
+        this.cover.append(image);
+      }
+
+      if (image.getAttribute('src') !== source) image.src = source;
+      this.cover.classList.add('has-cover-art');
     }
 
     prepareIcons() {
@@ -304,6 +375,7 @@
       this.artist.textContent = row.dataset.songArtist || '7719 Music';
       this.album.textContent = row.dataset.songAlbum ? ` · ${row.dataset.songAlbum}` : '';
       this.status.textContent = '正在读取音频…';
+      this.syncCover(row);
 
       if (this.audio.dataset.source !== source) {
         this.audio.dataset.source = source;
@@ -320,6 +392,15 @@
       this.rows.forEach((item, itemIndex) => {
         item.classList.toggle('is-active', itemIndex === this.activeIndex);
       });
+
+      window.dispatchEvent(new CustomEvent('music:player-track-change', {
+        detail: {
+          title: row.dataset.songTitle || '',
+          artist: row.dataset.songArtist || '',
+          album: row.dataset.songAlbum || '',
+          source
+        }
+      }));
 
       if (!autoplay) return;
 
