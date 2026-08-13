@@ -1,6 +1,7 @@
 (() => {
   const FRAME_PARAM = '__site_frame';
   const STATE_KEY = '7719:persistent-player:v2';
+  const VIEW_KEY = '7719:persistent-player-view:v1';
   const THREE_D_PATH = /^\/(?:preview\/)?solar-universe(?:\/|$)/;
   const frame = document.querySelector('[data-shell-frame]');
   const loading = document.querySelector('[data-shell-loading]');
@@ -22,6 +23,7 @@
     duration: playerRoot.querySelector('[data-persistent-duration]'),
     seek: playerRoot.querySelector('[data-persistent-seek]'),
     volume: playerRoot.querySelector('[data-persistent-volume]'),
+    collapse: playerRoot.querySelector('[data-persistent-collapse]'),
     close: playerRoot.querySelector('[data-persistent-close]'),
     status: playerRoot.querySelector('[data-persistent-status]')
   };
@@ -109,6 +111,33 @@
 
   const activeTrack = () => state.queue[state.index] || state.track;
 
+  const setCollapsed = (collapsed, { persist = true } = {}) => {
+    playerRoot.classList.toggle('is-collapsed', collapsed);
+
+    if (ui.collapse) {
+      ui.collapse.setAttribute('aria-expanded', String(!collapsed));
+      ui.collapse.setAttribute('aria-label', collapsed ? '展开播放器' : '收起播放器');
+      ui.collapse.textContent = collapsed ? '⌃' : '⌄';
+    }
+
+    if (!persist) return;
+    try {
+      sessionStorage.setItem(VIEW_KEY, collapsed ? 'collapsed' : 'expanded');
+    } catch {
+      // View state is optional; playback state remains independent.
+    }
+  };
+
+  const restoreViewState = () => {
+    let collapsed = false;
+    try {
+      collapsed = sessionStorage.getItem(VIEW_KEY) === 'collapsed';
+    } catch {
+      collapsed = false;
+    }
+    setCollapsed(collapsed, { persist: false });
+  };
+
   const renderCover = (track) => {
     if (!ui.cover) return;
 
@@ -138,7 +167,7 @@
     if (!track) return;
     ui.title.textContent = track.title;
     ui.artist.textContent = track.artist;
-    ui.album.textContent = track.album ? ` · ${track.album}` : '';
+    ui.album.textContent = track.album || '';
     renderCover(track);
     ui.state.textContent = audio.paused ? 'PAUSED' : 'NOW PLAYING';
     document.title = document.title || '7719 Universe';
@@ -358,6 +387,9 @@
     if (audio.paused) playCurrent();
     else audio.pause();
   });
+  ui.collapse?.addEventListener('click', () => {
+    setCollapsed(!playerRoot.classList.contains('is-collapsed'));
+  });
   ui.close.addEventListener('click', () => stopPlayback({ clear: true }));
 
   ui.volume.addEventListener('input', () => {
@@ -452,6 +484,7 @@
     })
   });
 
+  restoreViewState();
   restorePlayerState();
   const initialRoute = routeFromShellQuery();
   navigate(initialRoute, { push: false });
