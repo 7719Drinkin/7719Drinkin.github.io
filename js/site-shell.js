@@ -90,13 +90,16 @@
     })();
     if (!source) return null;
 
+    const cover = track.coverSrc ? sameOriginUrl(track.coverSrc) : null;
+
     return {
       id: String(track.id || source.href),
       src: source.href,
       type: String(track.type || 'audio/mpeg'),
       title: String(track.title || 'Untitled'),
       artist: String(track.artist || '7719 Music'),
-      album: String(track.album || '')
+      album: String(track.album || ''),
+      coverSrc: cover?.href || ''
     };
   };
 
@@ -106,12 +109,37 @@
 
   const activeTrack = () => state.queue[state.index] || state.track;
 
+  const renderCover = (track) => {
+    if (!ui.cover) return;
+
+    const fallback = () => {
+      ui.cover.replaceChildren();
+      ui.cover.classList.remove('has-cover-art');
+      ui.cover.textContent = initials(track?.artist);
+    };
+
+    if (!track?.coverSrc) {
+      fallback();
+      return;
+    }
+
+    const image = document.createElement('img');
+    image.src = track.coverSrc;
+    image.alt = '';
+    image.decoding = 'async';
+    image.draggable = false;
+    image.addEventListener('error', fallback, { once: true });
+
+    ui.cover.replaceChildren(image);
+    ui.cover.classList.add('has-cover-art');
+  };
+
   const updateMetadata = (track) => {
     if (!track) return;
     ui.title.textContent = track.title;
     ui.artist.textContent = track.artist;
     ui.album.textContent = track.album ? ` · ${track.album}` : '';
-    ui.cover.textContent = initials(track.artist);
+    renderCover(track);
     ui.state.textContent = audio.paused ? 'PAUSED' : 'NOW PLAYING';
     document.title = document.title || '7719 Universe';
   };
