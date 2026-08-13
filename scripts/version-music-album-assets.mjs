@@ -5,7 +5,6 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MUSIC_ARTISTS_ROOT = join(ROOT, 'music', 'artists');
 const MUSIC_ALBUM_CSS_VERSION = '20260806-2';
-const MUSIC_RUNTIME_VERSION = '20260806-albums-2';
 
 async function htmlFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -27,10 +26,6 @@ async function main() {
       .replace(
         /\/css\/music-album\.css\?v=[^"]+/g,
         `/css/music-album.css?v=${MUSIC_ALBUM_CSS_VERSION}`
-      )
-      .replace(
-        /\/js\/music\.js\?v=[^"]+/g,
-        `/js/music.js?v=${MUSIC_RUNTIME_VERSION}`
       );
 
     if (output === source) continue;
