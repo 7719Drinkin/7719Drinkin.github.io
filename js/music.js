@@ -154,6 +154,13 @@ if (catalogPage && !document.querySelector('script[data-music-catalog-loader]'))
   document.body.append(script);
 }
 
+if (catalogPage && !document.querySelector('script[data-music-cover-art]')) {
+  const script = document.createElement('script');
+  script.src = '/js/music-cover-art.js?v=20260813-1';
+  script.dataset.musicCoverArt = '';
+  document.body.append(script);
+}
+
 const revealItems = [...document.querySelectorAll('.reveal')];
 
 if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
