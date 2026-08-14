@@ -1,118 +1,163 @@
 /*
- * Collapsed vinyl interaction refinement.
- * The minimized dock keeps only the large expand control and the record itself.
- * The existing semantic play/pause button becomes an invisible hit surface over the vinyl,
- * so there is no extra visible playback button in collapsed mode.
+ * Persistent-player chassis refinement.
+ * The record anchor is a sibling of the animated chassis, so collapsing the body never
+ * resizes, filters, reparents or morphs the vinyl subtree. This avoids the record flash
+ * seen when the transport button was previously stretched over the record during collapse.
  */
 
+/* Stable outer stage: it never changes width while the player is visible. */
+.persistent-music-player,
+.persistent-music-player.is-collapsed {
+  width: min(660px, calc(100vw - 52px));
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  pointer-events: none;
+  transition: opacity .28s ease;
+}
+
+.persistent-music-player.is-playing {
+  border-color: transparent;
+  box-shadow: none;
+}
+
 /*
- * Keep the global shell frame neutral so it remains compatible with Music, Basketball,
- * Games and Universe page palettes. Gold stays inside the transport controls instead of
- * outlining the whole persistent player on every route.
+ * Only this chassis changes width. The turntable sits outside it, so the backdrop-filter
+ * compositing surface can resize without touching the rotating platter layer.
  */
-.persistent-music-player {
-  border-color: rgba(190, 200, 214, .16);
+.persistent-player-chassis {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  border: 1px solid rgba(190, 200, 214, .16);
+  border-radius: 18px;
   background:
     radial-gradient(circle at 92% 50%, rgba(255,255,255,.045), transparent 24%),
     linear-gradient(110deg, rgba(255,255,255,.018), transparent 42%),
     var(--shell-panel);
+  box-shadow: 0 22px 64px rgba(0, 0, 0, .42);
+  backdrop-filter: blur(22px) saturate(125%);
+  color: var(--shell-text);
+  pointer-events: auto;
+  transition:
+    width .52s var(--shell-ease),
+    border-color .24s ease,
+    box-shadow .24s ease;
 }
 
-.persistent-music-player.is-playing {
+.persistent-music-player.is-playing .persistent-player-chassis {
   border-color: rgba(214, 222, 232, .22);
   box-shadow:
     0 22px 64px rgba(0, 0, 0, .42),
     0 0 0 1px rgba(255,255,255,.035);
 }
 
-/*
- * Keep stacking and overflow geometry identical before, during and after collapse.
- * The previous collapsed-only overflow/z-index switch forced the record subtree onto a
- * different paint layer at the beginning of the width transition, which could flash.
- */
 .persistent-player-main {
   z-index: 8;
-  overflow: visible;
+  overflow: hidden;
 }
 
+/* Keep the record on its own stable stage, outside the animated filtered chassis. */
 .persistent-player-turntable {
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  will-change: transform;
-  isolation: isolate;
+  z-index: 10;
+  pointer-events: none;
+  outline: none;
 }
 
-/* Keep the platter animation mounted at all times so pausing freezes the current angle. */
+/* Keep the platter animation mounted so pausing freezes the current rotation angle. */
 .persistent-player-platter {
   animation: persistent-platter-turn 12s linear infinite;
   animation-play-state: paused;
   transform-origin: 50% 50%;
-  backface-visibility: hidden;
-  will-change: transform;
 }
 
 .persistent-music-player.is-playing .persistent-player-platter {
   animation-play-state: running;
 }
 
-/* A tighter dock: expand control + record, with no leftover transport button block. */
-.persistent-music-player.is-collapsed {
+/* Minimized dock: the chassis retracts; the outer stage and record stay fixed. */
+.persistent-music-player.is-collapsed .persistent-player-chassis {
   width: 128px;
 }
 
-.persistent-music-player.is-collapsed .persistent-player-transport {
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.persistent-music-player.is-collapsed .persistent-player-transport-actions {
-  position: absolute;
-  z-index: 9;
-  top: calc((var(--persistent-player-height) - var(--persistent-record-size)) / 2);
-  right: calc(var(--persistent-record-overhang) * -1);
-  display: block;
-  width: var(--persistent-record-size);
-  height: var(--persistent-record-size);
+.persistent-music-player.is-collapsed .persistent-player-copy {
+  opacity: 0;
   pointer-events: none;
 }
 
 /*
- * The transport button remains in the DOM for keyboard/accessibility semantics,
- * but visually disappears and exactly follows the vinyl hit area.
- * Clicking anywhere on the record toggles play/pause without moving or restyling the record.
+ * Do not morph the visible transport toggle into a vinyl-sized button. The whole transport
+ * simply becomes non-interactive while the static turntable itself receives the click.
  */
-.persistent-music-player.is-collapsed .persistent-player-toggle,
-.persistent-music-player.is-collapsed .persistent-player-toggle:hover,
-.persistent-music-player.is-collapsed .persistent-player-toggle:focus-visible,
-.persistent-music-player.is-collapsed .persistent-player-toggle:active {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: transparent;
-  box-shadow: none;
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
-  cursor: pointer;
-  outline: none;
+.persistent-music-player.is-collapsed .persistent-player-transport {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: none;
 }
 
-.persistent-music-player.is-collapsed .persistent-player-toggle .persistent-ui-icon {
-  width: 0;
-  height: 0;
-  opacity: 0;
+.persistent-music-player.is-collapsed .persistent-player-turntable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-turntable:focus-visible {
+  outline: 2px solid rgba(214, 222, 232, .44);
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+
+/* Neutral expand/collapse control: no route-independent gold frame. */
+.persistent-player-collapse {
+  border-color: rgba(190, 200, 214, .22);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.035), transparent 44%),
+    rgba(8,13,22,.96);
+  color: rgba(220, 228, 238, .78);
+  box-shadow: 0 8px 22px rgba(0,0,0,.32);
+}
+
+.persistent-player-collapse:hover,
+.persistent-player-collapse:focus-visible {
+  border-color: rgba(220, 228, 238, .46);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.055), transparent 44%),
+    rgba(12,17,27,.98);
+  color: rgba(239, 243, 248, .96);
+  box-shadow:
+    0 9px 24px rgba(0,0,0,.36),
+    0 0 0 4px rgba(210, 220, 232, .07);
+}
+
+.persistent-music-player.is-collapsed .persistent-player-collapse {
+  opacity: 1;
+  transform: translateX(0);
+  border-color: rgba(205, 214, 226, .28);
+  color: rgba(226, 233, 241, .86);
+}
+
+.persistent-music-player.is-collapsed .persistent-player-collapse:hover,
+.persistent-music-player.is-collapsed .persistent-player-collapse:focus-visible {
+  transform: translateX(-3px);
+  border-color: rgba(228, 234, 242, .5);
 }
 
 @media (max-width: 680px) {
+  .persistent-music-player,
   .persistent-music-player.is-collapsed {
+    width: calc(100vw - 36px);
+  }
+
+  .persistent-player-chassis {
+    border-radius: 16px;
+  }
+
+  .persistent-music-player.is-collapsed .persistent-player-chassis {
     width: 116px;
   }
 }
@@ -120,5 +165,9 @@
 @media (prefers-reduced-motion: reduce) {
   .persistent-player-platter {
     animation: none;
+  }
+
+  .persistent-player-chassis {
+    transition: none;
   }
 }
