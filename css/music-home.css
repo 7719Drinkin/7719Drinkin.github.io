@@ -1,0 +1,206 @@
+body.music-collection-page .collection-hero-impression {
+  position: relative;
+  display: block;
+  max-width: 31em;
+  min-height: 3.5em;
+  margin: 24px 0 0;
+  padding-left: 18px;
+  border-left: 1px solid color-mix(in srgb, var(--music-gold) 72%, transparent);
+  color: color-mix(in srgb, var(--music-text) 86%, var(--music-muted));
+  font-family: "Noto Serif SC", "Playfair Display", serif;
+  font-size: clamp(17px, 1.45vw, 23px);
+  font-weight: 500;
+  line-height: 1.75;
+  letter-spacing: .015em;
+}
+
+.collection-hero-quote-line {
+  display: inline;
+}
+
+.collection-hero-quote-bracket {
+  color: color-mix(in srgb, var(--music-gold-soft) 66%, var(--music-text));
+}
+
+.collection-hero-quote-text {
+  white-space: normal;
+}
+
+.collection-hero-quote-cursor {
+  display: inline-block;
+  width: 1px;
+  height: 1.08em;
+  margin: 0 .14em 0 .1em;
+  background: var(--music-gold);
+  box-shadow: 0 0 10px rgba(216, 168, 78, .35);
+  vertical-align: -.12em;
+  animation: music-home-cursor-blink .86s steps(1, end) infinite;
+}
+
+@keyframes music-home-cursor-blink {
+  0%, 46% { opacity: 1; }
+  47%, 100% { opacity: 0; }
+}
+
+.collection-gramophone-stage {
+  position: relative;
+  z-index: 2;
+  min-height: min(66vw, 720px);
+  isolation: isolate;
+  overflow: visible;
+}
+
+.collection-gramophone-stage::before {
+  inset: 4% -11% -2% -8%;
+  border: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 52% 46%, rgba(216, 168, 78, .09), transparent 32%),
+    radial-gradient(circle at 62% 54%, rgba(95, 118, 157, .12), transparent 52%);
+  box-shadow: none;
+  transform: none;
+}
+
+.collection-gramophone-stage::after {
+  position: absolute;
+  inset: 8% -7% 0 2%;
+  z-index: -1;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 46% 54% 50% 48%;
+  content: "";
+  opacity: .8;
+  transform: rotate(-4deg);
+}
+
+.collection-gramophone-canvas {
+  position: absolute;
+  top: -8%;
+  right: -20%;
+  bottom: -9%;
+  left: -11%;
+  z-index: 3;
+  display: block;
+  width: 131%;
+  height: 117%;
+  opacity: 0;
+  pointer-events: none;
+  filter: saturate(.9) contrast(1.035);
+  transition: opacity .72s cubic-bezier(.2,.7,.2,1);
+}
+
+.collection-gramophone-stage.is-ready .collection-gramophone-canvas {
+  opacity: 1;
+}
+
+.collection-gramophone-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity .42s ease;
+}
+
+.collection-gramophone-stage.is-ready .collection-gramophone-fallback {
+  opacity: 0;
+}
+
+.collection-gramophone-stage.is-loading .collection-gramophone-fallback {
+  opacity: .56;
+}
+
+.collection-gramophone-stage > p {
+  z-index: 5;
+  right: 3%;
+  bottom: 2%;
+}
+
+.collection-gramophone-credit {
+  position: absolute;
+  bottom: 2%;
+  left: 4%;
+  z-index: 6;
+  color: rgba(240,216,157,.42);
+  font: 7px/1.4 var(--music-mono);
+  letter-spacing: .11em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color .2s ease;
+}
+
+.collection-gramophone-credit:hover,
+.collection-gramophone-credit:focus-visible {
+  color: var(--music-gold-soft);
+}
+
+.collection-gramophone-stage.is-error .collection-gramophone-credit::after {
+  content: " · FALLBACK";
+}
+
+@media (max-width: 1080px) {
+  .collection-gramophone-stage {
+    min-height: 640px;
+  }
+
+  .collection-gramophone-canvas {
+    top: -9%;
+    right: -10%;
+    bottom: -8%;
+    left: -7%;
+    width: 117%;
+    height: 117%;
+  }
+}
+
+@media (max-width: 760px) {
+  body.music-collection-page .collection-hero-impression {
+    max-width: 24em;
+    min-height: 5.25em;
+    margin-top: 20px;
+    padding-left: 14px;
+    font-size: 16px;
+  }
+
+  .collection-gramophone-stage {
+    min-height: 480px;
+    margin-top: 12px;
+  }
+
+  .collection-gramophone-stage::after {
+    inset: 12% -22% 3% 0;
+  }
+
+  .collection-gramophone-canvas {
+    top: -5%;
+    right: -31%;
+    bottom: -5%;
+    left: -13%;
+    width: 144%;
+    height: 110%;
+  }
+
+  .collection-gramophone-stage > p {
+    right: 1%;
+    bottom: 1%;
+    font-size: 7px;
+  }
+
+  .collection-gramophone-credit {
+    bottom: 1%;
+    left: 1%;
+    max-width: 54%;
+    font-size: 6px;
+    line-height: 1.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collection-hero-quote-cursor {
+    animation: none;
+    opacity: .72;
+  }
+
+  .collection-gramophone-canvas,
+  .collection-gramophone-fallback {
+    transition: none;
+  }
+}
