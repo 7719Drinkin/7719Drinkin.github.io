@@ -9,7 +9,7 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-const [home, interestsRaw, universeRuntime, musicRuntime, catalogRuntime, playerRuntime, playerCss, frameBridge, shellRuntime, shellCss, vinylToggleCss, shellPage] = await Promise.all([
+const [home, interestsRaw, universeRuntime, musicRuntime, catalogRuntime, playerRuntime, playerCss, frameBridge, shellRuntime, shellCss, vinylToggleCss, vinylHitRuntime, shellPage] = await Promise.all([
   read('index.html'),
   read('data/interests.json'),
   read('js/universe-refined.js'),
@@ -21,6 +21,7 @@ const [home, interestsRaw, universeRuntime, musicRuntime, catalogRuntime, player
   read('js/site-shell.js'),
   read('css/site-shell.css'),
   read('css/site-shell-vinyl-toggle.css'),
+  read('js/site-shell-vinyl-hit.js'),
   read('site-shell.html')
 ]);
 
@@ -49,7 +50,7 @@ assert(shellRuntime.includes('restoreViewState();'), 'Persistent player must res
 assert(shellRuntime.includes("ui.album.textContent = track.album || ''"), 'Persistent player must retain album metadata independently.');
 assert(shellRuntime.includes('updateMetadata(current);'), 'Persistent player must refresh metadata when selecting the already-loaded track.');
 assert(shellRuntime.includes('const ICONS = Object.freeze'), 'Persistent player controls must use the shared inline SVG icon set.');
-assert(shellRuntime.includes('ui.toggle.innerHTML = playing ? ICONS.pause : ICONS.play'), 'Persistent player must keep play/pause semantics while the collapsed hit surface becomes invisible.');
+assert(shellRuntime.includes('ui.toggle.innerHTML = playing ? ICONS.pause : ICONS.play'), 'Persistent player must keep play/pause semantics in the expanded transport deck.');
 assert(shellRuntime.includes('ICONS.collapseRight'), 'Expanded player collapse affordance must indicate motion toward the right-side record anchor.');
 assert(shellRuntime.includes('ICONS.expandLeft'), 'Collapsed player affordance must indicate expansion toward the left.');
 assert(shellRuntime.includes('const setRangeFill ='), 'Persistent player ranges must expose visual progress without external UI libraries.');
@@ -63,7 +64,6 @@ assert(!shellRuntime.includes("'PAUSED'"), 'Persistent player must not render te
 assert(shellCss.includes('--persistent-player-height: 84px;'), 'Persistent player must define one fixed desktop height.');
 assert(shellCss.includes('--persistent-record-size: 108px;'), 'Persistent record must remain larger than the player body height.');
 assert(shellCss.includes('height: var(--persistent-player-height);'), 'Persistent player body must use the fixed horizontal-rail height.');
-assert(shellCss.includes('width .52s var(--shell-ease)'), 'Persistent player collapse must animate its horizontal width.');
 assert(!shellCss.includes('translateY'), 'Persistent player stylesheet must not use vertical translation for player interaction.');
 assert(!shellCss.includes('min-height:'), 'Persistent player must not change vertical size between view states.');
 assert(shellCss.includes('.persistent-player-copy {'), 'Persistent player must define a dedicated song-content rail.');
@@ -77,31 +77,36 @@ assert(!shellCss.includes('.persistent-player-spindle'), 'Record center must not
 assert(shellCss.includes('.persistent-player-volume-inline'), 'Expanded player must expose an always-visible inline volume control.');
 assert(shellCss.includes('width: 44px;\n  height: 44px;'), 'Desktop collapse control must expose a large square hit target.');
 assert(shellCss.includes('border-radius: 12px;'), 'Desktop collapse control must use a rounded-square shape.');
-assert(shellCss.includes('.persistent-music-player.is-collapsed .persistent-player-copy {\n  opacity: 0;'), 'Minimized dock must fully hide song metadata instead of leaving an empty title rail.');
 assert(shellCss.includes('@keyframes persistent-collapse-hint-right'), 'Expanded collapse affordance must animate toward the collapse direction.');
 assert(shellCss.includes('@keyframes persistent-collapse-hint-left'), 'Collapsed expand affordance must animate toward the expansion direction.');
 assert(!shellCss.includes('.persistent-player-center-toggle'), 'Play/pause must not overlay the record artwork in expanded mode.');
 
-assert(vinylToggleCss.includes('.persistent-music-player.is-collapsed {\n  width: 128px;'), 'Desktop minimized dock must collapse to the record-and-expand-control footprint.');
-assert(vinylToggleCss.includes('width: 116px;'), 'Mobile minimized dock must collapse to the compact record footprint.');
+assert(vinylToggleCss.includes('.persistent-player-chassis {'), 'Persistent player must isolate the animated body inside a dedicated chassis.');
+assert(vinylToggleCss.includes('.persistent-music-player,\n.persistent-music-player.is-collapsed {\n  width: min(660px'), 'Outer player stage must keep one stable desktop width through collapse.');
+assert(vinylToggleCss.includes('.persistent-music-player.is-collapsed .persistent-player-chassis {\n  width: 128px;'), 'Desktop minimized dock must retract only the chassis to 128px.');
+assert(vinylToggleCss.includes('width: 116px;'), 'Mobile minimized chassis must collapse to 116px.');
+assert(vinylToggleCss.includes('backdrop-filter: blur(22px) saturate(125%);'), 'Backdrop filtering must stay on the chassis instead of the vinyl-containing outer stage.');
+assert(vinylToggleCss.includes('.persistent-music-player.is-collapsed .persistent-player-transport {\n  opacity: 0;\n  visibility: hidden;'), 'Collapsed transport must disappear instead of morphing into a vinyl-sized click layer.');
+assert(!vinylToggleCss.includes('.persistent-music-player.is-collapsed .persistent-player-toggle,'), 'Collapsed mode must not stretch the transport play button over the record.');
+assert(vinylToggleCss.includes('.persistent-music-player.is-collapsed .persistent-player-turntable {\n  pointer-events: auto;\n  cursor: pointer;'), 'Collapsed turntable must directly own the pointer interaction.');
 assert(vinylToggleCss.includes('animation-play-state: paused;'), 'Paused vinyl must freeze at its current rotation angle instead of snapping upright.');
 assert(vinylToggleCss.includes('.persistent-music-player.is-playing .persistent-player-platter {\n  animation-play-state: running;'), 'Playing vinyl must resume the same platter animation from the paused angle.');
-assert(vinylToggleCss.includes('.persistent-music-player.is-collapsed .persistent-player-toggle,'), 'Collapsed vinyl must reuse the existing play/pause control as its click surface.');
-assert(vinylToggleCss.includes('color: transparent;'), 'Collapsed vinyl click surface must not render a play/pause icon.');
-assert(vinylToggleCss.includes('border-radius: 50%;'), 'Collapsed click target must follow the round vinyl footprint.');
-assert(vinylToggleCss.includes('pointer-events: auto;\n  cursor: pointer;'), 'Collapsed vinyl must be directly clickable without moving the record.');
 assert(!vinylToggleCss.includes('scale('), 'Collapsed vinyl interaction must not scale or move the record on click.');
-assert(vinylToggleCss.includes('.persistent-player-main {\n  z-index: 8;\n  overflow: visible;'), 'Player main stacking and overflow must remain stable across collapse transitions to prevent vinyl flashing.');
-assert(!vinylToggleCss.includes('.persistent-music-player.is-collapsed .persistent-player-main'), 'Collapsed mode must not switch the player main to a different paint-layer geometry.');
-assert(vinylToggleCss.includes('transform: translate3d(0, 0, 0);'), 'Turntable must keep a stable compositor layer during horizontal collapse.');
-assert(vinylToggleCss.includes('backface-visibility: hidden;'), 'Turntable/platter must suppress transient compositor backface flashes.');
-assert(vinylToggleCss.includes('border-color: rgba(190, 200, 214, .16);'), 'Persistent player frame must use a neutral border that works across page palettes.');
-assert(vinylToggleCss.includes('border-color: rgba(214, 222, 232, .22);'), 'Playing frame must brighten neutrally instead of switching to a route-specific gold outline.');
+assert(vinylToggleCss.includes('border-color: rgba(190, 200, 214, .22);'), 'Collapse control must use a neutral border instead of route-independent gold.');
+assert(vinylToggleCss.includes('color: rgba(220, 228, 238, .78);'), 'Collapse icon must use a neutral foreground color across page palettes.');
+assert(vinylToggleCss.includes('border-color: rgba(205, 214, 226, .28);'), 'Collapsed expand control must keep the same neutral palette.');
 
+assert(vinylHitRuntime.includes("turntable.setAttribute('role', 'button')"), 'Collapsed turntable must expose keyboard button semantics without rendering a visible button.');
+assert(vinylHitRuntime.includes("turntable.setAttribute('aria-label', audio.paused ? '播放' : '暂停')"), 'Collapsed turntable accessibility label must track playback state.');
+assert(vinylHitRuntime.includes('transportToggle.click();'), 'Collapsed turntable must reuse the existing playback action instead of duplicating player state logic.');
+assert(vinylHitRuntime.includes("event.key !== 'Enter' && event.key !== ' '"), 'Collapsed vinyl must support keyboard activation.');
+assert(vinylHitRuntime.includes('new MutationObserver(syncTurntableSemantics)'), 'Turntable semantics must follow collapse/expand state changes.');
+
+assert(shellPage.includes('class="persistent-player-chassis"'), 'Persistent shell must render the animated chassis separately from the record anchor.');
 assert(shellPage.includes('class="persistent-player-copy"'), 'Persistent shell must render song metadata as one horizontal content line.');
 assert(shellPage.includes('class="persistent-player-transport"'), 'Persistent shell must render a separate transport deck.');
-assert(shellPage.includes('data-persistent-turntable'), 'Persistent shell must render a dedicated right-side record anchor.');
-assert(shellPage.includes('class="persistent-player-toggle"'), 'Persistent shell must retain semantic play/pause control outside the vinyl artwork markup.');
+assert(shellPage.includes('data-persistent-turntable tabindex="-1"'), 'Persistent shell must keep the turntable statically mounted for collapsed playback interaction.');
+assert(shellPage.includes('class="persistent-player-toggle"'), 'Persistent shell must retain the visible expanded transport play/pause control.');
 assert(!shellPage.includes('persistent-player-center-toggle'), 'Persistent shell must not place a visible play/pause button over the record.');
 assert(!shellPage.includes('persistent-player-spindle'), 'Persistent shell must not render an unnecessary center spindle.');
 assert(shellPage.includes('L62 36'), 'Tonearm geometry must land the cartridge on the outer groove area.');
@@ -112,9 +117,10 @@ assert(!shellPage.includes('persistent-player-collapse-rail'), 'Large square col
 assert(shellPage.includes('data-persistent-volume-control'), 'Persistent shell must render the inline volume control in expanded mode.');
 assert(shellPage.includes('data-persistent-volume-icon'), 'Persistent shell must render a visible volume icon.');
 assert(shellPage.includes('persistent-player-tonearm-cartridge'), 'Persistent shell must render the detailed decorative tonearm.');
-assert(shellPage.includes('/js/site-shell.js?v=20260814-minimized-dock-1'), 'Persistent shell JS cache version must remain pinned to the unchanged minimized-dock runtime.');
+assert(shellPage.includes('/js/site-shell.js?v=20260814-minimized-dock-1'), 'Persistent shell base player runtime version must remain pinned.');
+assert(shellPage.includes('/js/site-shell-vinyl-hit.js?v=20260814-vinyl-chassis-3'), 'Persistent shell must load the dedicated collapsed-vinyl interaction runtime.');
 assert(shellPage.includes('/css/site-shell.css?v=20260814-minimized-dock-1'), 'Persistent shell base CSS cache version must remain available.');
-assert(shellPage.includes('/css/site-shell-vinyl-toggle.css?v=20260814-vinyl-stable-2'), 'Persistent shell must load the stable collapsed-vinyl refinement stylesheet.');
+assert(shellPage.includes('/css/site-shell-vinyl-toggle.css?v=20260814-vinyl-chassis-3'), 'Persistent shell must load the isolated chassis refinement stylesheet.');
 
 const [artistPage, albumPage] = await Promise.all([
   read('music/artists/tan-yonglin/index.html'),
