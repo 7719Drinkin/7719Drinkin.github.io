@@ -73,9 +73,8 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
 @keyframes shell-spin { to { transform: rotate(1turn); } }
 
 /*
- * Persistent player geometry is intentionally horizontal-only:
- * the player keeps one fixed height and collapses by changing width on the X axis.
- * The record is an independent right-side anchor and is larger than the body height.
+ * The player is a fixed-height horizontal rail. View state changes only its width.
+ * The oversized record remains a right-side anchor and never participates in layout columns.
  */
 .persistent-music-player {
   position: fixed;
@@ -85,7 +84,7 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
   width: min(660px, calc(100vw - 52px));
   height: var(--persistent-player-height);
   overflow: visible;
-  border: 1px solid color-mix(in srgb, var(--shell-accent) 22%, var(--shell-line));
+  border: 1px solid color-mix(in srgb, var(--shell-accent) 24%, var(--shell-line));
   border-radius: 18px;
   background:
     radial-gradient(circle at 92% 50%, rgba(217, 174, 85, .1), transparent 24%),
@@ -105,7 +104,7 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
 .persistent-music-player:not([hidden]) { opacity: 1; }
 
 .persistent-music-player.is-playing {
-  border-color: color-mix(in srgb, var(--shell-accent) 44%, var(--shell-line));
+  border-color: color-mix(in srgb, var(--shell-accent) 46%, var(--shell-line));
   box-shadow:
     0 22px 64px rgba(0, 0, 0, .42),
     0 0 0 1px color-mix(in srgb, var(--shell-accent) 8%, transparent);
@@ -115,13 +114,13 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
   position: absolute;
   inset: 0;
   overflow: hidden;
-  padding: 0 118px 0 26px;
+  padding: 0 118px 0 30px;
 }
 
-/* Song content is one horizontal information stream, never a vertical stack. */
+/* Song metadata is always one horizontal content line. */
 .persistent-player-copy {
   position: absolute;
-  left: 26px;
+  left: 30px;
   right: 118px;
   top: 13px;
   display: flex;
@@ -130,6 +129,7 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
+  transition: opacity .18s ease;
 }
 
 .persistent-player-copy strong,
@@ -173,23 +173,16 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
   font-size: 9px;
 }
 
-.persistent-player-album:empty,
-.persistent-player-album:empty + * {
-  display: none;
-}
-
 .persistent-player-copy:has(.persistent-player-album:empty) .persistent-player-album-separator {
   display: none;
 }
 
-.persistent-player-detail {
-  transition: opacity .2s ease;
-}
+.persistent-player-detail { transition: opacity .18s ease; }
 
-/* Playback controls occupy their own horizontal deck below the single-line metadata. */
+/* Playback controls occupy a separate horizontal deck below song metadata. */
 .persistent-player-transport {
   position: absolute;
-  left: 26px;
+  left: 30px;
   right: 108px;
   bottom: 10px;
   display: flex;
@@ -223,7 +216,7 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
   flex: 0 0 auto;
   min-width: 0;
   color: var(--shell-muted);
-  transition: color .18s ease;
+  transition: color .18s ease, opacity .18s ease;
 }
 
 .persistent-player-volume-inline:hover,
@@ -301,10 +294,7 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
 }
 
 .persistent-player-range:hover::-webkit-slider-thumb,
-.persistent-player-range:focus-visible::-webkit-slider-thumb {
-  transform: scale(1.18);
-}
-
+.persistent-player-range:focus-visible::-webkit-slider-thumb,
 .persistent-player-range:hover::-moz-range-thumb,
 .persistent-player-range:focus-visible::-moz-range-thumb {
   transform: scale(1.18);
@@ -319,8 +309,8 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
   justify-content: flex-end;
   gap: 3px;
   flex: 0 0 auto;
-  width: 126px;
-  height: 32px;
+  width: 130px;
+  height: 34px;
   transition: width .44s var(--shell-ease);
 }
 
@@ -331,7 +321,6 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
   place-items: center;
   padding: 0;
   border: 0;
-  border-radius: 50%;
   background: transparent;
   color: var(--shell-muted);
   cursor: pointer;
@@ -340,6 +329,7 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
     color .18s ease,
     background-color .18s ease,
     border-color .18s ease,
+    border-radius .22s ease,
     box-shadow .18s ease,
     opacity .18s ease,
     transform .18s ease;
@@ -349,12 +339,14 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
 .persistent-player-close {
   width: 26px;
   height: 26px;
+  border-radius: 50%;
 }
 
 .persistent-player-toggle {
-  width: 32px;
-  height: 32px;
-  border: 1px solid color-mix(in srgb, var(--shell-accent) 56%, rgba(255,255,255,.14));
+  width: 34px;
+  height: 34px;
+  border: 1px solid color-mix(in srgb, var(--shell-accent) 58%, rgba(255,255,255,.14));
+  border-radius: 50%;
   background:
     radial-gradient(circle at 35% 27%, rgba(255,255,255,.12), transparent 36%),
     rgba(12,14,19,.9);
@@ -380,16 +372,12 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
   outline: none;
 }
 
+.persistent-player-close:hover,
+.persistent-player-close:focus-visible { color: #e4aaaa; }
+
 .persistent-player-toggle:active,
 .persistent-player-skip:active,
-.persistent-player-close:active {
-  transform: scale(.92);
-}
-
-.persistent-player-close:hover,
-.persistent-player-close:focus-visible {
-  color: #e4aaaa;
-}
+.persistent-player-close:active { transform: scale(.92); }
 
 .persistent-ui-icon {
   display: block;
@@ -402,7 +390,7 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
   height: 14px;
 }
 
-/* The record is anchored to the right edge, larger than the player body, and never moves on Y. */
+/* Oversized vinyl anchor: no center spindle or extra fixed-point ornament. */
 .persistent-player-turntable {
   position: absolute;
   z-index: 7;
@@ -474,25 +462,15 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
   object-fit: cover;
 }
 
-.persistent-player-spindle {
-  position: absolute;
-  z-index: 4;
-  width: 7px;
-  height: 7px;
-  border: 1px solid rgba(255,255,255,.52);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #fff4c7, #a57928 72%);
-  box-shadow: 0 0 0 2px rgba(4,6,10,.78);
-}
-
+/* Tonearm playback pose lands on the outer grooves rather than near the label center. */
 .persistent-player-tonearm {
   position: absolute;
   z-index: 6;
-  top: -3px;
-  right: -2px;
+  top: -5px;
+  right: -3px;
   width: 92px;
   height: 92px;
-  transform: rotate(-27deg);
+  transform: rotate(-18deg);
   transform-origin: 76px 16px;
   transition: transform .72s var(--shell-ease), filter .22s ease;
   filter: drop-shadow(0 4px 5px rgba(0,0,0,.35));
@@ -567,81 +545,77 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
 }
 
 .persistent-music-player.is-playing .persistent-player-tonearm {
-  transform: rotate(7deg);
+  transform: rotate(0deg);
   filter: drop-shadow(0 5px 6px rgba(0,0,0,.38));
 }
 
 @keyframes persistent-platter-turn { to { transform: rotate(1turn); } }
 
-/* Direction-aware collapse control lives on the moving left edge. */
+/* Large rounded-square direction control on the moving left edge. */
 .persistent-player-collapse {
   position: absolute;
   z-index: 12;
-  left: -15px;
-  top: 0;
-  width: 30px;
-  height: var(--persistent-player-height);
+  left: -22px;
+  top: calc((var(--persistent-player-height) - 44px) / 2);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
   padding: 0;
-  border: 0;
-  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--shell-accent) 34%, rgba(255,255,255,.08));
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.035), transparent 44%),
+    rgba(8,13,22,.96);
   color: var(--shell-accent-soft);
+  box-shadow: 0 8px 22px rgba(0,0,0,.32);
   cursor: pointer;
+  opacity: .2;
+  transform: translateX(-6px);
+  transition:
+    opacity .18s ease,
+    transform .26s var(--shell-ease),
+    border-color .18s ease,
+    background-color .18s ease,
+    box-shadow .18s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.persistent-player-collapse-rail {
-  position: absolute;
-  left: 14px;
-  top: 20px;
-  width: 1px;
-  height: 44px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--shell-accent) 26%, rgba(255,255,255,.09));
-  opacity: .42;
-  transition: opacity .18s ease, box-shadow .18s ease;
-}
-
 .persistent-player-collapse-icon {
-  position: absolute;
-  left: 4px;
-  top: 31px;
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
-  border: 1px solid color-mix(in srgb, var(--shell-accent) 26%, rgba(255,255,255,.08));
-  border-radius: 999px;
-  background: rgba(8,13,22,.96);
-  box-shadow: 0 6px 18px rgba(0,0,0,.28);
-  opacity: 0;
-  transform: translateX(-4px);
-  transition:
-    opacity .16s ease,
-    transform .24s var(--shell-ease),
-    border-color .18s ease,
-    background-color .18s ease;
+  width: 100%;
+  height: 100%;
 }
 
 .persistent-player-collapse-icon .persistent-ui-icon {
-  width: 13px;
-  height: 13px;
+  width: 19px;
+  height: 19px;
+  stroke-width: 1.7;
 }
 
-.persistent-player-collapse:hover .persistent-player-collapse-rail,
-.persistent-player-collapse:focus-visible .persistent-player-collapse-rail {
-  opacity: .95;
-  box-shadow: 0 0 10px color-mix(in srgb, var(--shell-accent) 25%, transparent);
+.persistent-music-player:hover .persistent-player-collapse,
+.persistent-player-collapse:focus-visible {
+  opacity: .72;
+  transform: translateX(0);
+}
+
+.persistent-player-collapse:hover,
+.persistent-player-collapse:focus-visible {
+  opacity: 1;
+  transform: translateX(3px);
+  border-color: color-mix(in srgb, var(--shell-accent) 72%, rgba(255,255,255,.14));
+  background-color: rgba(14,17,24,.98);
+  box-shadow:
+    0 9px 24px rgba(0,0,0,.36),
+    0 0 0 4px color-mix(in srgb, var(--shell-accent) 9%, transparent);
+  outline: none;
 }
 
 .persistent-player-collapse:hover .persistent-player-collapse-icon,
 .persistent-player-collapse:focus-visible .persistent-player-collapse-icon {
-  opacity: 1;
-  transform: translateX(0);
-  border-color: color-mix(in srgb, var(--shell-accent) 58%, rgba(255,255,255,.12));
   animation: persistent-collapse-hint-right .9s ease-in-out infinite;
 }
-
-.persistent-player-collapse:focus-visible { outline: none; }
 
 @keyframes persistent-collapse-hint-right {
   0%, 100% { transform: translateX(0); }
@@ -653,33 +627,71 @@ body.site-shell-page { font-family: "Inter", "Noto Sans SC", sans-serif; }
   50% { transform: translateX(-3px); }
 }
 
-/* Collapse changes only width and horizontal visibility. Height/Y geometry stays unchanged. */
+/*
+ * Fully minimized dock: no song title rail, progress, volume, skip or close controls remain.
+ * Only the large expand affordance, play/pause control and fixed vinyl anchor remain visible.
+ */
 .persistent-music-player.is-collapsed {
-  width: 214px;
+  width: 172px;
 }
 
-.persistent-music-player.is-collapsed .persistent-player-detail,
-.persistent-music-player.is-collapsed .persistent-player-secondary-control,
-.persistent-music-player.is-collapsed .persistent-player-secondary-action {
+.persistent-music-player.is-collapsed .persistent-player-copy {
   opacity: 0;
   pointer-events: none;
 }
 
-.persistent-music-player.is-collapsed .persistent-player-copy {
-  right: 112px;
+.persistent-music-player.is-collapsed .persistent-player-secondary-control,
+.persistent-music-player.is-collapsed .persistent-player-secondary-action {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
-.persistent-music-player.is-collapsed .persistent-player-copy strong {
-  max-width: 100%;
-  font-size: 14px;
+.persistent-music-player.is-collapsed .persistent-player-transport {
+  left: 28px;
+  right: auto;
+  top: calc((var(--persistent-player-height) - 44px) / 2);
+  bottom: auto;
+  display: block;
+  width: 44px;
+  height: 44px;
 }
 
 .persistent-music-player.is-collapsed .persistent-player-transport-actions {
-  width: 34px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
 }
 
-.persistent-music-player.is-collapsed .persistent-player-secondary-action {
-  position: absolute;
+.persistent-music-player.is-collapsed .persistent-player-toggle {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border-color: color-mix(in srgb, var(--shell-accent) 68%, rgba(255,255,255,.14));
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255,255,255,.14), transparent 36%),
+    rgba(12,14,19,.96);
+  box-shadow:
+    0 7px 18px rgba(0,0,0,.34),
+    inset 0 0 0 1px rgba(255,255,255,.02);
+}
+
+.persistent-music-player.is-collapsed .persistent-player-toggle .persistent-ui-icon {
+  width: 17px;
+  height: 17px;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-collapse {
+  opacity: 1;
+  transform: translateX(0);
+  border-color: color-mix(in srgb, var(--shell-accent) 62%, rgba(255,255,255,.12));
+}
+
+.persistent-music-player.is-collapsed .persistent-player-collapse:hover,
+.persistent-music-player.is-collapsed .persistent-player-collapse:focus-visible {
+  transform: translateX(-3px);
 }
 
 .persistent-music-player.is-collapsed .persistent-player-collapse:hover .persistent-player-collapse-icon,
@@ -737,14 +749,12 @@ noscript {
   }
 
   .persistent-player-copy strong {
-    font-size: 15px;
     max-width: 48%;
+    font-size: 15px;
   }
 
   .persistent-player-artist,
-  .persistent-player-album {
-    font-size: 8px;
-  }
+  .persistent-player-album { font-size: 8px; }
 
   .persistent-player-transport {
     left: 20px;
@@ -785,39 +795,64 @@ noscript {
     height: 64px;
   }
 
-  .persistent-player-spindle {
-    width: 6px;
-    height: 6px;
-  }
-
   .persistent-player-tonearm {
     top: -6px;
     right: -5px;
-    transform: rotate(-27deg) scale(.86);
+    transform: rotate(-18deg) scale(.86);
     transform-origin: 76px 16px;
   }
 
   .persistent-music-player.is-playing .persistent-player-tonearm {
-    transform: rotate(7deg) scale(.86);
+    transform: rotate(0deg) scale(.86);
   }
 
-  .persistent-player-collapse-icon { top: 27px; }
-  .persistent-player-collapse-rail { top: 17px; height: 42px; }
+  .persistent-player-collapse {
+    left: -20px;
+    top: calc((var(--persistent-player-height) - 40px) / 2);
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+  }
+
+  .persistent-player-collapse-icon .persistent-ui-icon {
+    width: 18px;
+    height: 18px;
+  }
 
   .persistent-music-player.is-collapsed {
-    width: 186px;
+    width: 156px;
   }
 
-  .persistent-music-player.is-collapsed .persistent-player-copy {
-    right: 98px;
+  .persistent-music-player.is-collapsed .persistent-player-transport {
+    left: 24px;
+    top: calc((var(--persistent-player-height) - 40px) / 2);
+    width: 40px;
+    height: 40px;
+  }
+
+  .persistent-music-player.is-collapsed .persistent-player-transport-actions,
+  .persistent-music-player.is-collapsed .persistent-player-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .persistent-music-player.is-collapsed .persistent-player-toggle {
+    border-radius: 11px;
   }
 }
 
 @media (max-width: 480px) {
-  .persistent-player-volume-inline { grid-template-columns: 14px 40px; }
-  .persistent-player-transport-actions { width: 106px; }
-  .persistent-player-progress { grid-template-columns: 22px minmax(28px, 1fr) 22px; }
-  .persistent-player-progress time { font-size: 6px; }
+  .persistent-player-progress {
+    grid-template-columns: minmax(34px, 1fr);
+  }
+
+  .persistent-player-progress time { display: none; }
+
+  .persistent-player-volume-inline {
+    grid-template-columns: 14px 38px;
+  }
+
+  .persistent-player-transport-actions { width: 102px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -828,6 +863,7 @@ noscript {
 
   .persistent-player-tonearm,
   .persistent-music-player,
+  .persistent-player-collapse,
   .persistent-player-collapse-icon,
   .site-shell-loading {
     transition: none;
