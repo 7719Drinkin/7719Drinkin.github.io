@@ -52,6 +52,15 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="/css/music-home.css?v=20260814-1">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body class="music-page music-collection-page">
   <header class="music-site-header">
@@ -67,13 +76,19 @@
         <p class="music-eyebrow">03 / PERSONAL COLLECTION</p>
         <h1><span>Music</span><strong>Collection</strong></h1>
         <h2>音乐收藏</h2>
-        <blockquote class="collection-hero-impression">⌈只是狂歌一曲，恍惚间就化入无穷⌋</blockquote>
+        <blockquote class="collection-hero-impression" data-music-hero-quote aria-label="只是狂歌一曲，恍惚间就化入无穷">
+          <span class="collection-hero-quote-line"><span class="collection-hero-quote-bracket" aria-hidden="true">⌈</span><span class="collection-hero-quote-text" data-music-hero-quote-text>只是狂歌一曲，恍惚间就化入无穷</span><span class="collection-hero-quote-cursor" aria-hidden="true"></span><span class="collection-hero-quote-bracket" aria-hidden="true">⌋</span></span>
+        </blockquote>
         <a class="music-text-link" href="#artists">进入收藏 <b>↓</b></a>
       </div>
-      <div class="collection-record" aria-hidden="true">
-        <div class="collection-record-disc"><i></i><b></b></div>
-        <div class="collection-record-arm"><span></span></div>
-        <p>PERSONAL LISTENING ARCHIVE</p>
+      <div class="collection-record collection-gramophone-stage" data-music-gramophone role="img" aria-label="一台承载旋转唱片的古典留声机">
+        <canvas class="collection-gramophone-canvas" data-gramophone-canvas aria-hidden="true"></canvas>
+        <div class="collection-gramophone-fallback" aria-hidden="true">
+          <div class="collection-record-disc"><i></i><b></b></div>
+          <div class="collection-record-arm"><span></span></div>
+        </div>
+        <p aria-hidden="true">PERSONAL LISTENING ARCHIVE</p>
+        <a class="collection-gramophone-credit" href="https://sketchfab.com/3d-models/old-gramophone-5e892fc786db4ca1b36738ab5e40e64d" target="_blank" rel="noreferrer">3D · KIFIR · CC BY 4.0</a>
       </div>
     </section>
 
@@ -182,5 +197,6 @@
   </main>
   <footer class="music-site-footer"><span>7719 / MUSIC COLLECTION</span><span>CURATED, NOT COMPLETE.</span></footer>
   <script src="/js/music.js?v=20260805-2"></script>
+  <script type="module" src="/js/music-home.js?v=20260814-1"></script>
 </body>
 </html>
