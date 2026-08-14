@@ -10,11 +10,36 @@
     "en": "A personal archive of songs, stage impressions and repeated listening moments."
   },
   "personalNote": {
-    "zh": "当前还没有配置可播放音频；后续接入真实音频源后，曲目会自动进入页面。",
-    "en": "No playable audio source is configured yet; tracks will appear after real audio sources are added."
+    "zh": "完整曲目按专辑进入独立详情页；反复聆听只保留网页创建者主动挑选的少量歌曲。",
+    "en": "Complete tracks live on album detail pages, while repeated listening remains a small curator-selected set."
   },
   "heroImage": "/assets/Music/Artists/TanYonglin/hero/SingerPortrait_149_-2694000341785996801988.jpg",
-  "selectedSongs": [],
+  "selectedSongs": [
+    {
+      "title": "講不出再見",
+      "album": "梦幻的笑容"
+    },
+    {
+      "title": "一首歌一個故事",
+      "album": "梦幻的笑容"
+    },
+    {
+      "title": "一生中最愛",
+      "album": "神话1991"
+    },
+    {
+      "title": "愛情陷阱",
+      "album": "爱情陷阱"
+    },
+    {
+      "title": "世外桃源",
+      "album": "世外桃源"
+    },
+    {
+      "title": "爵士怨曲",
+      "album": "世外桃源"
+    }
+  ],
   "albums": [
     {
       "title": "7890后",
