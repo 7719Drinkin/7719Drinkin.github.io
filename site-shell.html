@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/site-shell.css?v=20260814-minimized-dock-1">
-  <link rel="stylesheet" href="/css/site-shell-vinyl-toggle.css?v=20260814-vinyl-stable-2">
+  <link rel="stylesheet" href="/css/site-shell-vinyl-toggle.css?v=20260814-vinyl-chassis-3">
 </head>
 <body class="site-shell-page">
   <div class="site-shell-loading" data-shell-loading aria-hidden="true">
@@ -27,52 +27,54 @@
   <aside class="persistent-music-player" data-persistent-player hidden aria-label="全站音乐播放器">
     <audio data-persistent-audio preload="metadata"></audio>
 
-    <button
-      class="persistent-player-collapse"
-      type="button"
-      data-persistent-collapse
-      aria-label="收起播放器"
-      aria-expanded="true">
-      <span class="persistent-player-collapse-icon" data-persistent-collapse-icon aria-hidden="true"></span>
-    </button>
+    <div class="persistent-player-chassis">
+      <button
+        class="persistent-player-collapse"
+        type="button"
+        data-persistent-collapse
+        aria-label="收起播放器"
+        aria-expanded="true">
+        <span class="persistent-player-collapse-icon" data-persistent-collapse-icon aria-hidden="true"></span>
+      </button>
 
-    <div class="persistent-player-main">
-      <div class="persistent-player-copy" aria-label="当前歌曲">
-        <strong data-persistent-title>尚未选择歌曲</strong>
-        <span class="persistent-player-copy-separator persistent-player-detail" aria-hidden="true">·</span>
-        <span class="persistent-player-artist persistent-player-detail" data-persistent-artist>7719 Music</span>
-        <span class="persistent-player-copy-separator persistent-player-album-separator persistent-player-detail" aria-hidden="true">·</span>
-        <span class="persistent-player-album persistent-player-detail" data-persistent-album></span>
-      </div>
-
-      <div class="persistent-player-transport">
-        <div class="persistent-player-progress persistent-player-secondary-control">
-          <time data-persistent-current>0:00</time>
-          <input class="persistent-player-range" data-persistent-seek type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
-          <time data-persistent-duration>0:00</time>
+      <div class="persistent-player-main">
+        <div class="persistent-player-copy" aria-label="当前歌曲">
+          <strong data-persistent-title>尚未选择歌曲</strong>
+          <span class="persistent-player-copy-separator persistent-player-detail" aria-hidden="true">·</span>
+          <span class="persistent-player-artist persistent-player-detail" data-persistent-artist>7719 Music</span>
+          <span class="persistent-player-copy-separator persistent-player-album-separator persistent-player-detail" aria-hidden="true">·</span>
+          <span class="persistent-player-album persistent-player-detail" data-persistent-album></span>
         </div>
 
-        <label class="persistent-player-volume-inline persistent-player-secondary-control" data-persistent-volume-control>
-          <span class="persistent-player-volume-icon" data-persistent-volume-icon aria-hidden="true"></span>
-          <input class="persistent-player-range" data-persistent-volume type="range" min="0" max="1" value="0.8" step="0.01" aria-label="音量">
-        </label>
+        <div class="persistent-player-transport">
+          <div class="persistent-player-progress persistent-player-secondary-control">
+            <time data-persistent-current>0:00</time>
+            <input class="persistent-player-range" data-persistent-seek type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
+            <time data-persistent-duration>0:00</time>
+          </div>
 
-        <div class="persistent-player-transport-actions">
-          <button class="persistent-player-skip persistent-player-secondary-action" type="button" data-persistent-prev aria-label="上一首"></button>
-          <button class="persistent-player-toggle" type="button" data-persistent-toggle aria-label="播放"></button>
-          <button class="persistent-player-skip persistent-player-secondary-action" type="button" data-persistent-next aria-label="下一首"></button>
-          <button class="persistent-player-close persistent-player-secondary-action" type="button" data-persistent-close aria-label="停止并关闭播放器"></button>
+          <label class="persistent-player-volume-inline persistent-player-secondary-control" data-persistent-volume-control>
+            <span class="persistent-player-volume-icon" data-persistent-volume-icon aria-hidden="true"></span>
+            <input class="persistent-player-range" data-persistent-volume type="range" min="0" max="1" value="0.8" step="0.01" aria-label="音量">
+          </label>
+
+          <div class="persistent-player-transport-actions">
+            <button class="persistent-player-skip persistent-player-secondary-action" type="button" data-persistent-prev aria-label="上一首"></button>
+            <button class="persistent-player-toggle" type="button" data-persistent-toggle aria-label="播放"></button>
+            <button class="persistent-player-skip persistent-player-secondary-action" type="button" data-persistent-next aria-label="下一首"></button>
+            <button class="persistent-player-close persistent-player-secondary-action" type="button" data-persistent-close aria-label="停止并关闭播放器"></button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="persistent-player-turntable" data-persistent-turntable aria-hidden="true">
-      <span class="persistent-player-platter">
+    <div class="persistent-player-turntable" data-persistent-turntable tabindex="-1">
+      <span class="persistent-player-platter" aria-hidden="true">
         <span class="persistent-player-grooves"></span>
         <span class="persistent-player-cover" data-persistent-cover>77</span>
       </span>
 
-      <span class="persistent-player-tonearm">
+      <span class="persistent-player-tonearm" aria-hidden="true">
         <svg viewBox="0 0 92 92" focusable="false">
           <defs>
             <linearGradient id="persistent-tonearm-metal" x1="0" y1="0" x2="1" y2="1">
@@ -106,5 +108,6 @@
 
   <noscript>本站的连续播放与页面导航需要启用 JavaScript。</noscript>
   <script src="/js/site-shell.js?v=20260814-minimized-dock-1"></script>
+  <script src="/js/site-shell-vinyl-hit.js?v=20260814-vinyl-chassis-3"></script>
 </body>
 </html>
