@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/site-shell.css?v=20260814-turntable-1">
+  <link rel="stylesheet" href="/css/site-shell.css?v=20260814-compact-controls-1">
 </head>
 <body class="site-shell-page">
   <div class="site-shell-loading" data-shell-loading aria-hidden="true">
@@ -26,27 +26,21 @@
   <aside class="persistent-music-player" data-persistent-player hidden aria-label="全站音乐播放器">
     <audio data-persistent-audio preload="metadata"></audio>
 
-    <button
-      class="persistent-player-turntable"
-      data-persistent-turntable
-      type="button"
-      aria-label="唱盘"
-      tabindex="-1">
+    <div class="persistent-player-turntable" data-persistent-turntable>
       <span class="persistent-player-platter" aria-hidden="true">
         <span class="persistent-player-grooves"></span>
         <span class="persistent-player-cover" data-persistent-cover>77</span>
         <span class="persistent-player-spindle"></span>
       </span>
-      <span class="persistent-player-tonearm" aria-hidden="true">
-        <i></i>
-      </span>
-    </button>
+      <button class="persistent-player-toggle persistent-player-center-toggle" type="button" data-persistent-toggle aria-label="播放">▶</button>
+      <span class="persistent-player-tonearm" aria-hidden="true"><i></i></span>
+    </div>
 
     <div class="persistent-player-main">
       <div class="persistent-player-topline">
         <span class="persistent-player-state" data-persistent-state>NOW PLAYING</span>
         <div class="persistent-player-actions">
-          <button class="persistent-player-collapse" type="button" data-persistent-collapse aria-label="收起播放器" aria-expanded="true">⌄</button>
+          <button class="persistent-player-collapse" type="button" data-persistent-collapse aria-label="收起播放器" aria-expanded="true">−</button>
           <button class="persistent-player-close" type="button" data-persistent-close aria-label="停止并关闭播放器">×</button>
         </div>
       </div>
@@ -60,28 +54,32 @@
         </div>
       </div>
 
-      <div class="persistent-player-controls">
-        <button type="button" data-persistent-prev aria-label="上一首">‹</button>
-        <button class="persistent-player-toggle" type="button" data-persistent-toggle aria-label="播放">▶</button>
-        <button type="button" data-persistent-next aria-label="下一首">›</button>
-      </div>
+      <div class="persistent-player-transport">
+        <button class="persistent-player-skip" type="button" data-persistent-prev aria-label="上一首">‹</button>
+        <div class="persistent-player-progress">
+          <time data-persistent-current>0:00</time>
+          <input data-persistent-seek type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
+          <time data-persistent-duration>0:00</time>
+        </div>
+        <button class="persistent-player-skip" type="button" data-persistent-next aria-label="下一首">›</button>
 
-      <div class="persistent-player-progress">
-        <time data-persistent-current>0:00</time>
-        <input data-persistent-seek type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
-        <time data-persistent-duration>0:00</time>
+        <div class="persistent-player-volume-control" data-persistent-volume-control>
+          <button class="persistent-player-volume-toggle" type="button" data-persistent-volume-toggle aria-label="音量" aria-expanded="false">
+            <span class="persistent-volume-icon" data-persistent-volume-icon aria-hidden="true"></span>
+          </button>
+          <label class="persistent-player-volume-panel" data-persistent-volume-panel>
+            <span>VOL</span>
+            <input data-persistent-volume type="range" min="0" max="1" value="0.8" step="0.05" aria-label="音量">
+            <output data-persistent-volume-value>80</output>
+          </label>
+        </div>
       </div>
-
-      <label class="persistent-player-volume">
-        <span>VOL</span>
-        <input data-persistent-volume type="range" min="0" max="1" value="0.8" step="0.05" aria-label="音量">
-      </label>
     </div>
 
     <p class="persistent-player-status" data-persistent-status aria-live="polite"></p>
   </aside>
 
   <noscript>本站的连续播放与页面导航需要启用 JavaScript。</noscript>
-  <script src="/js/site-shell.js?v=20260814-turntable-1"></script>
+  <script src="/js/site-shell.js?v=20260814-compact-controls-1"></script>
 </body>
 </html>
