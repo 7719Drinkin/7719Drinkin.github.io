@@ -60,7 +60,7 @@ assert(!shellRuntime.includes('NOW PLAYING'), 'Persistent player must not render
 assert(!shellRuntime.includes("'PAUSED'"), 'Persistent player must not render textual paused-state labels.');
 
 assert(shellCss.includes('--persistent-player-height: 84px;'), 'Persistent player must define one fixed desktop height.');
-assert(shellCss.includes('--persistent-record-size: 108px;'), 'Persistent record must be larger than the player body height.');
+assert(shellCss.includes('--persistent-record-size: 108px;'), 'Persistent record must remain larger than the player body height.');
 assert(shellCss.includes('height: var(--persistent-player-height);'), 'Persistent player body must use the fixed horizontal-rail height.');
 assert(shellCss.includes('width .52s var(--shell-ease)'), 'Persistent player collapse must animate its horizontal width.');
 assert(!shellCss.includes('translateY'), 'Persistent player stylesheet must not use vertical translation for player interaction.');
@@ -71,8 +71,14 @@ assert(shellCss.includes('.persistent-player-transport {'), 'Playback controls m
 assert(shellCss.includes('.persistent-player-turntable {'), 'Persistent player must render an independent turntable anchor.');
 assert(shellCss.includes('right: calc(var(--persistent-record-overhang) * -1);'), 'Record anchor must overlap the right edge instead of occupying a layout column.');
 assert(shellCss.includes('.persistent-player-tonearm-cartridge'), 'Persistent player must retain the structured tonearm cartridge.');
-assert(shellCss.includes('.persistent-player-volume-inline'), 'Persistent player must expose an always-visible inline volume control.');
-assert(shellCss.includes('.persistent-player-collapse-icon'), 'Persistent player must use a hover-revealed directional collapse affordance.');
+assert(shellCss.includes('transform: rotate(0deg);'), 'Playing tonearm must use the shallow outer-groove landing pose.');
+assert(!shellCss.includes('.persistent-player-spindle'), 'Record center must not render a fixed spindle ornament.');
+assert(shellCss.includes('.persistent-player-volume-inline'), 'Expanded player must expose an always-visible inline volume control.');
+assert(shellCss.includes('width: 44px;\n  height: 44px;'), 'Desktop collapse and minimized play controls must expose large square hit targets.');
+assert(shellCss.includes('border-radius: 12px;'), 'Desktop collapse control must use a rounded-square shape.');
+assert(shellCss.includes('.persistent-music-player.is-collapsed {\n  width: 172px;'), 'Desktop minimized player must collapse to the compact vinyl dock width.');
+assert(shellCss.includes('.persistent-music-player.is-collapsed .persistent-player-copy {\n  opacity: 0;'), 'Minimized dock must fully hide song metadata instead of leaving an empty title rail.');
+assert(shellCss.includes('.persistent-music-player.is-collapsed .persistent-player-toggle {'), 'Minimized dock must retain a dedicated play/pause control.');
 assert(shellCss.includes('@keyframes persistent-collapse-hint-right'), 'Expanded collapse affordance must animate toward the collapse direction.');
 assert(shellCss.includes('@keyframes persistent-collapse-hint-left'), 'Collapsed expand affordance must animate toward the expansion direction.');
 assert(!shellCss.includes('.persistent-player-center-toggle'), 'Play/pause must not overlay the record artwork.');
@@ -82,14 +88,17 @@ assert(shellPage.includes('class="persistent-player-transport"'), 'Persistent sh
 assert(shellPage.includes('data-persistent-turntable'), 'Persistent shell must render a dedicated right-side record anchor.');
 assert(shellPage.includes('class="persistent-player-toggle"'), 'Persistent shell must render play/pause outside the record.');
 assert(!shellPage.includes('persistent-player-center-toggle'), 'Persistent shell must not place play/pause over the record.');
+assert(!shellPage.includes('persistent-player-spindle'), 'Persistent shell must not render an unnecessary center spindle.');
+assert(shellPage.includes('L62 36'), 'Tonearm geometry must land the cartridge on the outer groove area.');
 assert(!shellPage.includes('data-persistent-state'), 'Persistent shell must not render textual playback-state labels.');
 assert(!shellPage.includes('NOW PLAYING'), 'Persistent shell must not render NOW PLAYING labels.');
-assert(shellPage.includes('data-persistent-collapse-icon'), 'Persistent shell must render the directional hover collapse indicator.');
-assert(shellPage.includes('data-persistent-volume-control'), 'Persistent shell must render the inline volume control.');
+assert(shellPage.includes('data-persistent-collapse-icon'), 'Persistent shell must render the directional collapse indicator.');
+assert(!shellPage.includes('persistent-player-collapse-rail'), 'Large square collapse control must not retain the old thin rail affordance.');
+assert(shellPage.includes('data-persistent-volume-control'), 'Persistent shell must render the inline volume control in expanded mode.');
 assert(shellPage.includes('data-persistent-volume-icon'), 'Persistent shell must render a visible volume icon.');
 assert(shellPage.includes('persistent-player-tonearm-cartridge'), 'Persistent shell must render the detailed decorative tonearm.');
-assert(shellPage.includes('/js/site-shell.js?v=20260814-horizontal-rail-1'), 'Persistent shell JS cache version was not bumped for the horizontal rail.');
-assert(shellPage.includes('/css/site-shell.css?v=20260814-horizontal-rail-1'), 'Persistent shell CSS cache version was not bumped for the horizontal rail.');
+assert(shellPage.includes('/js/site-shell.js?v=20260814-minimized-dock-1'), 'Persistent shell JS cache version was not bumped for the minimized dock.');
+assert(shellPage.includes('/css/site-shell.css?v=20260814-minimized-dock-1'), 'Persistent shell CSS cache version was not bumped for the minimized dock.');
 
 const [artistPage, albumPage] = await Promise.all([
   read('music/artists/tan-yonglin/index.html'),
