@@ -24,6 +24,9 @@
     duration: playerRoot.querySelector('[data-persistent-duration]'),
     seek: playerRoot.querySelector('[data-persistent-seek]'),
     volume: playerRoot.querySelector('[data-persistent-volume]'),
+    volumeControl: playerRoot.querySelector('[data-persistent-volume-control]'),
+    volumeToggle: playerRoot.querySelector('[data-persistent-volume-toggle]'),
+    volumeValue: playerRoot.querySelector('[data-persistent-volume-value]'),
     collapse: playerRoot.querySelector('[data-persistent-collapse]'),
     close: playerRoot.querySelector('[data-persistent-close]'),
     status: playerRoot.querySelector('[data-persistent-status]')
@@ -113,19 +116,21 @@
   const activeTrack = () => state.queue[state.index] || state.track;
   const isCollapsed = () => playerRoot.classList.contains('is-collapsed');
 
+  const setVolumeOpen = (open) => {
+    const next = Boolean(open) && !isCollapsed();
+    ui.volumeControl?.classList.toggle('is-open', next);
+    ui.volumeToggle?.setAttribute('aria-expanded', String(next));
+  };
+
   const setCollapsed = (collapsed, { persist = true } = {}) => {
     const next = Boolean(collapsed);
     playerRoot.classList.toggle('is-collapsed', next);
+    setVolumeOpen(false);
 
     if (ui.collapse) {
       ui.collapse.setAttribute('aria-expanded', String(!next));
       ui.collapse.setAttribute('aria-label', next ? '展开播放器' : '收起播放器');
-      ui.collapse.textContent = next ? '⌃' : '⌄';
-    }
-
-    if (ui.turntable) {
-      ui.turntable.tabIndex = next ? 0 : -1;
-      ui.turntable.setAttribute('aria-label', next ? '展开播放器' : '唱盘');
+      ui.collapse.textContent = next ? '+' : '−';
     }
 
     if (!persist) return;
@@ -179,6 +184,15 @@
     renderCover(track);
     ui.state.textContent = audio.paused ? 'PAUSED' : 'NOW PLAYING';
     document.title = document.title || '7719 Universe';
+  };
+
+  const updateVolumeUi = () => {
+    const value = Math.min(1, Math.max(0, Number(audio.volume) || 0));
+    const percent = Math.round(value * 100);
+    if (ui.volume) ui.volume.value = String(value);
+    if (ui.volumeValue) ui.volumeValue.textContent = String(percent);
+    ui.volumeControl?.classList.toggle('is-muted', value <= .001);
+    ui.volumeToggle?.setAttribute('aria-label', `音量 ${percent}%`);
   };
 
   const updatePlayingState = () => {
@@ -317,6 +331,7 @@
     ui.seek.value = '0';
     ui.status.textContent = '';
     playerRoot.classList.remove('is-playing');
+    setVolumeOpen(false);
 
     if (clear) {
       state.queue = [];
@@ -367,14 +382,17 @@
     } catch {
       saved = null;
     }
-    if (!saved?.track) return;
+    if (!saved?.track) {
+      updateVolumeUi();
+      return;
+    }
 
     state.restoring = true;
     state.queue = normalizeQueue(saved.queue);
     state.index = Number.isInteger(saved.index) ? saved.index : 0;
     state.track = normalizeTrack(saved.track);
     audio.volume = Math.min(1, Math.max(0, Number(saved.volume) || .8));
-    ui.volume.value = String(audio.volume);
+    updateVolumeUi();
     setSource(activeTrack() || state.track, Number(saved.currentTime) || 0);
     ui.state.textContent = 'PAUSED';
     state.restoring = false;
@@ -398,13 +416,16 @@
   ui.collapse?.addEventListener('click', () => {
     setCollapsed(!isCollapsed());
   });
-  ui.turntable?.addEventListener('click', () => {
-    if (isCollapsed()) setCollapsed(false);
-  });
   ui.close.addEventListener('click', () => stopPlayback({ clear: true }));
+
+  ui.volumeToggle?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setVolumeOpen(!ui.volumeControl?.classList.contains('is-open'));
+  });
 
   ui.volume.addEventListener('input', () => {
     audio.volume = Number(ui.volume.value);
+    updateVolumeUi();
     persistState();
   });
 
@@ -425,6 +446,7 @@
 
   audio.addEventListener('loadedmetadata', updateProgress);
   audio.addEventListener('durationchange', updateProgress);
+  audio.addEventListener('volumechange', updateVolumeUi);
   audio.addEventListener('timeupdate', () => {
     updateProgress();
     if (Math.floor(audio.currentTime) % 3 === 0) persistState();
@@ -476,6 +498,16 @@
     if (message.type === 'site:stop-and-navigate') {
       stopAndNavigate(message.href);
     }
+  });
+
+  document.addEventListener('pointerdown', (event) => {
+    if (!ui.volumeControl?.classList.contains('is-open')) return;
+    if (ui.volumeControl.contains(event.target)) return;
+    setVolumeOpen(false);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setVolumeOpen(false);
   });
 
   window.addEventListener('popstate', () => {
