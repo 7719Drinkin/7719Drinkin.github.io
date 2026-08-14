@@ -25,21 +25,42 @@ Reference implementation: `7719Drinkin/HCI_XiuXian-Station/src/views/Home.vue`.
 - Respect `prefers-reduced-motion`: show one complete sentence without automatic typing/deleting and avoid blinking animation.
 - Prevent layout jumps when phrases differ in length; reserve a stable text area and allow controlled wrapping on narrow screens.
 
-### 2. Large gramophone carrier
+### 2. Real 3D gramophone carrier
 
-- Replace the visually sparse modern turntable carrier on the right side of the hero with a large stylized gramophone composition.
-- Keep the vinyl record as the focal moving/visual element, but make it clearly sit on the gramophone base/platter.
-- Add a large horn with a curved neck, brass/gold edge treatment, dark metal interior, and subtle depth/shadow.
-- Rework the current tonearm/base so the hardware reads as one coherent gramophone rather than separate floating shapes.
-- Prefer scalable HTML/CSS + inline SVG geometry over a raster image so the object remains crisp, themeable, responsive, and lightweight.
-- Preserve the current right-side diagonal composition instead of centering the gramophone like a product photo.
-- On mobile/tablet, simplify the horn and reduce overlap so it does not compete with the hero copy.
-- Respect `prefers-reduced-motion`; any record or highlight animation must stop or become static.
+- Use a real downloadable 3D gramophone asset instead of hand-building the whole object with CSS/SVG.
+- Prefer GLB/glTF or an asset that can be converted cleanly to GLB, with a clear reuse license, moderate polygon count, and PBR textures.
+- First candidate class: middle/low-poly vintage gramophones around 4k-15k triangles so the hero remains practical on desktop and mobile.
+- Treat the gramophone body/horn as the static carrier and the vinyl record as a separately addressable mesh. The record must be able to rotate continuously around its own local spindle axis without rotating the gramophone body.
+- If the selected model already contains a record, either animate that mesh directly or hide/replace it with our own record mesh. Do not overlay a flat DOM record on top of a 3D model unless the perspective can be proven to match.
+- Keep the current Music hero composition: large gramophone on the right, slightly diagonal, dark body, brass/gold horn accents, vinyl still visually prominent.
+- Reuse the existing visual idea of the rotating black record, but move the rotation into the 3D scene so lighting, perspective, platter height, and tonearm alignment remain coherent.
+- Inspect model node/mesh names after import. Add a one-time adapter that resolves the record/platter mesh by configured name rather than scattering model-specific selectors through rendering code.
+- If the downloaded model does not expose the record as a separate mesh, edit the asset once in Blender or split the mesh during preprocessing; avoid runtime geometry surgery in the browser.
+- Render the hero object in a homepage-only WebGL layer. Keep 3D loading and animation outside shared artist/album runtime code.
+- Use compressed production assets where practical (mesh compression / optimized textures) and lazy-start the renderer after the hero is ready.
+- Provide a poster/static fallback if WebGL/model loading fails.
+- On tablet/mobile, reduce DPR/quality and camera framing instead of simply shrinking the desktop canvas. The horn may be partially cropped as part of the composition, but the record and base must remain recognizable.
+- Respect `prefers-reduced-motion`: keep the model visible but stop record rotation and nonessential camera/highlight motion.
+
+### 3. 3D asset selection checklist
+
+- Clear web-usable license and attribution requirements documented in-repo.
+- Downloadable source suitable for GLB/glTF conversion.
+- Prefer <= 15k triangles; tolerate somewhat more only if the visual gain is meaningful and optimization is straightforward.
+- PBR material separation for wood/dark metal/brass is preferred.
+- Horn silhouette must read clearly from the angled hero camera.
+- Record/platter must be a separable mesh or easy to split offline.
+- Avoid assets dominated by huge 4K/8K texture sets unless they can be downscaled aggressively for the web.
+- Final model should visually harmonize with the site's navy/black/gold palette rather than forcing the page to adopt the asset's original colors.
 
 ## Verification targets
 
 - Hero copy remains readable at desktop, tablet, and mobile widths.
 - Dynamic quote never pushes the CTA or changes the hero's overall height during phrase changes.
 - Cursor animation does not cause text reflow.
-- Gramophone does not overflow into the fixed header or persistent player.
+- Gramophone model loads without blocking first meaningful paint.
+- Vinyl rotates around the physically correct local axis with no wobble or texture sliding.
+- Tonearm/platter/record perspective remains coherent from the chosen camera angle.
+- Gramophone does not overflow into the fixed header or persistent player in an unintended way.
+- WebGL failure still leaves a deliberate static hero visual.
 - No homepage-specific behavior is introduced into artist/album pages.
