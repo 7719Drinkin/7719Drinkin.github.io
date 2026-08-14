@@ -33,8 +33,14 @@ async function main() {
   }
 
   const recent = selectRecentListening(selectedSongs, { limit: RECENT_LIMIT });
-  if (recent.length !== Math.min(RECENT_LIMIT, datedSongs.length)) {
-    throw new Error('Recent Listening selector returned an unexpected number of rows.');
+  const artistIds = new Set(selectedSongs.map((song) => song.artistId));
+  if (recent.length !== Math.min(RECENT_LIMIT, artistIds.size)) {
+    throw new Error('Recent Listening selector returned an unexpected number of artist rows.');
+  }
+
+  const recentArtistIds = recent.map((song) => song.artistId);
+  if (new Set(recentArtistIds).size !== recentArtistIds.length) {
+    throw new Error('Recent Listening must contain at most one song per artist.');
   }
 
   const source = await readFile(INDEX_PATH, 'utf8');
@@ -49,7 +55,7 @@ async function main() {
     throw new Error('music/index.html Recent Listening region is stale; run node scripts/update-music-recent-listening.mjs.');
   }
 
-  console.log(`Validated Recent Listening: ${generated.viewModels.map((item) => item.title).join(' / ')}`);
+  console.log(`Validated Recent Listening: ${generated.viewModels.map((item) => `${item.artist} / ${item.title}`).join(' | ')}`);
 }
 
 main().catch((error) => {
