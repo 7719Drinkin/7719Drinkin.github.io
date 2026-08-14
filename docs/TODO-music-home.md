@@ -42,7 +42,15 @@ Reference implementation: `7719Drinkin/HCI_XiuXian-Station/src/views/Home.vue`.
 - On tablet/mobile, reduce DPR/quality and camera framing instead of simply shrinking the desktop canvas. The horn may be partially cropped as part of the composition, but the record and base must remain recognizable.
 - Respect `prefers-reduced-motion`: keep the model visible but stop record rotation and nonessential camera/highlight motion.
 
-### 3. 3D asset selection checklist
+### 3. Selected 3D implementation
+
+- Selected source: Sketchfab `Old Gramophone` by KIFIR / Kirill Evtikhov, CC BY 4.0.
+- Use a commit-pinned public glTF mirror for runtime delivery and keep a visible attribution link to the original Sketchfab page.
+- The source glTF exposes three meshes. `Object001` is the thin circular record and is separately animated; `Object002` is the other animated hardware node. Reuse only the source-authored `Object001` rotation track so the record rotates while the gramophone/tonearm remains visually stable.
+- Load the model with a homepage-only Three.js module. Use responsive DPR caps, static fallback, reduced-motion handling, and camera fitting inside that module.
+- Keep the source CSS record/tonearm underneath as the failure/loading fallback; fade it out only after the WebGL model renders successfully.
+
+### 4. 3D asset selection checklist
 
 - Clear web-usable license and attribution requirements documented in-repo.
 - Downloadable source suitable for GLB/glTF conversion.
