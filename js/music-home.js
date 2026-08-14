@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const HOME_DATA_URL = '/data/music/home.json';
 const DEFAULT_QUOTES = ['只是狂歌一曲，恍惚间就化入无穷'];
-const MODEL_URL = 'https://raw.githubusercontent.com/explearning/threejs-react/a720ced527eefbaa54df783f44e44a07647edf4a/public/old_gramophone/scene.gltf';
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/explearning/threejs-react@a720ced527eefbaa54df783f44e44a07647edf4a/public/old_gramophone/scene.gltf';
 
 const TYPE_DELAY_MS = 120;
 const DELETE_DELAY_MS = 50;
@@ -36,12 +36,19 @@ const initHeroTypewriter = async () => {
   const textNode = root?.querySelector('[data-music-hero-quote-text]');
   if (!root || !textNode) return;
 
+  const fallbackQuote = textNode.textContent?.trim() || DEFAULT_QUOTES[0];
+
+  // Avoid flashing the complete fallback sentence before the local quote data
+  // arrives. No-JS users still keep the server-rendered fallback text.
+  if (!reducedMotion.matches) textNode.textContent = '';
+
   const quotes = await loadHeroQuotes();
-  const firstQuote = quotes[0] || DEFAULT_QUOTES[0];
+  const firstQuote = quotes[0] || fallbackQuote;
 
   if (reducedMotion.matches) {
     textNode.textContent = firstQuote;
     root.dataset.quoteIndex = '0';
+    root.setAttribute('aria-label', firstQuote);
     return;
   }
 
@@ -88,7 +95,6 @@ const initHeroTypewriter = async () => {
     timer = window.setTimeout(write, deleting ? DELETE_DELAY_MS : TYPE_DELAY_MS);
   };
 
-  textNode.textContent = '';
   root.setAttribute('aria-label', firstQuote);
   timer = window.setTimeout(write, 260);
 
@@ -158,6 +164,7 @@ const initGramophone = () => {
   let disposed = false;
   let frameRequest = 0;
   let previousTime = performance.now();
+  let resizeObserver = null;
 
   const setPixelRatio = () => {
     const compact = window.matchMedia('(max-width: 760px)').matches;
@@ -226,9 +233,9 @@ const initGramophone = () => {
         });
       });
 
-      // This asset exposes the record and tonearm as separate animated nodes.
-      // Object001 is the thin circular record mesh; keep the tonearm static and
-      // reuse only the record rotation track supplied by the source asset.
+      // The source asset exposes its record and tonearm as separate animated
+      // nodes. Object001 is the thin circular record mesh. Keep the tonearm
+      // static and reuse only the source-authored record rotation track.
       recordNode = asset.getObjectByName('Object001');
 
       const rawBox = new THREE.Box3().setFromObject(asset);
@@ -288,25 +295,34 @@ const initGramophone = () => {
     frameRequest = window.requestAnimationFrame(clockFrame);
   };
 
+  const handleResize = () => {
+    setPixelRatio();
+    frameComposition();
+    if (modelReady) renderer.render(scene, camera);
+  };
+
   setPixelRatio();
   frameComposition();
   frameRequest = window.requestAnimationFrame(clockFrame);
 
-  const resizeObserver = new ResizeObserver(() => {
-    setPixelRatio();
-    frameComposition();
-    if (modelReady) renderer.render(scene, camera);
-  });
-  resizeObserver.observe(stage);
+  if ('ResizeObserver' in window) {
+    resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(stage);
+  } else {
+    window.addEventListener('resize', handleResize, { passive: true });
+  }
 
-  reducedMotion.addEventListener?.('change', () => {
+  const renderCurrentFrame = () => {
     if (modelReady) renderer.render(scene, camera);
-  });
+  };
+  reducedMotion.addEventListener?.('change', renderCurrentFrame);
 
   window.addEventListener('pagehide', () => {
     disposed = true;
     window.cancelAnimationFrame(frameRequest);
-    resizeObserver.disconnect();
+    resizeObserver?.disconnect();
+    window.removeEventListener('resize', handleResize);
+    reducedMotion.removeEventListener?.('change', renderCurrentFrame);
     mixer?.stopAllAction();
     ground?.geometry?.dispose();
     ground?.material?.dispose();
