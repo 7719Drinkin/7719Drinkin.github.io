@@ -32,7 +32,13 @@ assert(universeRuntime.includes("cache: 'no-cache'"), 'Universe interest metadat
 assert(home.includes('/js/universe-refined.js?v=20260813-cover-runtime-1'), 'Universe refined runtime version was not bumped.');
 
 assert(musicRuntime.includes("musicRuntimeAsset('/js/music-catalog.js')"), 'music.js must propagate its release version to music-catalog.js.');
+assert(musicRuntime.includes('const TRAILING_MEDIA_CUE ='), 'Music runtime must distinguish trailing media-placement notes from the song title.');
+assert(musicRuntime.includes('主題曲|主题曲|插曲'), 'Track display filtering must recognize soundtrack role labels in Traditional and Simplified Chinese.');
+assert(musicRuntime.includes("heading.closest('[data-song-title]')"), 'Display-title cleanup must read the canonical full title from the playable row when available.');
+assert(musicRuntime.includes('heading.textContent = displaySongTitle(sourceTitle);'), 'Only the large visual song title should receive the simplified display form.');
 assert(catalogRuntime.includes("runtimeAsset('/js/music-player.js')"), 'music-catalog.js must propagate its release version to music-player.js.');
+assert(catalogRuntime.includes("row.dataset.songTitle = track.title || track.fileName || 'Untitled';"), 'Catalog rows must preserve the original full title for playback and metadata.');
+assert(catalogRuntime.includes('title.textContent = row.dataset.songTitle;'), 'Catalog renderer must expose the canonical title before display-only cleanup runs.');
 assert(catalogRuntime.includes('row.dataset.coverSrc'), 'Catalog adapter must expose coverSrc on playable rows.');
 assert(catalogRuntime.includes('playerRoot.dataset.defaultCover'), 'Catalog adapter must expose the idle/default player cover.');
 assert(playerRuntime.includes('row?.dataset.coverSrc'), 'MusicPlayer must consume coverSrc from the track row.');
