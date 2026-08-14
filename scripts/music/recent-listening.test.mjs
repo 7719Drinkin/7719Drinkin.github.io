@@ -4,28 +4,48 @@ import { selectRecentListening } from './recent-listening-selector.mjs';
 import { replaceHtmlRegion } from './html-region-updater.mjs';
 import { renderRecentListening } from './recent-listening-renderer.mjs';
 
-test('selectRecentListening sorts by curatedAt and ignores legacy undated rows', () => {
+test('selectRecentListening prioritizes dated artists and keeps legacy artist fallbacks', () => {
   const result = selectRecentListening([
-    { title: 'legacy', curatedAt: '', sourceOrder: 0 },
-    { title: 'older', curatedAt: '2026-08-14T13:00:00+08:00', sourceOrder: 1 },
-    { title: 'newer', curatedAt: '2026-08-14T14:00:00+08:00', sourceOrder: 2 }
+    { artistId: 'legacy-artist', title: 'legacy', curatedAt: '', sourceOrder: 0 },
+    { artistId: 'older-artist', title: 'older', curatedAt: '2026-08-14T13:00:00+08:00', sourceOrder: 1 },
+    { artistId: 'newer-artist', title: 'newer', curatedAt: '2026-08-14T14:00:00+08:00', sourceOrder: 2 }
   ], { limit: 3 });
 
-  assert.deepEqual(result.map((item) => item.title), ['newer', 'older']);
+  assert.deepEqual(result.map((item) => item.title), ['newer', 'older', 'legacy']);
 });
 
-test('selectRecentListening uses sourceOrder as a deterministic tie breaker', () => {
+test('selectRecentListening keeps only the newest song from each artist', () => {
   const result = selectRecentListening([
-    { title: 'second', curatedAt: '2026-08-14T14:00:00+08:00', sourceOrder: 2 },
-    { title: 'first', curatedAt: '2026-08-14T14:00:00+08:00', sourceOrder: 1 }
+    { artistId: 'artist-a', title: 'older-a', curatedAt: '2026-08-14T12:00:00+08:00', sourceOrder: 0 },
+    { artistId: 'artist-a', title: 'newer-a', curatedAt: '2026-08-14T14:00:00+08:00', sourceOrder: 1 },
+    { artistId: 'artist-b', title: 'artist-b', curatedAt: '2026-08-14T13:00:00+08:00', sourceOrder: 2 }
+  ], { limit: 3 });
+
+  assert.deepEqual(result.map((item) => item.title), ['newer-a', 'artist-b']);
+});
+
+test('selectRecentListening uses sourceOrder as a deterministic tie breaker across artists', () => {
+  const result = selectRecentListening([
+    { artistId: 'artist-b', title: 'second', curatedAt: '2026-08-14T14:00:00+08:00', sourceOrder: 2 },
+    { artistId: 'artist-a', title: 'first', curatedAt: '2026-08-14T14:00:00+08:00', sourceOrder: 1 }
   ], { limit: 2 });
 
   assert.deepEqual(result.map((item) => item.title), ['first', 'second']);
 });
 
+test('selectRecentListening does not let a legacy row duplicate an already selected dated artist', () => {
+  const result = selectRecentListening([
+    { artistId: 'artist-a', title: 'dated-a', curatedAt: '2026-08-14T14:00:00+08:00', sourceOrder: 1 },
+    { artistId: 'artist-a', title: 'legacy-a', curatedAt: '', sourceOrder: 0 },
+    { artistId: 'artist-b', title: 'legacy-b', curatedAt: '', sourceOrder: 2 }
+  ], { limit: 3 });
+
+  assert.deepEqual(result.map((item) => item.title), ['dated-a', 'legacy-b']);
+});
+
 test('selectRecentListening rejects malformed timestamps', () => {
   assert.throws(() => selectRecentListening([
-    { title: 'broken', curatedAt: '2026/08/14 14:00', sourceOrder: 0 }
+    { artistId: 'artist-a', title: 'broken', curatedAt: '2026/08/14 14:00', sourceOrder: 0 }
   ]), /Invalid curatedAt/);
 });
 
