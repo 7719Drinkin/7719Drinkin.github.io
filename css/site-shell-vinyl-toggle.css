@@ -1,0 +1,90 @@
+/*
+ * Collapsed vinyl interaction refinement.
+ * The minimized dock keeps only the large expand control and the record itself.
+ * The existing semantic play/pause button becomes an invisible hit surface over the vinyl,
+ * so there is no extra visible playback button in collapsed mode.
+ */
+
+/* Keep the platter animation mounted at all times so pausing freezes the current angle. */
+.persistent-player-platter {
+  animation: persistent-platter-turn 12s linear infinite;
+  animation-play-state: paused;
+}
+
+.persistent-music-player.is-playing .persistent-player-platter {
+  animation-play-state: running;
+}
+
+/* A tighter dock: expand control + record, with no leftover transport button block. */
+.persistent-music-player.is-collapsed {
+  width: 128px;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-main {
+  z-index: 8;
+  overflow: visible;
+  padding: 0;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-transport {
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-transport-actions {
+  position: absolute;
+  z-index: 9;
+  top: calc((var(--persistent-player-height) - var(--persistent-record-size)) / 2);
+  right: calc(var(--persistent-record-overhang) * -1);
+  display: block;
+  width: var(--persistent-record-size);
+  height: var(--persistent-record-size);
+  pointer-events: none;
+}
+
+/*
+ * The transport button remains in the DOM for keyboard/accessibility semantics,
+ * but visually disappears and exactly follows the vinyl hit area.
+ * Clicking anywhere on the record toggles play/pause without moving or restyling the record.
+ */
+.persistent-music-player.is-collapsed .persistent-player-toggle,
+.persistent-music-player.is-collapsed .persistent-player-toggle:hover,
+.persistent-music-player.is-collapsed .persistent-player-toggle:focus-visible,
+.persistent-music-player.is-collapsed .persistent-player-toggle:active {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: transparent;
+  box-shadow: none;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  cursor: pointer;
+  outline: none;
+}
+
+.persistent-music-player.is-collapsed .persistent-player-toggle .persistent-ui-icon {
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+@media (max-width: 680px) {
+  .persistent-music-player.is-collapsed {
+    width: 116px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .persistent-player-platter {
+    animation: none;
+  }
+}
