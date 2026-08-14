@@ -11,7 +11,6 @@ const TYPE_DELAY_MS = 120;
 const DELETE_DELAY_MS = 50;
 const HOLD_DELAY_MS = 1500;
 const BETWEEN_QUOTES_MS = 280;
-
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 const loadHeroQuotes = async () => {
@@ -22,7 +21,6 @@ const loadHeroQuotes = async () => {
       headers: { Accept: 'application/json' }
     });
     if (!response.ok) throw new Error(`Music home data ${response.status}`);
-
     const data = await response.json();
     const quotes = Array.isArray(data?.heroQuotes)
       ? data.heroQuotes.map((value) => String(value || '').trim()).filter(Boolean)
@@ -60,11 +58,9 @@ const initHeroTypewriter = async () => {
     const quote = quotes[quoteIndex] || firstQuote;
     const characters = Array.from(quote);
 
-    if (deleting) {
-      characterIndex = Math.max(0, characterIndex - 1);
-    } else {
-      characterIndex = Math.min(characters.length, characterIndex + 1);
-    }
+    characterIndex = deleting
+      ? Math.max(0, characterIndex - 1)
+      : Math.min(characters.length, characterIndex + 1);
 
     textNode.textContent = characters.slice(0, characterIndex).join('');
     root.dataset.quoteIndex = String(quoteIndex);
@@ -72,7 +68,6 @@ const initHeroTypewriter = async () => {
     if (!deleting && characterIndex === characters.length) {
       root.setAttribute('aria-label', quote);
       if (quotes.length === 1) return;
-
       timer = window.setTimeout(() => {
         deleting = true;
         write();
@@ -93,38 +88,22 @@ const initHeroTypewriter = async () => {
 
   root.setAttribute('aria-label', firstQuote);
   timer = window.setTimeout(write, 260);
-
   window.addEventListener('pagehide', () => window.clearTimeout(timer), { once: true });
 };
 
-const createHeroMaterial = (kind) => {
-  if (kind === 'record') {
-    return new THREE.MeshStandardMaterial({
-      color: 0x070d17,
-      roughness: .62,
-      metalness: .03,
-      emissive: 0x020812,
-      emissiveIntensity: .16
-    });
-  }
+const HERO_PALETTE = {
+  record: new THREE.Color(0x070b12),
+  bodyLow: new THREE.Color(0x0b1420),
+  bodyMid: new THREE.Color(0x17212d),
+  brassDark: new THREE.Color(0x5e472a),
+  brass: new THREE.Color(0x9b7440),
+  brassLight: new THREE.Color(0xb58b50),
+  hardware: new THREE.Color(0x8f6d3f)
+};
 
-  if (kind === 'tonearm') {
-    return new THREE.MeshStandardMaterial({
-      color: 0x81724f,
-      roughness: .82,
-      metalness: .12,
-      emissive: 0x0b0803,
-      emissiveIntensity: .08
-    });
-  }
-
-  return new THREE.MeshStandardMaterial({
-    color: 0x0a1422,
-    roughness: .94,
-    metalness: 0,
-    emissive: 0x020914,
-    emissiveIntensity: .2
-  });
+const smoothstep = (value, min, max) => {
+  const t = THREE.MathUtils.clamp((value - min) / Math.max(max - min, Number.EPSILON), 0, 1);
+  return t * t * (3 - 2 * t);
 };
 
 const classifyGramophoneMesh = (node) => {
@@ -136,20 +115,97 @@ const classifyGramophoneMesh = (node) => {
   }
   const identity = lineage.join(' / ');
   if (identity.includes('Object001')) return 'record';
-  if (identity.includes('Object002')) return 'tonearm';
+  if (identity.includes('Object002')) return 'hardware';
   return 'body';
+};
+
+const applyBodyVertexPalette = (node) => {
+  if (!node.geometry?.attributes?.position) return;
+
+  node.geometry = node.geometry.clone();
+  node.geometry.computeBoundingBox();
+  const box = node.geometry.boundingBox;
+  const position = node.geometry.attributes.position;
+  if (!box || !position) return;
+
+  const zMin = box.min.z;
+  const zRange = Math.max(box.max.z - zMin, Number.EPSILON);
+  const colors = new Float32Array(position.count * 3);
+  const mixed = new THREE.Color();
+
+  for (let i = 0; i < position.count; i += 1) {
+    const height = (position.getZ(i) - zMin) / zRange;
+
+    if (height < .43) {
+      mixed.lerpColors(
+        HERO_PALETTE.bodyLow,
+        HERO_PALETTE.bodyMid,
+        smoothstep(height, .04, .43)
+      );
+    } else if (height < .60) {
+      mixed.lerpColors(
+        HERO_PALETTE.bodyMid,
+        HERO_PALETTE.brassDark,
+        smoothstep(height, .43, .60)
+      );
+    } else {
+      mixed.lerpColors(
+        HERO_PALETTE.brass,
+        HERO_PALETTE.brassLight,
+        smoothstep(height, .60, .94) * .72
+      );
+    }
+
+    colors[i * 3] = mixed.r;
+    colors[i * 3 + 1] = mixed.g;
+    colors[i * 3 + 2] = mixed.b;
+  }
+
+  node.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+};
+
+const createHeroMaterial = (kind) => {
+  if (kind === 'record') {
+    return new THREE.MeshLambertMaterial({
+      color: HERO_PALETTE.record,
+      emissive: 0x020711,
+      emissiveIntensity: .16,
+      side: THREE.DoubleSide
+    });
+  }
+
+  if (kind === 'hardware') {
+    return new THREE.MeshLambertMaterial({
+      color: HERO_PALETTE.hardware,
+      emissive: 0x120b04,
+      emissiveIntensity: .09,
+      side: THREE.DoubleSide
+    });
+  }
+
+  return new THREE.MeshLambertMaterial({
+    color: 0xffffff,
+    vertexColors: true,
+    emissive: 0x02060c,
+    emissiveIntensity: .08,
+    side: THREE.DoubleSide
+  });
 };
 
 const addStylizedEdges = (node, kind) => {
   if (!node.geometry?.attributes?.position) return;
 
-  const edgeColor = kind === 'record' ? 0x586985 : 0xc6a45d;
-  const opacity = kind === 'record' ? .14 : kind === 'tonearm' ? .34 : .24;
-  const geometry = new THREE.EdgesGeometry(node.geometry, 28);
+  const edgePreset = kind === 'record'
+    ? { color: 0x52627b, opacity: .08 }
+    : kind === 'hardware'
+      ? { color: 0xc3a064, opacity: .16 }
+      : { color: 0x8b7a59, opacity: .10 };
+
+  const geometry = new THREE.EdgesGeometry(node.geometry, 32);
   const material = new THREE.LineBasicMaterial({
-    color: edgeColor,
+    color: edgePreset.color,
     transparent: true,
-    opacity,
+    opacity: edgePreset.opacity,
     depthWrite: false
   });
   const lines = new THREE.LineSegments(geometry, material);
@@ -173,7 +229,12 @@ const addRecordLabel = (recordMesh) => {
 
   const label = new THREE.Mesh(
     new THREE.CircleGeometry(radius, 48),
-    new THREE.MeshBasicMaterial({ color: 0xc9a04b, transparent: true, opacity: .86, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({
+      color: 0xc19a50,
+      transparent: true,
+      opacity: .78,
+      side: THREE.DoubleSide
+    })
   );
   label.position.set(centerX, centerY, topZ);
   label.renderOrder = 4;
@@ -196,6 +257,7 @@ const stylizeGramophoneAsset = (asset) => {
 
   meshes.forEach((node) => {
     const kind = classifyGramophoneMesh(node);
+    if (kind === 'body') applyBodyVertexPalette(node);
     node.material = createHeroMaterial(kind);
     node.castShadow = false;
     node.receiveShadow = false;
@@ -209,8 +271,9 @@ const installEmergencyFlatMaterials = (asset) => {
     if (!node.isMesh) return;
     const kind = classifyGramophoneMesh(node);
     node.material = new THREE.MeshBasicMaterial({
-      color: kind === 'tonearm' ? 0x81724f : kind === 'record' ? 0x07101e : 0x0a1422,
-      wireframe: false
+      color: kind === 'hardware' ? 0x8f6d3f : kind === 'record' ? 0x070b12 : 0x17212d,
+      wireframe: false,
+      side: THREE.DoubleSide
     });
     node.castShadow = false;
     node.receiveShadow = false;
@@ -239,8 +302,8 @@ const initGramophone = () => {
   stage.classList.add('is-loading');
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = .9;
+  renderer.toneMapping = THREE.NoToneMapping;
+  renderer.toneMappingExposure = 1;
   renderer.shadowMap.enabled = false;
 
   const scene = new THREE.Scene();
@@ -248,18 +311,22 @@ const initGramophone = () => {
   const composition = new THREE.Group();
   scene.add(composition);
 
-  scene.add(new THREE.AmbientLight(0xa7b4c9, 1.14));
+  scene.add(new THREE.AmbientLight(0x97a6bc, .96));
 
-  const hemisphere = new THREE.HemisphereLight(0x7386a3, 0x050914, 1.7);
+  const hemisphere = new THREE.HemisphereLight(0x607ca4, 0x120d08, .92);
   scene.add(hemisphere);
 
-  const keyLight = new THREE.DirectionalLight(0xd8bb78, 1.05);
-  keyLight.position.set(4.5, 7.5, 6.5);
-  scene.add(keyLight);
+  const warmKey = new THREE.DirectionalLight(0xd0a35b, .70);
+  warmKey.position.set(4.8, 7.2, 6.4);
+  scene.add(warmKey);
 
-  const rimLight = new THREE.DirectionalLight(0x6f89ad, 1.2);
-  rimLight.position.set(-5, 3.5, -4);
-  scene.add(rimLight);
+  const coolFill = new THREE.DirectionalLight(0x627fa8, .46);
+  coolFill.position.set(-5.2, 3.4, -3.6);
+  scene.add(coolFill);
+
+  const topAccent = new THREE.DirectionalLight(0xe1c27b, .22);
+  topAccent.position.set(.8, 8.5, 2.6);
+  scene.add(topAccent);
 
   let mixer = null;
   let recordNode = null;
