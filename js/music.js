@@ -22,6 +22,29 @@ document.querySelectorAll('.collection-song-row em').forEach((label) => {
 
 const catalogPage = document.body.dataset.musicCatalogPage;
 
+// The catalog title remains the source of truth for playback, matching and accessibility.
+// Only the large visual title drops a trailing media-placement note such as
+// “(电影恭喜发财主题曲)” or “（電影花仔多情插曲）”. Other parentheses —
+// duet credits, remixes, alternate names or parentheses that belong to the song title — stay.
+const TRAILING_MEDIA_CUE = /\s*[（(]([^（）()]*(?:主題曲|主题曲|插曲|片頭曲|片头曲|片尾曲|開場曲|开场曲|結尾曲|结尾曲|主題歌|主题歌|片頭歌|片头歌|片尾歌|電影歌曲|电影歌曲|電視劇歌曲|电视剧歌曲|劇集歌曲|剧集歌曲|原聲插曲|原声插曲)[^（）()]*)[）)]\s*$/u;
+
+const displaySongTitle = (value = '') => {
+  const title = String(value).trim();
+  const simplified = title.replace(TRAILING_MEDIA_CUE, '').trim();
+  return simplified || title;
+};
+
+const refreshSongDisplayTitles = (root = document) => {
+  root.querySelectorAll?.('.song-primary h3').forEach((heading) => {
+    const row = heading.closest('[data-song-title]');
+    const sourceTitle = row?.dataset.songTitle || heading.textContent || '';
+    heading.textContent = displaySongTitle(sourceTitle);
+  });
+};
+
+refreshSongDisplayTitles();
+window.addEventListener('music:catalog-ready', () => refreshSongDisplayTitles());
+
 const initAlbumSorting = () => {
   const albumGrid = document.querySelector('.album-grid');
   if (!albumGrid || albumGrid.dataset.albumSortReady === 'true') return;
