@@ -9,7 +9,7 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-const [home, interestsRaw, universeRuntime, musicRuntime, catalogRuntime, playerRuntime, playerCss, frameBridge, shellRuntime, shellCss, shellPage] = await Promise.all([
+const [home, interestsRaw, universeRuntime, musicRuntime, catalogRuntime, playerRuntime, playerCss, frameBridge, shellRuntime, shellCss, vinylToggleCss, shellPage] = await Promise.all([
   read('index.html'),
   read('data/interests.json'),
   read('js/universe-refined.js'),
@@ -20,6 +20,7 @@ const [home, interestsRaw, universeRuntime, musicRuntime, catalogRuntime, player
   read('js/site-frame-bridge.js'),
   read('js/site-shell.js'),
   read('css/site-shell.css'),
+  read('css/site-shell-vinyl-toggle.css'),
   read('site-shell.html')
 ]);
 
@@ -48,7 +49,7 @@ assert(shellRuntime.includes('restoreViewState();'), 'Persistent player must res
 assert(shellRuntime.includes("ui.album.textContent = track.album || ''"), 'Persistent player must retain album metadata independently.');
 assert(shellRuntime.includes('updateMetadata(current);'), 'Persistent player must refresh metadata when selecting the already-loaded track.');
 assert(shellRuntime.includes('const ICONS = Object.freeze'), 'Persistent player controls must use the shared inline SVG icon set.');
-assert(shellRuntime.includes('ui.toggle.innerHTML = playing ? ICONS.pause : ICONS.play'), 'Persistent player must expose play and pause through the transport button.');
+assert(shellRuntime.includes('ui.toggle.innerHTML = playing ? ICONS.pause : ICONS.play'), 'Persistent player must keep play/pause semantics while the collapsed hit surface becomes invisible.');
 assert(shellRuntime.includes('ICONS.collapseRight'), 'Expanded player collapse affordance must indicate motion toward the right-side record anchor.');
 assert(shellRuntime.includes('ICONS.expandLeft'), 'Collapsed player affordance must indicate expansion toward the left.');
 assert(shellRuntime.includes('const setRangeFill ='), 'Persistent player ranges must expose visual progress without external UI libraries.');
@@ -74,20 +75,28 @@ assert(shellCss.includes('.persistent-player-tonearm-cartridge'), 'Persistent pl
 assert(shellCss.includes('transform: rotate(0deg);'), 'Playing tonearm must use the shallow outer-groove landing pose.');
 assert(!shellCss.includes('.persistent-player-spindle'), 'Record center must not render a fixed spindle ornament.');
 assert(shellCss.includes('.persistent-player-volume-inline'), 'Expanded player must expose an always-visible inline volume control.');
-assert(shellCss.includes('width: 44px;\n  height: 44px;'), 'Desktop collapse and minimized play controls must expose large square hit targets.');
+assert(shellCss.includes('width: 44px;\n  height: 44px;'), 'Desktop collapse control must expose a large square hit target.');
 assert(shellCss.includes('border-radius: 12px;'), 'Desktop collapse control must use a rounded-square shape.');
-assert(shellCss.includes('.persistent-music-player.is-collapsed {\n  width: 172px;'), 'Desktop minimized player must collapse to the compact vinyl dock width.');
 assert(shellCss.includes('.persistent-music-player.is-collapsed .persistent-player-copy {\n  opacity: 0;'), 'Minimized dock must fully hide song metadata instead of leaving an empty title rail.');
-assert(shellCss.includes('.persistent-music-player.is-collapsed .persistent-player-toggle {'), 'Minimized dock must retain a dedicated play/pause control.');
 assert(shellCss.includes('@keyframes persistent-collapse-hint-right'), 'Expanded collapse affordance must animate toward the collapse direction.');
 assert(shellCss.includes('@keyframes persistent-collapse-hint-left'), 'Collapsed expand affordance must animate toward the expansion direction.');
-assert(!shellCss.includes('.persistent-player-center-toggle'), 'Play/pause must not overlay the record artwork.');
+assert(!shellCss.includes('.persistent-player-center-toggle'), 'Play/pause must not overlay the record artwork in expanded mode.');
+
+assert(vinylToggleCss.includes('.persistent-music-player.is-collapsed {\n  width: 128px;'), 'Desktop minimized dock must collapse to the record-and-expand-control footprint.');
+assert(vinylToggleCss.includes('width: 116px;'), 'Mobile minimized dock must collapse to the compact record footprint.');
+assert(vinylToggleCss.includes('animation-play-state: paused;'), 'Paused vinyl must freeze at its current rotation angle instead of snapping upright.');
+assert(vinylToggleCss.includes('.persistent-music-player.is-playing .persistent-player-platter {\n  animation-play-state: running;'), 'Playing vinyl must resume the same platter animation from the paused angle.');
+assert(vinylToggleCss.includes('.persistent-music-player.is-collapsed .persistent-player-toggle,'), 'Collapsed vinyl must reuse the existing play/pause control as its click surface.');
+assert(vinylToggleCss.includes('color: transparent;'), 'Collapsed vinyl click surface must not render a play/pause icon.');
+assert(vinylToggleCss.includes('border-radius: 50%;'), 'Collapsed click target must follow the round vinyl footprint.');
+assert(vinylToggleCss.includes('pointer-events: auto;\n  cursor: pointer;'), 'Collapsed vinyl must be directly clickable without moving the record.');
+assert(!vinylToggleCss.includes('scale('), 'Collapsed vinyl interaction must not scale or move the record on click.');
 
 assert(shellPage.includes('class="persistent-player-copy"'), 'Persistent shell must render song metadata as one horizontal content line.');
 assert(shellPage.includes('class="persistent-player-transport"'), 'Persistent shell must render a separate transport deck.');
 assert(shellPage.includes('data-persistent-turntable'), 'Persistent shell must render a dedicated right-side record anchor.');
-assert(shellPage.includes('class="persistent-player-toggle"'), 'Persistent shell must render play/pause outside the record.');
-assert(!shellPage.includes('persistent-player-center-toggle'), 'Persistent shell must not place play/pause over the record.');
+assert(shellPage.includes('class="persistent-player-toggle"'), 'Persistent shell must retain semantic play/pause control outside the vinyl artwork markup.');
+assert(!shellPage.includes('persistent-player-center-toggle'), 'Persistent shell must not place a visible play/pause button over the record.');
 assert(!shellPage.includes('persistent-player-spindle'), 'Persistent shell must not render an unnecessary center spindle.');
 assert(shellPage.includes('L62 36'), 'Tonearm geometry must land the cartridge on the outer groove area.');
 assert(!shellPage.includes('data-persistent-state'), 'Persistent shell must not render textual playback-state labels.');
@@ -97,8 +106,9 @@ assert(!shellPage.includes('persistent-player-collapse-rail'), 'Large square col
 assert(shellPage.includes('data-persistent-volume-control'), 'Persistent shell must render the inline volume control in expanded mode.');
 assert(shellPage.includes('data-persistent-volume-icon'), 'Persistent shell must render a visible volume icon.');
 assert(shellPage.includes('persistent-player-tonearm-cartridge'), 'Persistent shell must render the detailed decorative tonearm.');
-assert(shellPage.includes('/js/site-shell.js?v=20260814-minimized-dock-1'), 'Persistent shell JS cache version was not bumped for the minimized dock.');
-assert(shellPage.includes('/css/site-shell.css?v=20260814-minimized-dock-1'), 'Persistent shell CSS cache version was not bumped for the minimized dock.');
+assert(shellPage.includes('/js/site-shell.js?v=20260814-minimized-dock-1'), 'Persistent shell JS cache version must remain pinned to the unchanged minimized-dock runtime.');
+assert(shellPage.includes('/css/site-shell.css?v=20260814-minimized-dock-1'), 'Persistent shell base CSS cache version must remain available.');
+assert(shellPage.includes('/css/site-shell-vinyl-toggle.css?v=20260814-vinyl-toggle-1'), 'Persistent shell must load the collapsed vinyl interaction refinement stylesheet.');
 
 const [artistPage, albumPage] = await Promise.all([
   read('music/artists/tan-yonglin/index.html'),
