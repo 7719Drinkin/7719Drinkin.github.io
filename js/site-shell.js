@@ -13,7 +13,6 @@
   const ui = {
     turntable: playerRoot.querySelector('[data-persistent-turntable]'),
     cover: playerRoot.querySelector('[data-persistent-cover]'),
-    state: playerRoot.querySelector('[data-persistent-state]'),
     title: playerRoot.querySelector('[data-persistent-title]'),
     artist: playerRoot.querySelector('[data-persistent-artist]'),
     album: playerRoot.querySelector('[data-persistent-album]'),
@@ -27,6 +26,7 @@
     volumeControl: playerRoot.querySelector('[data-persistent-volume-control]'),
     volumeIcon: playerRoot.querySelector('[data-persistent-volume-icon]'),
     collapse: playerRoot.querySelector('[data-persistent-collapse]'),
+    collapseIcon: playerRoot.querySelector('[data-persistent-collapse-icon]'),
     close: playerRoot.querySelector('[data-persistent-close]'),
     status: playerRoot.querySelector('[data-persistent-status]')
   };
@@ -41,8 +41,8 @@
     pause: icon('<path d="M9 6v12"></path><path d="M15 6v12"></path>'),
     skipBack: icon('<path d="M19 5 9 12l10 7V5Z"></path><path d="M5 5v14"></path>'),
     skipForward: icon('<path d="m5 5 10 7-10 7V5Z"></path><path d="M19 5v14"></path>'),
-    chevronUp: icon('<path d="m7 14 5-5 5 5"></path>'),
-    chevronDown: icon('<path d="m7 10 5 5 5-5"></path>'),
+    collapseRight: icon('<path d="m9 7 5 5-5 5"></path><path d="m14 7 5 5-5 5"></path>'),
+    expandLeft: icon('<path d="m15 7-5 5 5 5"></path><path d="m10 7-5 5 5 5"></path>'),
     close: icon('<path d="M7 7l10 10"></path><path d="m17 7-10 10"></path>'),
     volumeHigh: icon('<path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"></path><path d="M15 9a4 4 0 0 1 0 6"></path><path d="M18 6.5a8 8 0 0 1 0 11"></path>'),
     volumeLow: icon('<path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"></path><path d="M15 9.5a3.5 3.5 0 0 1 0 5"></path>'),
@@ -133,6 +133,12 @@
   const activeTrack = () => state.queue[state.index] || state.track;
   const isCollapsed = () => playerRoot.classList.contains('is-collapsed');
 
+  const setRangeFill = (element, value) => {
+    if (!element) return;
+    const percent = Math.min(100, Math.max(0, Number(value) || 0));
+    element.style.setProperty('--range-progress', `${percent}%`);
+  };
+
   const renderStaticIcons = () => {
     if (ui.previous) ui.previous.innerHTML = ICONS.skipBack;
     if (ui.next) ui.next.innerHTML = ICONS.skipForward;
@@ -146,8 +152,10 @@
 
     if (ui.collapse) {
       ui.collapse.setAttribute('aria-expanded', String(!next));
-      ui.collapse.setAttribute('aria-label', next ? '展开播放器' : '收起播放器');
-      ui.collapse.innerHTML = next ? ICONS.chevronUp : ICONS.chevronDown;
+      ui.collapse.setAttribute('aria-label', next ? '向左展开播放器' : '向右收起播放器');
+    }
+    if (ui.collapseIcon) {
+      ui.collapseIcon.innerHTML = next ? ICONS.expandLeft : ICONS.collapseRight;
     }
 
     if (!persist) return;
@@ -199,7 +207,6 @@
     ui.artist.textContent = track.artist;
     ui.album.textContent = track.album || '';
     renderCover(track);
-    ui.state.textContent = audio.paused ? 'PAUSED' : 'NOW PLAYING';
     document.title = document.title || '7719 Universe';
   };
 
@@ -209,6 +216,7 @@
     if (ui.volume) {
       ui.volume.value = String(value);
       ui.volume.setAttribute('aria-label', `音量 ${percent}%`);
+      setRangeFill(ui.volume, percent);
     }
     if (ui.volumeIcon) {
       ui.volumeIcon.innerHTML = value <= .001
@@ -225,7 +233,6 @@
     playerRoot.classList.toggle('is-playing', playing);
     ui.toggle.innerHTML = playing ? ICONS.pause : ICONS.play;
     ui.toggle.setAttribute('aria-label', playing ? '暂停' : '播放');
-    ui.state.textContent = playing ? 'NOW PLAYING' : 'PAUSED';
     broadcastPlayerState();
     persistState();
   };
@@ -234,7 +241,11 @@
     ui.current.textContent = formatTime(audio.currentTime);
     ui.duration.textContent = formatTime(audio.duration);
     if (!state.seeking && Number.isFinite(audio.duration) && audio.duration > 0) {
-      ui.seek.value = String((audio.currentTime / audio.duration) * 100);
+      const percent = (audio.currentTime / audio.duration) * 100;
+      ui.seek.value = String(percent);
+      setRangeFill(ui.seek, percent);
+    } else if (!Number.isFinite(audio.duration) || audio.duration <= 0) {
+      setRangeFill(ui.seek, 0);
     }
   };
 
@@ -354,6 +365,7 @@
     ui.current.textContent = '0:00';
     ui.duration.textContent = '0:00';
     ui.seek.value = '0';
+    setRangeFill(ui.seek, 0);
     ui.status.textContent = '';
     playerRoot.classList.remove('is-playing');
     ui.toggle.innerHTML = ICONS.play;
@@ -420,7 +432,6 @@
     audio.volume = Math.min(1, Math.max(0, Number(saved.volume) || .8));
     updateVolumeUi();
     setSource(activeTrack() || state.track, Number(saved.currentTime) || 0);
-    ui.state.textContent = 'PAUSED';
     ui.toggle.innerHTML = ICONS.play;
     ui.toggle.setAttribute('aria-label', '播放');
     state.restoring = false;
@@ -454,8 +465,10 @@
 
   ui.seek.addEventListener('input', () => {
     state.seeking = true;
+    const percent = Number(ui.seek.value);
+    setRangeFill(ui.seek, percent);
     if (Number.isFinite(audio.duration)) {
-      ui.current.textContent = formatTime((Number(ui.seek.value) / 100) * audio.duration);
+      ui.current.textContent = formatTime((percent / 100) * audio.duration);
     }
   });
 
@@ -545,6 +558,7 @@
   renderStaticIcons();
   restoreViewState();
   restorePlayerState();
+  setRangeFill(ui.seek, 0);
   const initialRoute = routeFromShellQuery();
   navigate(initialRoute, { push: false });
 })();
