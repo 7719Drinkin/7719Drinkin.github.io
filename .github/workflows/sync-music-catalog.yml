@@ -8,7 +8,8 @@ on:
       - 'scripts/sync-music-catalog.mjs'
       - '.github/workflows/sync-music-catalog.yml'
   schedule:
-    - cron: '17 * * * *'
+    # Run once per day at 00:17 UTC+8. workflow_dispatch remains available for on-demand refreshes.
+    - cron: '17 16 * * *'
   workflow_dispatch:
     inputs:
       allow_empty:
