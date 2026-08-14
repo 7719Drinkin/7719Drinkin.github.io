@@ -4,6 +4,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 const HOME_DATA_URL = '/data/music/home.json';
 const DEFAULT_QUOTES = ['只是狂歌一曲，恍惚间就化入无穷'];
 const MODEL_URL = 'https://cdn.jsdelivr.net/gh/explearning/threejs-react@a720ced527eefbaa54df783f44e44a07647edf4a/public/old_gramophone/scene.gltf';
+const MODEL_TEXTURE_PATH = '/public/old_gramophone/textures/';
+const ONE_PIXEL_TEXTURE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/0Wq7WQAAAABJRU5ErkJggg==';
 
 const TYPE_DELAY_MS = 120;
 const DELETE_DELAY_MS = 50;
@@ -37,9 +39,6 @@ const initHeroTypewriter = async () => {
   if (!root || !textNode) return;
 
   const fallbackQuote = textNode.textContent?.trim() || DEFAULT_QUOTES[0];
-
-  // Avoid flashing the complete fallback sentence before the local quote data
-  // arrives. No-JS users still keep the server-rendered fallback text.
   if (!reducedMotion.matches) textNode.textContent = '';
 
   const quotes = await loadHeroQuotes();
@@ -72,9 +71,6 @@ const initHeroTypewriter = async () => {
 
     if (!deleting && characterIndex === characters.length) {
       root.setAttribute('aria-label', quote);
-
-      // With one configured quote, type it once and leave the cursor blinking.
-      // Adding a second item to data/music/home.json automatically enables rotation.
       if (quotes.length === 1) return;
 
       timer = window.setTimeout(() => {
@@ -105,29 +101,29 @@ const createHeroMaterial = (kind) => {
   if (kind === 'record') {
     return new THREE.MeshStandardMaterial({
       color: 0x070d17,
-      roughness: .58,
-      metalness: .08,
+      roughness: .62,
+      metalness: .03,
       emissive: 0x020812,
-      emissiveIntensity: .18
+      emissiveIntensity: .16
     });
   }
 
   if (kind === 'tonearm') {
     return new THREE.MeshStandardMaterial({
-      color: 0x8c7a52,
-      roughness: .76,
-      metalness: .28,
+      color: 0x81724f,
+      roughness: .82,
+      metalness: .12,
       emissive: 0x0b0803,
-      emissiveIntensity: .1
+      emissiveIntensity: .08
     });
   }
 
   return new THREE.MeshStandardMaterial({
     color: 0x0a1422,
-    roughness: .9,
-    metalness: .04,
+    roughness: .94,
+    metalness: 0,
     emissive: 0x020914,
-    emissiveIntensity: .22
+    emissiveIntensity: .2
   });
 };
 
@@ -145,9 +141,11 @@ const classifyGramophoneMesh = (node) => {
 };
 
 const addStylizedEdges = (node, kind) => {
+  if (!node.geometry?.attributes?.position) return;
+
   const edgeColor = kind === 'record' ? 0x586985 : 0xc6a45d;
-  const opacity = kind === 'record' ? .18 : kind === 'tonearm' ? .46 : .32;
-  const geometry = new THREE.EdgesGeometry(node.geometry, 24);
+  const opacity = kind === 'record' ? .14 : kind === 'tonearm' ? .34 : .24;
+  const geometry = new THREE.EdgesGeometry(node.geometry, 28);
   const material = new THREE.LineBasicMaterial({
     color: edgeColor,
     transparent: true,
@@ -171,10 +169,11 @@ const addRecordLabel = (recordMesh) => {
   const centerY = (box.min.y + box.max.y) / 2;
   const topZ = box.max.z + .025;
   const radius = Math.min(box.max.x - box.min.x, box.max.y - box.min.y) * .085;
+  if (!Number.isFinite(radius) || radius <= 0) return;
 
   const label = new THREE.Mesh(
     new THREE.CircleGeometry(radius, 48),
-    new THREE.MeshBasicMaterial({ color: 0xc9a04b, transparent: true, opacity: .9, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ color: 0xc9a04b, transparent: true, opacity: .86, side: THREE.DoubleSide })
   );
   label.position.set(centerX, centerY, topZ);
   label.renderOrder = 4;
@@ -189,17 +188,33 @@ const addRecordLabel = (recordMesh) => {
   recordMesh.add(spindle);
 };
 
-const disposeSourceMaterial = (material) => {
-  if (!material) return;
-  [
-    material.map,
-    material.normalMap,
-    material.roughnessMap,
-    material.metalnessMap,
-    material.aoMap,
-    material.emissiveMap
-  ].filter(Boolean).forEach((texture) => texture.dispose());
-  material.dispose?.();
+const stylizeGramophoneAsset = (asset) => {
+  const meshes = [];
+  asset.traverse((node) => {
+    if (node.isMesh) meshes.push(node);
+  });
+
+  meshes.forEach((node) => {
+    const kind = classifyGramophoneMesh(node);
+    node.material = createHeroMaterial(kind);
+    node.castShadow = false;
+    node.receiveShadow = false;
+    addStylizedEdges(node, kind);
+    if (kind === 'record') addRecordLabel(node);
+  });
+};
+
+const installEmergencyFlatMaterials = (asset) => {
+  asset.traverse((node) => {
+    if (!node.isMesh) return;
+    const kind = classifyGramophoneMesh(node);
+    node.material = new THREE.MeshBasicMaterial({
+      color: kind === 'tonearm' ? 0x81724f : kind === 'record' ? 0x07101e : 0x0a1422,
+      wireframe: false
+    });
+    node.castShadow = false;
+    node.receiveShadow = false;
+  });
 };
 
 const initGramophone = () => {
@@ -225,7 +240,7 @@ const initGramophone = () => {
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = .92;
+  renderer.toneMappingExposure = .9;
   renderer.shadowMap.enabled = false;
 
   const scene = new THREE.Scene();
@@ -233,18 +248,16 @@ const initGramophone = () => {
   const composition = new THREE.Group();
   scene.add(composition);
 
-  // The hero is intentionally illustration-like rather than photorealistic:
-  // broad ambient light, restrained directional accents, no dramatic shadows.
-  scene.add(new THREE.AmbientLight(0xa7b4c9, 1.05));
+  scene.add(new THREE.AmbientLight(0xa7b4c9, 1.14));
 
-  const hemisphere = new THREE.HemisphereLight(0x7386a3, 0x050914, 1.8);
+  const hemisphere = new THREE.HemisphereLight(0x7386a3, 0x050914, 1.7);
   scene.add(hemisphere);
 
-  const keyLight = new THREE.DirectionalLight(0xd8bb78, 1.3);
+  const keyLight = new THREE.DirectionalLight(0xd8bb78, 1.05);
   keyLight.position.set(4.5, 7.5, 6.5);
   scene.add(keyLight);
 
-  const rimLight = new THREE.DirectionalLight(0x6f89ad, 1.45);
+  const rimLight = new THREE.DirectionalLight(0x6f89ad, 1.2);
   rimLight.position.set(-5, 3.5, -4);
   scene.add(rimLight);
 
@@ -284,13 +297,20 @@ const initGramophone = () => {
     const direction = new THREE.Vector3(.5, .26, 1).normalize();
 
     camera.position.copy(center).add(direction.multiplyScalar(distance));
-    // Aim a little below the geometric center so the cabinet sits safely above
-    // the hero's lower crop while the horn can still breathe into the top-right.
     camera.lookAt(center.x - .12, center.y - size.y * .055, center.z);
     camera.updateProjectionMatrix();
   };
 
-  const loader = new GLTFLoader();
+  const manager = new THREE.LoadingManager();
+  manager.setURLModifier((url) => {
+    if (url.includes(MODEL_TEXTURE_PATH)) return ONE_PIXEL_TEXTURE;
+    return url;
+  });
+  manager.onError = (url) => {
+    console.warn('Music gramophone dependent asset failed to load.', url);
+  };
+
+  const loader = new GLTFLoader(manager);
   loader.setCrossOrigin('anonymous');
   loader.load(
     MODEL_URL,
@@ -300,26 +320,13 @@ const initGramophone = () => {
       const asset = gltf.scene;
       asset.updateMatrixWorld(true);
 
-      asset.traverse((node) => {
-        if (!node.isMesh) return;
+      try {
+        stylizeGramophoneAsset(asset);
+      } catch (error) {
+        console.warn('Music gramophone stylization degraded gracefully.', error);
+        installEmergencyFlatMaterials(asset);
+      }
 
-        const kind = classifyGramophoneMesh(node);
-        const sourceMaterials = Array.isArray(node.material) ? node.material : [node.material];
-        const material = createHeroMaterial(kind);
-
-        node.material = material;
-        node.castShadow = false;
-        node.receiveShadow = false;
-        addStylizedEdges(node, kind);
-
-        if (kind === 'record') addRecordLabel(node);
-
-        // Once the replacement material is installed, the source PBR textures
-        // are no longer part of the hero's visual language.
-        sourceMaterials.filter(Boolean).forEach(disposeSourceMaterial);
-      });
-
-      // Object001 is the separate record group supplied by the source asset.
       recordNode = asset.getObjectByName('Object001');
 
       const rawBox = new THREE.Box3().setFromObject(asset);
