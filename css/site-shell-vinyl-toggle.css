@@ -5,10 +5,50 @@
  * so there is no extra visible playback button in collapsed mode.
  */
 
+/*
+ * Keep the global shell frame neutral so it remains compatible with Music, Basketball,
+ * Games and Universe page palettes. Gold stays inside the transport controls instead of
+ * outlining the whole persistent player on every route.
+ */
+.persistent-music-player {
+  border-color: rgba(190, 200, 214, .16);
+  background:
+    radial-gradient(circle at 92% 50%, rgba(255,255,255,.045), transparent 24%),
+    linear-gradient(110deg, rgba(255,255,255,.018), transparent 42%),
+    var(--shell-panel);
+}
+
+.persistent-music-player.is-playing {
+  border-color: rgba(214, 222, 232, .22);
+  box-shadow:
+    0 22px 64px rgba(0, 0, 0, .42),
+    0 0 0 1px rgba(255,255,255,.035);
+}
+
+/*
+ * Keep stacking and overflow geometry identical before, during and after collapse.
+ * The previous collapsed-only overflow/z-index switch forced the record subtree onto a
+ * different paint layer at the beginning of the width transition, which could flash.
+ */
+.persistent-player-main {
+  z-index: 8;
+  overflow: visible;
+}
+
+.persistent-player-turntable {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform;
+  isolation: isolate;
+}
+
 /* Keep the platter animation mounted at all times so pausing freezes the current angle. */
 .persistent-player-platter {
   animation: persistent-platter-turn 12s linear infinite;
   animation-play-state: paused;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .persistent-music-player.is-playing .persistent-player-platter {
@@ -18,12 +58,6 @@
 /* A tighter dock: expand control + record, with no leftover transport button block. */
 .persistent-music-player.is-collapsed {
   width: 128px;
-}
-
-.persistent-music-player.is-collapsed .persistent-player-main {
-  z-index: 8;
-  overflow: visible;
-  padding: 0;
 }
 
 .persistent-music-player.is-collapsed .persistent-player-transport {
