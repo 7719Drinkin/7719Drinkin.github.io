@@ -53,6 +53,7 @@ jobs:
           node --check js/site-shell.js
           node --check js/site-frame-bridge.js
           node --check js/music.js
+          node --check js/music-home.js
           node --check js/music-catalog.js
           node --check js/music-player.js
           node --check js/universe-refined.js
