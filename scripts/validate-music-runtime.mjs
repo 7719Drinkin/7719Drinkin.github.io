@@ -47,31 +47,37 @@ assert(shellRuntime.includes('const setCollapsed ='), 'Persistent player must ex
 assert(shellRuntime.includes('restoreViewState();'), 'Persistent player must restore its view state independently.');
 assert(shellRuntime.includes("ui.album.textContent = track.album || ''"), 'Persistent player must not concatenate album metadata into the artist line.');
 assert(shellRuntime.includes('updateMetadata(current);'), 'Persistent player must refresh metadata when selecting the already-loaded track.');
-assert(shellRuntime.includes('const setVolumeOpen ='), 'Persistent player must expose an explicit volume popover state.');
-assert(shellRuntime.includes("volumeToggle: playerRoot.querySelector('[data-persistent-volume-toggle]')"), 'Persistent player must bind the compact volume trigger.');
+assert(shellRuntime.includes('const ICONS = Object.freeze'), 'Persistent player controls must use the shared inline SVG icon set.');
+assert(shellRuntime.includes('ui.toggle.innerHTML = playing ? ICONS.pause : ICONS.play'), 'Persistent center control must expose play and pause states visually.');
+assert(shellRuntime.includes("volumeIcon: playerRoot.querySelector('[data-persistent-volume-icon]')"), 'Persistent player must bind the visible inline volume icon.');
 assert(shellRuntime.includes("audio.addEventListener('volumechange', updateVolumeUi)"), 'Persistent player volume UI must follow native audio volume changes.');
-assert(shellRuntime.includes("document.addEventListener('pointerdown'"), 'Volume popover must close when clicking outside.');
-assert(shellRuntime.includes("event.key === 'Escape'"), 'Volume popover must close with Escape.');
+assert(!shellRuntime.includes('const setVolumeOpen ='), 'Persistent player must not hide volume behind a popup state.');
+assert(!shellRuntime.includes("volumeToggle: playerRoot.querySelector('[data-persistent-volume-toggle]')"), 'Persistent player must not bind a hidden volume trigger.');
 assert(shellRuntime.includes('setCollapsed,'), 'Persistent shell API must expose collapse state transitions explicitly.');
 assert(shellRuntime.includes('collapsed: isCollapsed()'), 'Persistent shell player state must report the current view state.');
+
 assert(shellCss.includes('.persistent-player-cover.has-cover-art > img'), 'Persistent player cover image styles must live in site-shell.css.');
 assert(shellCss.includes('.persistent-music-player.is-collapsed'), 'Persistent player CSS must define a compact view.');
 assert(shellCss.includes('.persistent-player-platter'), 'Persistent player must render a physical turntable platter.');
-assert(shellCss.includes('.persistent-player-tonearm'), 'Persistent player must render the tonearm as the primary transport control.');
-assert(shellCss.includes('width: 72px;\n  height: 72px;'), 'Expanded vinyl label must expose more album artwork around the center spindle.');
-assert(shellCss.includes('color: transparent;\n  font-size: 0;'), 'Tonearm control must hide the legacy play/pause glyph while preserving the button behavior.');
-assert(shellCss.includes('.persistent-player-volume-panel'), 'Persistent player must use a popup volume panel instead of a permanent volume row.');
+assert(shellCss.includes('.persistent-player-center-toggle'), 'Persistent player must expose a visible center play/pause control.');
+assert(shellCss.includes('.persistent-player-tonearm-cartridge'), 'Persistent player must render a structured tonearm with a cartridge.');
+assert(shellCss.includes('.persistent-player-volume-inline'), 'Persistent player must expose an always-visible inline volume control.');
+assert(shellCss.includes('width: 72px;\n  height: 72px;'), 'Expanded vinyl label must expose album artwork around the center control.');
 assert(shellCss.includes('min-height: 124px;'), 'Expanded persistent player height must remain compact.');
 assert(shellCss.includes('min-height: 74px;'), 'Collapsed persistent player height must remain compact.');
+
 assert(shellPage.includes('data-persistent-collapse'), 'Persistent shell must render an explicit compact view control.');
 assert(shellPage.includes('class="persistent-player-meta"'), 'Persistent shell must separate artist and album metadata structurally.');
 assert(shellPage.includes('data-persistent-turntable'), 'Persistent shell must render a dedicated turntable surface.');
-assert(shellPage.includes('data-persistent-tonearm data-persistent-toggle'), 'Tonearm must own the persistent play/pause action.');
-assert(!shellPage.includes('persistent-player-center-toggle'), 'Persistent shell must not overlay a play/pause button on the album artwork.');
-assert(shellPage.includes('data-persistent-volume-toggle'), 'Persistent shell must render a compact volume trigger.');
-assert(shellPage.includes('data-persistent-volume-panel'), 'Persistent shell must render a dedicated volume popup panel.');
-assert(shellPage.includes('/js/site-shell.js?v=20260814-tonearm-control-1'), 'Persistent shell JS cache version was not bumped for the tonearm control.');
-assert(shellPage.includes('/css/site-shell.css?v=20260814-tonearm-control-1'), 'Persistent shell CSS cache version was not bumped for the tonearm control.');
+assert(shellPage.includes('persistent-player-center-toggle'), 'Persistent shell must place play/pause in the record center.');
+assert(shellPage.includes('persistent-player-tonearm-cartridge'), 'Persistent shell must render the detailed decorative tonearm.');
+assert(!shellPage.includes('data-persistent-tonearm data-persistent-toggle'), 'Tonearm must no longer own the playback action.');
+assert(shellPage.includes('data-persistent-volume-control'), 'Persistent shell must render the inline volume control.');
+assert(shellPage.includes('data-persistent-volume-icon'), 'Persistent shell must render a visible volume icon.');
+assert(!shellPage.includes('data-persistent-volume-toggle'), 'Persistent shell must not hide volume behind a trigger button.');
+assert(!shellPage.includes('data-persistent-volume-panel'), 'Persistent shell must not render a popup volume panel.');
+assert(shellPage.includes('/js/site-shell.js?v=20260814-player-polish-2'), 'Persistent shell JS cache version was not bumped for polished controls.');
+assert(shellPage.includes('/css/site-shell.css?v=20260814-player-polish-2'), 'Persistent shell CSS cache version was not bumped for polished controls.');
 
 const [artistPage, albumPage] = await Promise.all([
   read('music/artists/tan-yonglin/index.html'),
