@@ -91,6 +91,12 @@ assert(vinylToggleCss.includes('color: transparent;'), 'Collapsed vinyl click su
 assert(vinylToggleCss.includes('border-radius: 50%;'), 'Collapsed click target must follow the round vinyl footprint.');
 assert(vinylToggleCss.includes('pointer-events: auto;\n  cursor: pointer;'), 'Collapsed vinyl must be directly clickable without moving the record.');
 assert(!vinylToggleCss.includes('scale('), 'Collapsed vinyl interaction must not scale or move the record on click.');
+assert(vinylToggleCss.includes('.persistent-player-main {\n  z-index: 8;\n  overflow: visible;'), 'Player main stacking and overflow must remain stable across collapse transitions to prevent vinyl flashing.');
+assert(!vinylToggleCss.includes('.persistent-music-player.is-collapsed .persistent-player-main'), 'Collapsed mode must not switch the player main to a different paint-layer geometry.');
+assert(vinylToggleCss.includes('transform: translate3d(0, 0, 0);'), 'Turntable must keep a stable compositor layer during horizontal collapse.');
+assert(vinylToggleCss.includes('backface-visibility: hidden;'), 'Turntable/platter must suppress transient compositor backface flashes.');
+assert(vinylToggleCss.includes('border-color: rgba(190, 200, 214, .16);'), 'Persistent player frame must use a neutral border that works across page palettes.');
+assert(vinylToggleCss.includes('border-color: rgba(214, 222, 232, .22);'), 'Playing frame must brighten neutrally instead of switching to a route-specific gold outline.');
 
 assert(shellPage.includes('class="persistent-player-copy"'), 'Persistent shell must render song metadata as one horizontal content line.');
 assert(shellPage.includes('class="persistent-player-transport"'), 'Persistent shell must render a separate transport deck.');
@@ -108,7 +114,7 @@ assert(shellPage.includes('data-persistent-volume-icon'), 'Persistent shell must
 assert(shellPage.includes('persistent-player-tonearm-cartridge'), 'Persistent shell must render the detailed decorative tonearm.');
 assert(shellPage.includes('/js/site-shell.js?v=20260814-minimized-dock-1'), 'Persistent shell JS cache version must remain pinned to the unchanged minimized-dock runtime.');
 assert(shellPage.includes('/css/site-shell.css?v=20260814-minimized-dock-1'), 'Persistent shell base CSS cache version must remain available.');
-assert(shellPage.includes('/css/site-shell-vinyl-toggle.css?v=20260814-vinyl-toggle-1'), 'Persistent shell must load the collapsed vinyl interaction refinement stylesheet.');
+assert(shellPage.includes('/css/site-shell-vinyl-toggle.css?v=20260814-vinyl-stable-2'), 'Persistent shell must load the stable collapsed-vinyl refinement stylesheet.');
 
 const [artistPage, albumPage] = await Promise.all([
   read('music/artists/tan-yonglin/index.html'),
