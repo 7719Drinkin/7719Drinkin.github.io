@@ -11,6 +11,7 @@
   if (!frame || !playerRoot || !audio) return;
 
   const ui = {
+    turntable: playerRoot.querySelector('[data-persistent-turntable]'),
     cover: playerRoot.querySelector('[data-persistent-cover]'),
     state: playerRoot.querySelector('[data-persistent-state]'),
     title: playerRoot.querySelector('[data-persistent-title]'),
@@ -110,19 +111,26 @@
     .filter(Boolean);
 
   const activeTrack = () => state.queue[state.index] || state.track;
+  const isCollapsed = () => playerRoot.classList.contains('is-collapsed');
 
   const setCollapsed = (collapsed, { persist = true } = {}) => {
-    playerRoot.classList.toggle('is-collapsed', collapsed);
+    const next = Boolean(collapsed);
+    playerRoot.classList.toggle('is-collapsed', next);
 
     if (ui.collapse) {
-      ui.collapse.setAttribute('aria-expanded', String(!collapsed));
-      ui.collapse.setAttribute('aria-label', collapsed ? '展开播放器' : '收起播放器');
-      ui.collapse.textContent = collapsed ? '⌃' : '⌄';
+      ui.collapse.setAttribute('aria-expanded', String(!next));
+      ui.collapse.setAttribute('aria-label', next ? '展开播放器' : '收起播放器');
+      ui.collapse.textContent = next ? '⌃' : '⌄';
+    }
+
+    if (ui.turntable) {
+      ui.turntable.tabIndex = next ? 0 : -1;
+      ui.turntable.setAttribute('aria-label', next ? '展开播放器' : '唱盘');
     }
 
     if (!persist) return;
     try {
-      sessionStorage.setItem(VIEW_KEY, collapsed ? 'collapsed' : 'expanded');
+      sessionStorage.setItem(VIEW_KEY, next ? 'collapsed' : 'expanded');
     } catch {
       // View state is optional; playback state remains independent.
     }
@@ -388,7 +396,10 @@
     else audio.pause();
   });
   ui.collapse?.addEventListener('click', () => {
-    setCollapsed(!playerRoot.classList.contains('is-collapsed'));
+    setCollapsed(!isCollapsed());
+  });
+  ui.turntable?.addEventListener('click', () => {
+    if (isCollapsed()) setCollapsed(false);
   });
   ui.close.addEventListener('click', () => stopPlayback({ clear: true }));
 
@@ -477,10 +488,12 @@
     navigate,
     selectTrack,
     stopAndNavigate,
+    setCollapsed,
     getPlayerState: () => ({
       track: activeTrack() ? { ...activeTrack() } : null,
       playing: !audio.paused && !audio.ended,
-      currentTime: Number.isFinite(audio.currentTime) ? audio.currentTime : 0
+      currentTime: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
+      collapsed: isCollapsed()
     })
   });
 
