@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/site-shell.css?v=20260814-tonearm-control-1">
+  <link rel="stylesheet" href="/css/site-shell.css?v=20260814-player-polish-2">
 </head>
 <body class="site-shell-page">
   <div class="site-shell-loading" data-shell-loading aria-hidden="true">
@@ -30,17 +30,47 @@
       <span class="persistent-player-platter" aria-hidden="true">
         <span class="persistent-player-grooves"></span>
         <span class="persistent-player-cover" data-persistent-cover>77</span>
-        <span class="persistent-player-spindle"></span>
       </span>
-      <button class="persistent-player-tonearm" type="button" data-persistent-tonearm data-persistent-toggle aria-label="播放">▶</button>
+
+      <button
+        class="persistent-player-toggle persistent-player-center-toggle"
+        type="button"
+        data-persistent-toggle
+        aria-label="播放"></button>
+
+      <span class="persistent-player-tonearm" aria-hidden="true">
+        <svg viewBox="0 0 84 72" focusable="false">
+          <defs>
+            <linearGradient id="persistent-tonearm-metal" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f3f5f6"/>
+              <stop offset="0.48" stop-color="#8995a2"/>
+              <stop offset="1" stop-color="#d5bc78"/>
+            </linearGradient>
+            <radialGradient id="persistent-tonearm-gold" cx="35%" cy="28%" r="80%">
+              <stop offset="0" stop-color="#f3d98f"/>
+              <stop offset="0.62" stop-color="#bb8a38"/>
+              <stop offset="1" stop-color="#62431c"/>
+            </radialGradient>
+          </defs>
+          <circle class="persistent-player-tonearm-base" cx="72" cy="17" r="11"/>
+          <circle class="persistent-player-tonearm-pivot" cx="72" cy="17" r="7" fill="url(#persistent-tonearm-gold)"/>
+          <circle class="persistent-player-tonearm-cap" cx="70" cy="15" r="2.2"/>
+          <path class="persistent-player-tonearm-shadow" d="M68 22 C64 25 61 28 58 31 L49 39"/>
+          <path class="persistent-player-tonearm-arm" d="M68 22 C64 25 61 28 58 31 L49 39" stroke="url(#persistent-tonearm-metal)"/>
+          <g class="persistent-player-tonearm-cartridge" transform="translate(48 38) rotate(-42)">
+            <rect x="-5" y="-3.5" width="12" height="7" rx="2"/>
+            <path d="M-3 3.5 L-4.5 8"/>
+          </g>
+        </svg>
+      </span>
     </div>
 
     <div class="persistent-player-main">
       <div class="persistent-player-topline">
         <span class="persistent-player-state" data-persistent-state>NOW PLAYING</span>
         <div class="persistent-player-actions">
-          <button class="persistent-player-collapse" type="button" data-persistent-collapse aria-label="收起播放器" aria-expanded="true">−</button>
-          <button class="persistent-player-close" type="button" data-persistent-close aria-label="停止并关闭播放器">×</button>
+          <button class="persistent-player-collapse" type="button" data-persistent-collapse aria-label="收起播放器" aria-expanded="true"></button>
+          <button class="persistent-player-close" type="button" data-persistent-close aria-label="停止并关闭播放器"></button>
         </div>
       </div>
 
@@ -54,24 +84,18 @@
       </div>
 
       <div class="persistent-player-transport">
-        <button class="persistent-player-skip" type="button" data-persistent-prev aria-label="上一首">‹</button>
+        <button class="persistent-player-skip" type="button" data-persistent-prev aria-label="上一首"></button>
         <div class="persistent-player-progress">
           <time data-persistent-current>0:00</time>
           <input data-persistent-seek type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
           <time data-persistent-duration>0:00</time>
         </div>
-        <button class="persistent-player-skip" type="button" data-persistent-next aria-label="下一首">›</button>
+        <button class="persistent-player-skip" type="button" data-persistent-next aria-label="下一首"></button>
 
-        <div class="persistent-player-volume-control" data-persistent-volume-control>
-          <button class="persistent-player-volume-toggle" type="button" data-persistent-volume-toggle aria-label="音量" aria-expanded="false">
-            <span class="persistent-volume-icon" data-persistent-volume-icon aria-hidden="true"></span>
-          </button>
-          <label class="persistent-player-volume-panel" data-persistent-volume-panel>
-            <span>VOL</span>
-            <input data-persistent-volume type="range" min="0" max="1" value="0.8" step="0.05" aria-label="音量">
-            <output data-persistent-volume-value>80</output>
-          </label>
-        </div>
+        <label class="persistent-player-volume-inline" data-persistent-volume-control>
+          <span class="persistent-player-volume-icon" data-persistent-volume-icon aria-hidden="true"></span>
+          <input data-persistent-volume type="range" min="0" max="1" value="0.8" step="0.01" aria-label="音量">
+        </label>
       </div>
     </div>
 
@@ -79,6 +103,6 @@
   </aside>
 
   <noscript>本站的连续播放与页面导航需要启用 JavaScript。</noscript>
-  <script src="/js/site-shell.js?v=20260814-tonearm-control-1"></script>
+  <script src="/js/site-shell.js?v=20260814-player-polish-2"></script>
 </body>
 </html>
