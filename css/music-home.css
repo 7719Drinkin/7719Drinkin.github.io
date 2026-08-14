@@ -51,41 +51,40 @@ body.music-collection-page .collection-hero-impression {
 }
 
 .collection-gramophone-stage::before {
-  inset: 4% -11% -2% -8%;
+  inset: 6% -6% 4% -3%;
   border: 0;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 52% 46%, rgba(216, 168, 78, .09), transparent 32%),
-    radial-gradient(circle at 62% 54%, rgba(95, 118, 157, .12), transparent 52%);
+    radial-gradient(circle at 54% 49%, rgba(216, 168, 78, .045), transparent 31%),
+    radial-gradient(circle at 62% 54%, rgba(95, 118, 157, .075), transparent 56%);
   box-shadow: none;
   transform: none;
 }
 
 .collection-gramophone-stage::after {
   position: absolute;
-  inset: 8% -7% 0 2%;
+  inset: 11% -2% 5% 5%;
   z-index: -1;
-  border: 1px solid rgba(255,255,255,.055);
-  border-radius: 46% 54% 50% 48%;
+  border: 1px solid rgba(255,255,255,.045);
+  border-radius: 49% 51% 48% 52%;
   content: "";
-  opacity: .8;
-  transform: rotate(-4deg);
+  opacity: .68;
+  transform: rotate(-3deg);
 }
 
 .collection-gramophone-canvas {
   position: absolute;
-  top: -8%;
-  right: -20%;
-  bottom: -9%;
-  left: -11%;
+  top: -2%;
+  right: -10%;
+  bottom: 2%;
+  left: -4%;
   z-index: 3;
   display: block;
-  width: 131%;
-  height: 117%;
+  width: 114%;
+  height: 102%;
   opacity: 0;
   pointer-events: none;
-  filter: saturate(.9) contrast(1.035);
-  transition: opacity .72s cubic-bezier(.2,.7,.2,1);
+  transition: opacity .62s cubic-bezier(.2,.7,.2,1);
 }
 
 .collection-gramophone-stage.is-ready .collection-gramophone-canvas {
@@ -97,7 +96,7 @@ body.music-collection-page .collection-hero-impression {
   inset: 0;
   z-index: 1;
   opacity: 1;
-  transition: opacity .42s ease;
+  transition: opacity .36s ease;
 }
 
 .collection-gramophone-stage.is-ready .collection-gramophone-fallback {
@@ -105,21 +104,22 @@ body.music-collection-page .collection-hero-impression {
 }
 
 .collection-gramophone-stage.is-loading .collection-gramophone-fallback {
-  opacity: .56;
+  opacity: .74;
 }
 
 .collection-gramophone-stage > p {
   z-index: 5;
-  right: 3%;
-  bottom: 2%;
+  right: 5%;
+  bottom: 4%;
+  opacity: .58;
 }
 
 .collection-gramophone-credit {
   position: absolute;
-  bottom: 2%;
-  left: 4%;
+  bottom: 4%;
+  left: 5%;
   z-index: 6;
-  color: rgba(240,216,157,.42);
+  color: rgba(240,216,157,.3);
   font: 7px/1.4 var(--music-mono);
   letter-spacing: .11em;
   text-decoration: none;
@@ -142,12 +142,12 @@ body.music-collection-page .collection-hero-impression {
   }
 
   .collection-gramophone-canvas {
-    top: -9%;
-    right: -10%;
-    bottom: -8%;
-    left: -7%;
-    width: 117%;
-    height: 117%;
+    top: 0;
+    right: -6%;
+    bottom: 2%;
+    left: -3%;
+    width: 109%;
+    height: 100%;
   }
 }
 
@@ -166,26 +166,26 @@ body.music-collection-page .collection-hero-impression {
   }
 
   .collection-gramophone-stage::after {
-    inset: 12% -22% 3% 0;
+    inset: 15% -12% 6% 3%;
   }
 
   .collection-gramophone-canvas {
-    top: -5%;
-    right: -31%;
-    bottom: -5%;
-    left: -13%;
-    width: 144%;
-    height: 110%;
+    top: 0;
+    right: -16%;
+    bottom: 3%;
+    left: -8%;
+    width: 124%;
+    height: 98%;
   }
 
   .collection-gramophone-stage > p {
     right: 1%;
-    bottom: 1%;
+    bottom: 2%;
     font-size: 7px;
   }
 
   .collection-gramophone-credit {
-    bottom: 1%;
+    bottom: 2%;
     left: 1%;
     max-width: 54%;
     font-size: 6px;

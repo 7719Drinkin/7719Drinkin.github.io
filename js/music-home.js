@@ -101,6 +101,107 @@ const initHeroTypewriter = async () => {
   window.addEventListener('pagehide', () => window.clearTimeout(timer), { once: true });
 };
 
+const createHeroMaterial = (kind) => {
+  if (kind === 'record') {
+    return new THREE.MeshStandardMaterial({
+      color: 0x070d17,
+      roughness: .58,
+      metalness: .08,
+      emissive: 0x020812,
+      emissiveIntensity: .18
+    });
+  }
+
+  if (kind === 'tonearm') {
+    return new THREE.MeshStandardMaterial({
+      color: 0x8c7a52,
+      roughness: .76,
+      metalness: .28,
+      emissive: 0x0b0803,
+      emissiveIntensity: .1
+    });
+  }
+
+  return new THREE.MeshStandardMaterial({
+    color: 0x0a1422,
+    roughness: .9,
+    metalness: .04,
+    emissive: 0x020914,
+    emissiveIntensity: .22
+  });
+};
+
+const classifyGramophoneMesh = (node) => {
+  const lineage = [];
+  let current = node;
+  while (current) {
+    lineage.push(current.name || '');
+    current = current.parent;
+  }
+  const identity = lineage.join(' / ');
+  if (identity.includes('Object001')) return 'record';
+  if (identity.includes('Object002')) return 'tonearm';
+  return 'body';
+};
+
+const addStylizedEdges = (node, kind) => {
+  const edgeColor = kind === 'record' ? 0x586985 : 0xc6a45d;
+  const opacity = kind === 'record' ? .18 : kind === 'tonearm' ? .46 : .32;
+  const geometry = new THREE.EdgesGeometry(node.geometry, 24);
+  const material = new THREE.LineBasicMaterial({
+    color: edgeColor,
+    transparent: true,
+    opacity,
+    depthWrite: false
+  });
+  const lines = new THREE.LineSegments(geometry, material);
+  lines.name = `MusicHeroEdges:${node.name}`;
+  lines.renderOrder = 3;
+  node.add(lines);
+};
+
+const addRecordLabel = (recordMesh) => {
+  if (!recordMesh?.geometry) return;
+
+  recordMesh.geometry.computeBoundingBox();
+  const box = recordMesh.geometry.boundingBox;
+  if (!box) return;
+
+  const centerX = (box.min.x + box.max.x) / 2;
+  const centerY = (box.min.y + box.max.y) / 2;
+  const topZ = box.max.z + .025;
+  const radius = Math.min(box.max.x - box.min.x, box.max.y - box.min.y) * .085;
+
+  const label = new THREE.Mesh(
+    new THREE.CircleGeometry(radius, 48),
+    new THREE.MeshBasicMaterial({ color: 0xc9a04b, transparent: true, opacity: .9, side: THREE.DoubleSide })
+  );
+  label.position.set(centerX, centerY, topZ);
+  label.renderOrder = 4;
+  recordMesh.add(label);
+
+  const spindle = new THREE.Mesh(
+    new THREE.CircleGeometry(radius * .12, 24),
+    new THREE.MeshBasicMaterial({ color: 0x07101e, side: THREE.DoubleSide })
+  );
+  spindle.position.set(centerX, centerY, topZ + .008);
+  spindle.renderOrder = 5;
+  recordMesh.add(spindle);
+};
+
+const disposeSourceMaterial = (material) => {
+  if (!material) return;
+  [
+    material.map,
+    material.normalMap,
+    material.roughnessMap,
+    material.metalnessMap,
+    material.aoMap,
+    material.emissiveMap
+  ].filter(Boolean).forEach((texture) => texture.dispose());
+  material.dispose?.();
+};
+
 const initGramophone = () => {
   const stage = document.querySelector('[data-music-gramophone]');
   const canvas = stage?.querySelector('[data-gramophone-canvas]');
@@ -124,43 +225,33 @@ const initGramophone = () => {
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.08;
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMappingExposure = .92;
+  renderer.shadowMap.enabled = false;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(31, 1, 0.01, 100);
   const composition = new THREE.Group();
   scene.add(composition);
 
-  const hemisphere = new THREE.HemisphereLight(0x9aabc5, 0x080a10, 1.45);
+  // The hero is intentionally illustration-like rather than photorealistic:
+  // broad ambient light, restrained directional accents, no dramatic shadows.
+  scene.add(new THREE.AmbientLight(0xa7b4c9, 1.05));
+
+  const hemisphere = new THREE.HemisphereLight(0x7386a3, 0x050914, 1.8);
   scene.add(hemisphere);
 
-  const keyLight = new THREE.DirectionalLight(0xf2cf84, 3.5);
+  const keyLight = new THREE.DirectionalLight(0xd8bb78, 1.3);
   keyLight.position.set(4.5, 7.5, 6.5);
-  keyLight.castShadow = true;
-  keyLight.shadow.mapSize.set(1024, 1024);
-  keyLight.shadow.camera.near = 0.1;
-  keyLight.shadow.camera.far = 30;
-  keyLight.shadow.camera.left = -6;
-  keyLight.shadow.camera.right = 6;
-  keyLight.shadow.camera.top = 6;
-  keyLight.shadow.camera.bottom = -6;
   scene.add(keyLight);
 
-  const rimLight = new THREE.DirectionalLight(0x637fa9, 2.2);
-  rimLight.position.set(-5, 4, -4);
+  const rimLight = new THREE.DirectionalLight(0x6f89ad, 1.45);
+  rimLight.position.set(-5, 3.5, -4);
   scene.add(rimLight);
-
-  const hornGlow = new THREE.PointLight(0xd8a84e, 14, 13, 2);
-  hornGlow.position.set(-2.5, 3.8, 2.8);
-  scene.add(hornGlow);
 
   let mixer = null;
   let recordNode = null;
   let useManualRecordSpin = false;
   let modelReady = false;
-  let ground = null;
   let disposed = false;
   let frameRequest = 0;
   let previousTime = performance.now();
@@ -168,7 +259,7 @@ const initGramophone = () => {
 
   const setPixelRatio = () => {
     const compact = window.matchMedia('(max-width: 760px)').matches;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, compact ? 1.3 : 1.7));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, compact ? 1.2 : 1.55));
   };
 
   const frameComposition = () => {
@@ -188,25 +279,15 @@ const initGramophone = () => {
     const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * camera.aspect);
     const fitHeight = size.y / (2 * Math.tan(verticalFov / 2));
     const fitWidth = size.x / (2 * Math.tan(horizontalFov / 2));
-    const distance = Math.max(fitHeight, fitWidth) * (camera.aspect < .95 ? 1.16 : 1.02);
-    const direction = new THREE.Vector3(.54, .31, 1).normalize();
+    const compact = camera.aspect < .95;
+    const distance = Math.max(fitHeight, fitWidth) * (compact ? 1.34 : 1.18);
+    const direction = new THREE.Vector3(.5, .26, 1).normalize();
 
     camera.position.copy(center).add(direction.multiplyScalar(distance));
-    camera.lookAt(center.x - .18, center.y + .18, center.z);
+    // Aim a little below the geometric center so the cabinet sits safely above
+    // the hero's lower crop while the horn can still breathe into the top-right.
+    camera.lookAt(center.x - .12, center.y - size.y * .055, center.z);
     camera.updateProjectionMatrix();
-  };
-
-  const installGround = () => {
-    const box = new THREE.Box3().setFromObject(composition);
-    const size = box.getSize(new THREE.Vector3());
-    const center = box.getCenter(new THREE.Vector3());
-    const material = new THREE.ShadowMaterial({ opacity: .24 });
-    const geometry = new THREE.PlaneGeometry(Math.max(8, size.x * 1.55), Math.max(8, size.z * 1.55));
-    ground = new THREE.Mesh(geometry, material);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.set(center.x, box.min.y - .035, center.z);
-    ground.receiveShadow = true;
-    scene.add(ground);
   };
 
   const loader = new GLTFLoader();
@@ -221,21 +302,24 @@ const initGramophone = () => {
 
       asset.traverse((node) => {
         if (!node.isMesh) return;
-        node.castShadow = true;
-        node.receiveShadow = true;
-        const materials = Array.isArray(node.material) ? node.material : [node.material];
-        materials.filter(Boolean).forEach((material) => {
-          const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
-          [material.map, material.normalMap, material.roughnessMap, material.metalnessMap]
-            .filter(Boolean)
-            .forEach((texture) => { texture.anisotropy = Math.min(8, maxAnisotropy); });
-          material.needsUpdate = true;
-        });
+
+        const kind = classifyGramophoneMesh(node);
+        const sourceMaterials = Array.isArray(node.material) ? node.material : [node.material];
+        const material = createHeroMaterial(kind);
+
+        node.material = material;
+        node.castShadow = false;
+        node.receiveShadow = false;
+        addStylizedEdges(node, kind);
+
+        if (kind === 'record') addRecordLabel(node);
+
+        // Once the replacement material is installed, the source PBR textures
+        // are no longer part of the hero's visual language.
+        sourceMaterials.filter(Boolean).forEach(disposeSourceMaterial);
       });
 
-      // The source asset exposes its record and tonearm as separate animated
-      // nodes. Object001 is the thin circular record mesh. Keep the tonearm
-      // static and reuse only the source-authored record rotation track.
+      // Object001 is the separate record group supplied by the source asset.
       recordNode = asset.getObjectByName('Object001');
 
       const rawBox = new THREE.Box3().setFromObject(asset);
@@ -245,10 +329,10 @@ const initGramophone = () => {
 
       const normalization = new THREE.Group();
       normalization.add(asset);
-      normalization.scale.setScalar(5.75 / Math.max(rawSize.x, rawSize.y, rawSize.z));
+      normalization.scale.setScalar(5.55 / Math.max(rawSize.x, rawSize.y, rawSize.z));
       composition.add(normalization);
-      composition.rotation.set(-.055, -.52, .018);
-      composition.position.set(.12, -.08, 0);
+      composition.rotation.set(-.04, -.5, .014);
+      composition.position.set(.08, .08, 0);
       composition.updateMatrixWorld(true);
 
       const sourceClip = gltf.animations?.find((clip) => clip.name === 'Gramofon_Anim') || gltf.animations?.[0];
@@ -265,7 +349,6 @@ const initGramophone = () => {
       }
 
       modelReady = true;
-      installGround();
       setPixelRatio();
       frameComposition();
       renderer.render(scene, camera);
@@ -324,8 +407,6 @@ const initGramophone = () => {
     window.removeEventListener('resize', handleResize);
     reducedMotion.removeEventListener?.('change', renderCurrentFrame);
     mixer?.stopAllAction();
-    ground?.geometry?.dispose();
-    ground?.material?.dispose();
     renderer.dispose();
   }, { once: true });
 };
