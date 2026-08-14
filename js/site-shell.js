@@ -25,12 +25,29 @@
     seek: playerRoot.querySelector('[data-persistent-seek]'),
     volume: playerRoot.querySelector('[data-persistent-volume]'),
     volumeControl: playerRoot.querySelector('[data-persistent-volume-control]'),
-    volumeToggle: playerRoot.querySelector('[data-persistent-volume-toggle]'),
-    volumeValue: playerRoot.querySelector('[data-persistent-volume-value]'),
+    volumeIcon: playerRoot.querySelector('[data-persistent-volume-icon]'),
     collapse: playerRoot.querySelector('[data-persistent-collapse]'),
     close: playerRoot.querySelector('[data-persistent-close]'),
     status: playerRoot.querySelector('[data-persistent-status]')
   };
+
+  const icon = (body) => `
+    <svg class="persistent-ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      ${body}
+    </svg>`;
+
+  const ICONS = Object.freeze({
+    play: icon('<path d="M8 5v14l11-7z" fill="currentColor" stroke="none"></path>'),
+    pause: icon('<path d="M9 6v12"></path><path d="M15 6v12"></path>'),
+    skipBack: icon('<path d="M19 5 9 12l10 7V5Z"></path><path d="M5 5v14"></path>'),
+    skipForward: icon('<path d="m5 5 10 7-10 7V5Z"></path><path d="M19 5v14"></path>'),
+    chevronUp: icon('<path d="m7 14 5-5 5 5"></path>'),
+    chevronDown: icon('<path d="m7 10 5 5 5-5"></path>'),
+    close: icon('<path d="M7 7l10 10"></path><path d="m17 7-10 10"></path>'),
+    volumeHigh: icon('<path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"></path><path d="M15 9a4 4 0 0 1 0 6"></path><path d="M18 6.5a8 8 0 0 1 0 11"></path>'),
+    volumeLow: icon('<path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"></path><path d="M15 9.5a3.5 3.5 0 0 1 0 5"></path>'),
+    volumeMute: icon('<path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"></path><path d="m16 9 5 5"></path><path d="m21 9-5 5"></path>')
+  });
 
   const state = {
     route: '/',
@@ -116,21 +133,21 @@
   const activeTrack = () => state.queue[state.index] || state.track;
   const isCollapsed = () => playerRoot.classList.contains('is-collapsed');
 
-  const setVolumeOpen = (open) => {
-    const next = Boolean(open) && !isCollapsed();
-    ui.volumeControl?.classList.toggle('is-open', next);
-    ui.volumeToggle?.setAttribute('aria-expanded', String(next));
+  const renderStaticIcons = () => {
+    if (ui.previous) ui.previous.innerHTML = ICONS.skipBack;
+    if (ui.next) ui.next.innerHTML = ICONS.skipForward;
+    if (ui.close) ui.close.innerHTML = ICONS.close;
+    if (ui.toggle) ui.toggle.innerHTML = ICONS.play;
   };
 
   const setCollapsed = (collapsed, { persist = true } = {}) => {
     const next = Boolean(collapsed);
     playerRoot.classList.toggle('is-collapsed', next);
-    setVolumeOpen(false);
 
     if (ui.collapse) {
       ui.collapse.setAttribute('aria-expanded', String(!next));
       ui.collapse.setAttribute('aria-label', next ? '展开播放器' : '收起播放器');
-      ui.collapse.textContent = next ? '+' : '−';
+      ui.collapse.innerHTML = next ? ICONS.chevronUp : ICONS.chevronDown;
     }
 
     if (!persist) return;
@@ -189,16 +206,24 @@
   const updateVolumeUi = () => {
     const value = Math.min(1, Math.max(0, Number(audio.volume) || 0));
     const percent = Math.round(value * 100);
-    if (ui.volume) ui.volume.value = String(value);
-    if (ui.volumeValue) ui.volumeValue.textContent = String(percent);
+    if (ui.volume) {
+      ui.volume.value = String(value);
+      ui.volume.setAttribute('aria-label', `音量 ${percent}%`);
+    }
+    if (ui.volumeIcon) {
+      ui.volumeIcon.innerHTML = value <= .001
+        ? ICONS.volumeMute
+        : value < .5
+          ? ICONS.volumeLow
+          : ICONS.volumeHigh;
+    }
     ui.volumeControl?.classList.toggle('is-muted', value <= .001);
-    ui.volumeToggle?.setAttribute('aria-label', `音量 ${percent}%`);
   };
 
   const updatePlayingState = () => {
     const playing = !audio.paused && !audio.ended && Boolean(audio.src);
     playerRoot.classList.toggle('is-playing', playing);
-    ui.toggle.textContent = playing ? 'Ⅱ' : '▶';
+    ui.toggle.innerHTML = playing ? ICONS.pause : ICONS.play;
     ui.toggle.setAttribute('aria-label', playing ? '暂停' : '播放');
     ui.state.textContent = playing ? 'NOW PLAYING' : 'PAUSED';
     broadcastPlayerState();
@@ -331,7 +356,8 @@
     ui.seek.value = '0';
     ui.status.textContent = '';
     playerRoot.classList.remove('is-playing');
-    setVolumeOpen(false);
+    ui.toggle.innerHTML = ICONS.play;
+    ui.toggle.setAttribute('aria-label', '播放');
 
     if (clear) {
       state.queue = [];
@@ -395,6 +421,8 @@
     updateVolumeUi();
     setSource(activeTrack() || state.track, Number(saved.currentTime) || 0);
     ui.state.textContent = 'PAUSED';
+    ui.toggle.innerHTML = ICONS.play;
+    ui.toggle.setAttribute('aria-label', '播放');
     state.restoring = false;
   };
 
@@ -417,11 +445,6 @@
     setCollapsed(!isCollapsed());
   });
   ui.close.addEventListener('click', () => stopPlayback({ clear: true }));
-
-  ui.volumeToggle?.addEventListener('click', (event) => {
-    event.stopPropagation();
-    setVolumeOpen(!ui.volumeControl?.classList.contains('is-open'));
-  });
 
   ui.volume.addEventListener('input', () => {
     audio.volume = Number(ui.volume.value);
@@ -500,16 +523,6 @@
     }
   });
 
-  document.addEventListener('pointerdown', (event) => {
-    if (!ui.volumeControl?.classList.contains('is-open')) return;
-    if (ui.volumeControl.contains(event.target)) return;
-    setVolumeOpen(false);
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') setVolumeOpen(false);
-  });
-
   window.addEventListener('popstate', () => {
     navigate(window.location.href, { push: false });
   });
@@ -529,6 +542,7 @@
     })
   });
 
+  renderStaticIcons();
   restoreViewState();
   restorePlayerState();
   const initialRoute = routeFromShellQuery();
