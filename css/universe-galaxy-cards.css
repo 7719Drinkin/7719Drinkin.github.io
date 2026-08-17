@@ -1,7 +1,6 @@
 /*
  * Universe homepage — 仰观万象 / Galaxy catalog cards
- * Second-pass refinement: lighter cards, stronger real-cover emphasis,
- * and distinct “forming” visuals for unfinished galaxies.
+ * Clean real-cover treatment with explicit pseudo-element resets.
  */
 
 body.theme-universe .galaxy-catalog .section-heading {
@@ -43,10 +42,7 @@ body.theme-universe .galaxy-catalog .interest-card {
   background: linear-gradient(180deg, rgba(7,10,18,.98), rgba(4,7,13,.99));
   box-shadow: 0 18px 44px rgba(0,0,0,.15);
   isolation: isolate;
-  transition:
-    transform .42s cubic-bezier(.22,1,.36,1),
-    border-color .28s ease,
-    box-shadow .42s cubic-bezier(.22,1,.36,1);
+  transition: transform .42s cubic-bezier(.22,1,.36,1), border-color .28s ease, box-shadow .42s cubic-bezier(.22,1,.36,1);
 }
 
 body.theme-universe .galaxy-catalog .interest-card::before {
@@ -54,29 +50,21 @@ body.theme-universe .galaxy-catalog .interest-card::before {
   inset: 0;
   z-index: 6;
   border-radius: inherit;
-  background: radial-gradient(
-    circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
-    color-mix(in srgb, var(--card-accent) 10%, transparent),
-    transparent 34%
-  );
+  background: radial-gradient(circle at var(--pointer-x, 50%) var(--pointer-y, 50%), color-mix(in srgb, var(--card-accent) 10%, transparent), transparent 34%);
   content: "";
   opacity: 0;
   pointer-events: none;
   transition: opacity .3s ease;
 }
 
+/* Explicitly reset the old card-level decoration from earlier layouts. */
 body.theme-universe .galaxy-catalog .interest-card::after {
-  position: absolute;
-  inset: auto 0 0;
-  z-index: 2;
-  height: 116px;
-  content: "";
-  background: linear-gradient(180deg, transparent, rgba(4,7,13,.46) 36%, rgba(4,7,13,.9));
-  pointer-events: none;
+  display: none;
+  content: none;
 }
 
 body.theme-universe .galaxy-catalog .interest-card:hover::before {
-  opacity: .72;
+  opacity: .68;
 }
 
 body.theme-universe .galaxy-catalog .interest-card:hover {
@@ -107,9 +95,7 @@ body.theme-universe .galaxy-catalog .interest-card-visual .interest-card-cover {
   object-fit: cover;
   filter: saturate(.98) brightness(.88) contrast(1.04);
   transform: scale(1.015);
-  transition:
-    transform .78s cubic-bezier(.22,1,.36,1),
-    filter .45s ease;
+  transition: transform .78s cubic-bezier(.22,1,.36,1), filter .45s ease;
 }
 
 body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"] .interest-card-visual img,
@@ -130,34 +116,48 @@ body.theme-universe .galaxy-catalog .interest-card:hover .interest-card-cover {
   transform: scale(1.1);
 }
 
-/* Real covers stay visually dominant. */
-body.theme-universe .galaxy-catalog .interest-card-visual::before {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  content: "";
-  background:
-    linear-gradient(180deg, rgba(5,8,15,.02) 0%, rgba(5,8,15,.04) 44%, rgba(5,8,15,.18) 72%, rgba(5,8,15,.42) 100%),
-    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px),
-    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px);
-  background-size: auto, 46px 46px, 46px 46px;
-  opacity: .5;
-  pointer-events: none;
-}
-
+/*
+ * Reset every geometry property inherited from universe-home.css.
+ * The earlier ::after was a 1px line with box-shadows and a rotation; when the
+ * new full-cover gradient was layered on top, those old properties survived and
+ * produced the visible band across photographic covers.
+ */
+body.theme-universe .galaxy-catalog .interest-card-visual::before,
 body.theme-universe .galaxy-catalog .interest-card-visual::after {
   position: absolute;
   inset: 0;
-  z-index: 3;
-  content: "";
-  background:
-    radial-gradient(95% 60% at 50% 100%, color-mix(in srgb, var(--card-accent) 10%, transparent), transparent 58%),
-    linear-gradient(180deg, transparent 0%, transparent 62%, rgba(5,8,15,.26) 100%);
-  opacity: 1;
+  right: auto;
+  bottom: auto;
+  width: auto;
+  height: auto;
+  box-shadow: none;
+  transform: none;
+  -webkit-mask-image: none;
+  mask-image: none;
   pointer-events: none;
 }
 
-/* Unfinished galaxies are presented as deliberate atlas / observatory states. */
+/* Real photos: keep overlays nearly invisible so the artwork reads cleanly. */
+body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"] .interest-card-visual::before,
+body.theme-universe .galaxy-catalog .interest-card[data-theme="music"] .interest-card-visual::before {
+  z-index: 2;
+  content: "";
+  background: linear-gradient(180deg, rgba(5,8,15,.015) 0%, rgba(5,8,15,.025) 62%, rgba(5,8,15,.11) 100%);
+  opacity: 1;
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"] .interest-card-visual::after,
+body.theme-universe .galaxy-catalog .interest-card[data-theme="music"] .interest-card-visual::after {
+  z-index: 3;
+  content: "";
+  top: auto;
+  bottom: 0;
+  height: 16%;
+  background: linear-gradient(180deg, transparent, rgba(5,8,15,.16));
+  opacity: 1;
+}
+
+/* Unfinished galaxies retain a deliberate atlas / observatory treatment. */
 body.theme-universe .galaxy-catalog .interest-card[data-theme="games"] .interest-card-visual,
 body.theme-universe .galaxy-catalog .interest-card[data-theme="anime"] .interest-card-visual {
   background:
@@ -170,14 +170,18 @@ body.theme-universe .galaxy-catalog .interest-card[data-theme="anime"] .interest
 
 body.theme-universe .galaxy-catalog .interest-card[data-theme="games"] .interest-card-visual::before,
 body.theme-universe .galaxy-catalog .interest-card[data-theme="anime"] .interest-card-visual::before {
-  opacity: .36;
+  z-index: 2;
+  content: "";
   background:
     linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
     linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px);
   background-size: 48px 48px;
+  opacity: .36;
 }
 
 body.theme-universe .galaxy-catalog .interest-card[data-theme="games"] .interest-card-visual::after {
+  z-index: 3;
+  content: "";
   background:
     radial-gradient(circle at 50% 38%, rgba(117,184,255,.14) 0, transparent 18%),
     radial-gradient(circle at 50% 38%, rgba(255,255,255,.18) 0 1px, transparent 2px),
@@ -189,6 +193,8 @@ body.theme-universe .galaxy-catalog .interest-card[data-theme="games"] .interest
 }
 
 body.theme-universe .galaxy-catalog .interest-card[data-theme="anime"] .interest-card-visual::after {
+  z-index: 3;
+  content: "";
   background:
     radial-gradient(circle at 50% 40%, rgba(220,127,149,.13) 0, transparent 17%),
     radial-gradient(circle at 50% 40%, rgba(255,255,255,.18) 0 1px, transparent 2px),
@@ -207,9 +213,7 @@ body.theme-universe .galaxy-catalog .interest-card-content {
   flex-direction: column;
   justify-content: space-between;
   padding: 17px 18px 16px;
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--card-accent) 3%, transparent), transparent 48%),
-    rgba(6,9,16,.985);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--card-accent) 3%, transparent), transparent 48%), rgba(6,9,16,.985);
 }
 
 body.theme-universe .galaxy-catalog .interest-card-top {
