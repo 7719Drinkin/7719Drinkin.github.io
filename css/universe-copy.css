@@ -93,6 +93,15 @@
   font-family: var(--universe-serif);
 }
 
+/* The poetic chapter labels were visually redundant beside the large headings.
+ * Remove only structural decoration; keep functional card labels such as the
+ * 3D experience and featured subject identifiers. */
+body.theme-universe .universe-hero-copy > .eyebrow,
+body.theme-universe .section-heading > div > p,
+body.theme-universe .about-block > div > .eyebrow {
+  display: none;
+}
+
 html[lang="zh-CN"] body.theme-universe .section-heading h2,
 html[lang="zh-CN"] body.theme-universe .solar-experience-copy h3,
 html[lang="zh-CN"] body.theme-universe .about-block h2 {
