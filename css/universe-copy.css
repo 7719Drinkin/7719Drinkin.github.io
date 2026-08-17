@@ -93,7 +93,6 @@
   font-family: var(--universe-serif);
 }
 
-html[lang="zh-CN"] body.theme-universe .universe-hero h1,
 html[lang="zh-CN"] body.theme-universe .section-heading h2,
 html[lang="zh-CN"] body.theme-universe .solar-experience-copy h3,
 html[lang="zh-CN"] body.theme-universe .about-block h2 {
@@ -102,9 +101,13 @@ html[lang="zh-CN"] body.theme-universe .about-block h2 {
   letter-spacing: -.035em;
 }
 
+/* Keep the Hero in the same bold sans-serif visual system in both languages. */
 html[lang="zh-CN"] body.theme-universe .universe-hero h1 {
-  font-size: clamp(76px, 11vw, 158px);
-  line-height: .9;
+  font-family: var(--universe-ui);
+  font-size: clamp(72px, 10vw, 148px);
+  font-weight: 800;
+  line-height: .86;
+  letter-spacing: -.055em;
 }
 
 html[lang="zh-CN"] body.theme-universe .interest-card h3 {
