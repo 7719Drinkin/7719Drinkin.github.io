@@ -17,10 +17,12 @@ const loadHeroQuotes = async () => {
       headers: { Accept: 'application/json' }
     });
     if (!response.ok) throw new Error(`Music home data ${response.status}`);
+
     const data = await response.json();
     const quotes = Array.isArray(data?.heroQuotes)
       ? data.heroQuotes.map((value) => String(value || '').trim()).filter(Boolean)
       : [];
+
     return quotes.length ? quotes : DEFAULT_QUOTES;
   } catch {
     return DEFAULT_QUOTES;
@@ -64,6 +66,7 @@ const initHeroTypewriter = async () => {
     if (!deleting && characterIndex === characters.length) {
       root.setAttribute('aria-label', quote);
       if (quotes.length === 1) return;
+
       timer = window.setTimeout(() => {
         deleting = true;
         write();
@@ -88,17 +91,19 @@ const initHeroTypewriter = async () => {
 };
 
 const COLORS = {
-  cabinet: 0x11131b,
-  cabinetTop: 0x1b1d27,
-  cabinetEdge: 0x40495d,
-  brass: 0xb58b4f,
-  brassLight: 0xd1b16d,
-  brassDark: 0x765632,
-  hornInner: 0x613b3f,
-  hornInnerDark: 0x241821,
+  cabinet: 0x151923,
+  cabinetSide: 0x0d111a,
+  cabinetTop: 0x242935,
+  cabinetEdge: 0x4b566e,
+  panel: 0x0b1018,
+  brass: 0xb58a4a,
+  brassLight: 0xd4b36c,
+  brassDark: 0x73522e,
+  hornInner: 0x6c3b42,
+  hornInnerDeep: 0x25151c,
   record: 0x05070b,
-  recordEdge: 0x31435f,
-  coolAccent: 0x657a9a
+  recordEdge: 0x354761,
+  coolAccent: 0x687d9b
 };
 
 const lambert = (color, emissive = 0x000000, intensity = 0, extra = {}) => new THREE.MeshLambertMaterial({
@@ -111,8 +116,9 @@ const lambert = (color, emissive = 0x000000, intensity = 0, extra = {}) => new T
 
 const basic = (color, extra = {}) => new THREE.MeshBasicMaterial({ color, ...extra });
 
-const addEdges = (mesh, color, opacity = .16, threshold = 28) => {
+const addEdges = (mesh, color, opacity = .13, threshold = 30) => {
   if (!mesh.geometry?.attributes?.position) return;
+
   const geometry = new THREE.EdgesGeometry(mesh.geometry, threshold);
   const material = new THREE.LineBasicMaterial({
     color,
@@ -120,6 +126,7 @@ const addEdges = (mesh, color, opacity = .16, threshold = 28) => {
     opacity,
     depthWrite: false
   });
+
   const lines = new THREE.LineSegments(geometry, material);
   lines.renderOrder = 4;
   mesh.add(lines);
@@ -130,6 +137,7 @@ const addBox = (group, size, position, material, edge = null) => {
   mesh.position.set(...position);
   mesh.castShadow = false;
   mesh.receiveShadow = false;
+
   if (edge) addEdges(mesh, edge.color, edge.opacity, edge.threshold);
   group.add(mesh);
   return mesh;
@@ -140,10 +148,12 @@ const addCylinderBetween = (group, start, end, radius, material, radialSegments 
   const endVector = new THREE.Vector3(...end);
   const direction = endVector.clone().sub(startVector);
   const length = direction.length();
+
   const mesh = new THREE.Mesh(
     new THREE.CylinderGeometry(radius, radius, length, radialSegments, 1, false),
     material
   );
+
   mesh.position.copy(startVector).add(endVector).multiplyScalar(.5);
   mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
   group.add(mesh);
@@ -151,64 +161,113 @@ const addCylinderBetween = (group, start, end, radius, material, radialSegments 
 };
 
 const addTube = (group, points, radius, material, radialSegments = 6, tubularSegments = 24) => {
-  const curve = new THREE.CatmullRomCurve3(points.map((point) => new THREE.Vector3(...point)));
+  const curve = new THREE.CatmullRomCurve3(
+    points.map((point) => new THREE.Vector3(...point)),
+    false,
+    'catmullrom',
+    .55
+  );
+
   const mesh = new THREE.Mesh(
     new THREE.TubeGeometry(curve, tubularSegments, radius, radialSegments, false),
     material
   );
+
   group.add(mesh);
   return mesh;
+};
+
+const addHornMouthRibs = (group, bellVector, direction, radius, material) => {
+  const normal = direction.clone().normalize();
+  const basisX = new THREE.Vector3(0, 1, 0);
+
+  if (Math.abs(normal.dot(basisX)) > .92) {
+    basisX.set(1, 0, 0);
+  }
+
+  basisX.cross(normal).normalize();
+  const basisY = normal.clone().cross(basisX).normalize();
+  const center = bellVector.clone().addScaledVector(normal, -.045);
+
+  for (let i = 0; i < 8; i += 1) {
+    const angle = (Math.PI * 2 * i) / 8;
+    const end = center.clone()
+      .addScaledVector(basisX, Math.cos(angle) * radius)
+      .addScaledVector(basisY, Math.sin(angle) * radius);
+
+    addCylinderBetween(
+      group,
+      center.toArray(),
+      end.toArray(),
+      .007,
+      material,
+      5
+    );
+  }
 };
 
 const addHorn = (group, throat, bell, materials) => {
   const throatVector = new THREE.Vector3(...throat);
   const bellVector = new THREE.Vector3(...bell);
   const direction = bellVector.clone().sub(throatVector);
+  const directionNormal = direction.clone().normalize();
   const length = direction.length();
   const center = throatVector.clone().add(bellVector).multiplyScalar(.5);
+
   const orientation = new THREE.Quaternion().setFromUnitVectors(
     new THREE.Vector3(0, 1, 0),
-    direction.clone().normalize()
+    directionNormal
   );
 
   const shell = new THREE.Mesh(
-    new THREE.CylinderGeometry(1.06, .29, length, 10, 2, true),
+    new THREE.CylinderGeometry(1.18, .27, length, 12, 3, true),
     materials.shell
   );
   shell.position.copy(center);
   shell.quaternion.copy(orientation);
   group.add(shell);
-  addEdges(shell, COLORS.brassLight, .22, 20);
+  addEdges(shell, COLORS.brassLight, .18, 22);
 
-  const insetDirection = direction.clone().normalize();
-  const innerStart = throatVector.clone().addScaledVector(insetDirection, .08);
-  const innerEnd = bellVector.clone().addScaledVector(insetDirection, -.055);
+  const innerStart = throatVector.clone().addScaledVector(directionNormal, .10);
+  const innerEnd = bellVector.clone().addScaledVector(directionNormal, -.07);
   const innerDirection = innerEnd.clone().sub(innerStart);
+
   const inner = new THREE.Mesh(
-    new THREE.CylinderGeometry(.91, .23, innerDirection.length(), 10, 2, true),
+    new THREE.CylinderGeometry(1.02, .22, innerDirection.length(), 12, 2, true),
     materials.inner
   );
   inner.position.copy(innerStart).add(innerEnd).multiplyScalar(.5);
-  inner.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), innerDirection.clone().normalize());
+  inner.quaternion.setFromUnitVectors(
+    new THREE.Vector3(0, 1, 0),
+    innerDirection.clone().normalize()
+  );
   group.add(inner);
 
+  const mouth = new THREE.Mesh(
+    new THREE.CircleGeometry(.98, 12),
+    materials.mouth
+  );
+  mouth.position.copy(bellVector).addScaledVector(directionNormal, -.075);
+  mouth.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), directionNormal);
+  group.add(mouth);
+
   const rim = new THREE.Mesh(
-    new THREE.TorusGeometry(1.06, .045, 6, 20),
+    new THREE.TorusGeometry(1.18, .045, 6, 24),
     materials.rim
   );
   rim.position.copy(bellVector);
-  rim.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), direction.clone().normalize());
+  rim.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), directionNormal);
   group.add(rim);
 
+  addHornMouthRibs(group, bellVector, direction, .90, materials.rib);
+
   const throatRing = new THREE.Mesh(
-    new THREE.TorusGeometry(.29, .026, 6, 16),
+    new THREE.TorusGeometry(.27, .026, 6, 16),
     materials.rim
   );
   throatRing.position.copy(throatVector);
   throatRing.quaternion.copy(rim.quaternion);
   group.add(throatRing);
-
-  return shell;
 };
 
 const buildProceduralGramophone = () => {
@@ -216,60 +275,69 @@ const buildProceduralGramophone = () => {
   root.name = 'MusicHeroProceduralGramophone';
 
   const materials = {
-    cabinet: lambert(COLORS.cabinet, 0x03050a, .12),
-    cabinetTop: lambert(COLORS.cabinetTop, 0x05070d, .12),
-    brass: lambert(COLORS.brass, 0x1c1005, .08),
+    cabinet: lambert(COLORS.cabinet, 0x03050a, .10),
+    cabinetSide: lambert(COLORS.cabinetSide, 0x020409, .10),
+    cabinetTop: lambert(COLORS.cabinetTop, 0x05070d, .11),
+    panel: basic(COLORS.panel),
+    brass: lambert(COLORS.brass, 0x1b1005, .07),
     brassLight: lambert(COLORS.brassLight, 0x211306, .07),
-    brassDark: lambert(COLORS.brassDark, 0x120904, .09),
-    horn: lambert(COLORS.brass, 0x1b1006, .08, { side: THREE.DoubleSide }),
-    hornInner: lambert(COLORS.hornInner, COLORS.hornInnerDark, .14, { side: THREE.DoubleSide }),
-    record: lambert(COLORS.record, 0x010308, .18),
-    cool: lambert(COLORS.coolAccent, 0x080d16, .08)
+    brassDark: lambert(COLORS.brassDark, 0x110804, .08),
+    horn: lambert(COLORS.brass, 0x1a0e04, .07, { side: THREE.DoubleSide }),
+    hornInner: lambert(COLORS.hornInner, COLORS.hornInnerDeep, .15, { side: THREE.DoubleSide }),
+    hornMouth: lambert(COLORS.hornInnerDeep, 0x090308, .18, { side: THREE.DoubleSide }),
+    record: lambert(COLORS.record, 0x010308, .16),
+    cool: lambert(COLORS.coolAccent, 0x080d16, .07)
   };
 
   const cabinet = new THREE.Group();
   cabinet.name = 'cabinet';
   root.add(cabinet);
 
-  addBox(cabinet, [3.75, .18, 2.75], [0, -1.42, 0], materials.cabinetTop, {
+  addBox(cabinet, [3.80, .18, 2.78], [0, -1.43, 0], materials.cabinetTop, {
     color: COLORS.cabinetEdge,
-    opacity: .16,
-    threshold: 25
+    opacity: .14,
+    threshold: 26
   });
-  addBox(cabinet, [3.42, 1.62, 2.43], [0, -.58, 0], materials.cabinet, {
+
+  addBox(cabinet, [3.46, 1.64, 2.45], [0, -.59, 0], materials.cabinet, {
     color: COLORS.cabinetEdge,
-    opacity: .15,
-    threshold: 25
+    opacity: .13,
+    threshold: 26
   });
-  addBox(cabinet, [3.58, .16, 2.63], [0, .27, 0], materials.cabinetTop, {
+
+  const rightSide = addBox(cabinet, [.045, 1.48, 2.28], [1.755, -.58, -.03], materials.cabinetSide);
+  addEdges(rightSide, COLORS.coolAccent, .07, 28);
+
+  addBox(cabinet, [3.62, .16, 2.66], [0, .28, 0], materials.cabinetTop, {
     color: COLORS.brassDark,
-    opacity: .18,
-    threshold: 25
+    opacity: .15,
+    threshold: 26
   });
 
-  const panelZ = 1.236;
-  addBox(cabinet, [2.48, .74, .025], [0, -.58, panelZ], basic(0x0c0f17));
-  const frameEdge = .035;
-  addBox(cabinet, [2.50, frameEdge, .04], [0, -.19, panelZ + .022], materials.brassDark);
-  addBox(cabinet, [2.50, frameEdge, .04], [0, -.97, panelZ + .022], materials.brassDark);
-  addBox(cabinet, [frameEdge, .82, .04], [-1.25, -.58, panelZ + .022], materials.brassDark);
-  addBox(cabinet, [frameEdge, .82, .04], [1.25, -.58, panelZ + .022], materials.brassDark);
+  const panelZ = 1.245;
+  addBox(cabinet, [2.52, .76, .025], [0, -.58, panelZ], materials.panel);
 
-  [[-1.55, -1.58, -.98], [1.55, -1.58, -.98], [-1.55, -1.58, .98], [1.55, -1.58, .98]].forEach((position) => {
-    addBox(cabinet, [.22, .26, .24], position, materials.cabinetTop);
+  const frameEdge = .035;
+  addBox(cabinet, [2.54, frameEdge, .04], [0, -.18, panelZ + .022], materials.brassDark);
+  addBox(cabinet, [2.54, frameEdge, .04], [0, -.98, panelZ + .022], materials.brassDark);
+  addBox(cabinet, [frameEdge, .84, .04], [-1.27, -.58, panelZ + .022], materials.brassDark);
+  addBox(cabinet, [frameEdge, .84, .04], [1.27, -.58, panelZ + .022], materials.brassDark);
+
+  [[-1.58, -1.59, -.99], [1.58, -1.59, -.99], [-1.58, -1.59, .99], [1.58, -1.59, .99]].forEach((position) => {
+    addBox(cabinet, [.22, .27, .24], position, materials.cabinetTop);
   });
 
   const platter = new THREE.Mesh(
     new THREE.CylinderGeometry(1.29, 1.29, .09, 32),
     materials.cabinetTop
   );
-  platter.position.set(-.10, .405, .06);
+  platter.position.set(-.18, .41, .04);
   cabinet.add(platter);
-  addEdges(platter, COLORS.coolAccent, .11, 28);
+  addEdges(platter, COLORS.coolAccent, .10, 28);
 
   const recordGroup = new THREE.Group();
   recordGroup.name = 'record';
-  recordGroup.position.set(-.10, .495, .06);
+  recordGroup.position.set(-.18, .50, .04);
   cabinet.add(recordGroup);
 
   const record = new THREE.Mesh(
@@ -277,12 +345,15 @@ const buildProceduralGramophone = () => {
     materials.record
   );
   recordGroup.add(record);
-  addEdges(record, COLORS.recordEdge, .12, 28);
+  addEdges(record, COLORS.recordEdge, .11, 28);
 
   [0.44, 0.72, 0.96].forEach((radius, index) => {
     const groove = new THREE.Mesh(
       new THREE.TorusGeometry(radius, .006 + index * .001, 4, 40),
-      basic(COLORS.recordEdge, { transparent: true, opacity: .34 - index * .05 })
+      basic(COLORS.recordEdge, {
+        transparent: true,
+        opacity: .32 - index * .05
+      })
     );
     groove.rotation.x = Math.PI / 2;
     groove.position.y = .026;
@@ -306,41 +377,43 @@ const buildProceduralGramophone = () => {
   const tonearm = new THREE.Group();
   tonearm.name = 'tonearm';
   cabinet.add(tonearm);
+
   const tonearmTube = addTube(tonearm, [
-    [1.24, .55, -.69],
-    [1.30, .86, -.58],
-    [1.10, 1.00, -.19],
-    [.78, .97, .25],
-    [.46, .80, .58]
+    [1.26, .56, -.72],
+    [1.32, .87, -.58],
+    [1.12, 1.01, -.17],
+    [.80, .98, .26],
+    [.47, .81, .60]
   ], .055, materials.brassDark, 6, 24);
-  addEdges(tonearmTube, COLORS.brassLight, .16, 30);
+  addEdges(tonearmTube, COLORS.brassLight, .14, 30);
 
   const tonearmPivot = new THREE.Mesh(
     new THREE.CylinderGeometry(.15, .19, .20, 10),
     materials.brass
   );
-  tonearmPivot.position.set(1.24, .55, -.69);
+  tonearmPivot.position.set(1.26, .56, -.72);
   tonearm.add(tonearmPivot);
 
   const cartridge = new THREE.Mesh(
     new THREE.BoxGeometry(.28, .10, .17),
     materials.brassLight
   );
-  cartridge.position.set(.43, .77, .61);
+  cartridge.position.set(.44, .78, .63);
   cartridge.rotation.set(0, -.22, -.18);
   tonearm.add(cartridge);
 
   const crank = addTube(cabinet, [
-    [1.70, -.60, 1.23],
-    [1.88, -.51, 1.34],
-    [1.83, -.27, 1.39]
+    [1.72, -.62, 1.24],
+    [1.90, -.53, 1.36],
+    [1.85, -.29, 1.41]
   ], .047, materials.brass, 6, 12);
-  addEdges(crank, COLORS.brassLight, .16, 30);
+  addEdges(crank, COLORS.brassLight, .14, 30);
+
   const crankKnob = new THREE.Mesh(
     new THREE.CylinderGeometry(.095, .095, .20, 10),
     materials.brassLight
   );
-  crankKnob.position.set(1.83, -.18, 1.39);
+  crankKnob.position.set(1.85, -.20, 1.41);
   crankKnob.rotation.x = Math.PI / 2;
   cabinet.add(crankKnob);
 
@@ -348,38 +421,37 @@ const buildProceduralGramophone = () => {
   hornSystem.name = 'horn-system';
   root.add(hornSystem);
 
-  const pipe = addTube(hornSystem, [
-    [1.48, .43, -.83],
-    [1.62, 1.18, -.76],
-    [1.42, 1.70, -.67],
-    [1.02, 1.98, -.55],
-    [.60, 2.13, -.45]
-  ], .105, materials.brassDark, 7, 28);
-  addEdges(pipe, COLORS.brassLight, .14, 30);
+  const throat = [1.00, 2.05, -.56];
+  const bell = [2.54, 3.02, 1.56];
 
-  addHorn(
-    hornSystem,
-    [.60, 2.13, -.45],
-    [-1.02, 3.13, .67],
-    {
-      shell: materials.horn,
-      inner: materials.hornInner,
-      rim: materials.brassLight
-    }
-  );
+  const pipe = addTube(hornSystem, [
+    [1.50, .44, -.86],
+    [1.66, 1.18, -.78],
+    [1.52, 1.65, -.70],
+    [1.28, 1.91, -.64],
+    throat
+  ], .105, materials.brassDark, 7, 28);
+  addEdges(pipe, COLORS.brassLight, .13, 30);
+
+  addHorn(hornSystem, throat, bell, {
+    shell: materials.horn,
+    inner: materials.hornInner,
+    mouth: materials.hornMouth,
+    rim: materials.brassLight,
+    rib: materials.brassDark
+  });
 
   const neck = addCylinderBetween(
     hornSystem,
-    [.93, 1.95, -.58],
-    [.60, 2.13, -.45],
-    .16,
+    [1.25, 1.92, -.66],
+    throat,
+    .15,
     materials.brass,
     8
   );
-  addEdges(neck, COLORS.brassLight, .13, 30);
+  addEdges(neck, COLORS.brassLight, .12, 30);
 
-  root.rotation.set(-.035, -.34, .018);
-  root.scale.setScalar(1.02);
+  root.rotation.set(-.045, -.16, .01);
 
   return { root, recordGroup };
 };
@@ -391,7 +463,7 @@ const initGramophone = () => {
 
   const credit = stage.querySelector('.collection-gramophone-credit');
   if (credit) {
-    credit.textContent = '3D · PROCEDURAL · THREE.JS';
+    credit.textContent = 'OBJECT 01 · LISTENING MACHINE';
     credit.removeAttribute('href');
     credit.removeAttribute('target');
     credit.removeAttribute('rel');
@@ -417,23 +489,23 @@ const initGramophone = () => {
   renderer.shadowMap.enabled = false;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(31, 1, .01, 100);
+  const camera = new THREE.PerspectiveCamera(33, 1, .01, 100);
   const composition = new THREE.Group();
   scene.add(composition);
 
-  scene.add(new THREE.AmbientLight(0xaab5c8, .72));
-  scene.add(new THREE.HemisphereLight(0x6e84a8, 0x2f1817, .74));
+  scene.add(new THREE.AmbientLight(0xaeb9cb, .78));
+  scene.add(new THREE.HemisphereLight(0x6f86aa, 0x2c1718, .76));
 
-  const warmKey = new THREE.DirectionalLight(0xd6ad68, .66);
-  warmKey.position.set(4.5, 7.4, 6.2);
+  const warmKey = new THREE.DirectionalLight(0xdab36f, .64);
+  warmKey.position.set(4.8, 7.4, 6.5);
   scene.add(warmKey);
 
-  const coolFill = new THREE.DirectionalLight(0x6d86aa, .33);
-  coolFill.position.set(-5.2, 3.2, -4.0);
+  const coolFill = new THREE.DirectionalLight(0x708caf, .38);
+  coolFill.position.set(-5.1, 3.0, -4.2);
   scene.add(coolFill);
 
-  const warmRim = new THREE.DirectionalLight(0xd6a665, .20);
-  warmRim.position.set(-2.4, 5.5, 3.8);
+  const warmRim = new THREE.DirectionalLight(0xe1bc75, .18);
+  warmRim.position.set(-2.0, 5.8, 4.2);
   scene.add(warmRim);
 
   const { root, recordGroup } = buildProceduralGramophone();
@@ -454,6 +526,7 @@ const initGramophone = () => {
     const rect = canvas.getBoundingClientRect();
     const width = Math.max(1, Math.round(rect.width));
     const height = Math.max(1, Math.round(rect.height));
+
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
@@ -461,18 +534,19 @@ const initGramophone = () => {
     const box = new THREE.Box3().setFromObject(composition);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
+
     const verticalFov = THREE.MathUtils.degToRad(camera.fov);
     const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * camera.aspect);
     const fitHeight = size.y / (2 * Math.tan(verticalFov / 2));
     const fitWidth = size.x / (2 * Math.tan(horizontalFov / 2));
     const compact = camera.aspect < .95;
-    const distance = Math.max(fitHeight, fitWidth) * (compact ? 1.31 : 1.12);
-    const direction = new THREE.Vector3(.58, .30, 1.08).normalize();
+    const distance = Math.max(fitHeight, fitWidth) * (compact ? 1.25 : 1.07);
+    const direction = new THREE.Vector3(.64, .28, 1.18).normalize();
 
     camera.position.copy(center).add(direction.multiplyScalar(distance));
     camera.lookAt(
-      center.x - size.x * .06,
-      center.y - size.y * .015,
+      center.x + size.x * .015,
+      center.y - size.y * .025,
       center.z
     );
     camera.updateProjectionMatrix();
@@ -489,11 +563,13 @@ const initGramophone = () => {
   setPixelRatio();
   frameComposition();
   render();
+
   stage.classList.remove('is-loading', 'is-error');
   stage.classList.add('is-ready');
 
   const clockFrame = (time) => {
     if (disposed) return;
+
     const deltaSeconds = Math.min(.05, Math.max(0, (time - previousTime) / 1000));
     previousTime = time;
 
@@ -532,6 +608,7 @@ const initGramophone = () => {
         node.material?.dispose?.();
       }
     });
+
     renderer.dispose();
   }, { once: true });
 };
