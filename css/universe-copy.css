@@ -1,0 +1,143 @@
+.universe-header-actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.universe-language {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  margin-left: 20px;
+  padding-left: 18px;
+  border-left: 1px solid var(--space-line);
+  color: #677386;
+  font-family: var(--universe-mono);
+  font-size: 8px;
+  line-height: 1;
+}
+
+.universe-language button {
+  appearance: none;
+  padding: 6px 3px;
+  border: 0;
+  color: #778496;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: .08em;
+  transition: color .2s ease, opacity .2s ease;
+}
+
+.universe-language button:hover,
+.universe-language button[aria-pressed="true"] {
+  color: var(--space-text);
+}
+
+.universe-language button[aria-pressed="false"] {
+  opacity: .62;
+}
+
+.universe-language-separator {
+  color: #465165;
+  user-select: none;
+}
+
+.universe-tagline cite,
+.section-quote cite,
+.solar-literary-copy cite,
+.featured-literary-copy cite,
+.about-literary-copy cite {
+  display: block;
+  margin-top: 8px;
+  color: #69778b;
+  font-family: var(--universe-mono);
+  font-size: 8px;
+  font-style: normal;
+  letter-spacing: .08em;
+  line-height: 1.55;
+}
+
+.section-quote {
+  display: block;
+}
+
+.section-quote > span {
+  display: block;
+  color: #a9b5c4;
+  font-family: var(--universe-serif);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.interest-card-description.quote-source {
+  margin-top: 10px;
+  color: #738095;
+  font-family: var(--universe-mono);
+  font-size: 8px;
+  letter-spacing: .06em;
+  line-height: 1.6;
+}
+
+.solar-literary-copy,
+.featured-literary-copy {
+  max-width: 50ch;
+}
+
+.solar-literary-copy > span,
+.featured-literary-copy > span,
+.about-literary-copy > span {
+  color: #b8c3d0;
+  font-family: var(--universe-serif);
+}
+
+html[lang="zh-CN"] body.theme-universe .universe-hero h1,
+html[lang="zh-CN"] body.theme-universe .section-heading h2,
+html[lang="zh-CN"] body.theme-universe .solar-experience-copy h3,
+html[lang="zh-CN"] body.theme-universe .about-block h2 {
+  font-family: var(--universe-serif);
+  font-weight: 600;
+  letter-spacing: -.035em;
+}
+
+html[lang="zh-CN"] body.theme-universe .universe-hero h1 {
+  font-size: clamp(76px, 11vw, 158px);
+  line-height: .9;
+}
+
+html[lang="zh-CN"] body.theme-universe .interest-card h3 {
+  font-family: var(--universe-ui);
+  font-weight: 800;
+  letter-spacing: -.04em;
+}
+
+html[lang="zh-CN"] .interest-card-subtitle {
+  font-family: var(--universe-serif);
+}
+
+@media (max-width: 760px) {
+  .universe-header-actions {
+    max-width: calc(100vw - 74px);
+    flex: 1 1 auto;
+  }
+
+  .universe-language {
+    margin-left: 10px;
+    padding-left: 9px;
+    font-size: 7px;
+  }
+
+  .section-quote > span {
+    font-size: 14px;
+  }
+
+  .universe-tagline cite,
+  .section-quote cite,
+  .solar-literary-copy cite,
+  .featured-literary-copy cite,
+  .about-literary-copy cite {
+    font-size: 7px;
+  }
+}
