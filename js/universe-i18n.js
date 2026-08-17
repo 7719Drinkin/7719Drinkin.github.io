@@ -1,6 +1,11 @@
 (() => {
   const root = document.documentElement;
 
+  const chineseOverrides = {
+    'hero.line1': '个人',
+    'hero.line2': '宇宙'
+  };
+
   const english = {
     'meta.description': '7719 Universe — a personal universe that keeps expanding.',
     'nav.label': 'Primary navigation',
@@ -121,7 +126,9 @@
 
     document.querySelectorAll('[data-i18n]').forEach((node) => {
       const key = node.dataset.i18n;
-      const value = dictionary?.[key] ?? originalText.get(key);
+      const value = selected === 'en'
+        ? dictionary?.[key]
+        : (chineseOverrides[key] ?? originalText.get(key));
       if (typeof value === 'string') node.textContent = value;
     });
 
@@ -146,8 +153,13 @@
     button.addEventListener('click', () => applyLanguage(button.dataset.languageChoice));
   });
 
-  // The static HTML is the canonical Chinese version. Do not rewrite visible copy on load.
-  // Language changes happen only after an explicit click, preventing post-load copy reversion.
+  // The static HTML is the canonical Chinese version. Keep the title explicitly Chinese
+  // even when an older HTML document is still cached while the new script has arrived.
+  Object.entries(chineseOverrides).forEach(([key, value]) => {
+    const node = document.querySelector(`[data-i18n="${key}"]`);
+    if (node) node.textContent = value;
+  });
+
   root.lang = 'zh-CN';
   root.dataset.universeLanguage = 'zh';
   syncControls('zh');
