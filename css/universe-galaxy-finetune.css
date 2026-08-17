@@ -123,11 +123,115 @@ body.theme-universe .galaxy-catalog .interest-card[data-theme="anime"] .interest
   box-shadow: inset 0 -60px 100px rgba(126,53,89,.05);
 }
 
+/* Final balance pass: shorter cards, clearer unfinished atlases, cleaner Basketball crop. */
+body.theme-universe .galaxy-catalog .interest-card {
+  min-height: 472px;
+  grid-template-rows: minmax(0, 64%) minmax(0, 36%);
+}
+
+body.theme-universe .galaxy-catalog .interest-card-top {
+  top: calc(-64% + 13px);
+}
+
+body.theme-universe .galaxy-catalog .interest-card-content {
+  padding: 16px 19px 15px;
+}
+
+body.theme-universe .galaxy-catalog .interest-card-enter {
+  margin-top: 10px;
+  padding-top: 9px;
+  font-size: 8px;
+}
+
+body.theme-universe .galaxy-catalog .interest-card-description,
+body.theme-universe .galaxy-catalog .interest-card-description.quote-source {
+  font-size: 7.4px;
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"] .interest-card-visual img,
+body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"] .interest-card-cover {
+  object-position: 8% 24%;
+  transform: scale(1.22);
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"]:hover .interest-card-visual img,
+body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"]:hover .interest-card-cover {
+  transform: scale(1.245);
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="games"] .interest-card-visual,
+body.theme-universe .galaxy-catalog .interest-card[data-theme="anime"] .interest-card-visual {
+  background-color: #060a13;
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="games"] .interest-card-visual::before,
+body.theme-universe .galaxy-catalog .interest-card[data-theme="anime"] .interest-card-visual::before {
+  opacity: .56;
+  background-size: 44px 44px, 44px 44px, auto;
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="games"] .interest-card-visual::after {
+  background:
+    radial-gradient(circle at 51% 39%, rgba(116,183,255,.22) 0 3%, transparent 22%),
+    radial-gradient(circle at 51% 39%, transparent 0 16.4%, rgba(116,183,255,.31) 16.65% 17.05%, transparent 17.3%),
+    radial-gradient(circle at 51% 39%, transparent 0 30.2%, rgba(116,183,255,.18) 30.45% 30.8%, transparent 31.05%),
+    radial-gradient(circle at 51% 39%, transparent 0 45.2%, rgba(116,183,255,.095) 45.4% 45.7%, transparent 45.95%),
+    linear-gradient(90deg, transparent 0 50.65%, rgba(116,183,255,.14) 50.83% 51.08%, transparent 51.26%),
+    linear-gradient(0deg, transparent 0 60.55%, rgba(116,183,255,.12) 60.72% 60.94%, transparent 61.12%),
+    linear-gradient(136deg, transparent 0 49.7%, rgba(116,183,255,.15) 49.9% 50.1%, transparent 50.3%),
+    radial-gradient(circle at 25% 24%, rgba(222,239,255,.9) 0 1.1px, transparent 2px),
+    radial-gradient(circle at 71% 27%, rgba(116,183,255,.9) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle at 63% 66%, rgba(222,239,255,.62) 0 1px, transparent 1.9px),
+    radial-gradient(circle at 84% 73%, rgba(116,183,255,.66) 0 1px, transparent 1.9px),
+    radial-gradient(circle at 36% 74%, rgba(116,183,255,.48) 0 1px, transparent 1.8px);
+  opacity: 1;
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="anime"] .interest-card-visual::after {
+  background:
+    radial-gradient(circle at 47% 40%, rgba(220,127,149,.21) 0 3%, transparent 21%),
+    radial-gradient(circle at 47% 40%, transparent 0 17.1%, rgba(220,127,149,.3) 17.35% 17.75%, transparent 18%),
+    radial-gradient(circle at 47% 40%, transparent 0 32.3%, rgba(220,127,149,.17) 32.55% 32.9%, transparent 33.15%),
+    radial-gradient(circle at 47% 40%, transparent 0 46.5%, rgba(220,127,149,.09) 46.7% 47%, transparent 47.25%),
+    linear-gradient(90deg, transparent 0 46.65%, rgba(220,127,149,.12) 46.83% 47.08%, transparent 47.26%),
+    linear-gradient(0deg, transparent 0 59.45%, rgba(220,127,149,.11) 59.62% 59.84%, transparent 60.02%),
+    linear-gradient(61deg, transparent 0 49.7%, rgba(220,127,149,.14) 49.9% 50.1%, transparent 50.3%),
+    linear-gradient(119deg, transparent 0 49.7%, rgba(220,127,149,.08) 49.9% 50.1%, transparent 50.3%),
+    radial-gradient(circle at 27% 25%, rgba(255,230,239,.88) 0 1.1px, transparent 2px),
+    radial-gradient(circle at 72% 24%, rgba(220,127,149,.9) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle at 65% 68%, rgba(255,230,239,.58) 0 1px, transparent 1.9px),
+    radial-gradient(circle at 83% 72%, rgba(220,127,149,.63) 0 1px, transparent 1.9px),
+    radial-gradient(circle at 34% 76%, rgba(220,127,149,.44) 0 1px, transparent 1.8px);
+  opacity: 1;
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="games"] .interest-card-visual {
+  box-shadow:
+    inset 0 -70px 120px rgba(41,93,158,.08),
+    inset 0 0 100px rgba(64,118,185,.025);
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="anime"] .interest-card-visual {
+  box-shadow:
+    inset 0 -70px 120px rgba(126,53,89,.08),
+    inset 0 0 100px rgba(151,66,104,.025);
+}
+
 @media (max-width: 1380px) {
   body.theme-universe .galaxy-catalog .section-quote { transform: none; }
+  body.theme-universe .galaxy-catalog .interest-card {
+    min-height: 492px;
+    grid-template-rows: minmax(0, 63%) minmax(0, 37%);
+  }
+  body.theme-universe .galaxy-catalog .interest-card-top { top: calc(-63% + 13px); }
 }
 
 @media (max-width: 680px) {
+  body.theme-universe .galaxy-catalog .interest-card {
+    min-height: 448px;
+    grid-template-rows: minmax(0, 61%) minmax(0, 39%);
+  }
+  body.theme-universe .galaxy-catalog .interest-card-top { top: calc(-61% + 12px); }
   body.theme-universe .galaxy-catalog .interest-card-content { padding: 17px 17px 15px; }
 
   body.theme-universe .galaxy-catalog .interest-card-description,
