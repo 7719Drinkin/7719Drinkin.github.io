@@ -1,0 +1,64 @@
+/*
+ * Universe Chinese title correction.
+ * All prominent four-character Chinese titles stay on one horizontal row.
+ * English layout is intentionally untouched.
+ */
+
+html[lang="zh-CN"] body.theme-universe .section-heading h2,
+html[lang="zh-CN"] body.theme-universe .about-block h2,
+html[lang="zh-CN"] body.theme-universe .solar-experience-copy h3 {
+  display: inline-block;
+  width: max-content;
+  max-width: 100%;
+  writing-mode: horizontal-tb;
+  text-orientation: mixed;
+  white-space: nowrap;
+  line-height: .9;
+  letter-spacing: -.04em;
+}
+
+html[lang="zh-CN"] body.theme-universe .section-heading h2 br,
+html[lang="zh-CN"] body.theme-universe .about-block h2 br,
+html[lang="zh-CN"] body.theme-universe .solar-experience-copy h3 br {
+  display: none;
+}
+
+/* Keep the hero title on the same one-row rule already established for Chinese. */
+html[lang="zh-CN"] body.theme-universe .universe-hero h1 {
+  display: flex;
+  width: max-content;
+  max-width: 100%;
+  flex-direction: row;
+  align-items: baseline;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+html[lang="zh-CN"] body.theme-universe .universe-hero h1 span,
+html[lang="zh-CN"] body.theme-universe .universe-hero h1 strong {
+  display: inline;
+  flex: 0 0 auto;
+}
+
+/* Once the title is a single row, keep its quote visually anchored to the same baseline. */
+html[lang="zh-CN"] body.theme-universe .section-heading {
+  align-items: end;
+}
+
+html[lang="zh-CN"] body.theme-universe .galaxy-catalog .section-quote {
+  padding-bottom: 4px;
+  transform: none;
+}
+
+@media (max-width: 760px) {
+  html[lang="zh-CN"] body.theme-universe .section-heading h2,
+  html[lang="zh-CN"] body.theme-universe .about-block h2 {
+    font-size: clamp(46px, 14vw, 68px);
+    letter-spacing: -.035em;
+  }
+
+  html[lang="zh-CN"] body.theme-universe .solar-experience-copy h3 {
+    font-size: clamp(42px, 13vw, 64px);
+    letter-spacing: -.045em;
+  }
+}
