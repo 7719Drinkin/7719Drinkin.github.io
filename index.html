@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="7719 Universe — an expanding personal universe where every interest becomes an independent galaxy.">
+  <meta name="description" content="7719 Universe — 一方仍在生长的个人天地。">
   <title>7719 Universe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,101 +13,115 @@
   <link rel="stylesheet" href="/css/universe-3d-entry.css?v=20260730-1">
   <link rel="stylesheet" href="/css/universe-refined.css?v=20260806-1">
   <link rel="stylesheet" href="/css/universe-polish.css?v=20260817-1">
+  <link rel="stylesheet" href="/css/universe-copy.css?v=20260817-1">
 </head>
 <body class="theme-universe universe-home">
   <div class="universe-noise" aria-hidden="true"></div>
 
   <header class="universe-header">
     <a class="universe-brand" href="/" aria-label="7719 Universe 首页">7719</a>
-    <nav class="universe-nav" aria-label="主导航">
-      <a href="#galaxies">GALAXIES</a>
-      <a href="#solar-experience">3D MODE</a>
-      <a href="#featured">FEATURED</a>
-      <a href="#about">ABOUT</a>
-      <a href="https://github.com/7719Drinkin">GITHUB</a>
-    </nav>
+    <div class="universe-header-actions">
+      <nav class="universe-nav" aria-label="主导航" data-i18n-aria-label="nav.label">
+        <a href="#galaxies" data-i18n="nav.galaxies">星系</a>
+        <a href="#solar-experience" data-i18n="nav.three">3D 模式</a>
+        <a href="#featured" data-i18n="nav.featured">精选</a>
+        <a href="#about" data-i18n="nav.about">关于</a>
+        <a href="https://github.com/7719Drinkin">GITHUB</a>
+      </nav>
+      <div class="universe-language" aria-label="语言">
+        <button type="button" data-language-choice="zh" aria-pressed="true" aria-label="中文">中</button>
+        <span class="universe-language-separator" aria-hidden="true">/</span>
+        <button type="button" data-language-choice="en" aria-pressed="false" aria-label="English">EN</button>
+      </div>
+    </div>
   </header>
 
   <main>
     <section class="universe-hero" id="top">
       <div class="deep-field" aria-hidden="true"></div>
       <div class="universe-hero-copy reveal">
-        <p class="eyebrow">FIELD NOTE 7719 / OPEN CATALOG</p>
-        <h1><span>PERSONAL</span><strong>UNIVERSE</strong></h1>
-        <p class="universe-tagline">No center. No fixed boundary. Every interest occupies its own region of space, and the catalog remains open to galaxies that have not formed yet.</p>
-        <a class="universe-scroll" href="#galaxies">EXPLORE THE CATALOG <span>↓</span></a>
+        <p class="eyebrow" data-i18n="hero.eyebrow">卷一 / 天地</p>
+        <h1><span data-i18n="hero.line1">一方</span><strong data-i18n="hero.line2">天地</strong></h1>
+        <p class="universe-tagline">
+          <span data-i18n="hero.quote">天地有大美而不言。</span>
+          <cite data-i18n="hero.source">— 《庄子·知北游》</cite>
+        </p>
+        <a class="universe-scroll" href="#galaxies"><span data-i18n="hero.explore">入此天地</span> <span>↓</span></a>
       </div>
 
-      <aside class="hero-readout" aria-label="Universe catalog status">
-        <div><span>ACTIVE GALAXIES</span><strong>04</strong></div>
-        <div><span>CATALOG STATUS</span><strong>EXPANDING</strong></div>
-        <div><span>BOUNDARY</span><strong>OPEN</strong></div>
+      <aside class="hero-readout" aria-label="宇宙状态" data-i18n-aria-label="hero.status.label">
+        <div><span data-i18n="hero.readout.galaxies">星系</span><strong>04</strong></div>
+        <div><span data-i18n="hero.readout.catalog">状态</span><strong data-i18n="hero.readout.catalogValue">生长</strong></div>
+        <div><span data-i18n="hero.readout.boundary">边界</span><strong data-i18n="hero.readout.boundaryValue">未定</strong></div>
       </aside>
     </section>
 
     <section id="galaxies" class="universe-section galaxy-catalog">
       <div class="section-heading reveal">
         <div>
-          <p>01 / DEEP FIELD CATALOG</p>
-          <h2>INDEPENDENT<br>GALAXIES.</h2>
+          <p data-i18n="galaxies.eyebrow">01 / 万象</p>
+          <h2 data-i18n-html="galaxies.title">仰观<br>万象</h2>
         </div>
-        <span>Each entry is a separate interest system. There is no central subject and no permanent final list.</span>
+        <span class="section-quote">
+          <span data-i18n="galaxies.quote">仰观宇宙之大，俯察品类之盛。</span>
+          <cite data-i18n="galaxies.source">— 王羲之《兰亭集序》</cite>
+        </span>
       </div>
 
       <div id="interest-grid" class="interest-grid" aria-live="polite">
-        <a class="interest-card reveal" data-theme="basketball" href="/basketball/" aria-label="进入 Basketball 星系">
+        <a class="interest-card reveal" data-theme="basketball" href="/basketball/" aria-label="进入篮球星系" data-i18n-aria-label="card.basketball.aria">
           <div class="interest-card-visual" aria-hidden="true"><img src="/assets/Basketball/MJ/15942445778634938029.JPG" alt="" loading="lazy" decoding="async"></div>
           <div class="interest-card-content">
-            <div class="interest-card-top"><span>GALAXY 01</span><span class="interest-card-status">EXPLORE</span></div>
+            <div class="interest-card-top"><span><span data-i18n="card.galaxy">星系</span> 01</span><span class="interest-card-status" data-i18n="card.explore">可进入</span></div>
             <div class="interest-card-copy">
-              <p class="interest-card-kicker">ACTIVE INTEREST SYSTEM</p>
-              <h3>Basketball</h3>
-              <p class="interest-card-subtitle">The game never stops.</p>
-              <p class="interest-card-description">Legends, iconic frames and the moments that made the game larger than life.</p>
+              <p class="interest-card-kicker" data-i18n="card.active">活跃星系</p>
+              <h3 data-i18n="card.basketball.title">篮球</h3>
+              <p class="interest-card-subtitle" data-i18n="card.basketball.quote">会当凌绝顶，一览众山小。</p>
+              <p class="interest-card-description quote-source" data-i18n="card.basketball.source">— 杜甫《望岳》</p>
             </div>
-            <span class="interest-card-enter">ENTER GALAXY <strong>↗</strong></span>
+            <span class="interest-card-enter"><span data-i18n="card.enter">进入星系</span> <strong>↗</strong></span>
           </div>
         </a>
 
-        <a class="interest-card reveal" data-theme="games" href="/games/" aria-label="进入 Games 星系">
+        <a class="interest-card reveal" data-theme="games" href="/games/" aria-label="进入游戏星系" data-i18n-aria-label="card.games.aria">
           <div class="interest-card-visual" aria-hidden="true"></div>
           <div class="interest-card-content">
-            <div class="interest-card-top"><span>GALAXY 02</span><span class="interest-card-status">FORMING</span></div>
+            <div class="interest-card-top"><span><span data-i18n="card.galaxy">星系</span> 02</span><span class="interest-card-status" data-i18n="card.forming">生长中</span></div>
             <div class="interest-card-copy">
-              <p class="interest-card-kicker">DEVELOPING INTEREST SYSTEM</p>
-              <h3>Games</h3>
-              <p class="interest-card-subtitle">Worlds built one decision at a time.</p>
-              <p class="interest-card-description">Strategy, civilization building and memorable virtual worlds.</p>
+              <p class="interest-card-kicker" data-i18n="card.developing">正在形成</p>
+              <h3 data-i18n="card.games.title">游戏</h3>
+              <p class="interest-card-subtitle" data-i18n="card.games.quote">人生如逆旅，我亦是行人。</p>
+              <p class="interest-card-description quote-source" data-i18n="card.games.source">— 苏轼《临江仙·送钱穆父》</p>
             </div>
-            <span class="interest-card-enter">ENTER GALAXY <strong>↗</strong></span>
+            <span class="interest-card-enter"><span data-i18n="card.enter">进入星系</span> <strong>↗</strong></span>
           </div>
         </a>
 
-        <a class="interest-card reveal" data-theme="music" href="/music/" aria-label="进入 Music 星系">
+        <a class="interest-card reveal" data-theme="music" href="/music/" aria-label="进入音乐星系" data-i18n-aria-label="card.music.aria">
           <div class="interest-card-visual" aria-hidden="true"></div>
           <div class="interest-card-content">
-            <div class="interest-card-top"><span>GALAXY 03</span><span class="interest-card-status">EXPLORE</span></div>
+            <div class="interest-card-top"><span><span data-i18n="card.galaxy">星系</span> 03</span><span class="interest-card-status" data-i18n="card.explore">可进入</span></div>
             <div class="interest-card-copy">
-              <p class="interest-card-kicker">ACTIVE INTEREST SYSTEM</p>
-              <h3>Music</h3>
-              <p class="interest-card-subtitle">Soundtracks for different versions of me.</p>
-              <p class="interest-card-description">Artists, albums and songs collected over time.</p>
+              <p class="interest-card-kicker" data-i18n="card.active">活跃星系</p>
+              <h3 data-i18n="card.music.title">音乐</h3>
+              <p class="interest-card-subtitle" data-i18n="card.music.quote">此曲只应天上有，人间能得几回闻。</p>
+              <p class="interest-card-description quote-source" data-i18n="card.music.source">— 杜甫《赠花卿》</p>
             </div>
-            <span class="interest-card-enter">ENTER GALAXY <strong>↗</strong></span>
+            <span class="interest-card-enter"><span data-i18n="card.enter">进入星系</span> <strong>↗</strong></span>
           </div>
         </a>
 
-        <a class="interest-card reveal" data-theme="anime" href="/anime/" aria-label="进入 Anime 星系">
+        <a class="interest-card reveal" data-theme="anime" href="/anime/" aria-label="进入动画星系" data-i18n-aria-label="card.anime.aria">
           <div class="interest-card-visual" aria-hidden="true"></div>
           <div class="interest-card-content">
-            <div class="interest-card-top"><span>GALAXY 04</span><span class="interest-card-status">FORMING</span></div>
+            <div class="interest-card-top"><span><span data-i18n="card.galaxy">星系</span> 04</span><span class="interest-card-status" data-i18n="card.forming">生长中</span></div>
             <div class="interest-card-copy">
-              <p class="interest-card-kicker">DEVELOPING INTEREST SYSTEM</p>
-              <h3>Anime</h3>
-              <p class="interest-card-subtitle">Stories drawn one frame at a time.</p>
-              <p class="interest-card-description">Works, characters, scenes and stories collected across different stages of life.</p>
+              <p class="interest-card-kicker" data-i18n="card.developing">正在形成</p>
+              <h3 data-i18n="card.anime.title">动画</h3>
+              <p class="interest-card-subtitle" data-i18n="card.anime.quote">俱怀逸兴壮思飞，欲上青天揽明月。</p>
+              <p class="interest-card-description quote-source" data-i18n="card.anime.source">— 李白《宣州谢朓楼饯别校书叔云》</p>
             </div>
-            <span class="interest-card-enter">ENTER GALAXY <strong>↗</strong></span>
+            <span class="interest-card-enter"><span data-i18n="card.enter">进入星系</span> <strong>↗</strong></span>
           </div>
         </a>
       </div>
@@ -116,26 +130,29 @@
     <section id="solar-experience" class="universe-section">
       <div class="section-heading reveal">
         <div>
-          <p>02 / OPTIONAL EXPERIENCE</p>
-          <h2>ORBIT THE<br>CATALOG.</h2>
+          <p data-i18n="solar.eyebrow">02 / 星汉</p>
+          <h2 data-i18n-html="solar.title">游于<br>星汉</h2>
         </div>
-        <span>The same interests presented as a separate interactive 3D browsing mode.</span>
+        <span class="section-quote">
+          <span data-i18n="solar.quote">星汉灿烂，若出其里。</span>
+          <cite data-i18n="solar.source">— 曹操《观沧海》</cite>
+        </span>
       </div>
 
       <article class="solar-experience-entry reveal">
         <div class="solar-experience-copy">
-          <p class="eyebrow">3D EXPERIENCE / REACT THREE FIBER</p>
-          <h3>SOLAR<br>UNIVERSE.</h3>
-          <p>Explore each interest as a miniature world. Move through the system, focus on a planet and rotate around the places and objects built into its surface.</p>
+          <p class="eyebrow" data-i18n="solar.card.eyebrow">3D 体验 / REACT THREE FIBER</p>
+          <h3 data-i18n-html="solar.card.title">行星<br>之间</h3>
+          <p class="solar-literary-copy"><span data-i18n="solar.card.copy">拖拽、缩放、绕行。</span></p>
         </div>
         <div class="solar-experience-meta">
           <dl class="solar-experience-readout">
-            <div><dt>MODE</dt><dd>OPTIONAL</dd></div>
-            <div><dt>INPUT</dt><dd>DRAG + ZOOM</dd></div>
-            <div><dt>FALLBACK</dt><dd>MAIN CATALOG</dd></div>
+            <div><dt data-i18n="solar.mode">模式</dt><dd data-i18n="solar.mode.value">可选</dd></div>
+            <div><dt data-i18n="solar.input">操作</dt><dd data-i18n="solar.input.value">拖拽 + 缩放</dd></div>
+            <div><dt data-i18n="solar.fallback">返回</dt><dd data-i18n="solar.fallback.value">主目录</dd></div>
           </dl>
           <a class="solar-experience-link" href="/solar-universe/">
-            <span>LAUNCH 3D EXPERIENCE</span>
+            <span data-i18n="solar.launch">进入 3D 宇宙</span>
             <strong>↗</strong>
           </a>
         </div>
@@ -145,44 +162,51 @@
     <section id="featured" class="universe-section">
       <div class="section-heading reveal">
         <div>
-          <p>03 / FEATURED COLLECTION</p>
-          <h2>THE<br>LEGACY.</h2>
+          <p data-i18n="featured.eyebrow">03 / 扶摇</p>
+          <h2 data-i18n-html="featured.title">扶摇<br>而上</h2>
         </div>
-        <span>The first fully developed collection inside the Basketball galaxy.</span>
+        <span class="section-quote">
+          <span data-i18n="featured.quote">大鹏一日同风起，扶摇直上九万里。</span>
+          <cite data-i18n="featured.source">— 李白《上李邕》</cite>
+        </span>
       </div>
 
       <article class="featured-collection reveal">
         <div class="featured-copy">
-          <p class="eyebrow">BASKETBALL / MICHAEL JORDAN</p>
+          <p class="eyebrow" data-i18n="featured.card.eyebrow">篮球 / 迈克尔·乔丹</p>
           <h3>23</h3>
-          <p>A visual tribute built around iconic frames, movement, focus and the legacy that made basketball feel larger than the game.</p>
-          <a class="primary-link" href="/basketball/michael-jordan/">VIEW COLLECTION <span>↗</span></a>
+          <p class="featured-literary-copy"><span data-i18n="featured.card.copy">起跳、停顿、出手。其余交给时间。</span></p>
+          <a class="primary-link" href="/basketball/michael-jordan/"><span data-i18n="featured.view">查看收藏</span> <span>↗</span></a>
         </div>
         <figure class="featured-media">
           <img src="/assets/Basketball/MJ/15815936170156050909.GIF" alt="Michael Jordan basketball tribute animation">
-          <figcaption>COLLECTION 01 · MOVING IMAGE ARCHIVE</figcaption>
+          <figcaption data-i18n="featured.caption">收藏 01 · 动态影像</figcaption>
         </figure>
       </article>
     </section>
 
     <section id="about" class="universe-section about-block reveal">
       <div>
-        <p class="eyebrow">04 / SYSTEM PRINCIPLE</p>
-        <h2>STILL<br>EXPANDING.</h2>
+        <p class="eyebrow" data-i18n="about.eyebrow">04 / 求索</p>
+        <h2 data-i18n-html="about.title">未有<br>穷期</h2>
       </div>
       <div class="about-copy">
-        <p>This site is not a fixed list of favorites. Every interest can become an independent galaxy, each galaxy can contain multiple collections, and new systems can be registered without displacing the existing ones.</p>
-        <p>Basketball is simply the first developed galaxy. It is not the center of the universe.</p>
+        <p class="about-literary-copy">
+          <span data-i18n="about.quote">路漫漫其修远兮，吾将上下而求索。</span>
+          <cite data-i18n="about.source">— 屈原《离骚》</cite>
+        </p>
+        <p data-i18n="about.copy">没有中心，也没有终点。兴趣会生长，星系会继续出现。</p>
       </div>
     </section>
   </main>
 
   <footer class="universe-footer">
     <span>7719 UNIVERSE</span>
-    <span>NO CENTER · NO FINAL BOUNDARY · 2026</span>
+    <span data-i18n="footer.tagline">上下求索 · 2026</span>
   </footer>
 
   <script src="/js/universe.js?v=20260730-5"></script>
   <script src="/js/universe-refined.js?v=20260813-cover-runtime-1"></script>
+  <script src="/js/universe-i18n.js?v=20260817-1"></script>
 </body>
 </html>
