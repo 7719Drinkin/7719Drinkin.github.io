@@ -103,11 +103,23 @@ html[lang="zh-CN"] body.theme-universe .about-block h2 {
 
 /* Keep the Hero in the same bold sans-serif visual system in both languages. */
 html[lang="zh-CN"] body.theme-universe .universe-hero h1 {
+  display: flex;
+  width: max-content;
+  max-width: 100%;
+  align-items: baseline;
+  flex-wrap: nowrap;
+  white-space: nowrap;
   font-family: var(--universe-ui);
-  font-size: clamp(72px, 10vw, 148px);
+  font-size: clamp(70px, 9.4vw, 142px);
   font-weight: 800;
-  line-height: .86;
-  letter-spacing: -.055em;
+  line-height: .88;
+  letter-spacing: -.06em;
+}
+
+html[lang="zh-CN"] body.theme-universe .universe-hero h1 span,
+html[lang="zh-CN"] body.theme-universe .universe-hero h1 strong {
+  display: inline;
+  flex: 0 0 auto;
 }
 
 html[lang="zh-CN"] body.theme-universe .interest-card h3 {
@@ -134,6 +146,11 @@ html[lang="zh-CN"] .interest-card-subtitle {
 
   .section-quote > span {
     font-size: 14px;
+  }
+
+  html[lang="zh-CN"] body.theme-universe .universe-hero h1 {
+    font-size: clamp(48px, 15vw, 72px);
+    letter-spacing: -.055em;
   }
 
   .universe-tagline cite,
