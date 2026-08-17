@@ -1,0 +1,136 @@
+/*
+ * Universe homepage — 仰观万象 / final detail pass
+ * Keeps the current four-card structure while refining crop, hierarchy,
+ * unfinished-galaxy atlas detail, and small-text readability.
+ */
+
+body.theme-universe .galaxy-catalog .section-quote {
+  align-self: end;
+  max-width: 29rem;
+  padding-bottom: 2px;
+  transform: translateY(14px);
+}
+
+body.theme-universe .galaxy-catalog .section-quote > span { color: #9aa6b5; }
+body.theme-universe .galaxy-catalog .section-quote cite { margin-top: 7px; color: #697588; }
+
+body.theme-universe .galaxy-catalog .interest-card-kicker { display: none; }
+
+body.theme-universe .galaxy-catalog .interest-card-content { padding: 18px 19px 16px; }
+
+body.theme-universe .galaxy-catalog .interest-card h3,
+html[lang="zh-CN"] body.theme-universe .galaxy-catalog .interest-card h3 {
+  font-size: clamp(31px, 2.7vw, 41px);
+}
+
+body.theme-universe .galaxy-catalog .interest-card-subtitle,
+html[lang="zh-CN"] body.theme-universe .galaxy-catalog .interest-card-subtitle {
+  margin-top: 9px;
+  color: #dce4ee;
+  font-size: 12.8px;
+  line-height: 1.48;
+}
+
+body.theme-universe .galaxy-catalog .interest-card-description,
+body.theme-universe .galaxy-catalog .interest-card-description.quote-source {
+  margin-top: 7px;
+  color: #8390a1;
+  font-size: 7.2px;
+  line-height: 1.55;
+}
+
+body.theme-universe .galaxy-catalog .interest-card-enter {
+  margin-top: 13px;
+  padding-top: 10px;
+  color: #ced7e2;
+  font-size: 7.8px;
+}
+
+body.theme-universe .galaxy-catalog .interest-card-top { font-size: 7.4px; }
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"] .interest-card-visual img,
+body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"] .interest-card-cover {
+  object-position: 17% 24%;
+  transform: scale(1.145);
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"]:hover .interest-card-visual img,
+body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"]:hover .interest-card-cover {
+  transform: scale(1.17);
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="music"] .interest-card-visual img,
+body.theme-universe .galaxy-catalog .interest-card[data-theme="music"] .interest-card-cover {
+  object-position: center 23%;
+  transform: scale(1.045);
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="music"]:hover .interest-card-visual img,
+body.theme-universe .galaxy-catalog .interest-card[data-theme="music"]:hover .interest-card-cover {
+  transform: scale(1.07);
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="games"] .interest-card-visual::before,
+body.theme-universe .galaxy-catalog .interest-card[data-theme="anime"] .interest-card-visual::before {
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.024) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,.024) 1px, transparent 1px),
+    radial-gradient(circle at 50% 38%, rgba(255,255,255,.07) 0 1px, transparent 1.5px);
+  background-size: 48px 48px, 48px 48px, auto;
+  opacity: .42;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 38%, #000 0 62%, transparent 88%);
+  mask-image: radial-gradient(ellipse at 50% 38%, #000 0 62%, transparent 88%);
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="games"] .interest-card-visual::after {
+  background:
+    radial-gradient(circle at 50% 38%, rgba(117,184,255,.14) 0 2%, transparent 20%),
+    radial-gradient(circle at 50% 38%, transparent 0 16.6%, rgba(117,184,255,.22) 16.8% 17.15%, transparent 17.35%),
+    radial-gradient(circle at 50% 38%, transparent 0 30.5%, rgba(117,184,255,.11) 30.7% 31%, transparent 31.2%),
+    radial-gradient(circle at 50% 38%, transparent 0 44.5%, rgba(117,184,255,.055) 44.7% 44.9%, transparent 45.1%),
+    linear-gradient(90deg, transparent 0 49.82%, rgba(117,184,255,.09) 49.94% 50.06%, transparent 50.18%),
+    linear-gradient(0deg, transparent 0 61.72%, rgba(117,184,255,.08) 61.84% 61.96%, transparent 62.08%),
+    linear-gradient(137deg, transparent 0 49.84%, rgba(117,184,255,.09) 49.95% 50.05%, transparent 50.16%),
+    radial-gradient(circle at 30% 24%, rgba(205,231,255,.72) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 72% 29%, rgba(117,184,255,.74) 0 1.1px, transparent 2px),
+    radial-gradient(circle at 63% 67%, rgba(205,231,255,.46) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 82% 74%, rgba(117,184,255,.42) 0 1px, transparent 1.8px);
+  opacity: .9;
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="anime"] .interest-card-visual::after {
+  background:
+    radial-gradient(circle at 48% 40%, rgba(220,127,149,.13) 0 2%, transparent 19%),
+    radial-gradient(circle at 48% 40%, transparent 0 17.7%, rgba(220,127,149,.21) 17.9% 18.25%, transparent 18.45%),
+    radial-gradient(circle at 48% 40%, transparent 0 32.2%, rgba(220,127,149,.105) 32.4% 32.7%, transparent 32.9%),
+    radial-gradient(circle at 48% 40%, transparent 0 46.2%, rgba(220,127,149,.052) 46.4% 46.6%, transparent 46.8%),
+    linear-gradient(90deg, transparent 0 47.82%, rgba(220,127,149,.08) 47.94% 48.06%, transparent 48.18%),
+    linear-gradient(0deg, transparent 0 59.72%, rgba(220,127,149,.07) 59.84% 59.96%, transparent 60.08%),
+    linear-gradient(62deg, transparent 0 49.84%, rgba(220,127,149,.09) 49.95% 50.05%, transparent 50.16%),
+    linear-gradient(118deg, transparent 0 49.84%, rgba(220,127,149,.055) 49.95% 50.05%, transparent 50.16%),
+    radial-gradient(circle at 28% 27%, rgba(255,224,235,.68) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 72% 25%, rgba(220,127,149,.72) 0 1.1px, transparent 2px),
+    radial-gradient(circle at 66% 69%, rgba(255,224,235,.42) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 82% 72%, rgba(220,127,149,.4) 0 1px, transparent 1.8px);
+  opacity: .9;
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="games"] .interest-card-visual {
+  box-shadow: inset 0 -60px 100px rgba(41,93,158,.05);
+}
+
+body.theme-universe .galaxy-catalog .interest-card[data-theme="anime"] .interest-card-visual {
+  box-shadow: inset 0 -60px 100px rgba(126,53,89,.05);
+}
+
+@media (max-width: 1380px) {
+  body.theme-universe .galaxy-catalog .section-quote { transform: none; }
+}
+
+@media (max-width: 680px) {
+  body.theme-universe .galaxy-catalog .interest-card-content { padding: 17px 17px 15px; }
+
+  body.theme-universe .galaxy-catalog .interest-card-description,
+  body.theme-universe .galaxy-catalog .interest-card-description.quote-source,
+  body.theme-universe .galaxy-catalog .interest-card-enter { font-size: 7.4px; }
+}
