@@ -1,11 +1,7 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const HOME_DATA_URL = '/data/music/home.json';
 const DEFAULT_QUOTES = ['只是狂歌一曲，恍惚间就化入无穷'];
-const MODEL_URL = 'https://cdn.jsdelivr.net/gh/explearning/threejs-react@a720ced527eefbaa54df783f44e44a07647edf4a/public/old_gramophone/scene.gltf';
-const MODEL_TEXTURE_PATH = '/public/old_gramophone/textures/';
-const ONE_PIXEL_TEXTURE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/0Wq7WQAAAABJRU5ErkJggg==';
 
 const TYPE_DELAY_MS = 120;
 const DELETE_DELAY_MS = 50;
@@ -91,199 +87,315 @@ const initHeroTypewriter = async () => {
   window.addEventListener('pagehide', () => window.clearTimeout(timer), { once: true });
 };
 
-const HERO_PALETTE = {
-  record: new THREE.Color(0x070b12),
-  bodyLow: new THREE.Color(0x0b1420),
-  bodyMid: new THREE.Color(0x17212d),
-  brassDark: new THREE.Color(0x5e472a),
-  brass: new THREE.Color(0x9b7440),
-  brassLight: new THREE.Color(0xb58b50),
-  hardware: new THREE.Color(0x8f6d3f)
+const COLORS = {
+  cabinet: 0x11131b,
+  cabinetTop: 0x1b1d27,
+  cabinetEdge: 0x40495d,
+  brass: 0xb58b4f,
+  brassLight: 0xd1b16d,
+  brassDark: 0x765632,
+  hornInner: 0x613b3f,
+  hornInnerDark: 0x241821,
+  record: 0x05070b,
+  recordEdge: 0x31435f,
+  coolAccent: 0x657a9a
 };
 
-const smoothstep = (value, min, max) => {
-  const t = THREE.MathUtils.clamp((value - min) / Math.max(max - min, Number.EPSILON), 0, 1);
-  return t * t * (3 - 2 * t);
-};
+const lambert = (color, emissive = 0x000000, intensity = 0, extra = {}) => new THREE.MeshLambertMaterial({
+  color,
+  emissive,
+  emissiveIntensity: intensity,
+  flatShading: true,
+  ...extra
+});
 
-const classifyGramophoneMesh = (node) => {
-  const lineage = [];
-  let current = node;
-  while (current) {
-    lineage.push(current.name || '');
-    current = current.parent;
-  }
-  const identity = lineage.join(' / ');
-  if (identity.includes('Object001')) return 'record';
-  if (identity.includes('Object002')) return 'hardware';
-  return 'body';
-};
+const basic = (color, extra = {}) => new THREE.MeshBasicMaterial({ color, ...extra });
 
-const applyBodyVertexPalette = (node) => {
-  if (!node.geometry?.attributes?.position) return;
-
-  node.geometry = node.geometry.clone();
-  node.geometry.computeBoundingBox();
-  const box = node.geometry.boundingBox;
-  const position = node.geometry.attributes.position;
-  if (!box || !position) return;
-
-  const zMin = box.min.z;
-  const zRange = Math.max(box.max.z - zMin, Number.EPSILON);
-  const colors = new Float32Array(position.count * 3);
-  const mixed = new THREE.Color();
-
-  for (let i = 0; i < position.count; i += 1) {
-    const height = (position.getZ(i) - zMin) / zRange;
-
-    if (height < .43) {
-      mixed.lerpColors(
-        HERO_PALETTE.bodyLow,
-        HERO_PALETTE.bodyMid,
-        smoothstep(height, .04, .43)
-      );
-    } else if (height < .60) {
-      mixed.lerpColors(
-        HERO_PALETTE.bodyMid,
-        HERO_PALETTE.brassDark,
-        smoothstep(height, .43, .60)
-      );
-    } else {
-      mixed.lerpColors(
-        HERO_PALETTE.brass,
-        HERO_PALETTE.brassLight,
-        smoothstep(height, .60, .94) * .72
-      );
-    }
-
-    colors[i * 3] = mixed.r;
-    colors[i * 3 + 1] = mixed.g;
-    colors[i * 3 + 2] = mixed.b;
-  }
-
-  node.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-};
-
-const createHeroMaterial = (kind) => {
-  if (kind === 'record') {
-    return new THREE.MeshLambertMaterial({
-      color: HERO_PALETTE.record,
-      emissive: 0x020711,
-      emissiveIntensity: .16,
-      side: THREE.DoubleSide
-    });
-  }
-
-  if (kind === 'hardware') {
-    return new THREE.MeshLambertMaterial({
-      color: HERO_PALETTE.hardware,
-      emissive: 0x120b04,
-      emissiveIntensity: .09,
-      side: THREE.DoubleSide
-    });
-  }
-
-  return new THREE.MeshLambertMaterial({
-    color: 0xffffff,
-    vertexColors: true,
-    emissive: 0x02060c,
-    emissiveIntensity: .08,
-    side: THREE.DoubleSide
-  });
-};
-
-const addStylizedEdges = (node, kind) => {
-  if (!node.geometry?.attributes?.position) return;
-
-  const edgePreset = kind === 'record'
-    ? { color: 0x52627b, opacity: .08 }
-    : kind === 'hardware'
-      ? { color: 0xc3a064, opacity: .16 }
-      : { color: 0x8b7a59, opacity: .10 };
-
-  const geometry = new THREE.EdgesGeometry(node.geometry, 32);
+const addEdges = (mesh, color, opacity = .16, threshold = 28) => {
+  if (!mesh.geometry?.attributes?.position) return;
+  const geometry = new THREE.EdgesGeometry(mesh.geometry, threshold);
   const material = new THREE.LineBasicMaterial({
-    color: edgePreset.color,
+    color,
     transparent: true,
-    opacity: edgePreset.opacity,
+    opacity,
     depthWrite: false
   });
   const lines = new THREE.LineSegments(geometry, material);
-  lines.name = `MusicHeroEdges:${node.name}`;
-  lines.renderOrder = 3;
-  node.add(lines);
+  lines.renderOrder = 4;
+  mesh.add(lines);
 };
 
-const addRecordLabel = (recordMesh) => {
-  if (!recordMesh?.geometry) return;
+const addBox = (group, size, position, material, edge = null) => {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
+  mesh.position.set(...position);
+  mesh.castShadow = false;
+  mesh.receiveShadow = false;
+  if (edge) addEdges(mesh, edge.color, edge.opacity, edge.threshold);
+  group.add(mesh);
+  return mesh;
+};
 
-  recordMesh.geometry.computeBoundingBox();
-  const box = recordMesh.geometry.boundingBox;
-  if (!box) return;
+const addCylinderBetween = (group, start, end, radius, material, radialSegments = 8) => {
+  const startVector = new THREE.Vector3(...start);
+  const endVector = new THREE.Vector3(...end);
+  const direction = endVector.clone().sub(startVector);
+  const length = direction.length();
+  const mesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(radius, radius, length, radialSegments, 1, false),
+    material
+  );
+  mesh.position.copy(startVector).add(endVector).multiplyScalar(.5);
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
+  group.add(mesh);
+  return mesh;
+};
 
-  const centerX = (box.min.x + box.max.x) / 2;
-  const centerY = (box.min.y + box.max.y) / 2;
-  const topZ = box.max.z + .025;
-  const radius = Math.min(box.max.x - box.min.x, box.max.y - box.min.y) * .085;
-  if (!Number.isFinite(radius) || radius <= 0) return;
+const addTube = (group, points, radius, material, radialSegments = 6, tubularSegments = 24) => {
+  const curve = new THREE.CatmullRomCurve3(points.map((point) => new THREE.Vector3(...point)));
+  const mesh = new THREE.Mesh(
+    new THREE.TubeGeometry(curve, tubularSegments, radius, radialSegments, false),
+    material
+  );
+  group.add(mesh);
+  return mesh;
+};
+
+const addHorn = (group, throat, bell, materials) => {
+  const throatVector = new THREE.Vector3(...throat);
+  const bellVector = new THREE.Vector3(...bell);
+  const direction = bellVector.clone().sub(throatVector);
+  const length = direction.length();
+  const center = throatVector.clone().add(bellVector).multiplyScalar(.5);
+  const orientation = new THREE.Quaternion().setFromUnitVectors(
+    new THREE.Vector3(0, 1, 0),
+    direction.clone().normalize()
+  );
+
+  const shell = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.06, .29, length, 10, 2, true),
+    materials.shell
+  );
+  shell.position.copy(center);
+  shell.quaternion.copy(orientation);
+  group.add(shell);
+  addEdges(shell, COLORS.brassLight, .22, 20);
+
+  const insetDirection = direction.clone().normalize();
+  const innerStart = throatVector.clone().addScaledVector(insetDirection, .08);
+  const innerEnd = bellVector.clone().addScaledVector(insetDirection, -.055);
+  const innerDirection = innerEnd.clone().sub(innerStart);
+  const inner = new THREE.Mesh(
+    new THREE.CylinderGeometry(.91, .23, innerDirection.length(), 10, 2, true),
+    materials.inner
+  );
+  inner.position.copy(innerStart).add(innerEnd).multiplyScalar(.5);
+  inner.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), innerDirection.clone().normalize());
+  group.add(inner);
+
+  const rim = new THREE.Mesh(
+    new THREE.TorusGeometry(1.06, .045, 6, 20),
+    materials.rim
+  );
+  rim.position.copy(bellVector);
+  rim.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), direction.clone().normalize());
+  group.add(rim);
+
+  const throatRing = new THREE.Mesh(
+    new THREE.TorusGeometry(.29, .026, 6, 16),
+    materials.rim
+  );
+  throatRing.position.copy(throatVector);
+  throatRing.quaternion.copy(rim.quaternion);
+  group.add(throatRing);
+
+  return shell;
+};
+
+const buildProceduralGramophone = () => {
+  const root = new THREE.Group();
+  root.name = 'MusicHeroProceduralGramophone';
+
+  const materials = {
+    cabinet: lambert(COLORS.cabinet, 0x03050a, .12),
+    cabinetTop: lambert(COLORS.cabinetTop, 0x05070d, .12),
+    brass: lambert(COLORS.brass, 0x1c1005, .08),
+    brassLight: lambert(COLORS.brassLight, 0x211306, .07),
+    brassDark: lambert(COLORS.brassDark, 0x120904, .09),
+    horn: lambert(COLORS.brass, 0x1b1006, .08, { side: THREE.DoubleSide }),
+    hornInner: lambert(COLORS.hornInner, COLORS.hornInnerDark, .14, { side: THREE.DoubleSide }),
+    record: lambert(COLORS.record, 0x010308, .18),
+    cool: lambert(COLORS.coolAccent, 0x080d16, .08)
+  };
+
+  const cabinet = new THREE.Group();
+  cabinet.name = 'cabinet';
+  root.add(cabinet);
+
+  addBox(cabinet, [3.75, .18, 2.75], [0, -1.42, 0], materials.cabinetTop, {
+    color: COLORS.cabinetEdge,
+    opacity: .16,
+    threshold: 25
+  });
+  addBox(cabinet, [3.42, 1.62, 2.43], [0, -.58, 0], materials.cabinet, {
+    color: COLORS.cabinetEdge,
+    opacity: .15,
+    threshold: 25
+  });
+  addBox(cabinet, [3.58, .16, 2.63], [0, .27, 0], materials.cabinetTop, {
+    color: COLORS.brassDark,
+    opacity: .18,
+    threshold: 25
+  });
+
+  const panelZ = 1.236;
+  addBox(cabinet, [2.48, .74, .025], [0, -.58, panelZ], basic(0x0c0f17));
+  const frameEdge = .035;
+  addBox(cabinet, [2.50, frameEdge, .04], [0, -.19, panelZ + .022], materials.brassDark);
+  addBox(cabinet, [2.50, frameEdge, .04], [0, -.97, panelZ + .022], materials.brassDark);
+  addBox(cabinet, [frameEdge, .82, .04], [-1.25, -.58, panelZ + .022], materials.brassDark);
+  addBox(cabinet, [frameEdge, .82, .04], [1.25, -.58, panelZ + .022], materials.brassDark);
+
+  [[-1.55, -1.58, -.98], [1.55, -1.58, -.98], [-1.55, -1.58, .98], [1.55, -1.58, .98]].forEach((position) => {
+    addBox(cabinet, [.22, .26, .24], position, materials.cabinetTop);
+  });
+
+  const platter = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.29, 1.29, .09, 32),
+    materials.cabinetTop
+  );
+  platter.position.set(-.10, .405, .06);
+  cabinet.add(platter);
+  addEdges(platter, COLORS.coolAccent, .11, 28);
+
+  const recordGroup = new THREE.Group();
+  recordGroup.name = 'record';
+  recordGroup.position.set(-.10, .495, .06);
+  cabinet.add(recordGroup);
+
+  const record = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.16, 1.16, .045, 48),
+    materials.record
+  );
+  recordGroup.add(record);
+  addEdges(record, COLORS.recordEdge, .12, 28);
+
+  [0.44, 0.72, 0.96].forEach((radius, index) => {
+    const groove = new THREE.Mesh(
+      new THREE.TorusGeometry(radius, .006 + index * .001, 4, 40),
+      basic(COLORS.recordEdge, { transparent: true, opacity: .34 - index * .05 })
+    );
+    groove.rotation.x = Math.PI / 2;
+    groove.position.y = .026;
+    recordGroup.add(groove);
+  });
 
   const label = new THREE.Mesh(
-    new THREE.CircleGeometry(radius, 48),
-    new THREE.MeshBasicMaterial({
-      color: 0xc19a50,
-      transparent: true,
-      opacity: .78,
-      side: THREE.DoubleSide
-    })
+    new THREE.CylinderGeometry(.205, .205, .052, 24),
+    basic(COLORS.brassLight)
   );
-  label.position.set(centerX, centerY, topZ);
-  label.renderOrder = 4;
-  recordMesh.add(label);
+  label.position.y = .034;
+  recordGroup.add(label);
 
   const spindle = new THREE.Mesh(
-    new THREE.CircleGeometry(radius * .12, 24),
-    new THREE.MeshBasicMaterial({ color: 0x07101e, side: THREE.DoubleSide })
+    new THREE.CylinderGeometry(.025, .025, .085, 12),
+    materials.cool
   );
-  spindle.position.set(centerX, centerY, topZ + .008);
-  spindle.renderOrder = 5;
-  recordMesh.add(spindle);
-};
+  spindle.position.y = .075;
+  recordGroup.add(spindle);
 
-const stylizeGramophoneAsset = (asset) => {
-  const meshes = [];
-  asset.traverse((node) => {
-    if (node.isMesh) meshes.push(node);
-  });
+  const tonearm = new THREE.Group();
+  tonearm.name = 'tonearm';
+  cabinet.add(tonearm);
+  const tonearmTube = addTube(tonearm, [
+    [1.24, .55, -.69],
+    [1.30, .86, -.58],
+    [1.10, 1.00, -.19],
+    [.78, .97, .25],
+    [.46, .80, .58]
+  ], .055, materials.brassDark, 6, 24);
+  addEdges(tonearmTube, COLORS.brassLight, .16, 30);
 
-  meshes.forEach((node) => {
-    const kind = classifyGramophoneMesh(node);
-    if (kind === 'body') applyBodyVertexPalette(node);
-    node.material = createHeroMaterial(kind);
-    node.castShadow = false;
-    node.receiveShadow = false;
-    addStylizedEdges(node, kind);
-    if (kind === 'record') addRecordLabel(node);
-  });
-};
+  const tonearmPivot = new THREE.Mesh(
+    new THREE.CylinderGeometry(.15, .19, .20, 10),
+    materials.brass
+  );
+  tonearmPivot.position.set(1.24, .55, -.69);
+  tonearm.add(tonearmPivot);
 
-const installEmergencyFlatMaterials = (asset) => {
-  asset.traverse((node) => {
-    if (!node.isMesh) return;
-    const kind = classifyGramophoneMesh(node);
-    node.material = new THREE.MeshBasicMaterial({
-      color: kind === 'hardware' ? 0x8f6d3f : kind === 'record' ? 0x070b12 : 0x17212d,
-      wireframe: false,
-      side: THREE.DoubleSide
-    });
-    node.castShadow = false;
-    node.receiveShadow = false;
-  });
+  const cartridge = new THREE.Mesh(
+    new THREE.BoxGeometry(.28, .10, .17),
+    materials.brassLight
+  );
+  cartridge.position.set(.43, .77, .61);
+  cartridge.rotation.set(0, -.22, -.18);
+  tonearm.add(cartridge);
+
+  const crank = addTube(cabinet, [
+    [1.70, -.60, 1.23],
+    [1.88, -.51, 1.34],
+    [1.83, -.27, 1.39]
+  ], .047, materials.brass, 6, 12);
+  addEdges(crank, COLORS.brassLight, .16, 30);
+  const crankKnob = new THREE.Mesh(
+    new THREE.CylinderGeometry(.095, .095, .20, 10),
+    materials.brassLight
+  );
+  crankKnob.position.set(1.83, -.18, 1.39);
+  crankKnob.rotation.x = Math.PI / 2;
+  cabinet.add(crankKnob);
+
+  const hornSystem = new THREE.Group();
+  hornSystem.name = 'horn-system';
+  root.add(hornSystem);
+
+  const pipe = addTube(hornSystem, [
+    [1.48, .43, -.83],
+    [1.62, 1.18, -.76],
+    [1.42, 1.70, -.67],
+    [1.02, 1.98, -.55],
+    [.60, 2.13, -.45]
+  ], .105, materials.brassDark, 7, 28);
+  addEdges(pipe, COLORS.brassLight, .14, 30);
+
+  addHorn(
+    hornSystem,
+    [.60, 2.13, -.45],
+    [-1.02, 3.13, .67],
+    {
+      shell: materials.horn,
+      inner: materials.hornInner,
+      rim: materials.brassLight
+    }
+  );
+
+  const neck = addCylinderBetween(
+    hornSystem,
+    [.93, 1.95, -.58],
+    [.60, 2.13, -.45],
+    .16,
+    materials.brass,
+    8
+  );
+  addEdges(neck, COLORS.brassLight, .13, 30);
+
+  root.rotation.set(-.035, -.34, .018);
+  root.scale.setScalar(1.02);
+
+  return { root, recordGroup };
 };
 
 const initGramophone = () => {
   const stage = document.querySelector('[data-music-gramophone]');
   const canvas = stage?.querySelector('[data-gramophone-canvas]');
   if (!stage || !canvas) return;
+
+  const credit = stage.querySelector('.collection-gramophone-credit');
+  if (credit) {
+    credit.textContent = '3D · PROCEDURAL · THREE.JS';
+    credit.removeAttribute('href');
+    credit.removeAttribute('target');
+    credit.removeAttribute('rel');
+  }
 
   let renderer;
   try {
@@ -299,39 +411,35 @@ const initGramophone = () => {
     return;
   }
 
-  stage.classList.add('is-loading');
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NoToneMapping;
-  renderer.toneMappingExposure = 1;
   renderer.shadowMap.enabled = false;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(31, 1, 0.01, 100);
+  const camera = new THREE.PerspectiveCamera(31, 1, .01, 100);
   const composition = new THREE.Group();
   scene.add(composition);
 
-  scene.add(new THREE.AmbientLight(0x97a6bc, .96));
+  scene.add(new THREE.AmbientLight(0xaab5c8, .72));
+  scene.add(new THREE.HemisphereLight(0x6e84a8, 0x2f1817, .74));
 
-  const hemisphere = new THREE.HemisphereLight(0x607ca4, 0x120d08, .92);
-  scene.add(hemisphere);
-
-  const warmKey = new THREE.DirectionalLight(0xd0a35b, .70);
-  warmKey.position.set(4.8, 7.2, 6.4);
+  const warmKey = new THREE.DirectionalLight(0xd6ad68, .66);
+  warmKey.position.set(4.5, 7.4, 6.2);
   scene.add(warmKey);
 
-  const coolFill = new THREE.DirectionalLight(0x627fa8, .46);
-  coolFill.position.set(-5.2, 3.4, -3.6);
+  const coolFill = new THREE.DirectionalLight(0x6d86aa, .33);
+  coolFill.position.set(-5.2, 3.2, -4.0);
   scene.add(coolFill);
 
-  const topAccent = new THREE.DirectionalLight(0xe1c27b, .22);
-  topAccent.position.set(.8, 8.5, 2.6);
-  scene.add(topAccent);
+  const warmRim = new THREE.DirectionalLight(0xd6a665, .20);
+  warmRim.position.set(-2.4, 5.5, 3.8);
+  scene.add(warmRim);
 
-  let mixer = null;
-  let recordNode = null;
-  let useManualRecordSpin = false;
-  let modelReady = false;
+  const { root, recordGroup } = buildProceduralGramophone();
+  composition.add(root);
+  composition.updateMatrixWorld(true);
+
   let disposed = false;
   let frameRequest = 0;
   let previousTime = performance.now();
@@ -350,8 +458,6 @@ const initGramophone = () => {
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
 
-    if (!modelReady) return;
-
     const box = new THREE.Box3().setFromObject(composition);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
@@ -360,106 +466,45 @@ const initGramophone = () => {
     const fitHeight = size.y / (2 * Math.tan(verticalFov / 2));
     const fitWidth = size.x / (2 * Math.tan(horizontalFov / 2));
     const compact = camera.aspect < .95;
-    const distance = Math.max(fitHeight, fitWidth) * (compact ? 1.34 : 1.18);
-    const direction = new THREE.Vector3(.5, .26, 1).normalize();
+    const distance = Math.max(fitHeight, fitWidth) * (compact ? 1.31 : 1.12);
+    const direction = new THREE.Vector3(.58, .30, 1.08).normalize();
 
     camera.position.copy(center).add(direction.multiplyScalar(distance));
-    camera.lookAt(center.x - .12, center.y - size.y * .055, center.z);
+    camera.lookAt(
+      center.x - size.x * .06,
+      center.y - size.y * .015,
+      center.z
+    );
     camera.updateProjectionMatrix();
   };
 
-  const manager = new THREE.LoadingManager();
-  manager.setURLModifier((url) => {
-    if (url.includes(MODEL_TEXTURE_PATH)) return ONE_PIXEL_TEXTURE;
-    return url;
-  });
-  manager.onError = (url) => {
-    console.warn('Music gramophone dependent asset failed to load.', url);
+  const render = () => renderer.render(scene, camera);
+
+  const handleResize = () => {
+    setPixelRatio();
+    frameComposition();
+    render();
   };
 
-  const loader = new GLTFLoader(manager);
-  loader.setCrossOrigin('anonymous');
-  loader.load(
-    MODEL_URL,
-    (gltf) => {
-      if (disposed) return;
-
-      const asset = gltf.scene;
-      asset.updateMatrixWorld(true);
-
-      try {
-        stylizeGramophoneAsset(asset);
-      } catch (error) {
-        console.warn('Music gramophone stylization degraded gracefully.', error);
-        installEmergencyFlatMaterials(asset);
-      }
-
-      recordNode = asset.getObjectByName('Object001');
-
-      const rawBox = new THREE.Box3().setFromObject(asset);
-      const rawCenter = rawBox.getCenter(new THREE.Vector3());
-      const rawSize = rawBox.getSize(new THREE.Vector3());
-      asset.position.sub(rawCenter);
-
-      const normalization = new THREE.Group();
-      normalization.add(asset);
-      normalization.scale.setScalar(5.55 / Math.max(rawSize.x, rawSize.y, rawSize.z));
-      composition.add(normalization);
-      composition.rotation.set(-.04, -.5, .014);
-      composition.position.set(.08, .08, 0);
-      composition.updateMatrixWorld(true);
-
-      const sourceClip = gltf.animations?.find((clip) => clip.name === 'Gramofon_Anim') || gltf.animations?.[0];
-      const recordTracks = sourceClip?.tracks?.filter((track) => track.name.includes('Object001')) || [];
-      if (recordTracks.length) {
-        const recordClip = new THREE.AnimationClip('record-spin', sourceClip.duration, recordTracks);
-        mixer = new THREE.AnimationMixer(asset);
-        const action = mixer.clipAction(recordClip);
-        action.setLoop(THREE.LoopRepeat, Infinity);
-        action.clampWhenFinished = false;
-        action.play();
-      } else if (recordNode) {
-        useManualRecordSpin = true;
-      }
-
-      modelReady = true;
-      setPixelRatio();
-      frameComposition();
-      renderer.render(scene, camera);
-      stage.classList.remove('is-loading', 'is-error');
-      stage.classList.add('is-ready');
-    },
-    undefined,
-    (error) => {
-      stage.classList.remove('is-loading');
-      stage.classList.add('is-error');
-      console.warn('Music gramophone model failed to load; keeping CSS fallback.', error);
-    }
-  );
+  setPixelRatio();
+  frameComposition();
+  render();
+  stage.classList.remove('is-loading', 'is-error');
+  stage.classList.add('is-ready');
 
   const clockFrame = (time) => {
     if (disposed) return;
-
     const deltaSeconds = Math.min(.05, Math.max(0, (time - previousTime) / 1000));
     previousTime = time;
 
-    if (modelReady && !reducedMotion.matches && !document.hidden) {
-      mixer?.update(deltaSeconds);
-      if (useManualRecordSpin && recordNode) recordNode.rotateZ(deltaSeconds * .78);
-      renderer.render(scene, camera);
+    if (!reducedMotion.matches && !document.hidden) {
+      recordGroup.rotation.y += deltaSeconds * .82;
+      render();
     }
 
     frameRequest = window.requestAnimationFrame(clockFrame);
   };
 
-  const handleResize = () => {
-    setPixelRatio();
-    frameComposition();
-    if (modelReady) renderer.render(scene, camera);
-  };
-
-  setPixelRatio();
-  frameComposition();
   frameRequest = window.requestAnimationFrame(clockFrame);
 
   if ('ResizeObserver' in window) {
@@ -469,9 +514,7 @@ const initGramophone = () => {
     window.addEventListener('resize', handleResize, { passive: true });
   }
 
-  const renderCurrentFrame = () => {
-    if (modelReady) renderer.render(scene, camera);
-  };
+  const renderCurrentFrame = () => render();
   reducedMotion.addEventListener?.('change', renderCurrentFrame);
 
   window.addEventListener('pagehide', () => {
@@ -480,7 +523,15 @@ const initGramophone = () => {
     resizeObserver?.disconnect();
     window.removeEventListener('resize', handleResize);
     reducedMotion.removeEventListener?.('change', renderCurrentFrame);
-    mixer?.stopAllAction();
+
+    composition.traverse((node) => {
+      node.geometry?.dispose?.();
+      if (Array.isArray(node.material)) {
+        node.material.forEach((material) => material?.dispose?.());
+      } else {
+        node.material?.dispose?.();
+      }
+    });
     renderer.dispose();
   }, { once: true });
 };
