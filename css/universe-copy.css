@@ -141,6 +141,126 @@ html[lang="zh-CN"] .interest-card-subtitle {
   font-family: var(--universe-serif);
 }
 
+/* Hero atlas --------------------------------------------------------------
+ * Keep the background abstract: orbital geometry, chart lines and a restrained
+ * violet/blue atmospheric glow rather than a literal photographic star field. */
+body.theme-universe .universe-hero {
+  isolation: isolate;
+  background:
+    radial-gradient(44% 54% at 78% 47%, rgba(99, 78, 189, .105), transparent 72%),
+    radial-gradient(30% 42% at 66% 76%, rgba(58, 106, 185, .075), transparent 74%),
+    radial-gradient(28% 34% at 92% 14%, rgba(126, 151, 225, .055), transparent 78%);
+}
+
+body.theme-universe .universe-hero::before {
+  display: block;
+  position: absolute;
+  top: 5%;
+  right: -17%;
+  z-index: 0;
+  width: min(69vw, 1120px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+  background:
+    radial-gradient(circle at center,
+      transparent 0 20.8%, rgba(171, 191, 236, .07) 20.95% 21.08%, transparent 21.22% 33.8%,
+      rgba(171, 191, 236, .055) 33.95% 34.08%, transparent 34.22% 47.2%,
+      rgba(171, 191, 236, .045) 47.35% 47.48%, transparent 47.62% 61.4%,
+      rgba(171, 191, 236, .035) 61.55% 61.68%, transparent 61.82%),
+    conic-gradient(from 13deg at 50% 50%,
+      transparent 0 8.2%, rgba(168, 188, 238, .045) 8.25% 8.42%, transparent 8.48% 21.2%,
+      rgba(168, 188, 238, .04) 21.25% 21.39%, transparent 21.45% 39.1%,
+      rgba(168, 188, 238, .04) 39.15% 39.31%, transparent 39.37% 61.8%,
+      rgba(168, 188, 238, .035) 61.85% 61.99%, transparent 62.05% 81.4%,
+      rgba(168, 188, 238, .035) 81.45% 81.59%, transparent 81.65%);
+  opacity: .72;
+  -webkit-mask-image: radial-gradient(circle, #000 0 63%, rgba(0,0,0,.72) 72%, transparent 84%);
+  mask-image: radial-gradient(circle, #000 0 63%, rgba(0,0,0,.72) 72%, transparent 84%);
+}
+
+body.theme-universe .universe-hero::after {
+  display: block;
+  position: absolute;
+  top: 20%;
+  right: -24%;
+  z-index: 0;
+  width: min(91vw, 1460px);
+  height: min(31vw, 500px);
+  border: 1px solid rgba(166, 187, 235, .07);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+  box-shadow:
+    0 0 0 1px rgba(108, 132, 202, .012),
+    inset 0 0 80px rgba(98, 77, 180, .025);
+  opacity: .68;
+  transform: rotate(-10deg);
+}
+
+body.theme-universe .deep-field {
+  z-index: 0;
+  background:
+    radial-gradient(circle at 74% 22%, rgba(214, 229, 255, .92) 0 1px, transparent 2px),
+    radial-gradient(circle at 84% 42%, rgba(139, 180, 255, .84) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 68% 63%, rgba(190, 160, 255, .76) 0 1.2px, transparent 2px),
+    radial-gradient(circle at 91% 31%, rgba(255,255,255,.82) 0 1px, transparent 2px),
+    radial-gradient(circle at 58% 31%, rgba(173,199,255,.46) 0 1px, transparent 2px),
+    radial-gradient(circle at 78% 74%, rgba(198,175,255,.48) 0 1px, transparent 2px),
+    radial-gradient(ellipse at 82% 38%, rgba(84, 111, 184, .135), transparent 22%),
+    radial-gradient(ellipse at 70% 72%, rgba(105, 72, 165, .12), transparent 24%),
+    linear-gradient(112deg, transparent 49%, rgba(132,154,214,.018) 49.7%, transparent 50.4%);
+}
+
+body.theme-universe .deep-field::before {
+  right: 6.2%;
+  bottom: 8.5%;
+  width: min(42vw, 650px);
+  aspect-ratio: 1.34;
+  overflow: hidden;
+  border: 1px solid rgba(199, 220, 247, .085);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 72% 42%, transparent 0 20%, rgba(158,179,230,.052) 20.3% 20.55%, transparent 20.85% 31%, rgba(158,179,230,.035) 31.25% 31.45%, transparent 31.75%),
+    linear-gradient(90deg, rgba(255,255,255,.021) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,.021) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(111, 90, 193, .035), transparent 54%);
+  background-size: auto, 36px 36px, 36px 36px, auto;
+  box-shadow:
+    inset 0 0 90px rgba(91, 128, 206, .04),
+    0 0 70px rgba(89, 71, 171, .025);
+  -webkit-mask-image: linear-gradient(135deg, rgba(0,0,0,.72), #000 38%, rgba(0,0,0,.74));
+  mask-image: linear-gradient(135deg, rgba(0,0,0,.72), #000 38%, rgba(0,0,0,.74));
+}
+
+body.theme-universe .deep-field::after {
+  top: 17%;
+  right: 13%;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: rgba(255,255,255,.96);
+  box-shadow:
+    -116px 54px 0 -2px #9cbcff,
+    -53px 171px 0 -2px rgba(255,255,255,.92),
+    71px 89px 0 -2px #c7b4ff,
+    148px -24px 0 -2px rgba(255,255,255,.96),
+    196px 118px 0 -2px #8cbcff,
+    243px 32px 0 -2px rgba(255,255,255,.9),
+    105px 241px 0 -2px #b8a0ff,
+    -34px 288px 0 -2px rgba(255,255,255,.85),
+    224px 276px 0 -2px #9bbcff;
+  filter: drop-shadow(0 0 8px rgba(164, 200, 255, .72));
+  opacity: .88;
+}
+
+body.theme-universe .universe-hero-copy,
+body.theme-universe .hero-readout {
+  position: relative;
+  z-index: 2;
+}
+
 @media (max-width: 760px) {
   .universe-header-actions {
     max-width: calc(100vw - 74px);
@@ -162,11 +282,47 @@ html[lang="zh-CN"] .interest-card-subtitle {
     letter-spacing: -.055em;
   }
 
+  body.theme-universe .universe-hero::before {
+    top: 23%;
+    right: -58%;
+    width: 132vw;
+    opacity: .46;
+  }
+
+  body.theme-universe .universe-hero::after {
+    top: 34%;
+    right: -72%;
+    width: 150vw;
+    height: 58vw;
+    opacity: .36;
+  }
+
+  body.theme-universe .deep-field::before {
+    right: -13%;
+    bottom: 12%;
+    width: 76vw;
+    opacity: .58;
+  }
+
+  body.theme-universe .deep-field::after {
+    right: 15%;
+    opacity: .64;
+  }
+
   .universe-tagline cite,
   .section-quote cite,
   .solar-literary-copy cite,
   .featured-literary-copy cite,
   .about-literary-copy cite {
     font-size: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.theme-universe .universe-hero::before,
+  body.theme-universe .universe-hero::after,
+  body.theme-universe .deep-field::before,
+  body.theme-universe .deep-field::after {
+    transform: none;
   }
 }
