@@ -1,23 +1,24 @@
 /*
  * Universe homepage — Michael Jordan cover framing.
- * The homepage now uses a landscape feature frame from the curated MJ wall,
- * so it needs much less forced zoom than the previous tall AIR photograph.
+ * The selected frame is a cleaner MJ photograph without the oversized Bulls poster crop,
+ * so keep the homepage treatment close to the source composition.
  */
 
 body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"] .interest-card-visual img,
 body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"] .interest-card-cover {
-  object-position: 50% 42%;
-  transform: scale(1.02);
+  object-position: 50% 46%;
+  transform: scale(1.035);
 }
 
 body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"]:hover .interest-card-visual img,
 body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"]:hover .interest-card-cover {
-  transform: scale(1.045);
+  transform: scale(1.065);
 }
 
 @media (max-width: 760px) {
   body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"] .interest-card-visual img,
   body.theme-universe .galaxy-catalog .interest-card[data-theme="basketball"] .interest-card-cover {
-    object-position: 50% 40%;
+    object-position: 50% 44%;
+    transform: scale(1.02);
   }
 }
