@@ -18,6 +18,27 @@ html.site-shell-frame-document .anime-page .universe-header {
   left: 0;
 }
 
+.anime-page .anime-header-identity {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  flex: 0 1 auto;
+}
+
+.anime-page .anime-header-divider {
+  display: block;
+  width: 1px;
+  height: 20px;
+  margin: 0 22px;
+  flex: 0 0 auto;
+  background: var(--anime-line-strong);
+}
+
+.anime-page .anime-header-crumbs {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
 .anime-page .anime-empty-state {
   display: none !important;
 }
@@ -112,7 +133,7 @@ html.site-shell-frame-document .anime-page .universe-header {
   margin-top: 8px;
 }
 
-/* Keep the decorative hero guide outside the breadcrumb/content column. */
+/* Keep the decorative hero guide outside the hero content column. */
 .anime-page .anime-frame-field::before {
   left: clamp(18px, 3vw, 48px);
 }
@@ -142,6 +163,12 @@ html.site-shell-frame-document .anime-page .universe-header {
 }
 
 @media (max-width: 760px) {
+  .anime-page .anime-header-divider {
+    height: 16px;
+    margin-right: 12px;
+    margin-left: 12px;
+  }
+
   .anime-page .anime-frame-field::before {
     left: 10px;
   }

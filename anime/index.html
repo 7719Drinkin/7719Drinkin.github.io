@@ -11,13 +11,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/universe.css?v=20260730-1">
   <link rel="stylesheet" href="/anime/anime.css?v=20260818-series-1">
-  <link rel="stylesheet" href="/anime/anime-runtime-fixes.css?v=20260818-layout-2">
+  <link rel="stylesheet" href="/anime/anime-runtime-fixes.css?v=20260818-header-1">
 </head>
 <body class="theme-anime interest-page anime-page">
   <div class="universe-noise" aria-hidden="true"></div>
 
   <header class="universe-header">
-    <a class="universe-brand" href="/" aria-label="返回 7719 Universe">7719</a>
+    <div class="anime-header-identity">
+      <a class="universe-brand" href="/" aria-label="返回 7719 Universe">7719</a>
+      <span class="anime-header-divider" aria-hidden="true"></span>
+      <nav class="universe-nav anime-header-crumbs" aria-label="动漫页面层级">
+        <a href="/anime/" data-copy="anime">动漫</a>
+      </nav>
+    </div>
     <nav class="universe-nav" aria-label="动漫页面导航">
       <a href="#series" data-copy="navSeries">系列</a>
       <a href="#characters" data-copy="navCharacters">人物</a>
@@ -30,10 +36,6 @@
   <main>
     <section class="anime-hero">
       <div class="anime-frame-field" aria-hidden="true"></div>
-
-      <div class="breadcrumb" style="position:absolute;top:92px;left:clamp(22px,6vw,96px);z-index:4;margin:0;">
-        <a href="/" data-copy="home">首页</a><span>/</span><span data-copy="anime">动漫</span>
-      </div>
 
       <div class="anime-hero-copy reveal">
         <p class="anime-title-caption" data-copy="heroCaption">过去，不过是我们讲给自己的故事。</p>
