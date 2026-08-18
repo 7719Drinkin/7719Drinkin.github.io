@@ -1,0 +1,23 @@
+.anime-page .universe-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  margin: 0;
+  transform: none;
+}
+
+html.site-shell-frame-document .anime-page .universe-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: auto;
+  left: 0;
+}
+
+.anime-page .anime-empty-state {
+  display: none !important;
+}
