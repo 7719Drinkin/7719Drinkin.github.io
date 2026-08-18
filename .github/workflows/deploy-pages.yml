@@ -58,6 +58,8 @@ jobs:
           node --check js/music-player.js
           node --check js/universe-refined.js
           node --check anime/anime.js
+          node --check scripts/apply-site-revision.mjs
+          node --check scripts/validate-site-revision.mjs
           node --check scripts/validate-anime-catalog.mjs
           node --check scripts/music-runtime-config.mjs
           node --check scripts/validate-music-runtime.mjs
@@ -113,6 +115,8 @@ jobs:
           node scripts/apply-basketball-design-system.mjs
           node scripts/install-site-shell.mjs
           node scripts/patch-music-header.mjs
+          node scripts/apply-site-revision.mjs
+          node scripts/validate-site-revision.mjs
           node scripts/validate-anime-catalog.mjs
           node scripts/validate-music-recent-listening.mjs
           node scripts/validate-music-runtime.mjs
