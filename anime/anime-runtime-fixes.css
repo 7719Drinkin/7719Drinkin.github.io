@@ -41,10 +41,14 @@ html.site-shell-frame-document .anime-page .universe-header {
 
 /* Channel identity: visually belongs with 7719, while keeping 7719 itself untouched. */
 .anime-page .anime-header-crumbs > a {
+  display: inline-flex;
+  height: 32px;
+  align-items: center;
   color: var(--anime-paper);
   font-family: var(--anime-serif);
   font-size: 16px;
   font-weight: 600;
+  line-height: 1;
   letter-spacing: .06em;
   text-transform: none;
 }
