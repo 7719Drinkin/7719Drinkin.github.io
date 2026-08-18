@@ -1,4 +1,10 @@
 {
   "schemaVersion": 1,
-  "backgrounds": []
+  "backgrounds": [
+    {
+      "id": "home-test-01",
+      "src": "/assets/Anime/Home/backgrounds/19d6954f9a509da8c61a7a8381e07c5f531dfe8e.jpg@1256w_856h_!web-article-pic.jpg",
+      "position": "center"
+    }
+  ]
 }
