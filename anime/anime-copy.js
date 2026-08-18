@@ -25,18 +25,6 @@ Object.assign(ANIME_COPY.zh, {
   recentKicker: '近来 /《指环王：护戒使者》',
   recentTitle: '我们真正能决定的，只有如何度过被给予的时间。',
 
-  emptyLabel: 'TO BE CONTINUED',
-  emptySeriesTitle: '未完待续。',
-  emptySeriesBody: '第一部系列尚未收录。',
-  emptyCharactersTitle: '未完待续。',
-  emptyCharactersBody: '人物会随对应系列一起出现。',
-  emptyScenesTitle: '未完待续。',
-  emptyScenesBody: '值得留下的一瞬，会从这里开始。',
-  emptySoundTitle: '未完待续。',
-  emptySoundBody: '第一段声音尚未收录。',
-  emptyRecentTitle: '未完待续。',
-  emptyRecentBody: '下一次观看会在这里留下日期。',
-
   seriesOpen: '进入这个世界',
   characterOpen: '去见这个人',
   sceneOpen: '回到这一瞬'
@@ -69,22 +57,13 @@ Object.assign(ANIME_COPY.en, {
   recentKicker: 'RECENT / THE FELLOWSHIP OF THE RING',
   recentTitle: 'All we have to decide is what to do with the time that is given to us.',
 
-  emptyLabel: 'TO BE CONTINUED',
-  emptySeriesTitle: 'To be continued.',
-  emptySeriesBody: 'The first series has not been entered yet.',
-  emptyCharactersTitle: 'To be continued.',
-  emptyCharactersBody: 'Characters will arrive with the series they belong to.',
-  emptyScenesTitle: 'To be continued.',
-  emptyScenesBody: 'The first moment worth keeping will begin here.',
-  emptySoundTitle: 'To be continued.',
-  emptySoundBody: 'The first sound has not been entered yet.',
-  emptyRecentTitle: 'To be continued.',
-  emptyRecentBody: 'The next watch will leave a date here.',
-
   seriesOpen: 'ENTER THIS WORLD',
   characterOpen: 'MEET THIS CHARACTER',
   sceneOpen: 'RETURN TO THIS MOMENT'
 });
+
+// No placeholder cards are rendered before real anime data is entered.
+emptyState = () => '';
 
 // Chinese lines are concise site translations of the sourced screen dialogue.
 // anime.js may still be waiting for the catalog request. Applying once here makes
