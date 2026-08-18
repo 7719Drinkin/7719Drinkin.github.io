@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="7719 宇宙中的私人动漫收藏与观看记忆。">
+  <meta name="description" content="7719 宇宙中的私人动漫系列收藏、人物、瞬间与观看记忆。">
   <meta name="theme-color" content="#0d1320">
   <title>动漫 · 7719 宇宙</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/universe.css?v=20260730-1">
-  <link rel="stylesheet" href="/anime/anime.css?v=20260807-2">
+  <link rel="stylesheet" href="/anime/anime.css?v=20260818-series-1">
 </head>
 <body class="theme-anime interest-page anime-page">
   <div class="universe-noise" aria-hidden="true"></div>
@@ -18,9 +18,10 @@
   <header class="universe-header">
     <a class="universe-brand" href="/" aria-label="返回 7719 Universe">7719</a>
     <nav class="universe-nav" aria-label="动漫页面导航">
-      <a href="/" data-copy="navUniverse">宇宙</a>
-      <a href="#modules" data-copy="navModules">档案</a>
-      <a href="/solar-universe/" data-copy="nav3d">3D 模式</a>
+      <a href="#series" data-copy="navSeries">系列</a>
+      <a href="#characters" data-copy="navCharacters">人物</a>
+      <a href="#scenes" data-copy="navScenes">瞬间</a>
+      <a href="#sound" data-copy="navSound">动画之声</a>
       <button id="anime-language-toggle" class="anime-language-toggle" type="button">EN</button>
     </nav>
   </header>
@@ -34,17 +35,17 @@
           <a href="/" data-copy="home">首页</a><span>/</span><span data-copy="anime">动漫</span>
         </div>
         <p class="anime-kicker" data-copy="heroEyebrow">04 / 私人动画档案</p>
-        <p class="anime-title-caption" data-copy="heroCaption">一册安静收拢画面与记忆的档案</p>
+        <p class="anime-title-caption" data-copy="heroCaption">以完整系列为单位，收藏真正留下来的部分</p>
         <h1 data-copy="anime">动漫</h1>
-        <p class="anime-hero-body" data-copy="heroBody">故事最后留下来的，往往只是一些片段：一个画面、一种声音、一个人物、一处地方。这里收集那些值得反复回望的部分。</p>
-        <a class="anime-enter" href="#modules"><span data-copy="enterArchive">翻阅档案</span><b aria-hidden="true">→</b></a>
+        <p class="anime-hero-body" data-copy="heroBody">不逐季复刻资料库，也不追求完整。每一部系列只留下值得反复回望的人物、瞬间、声音、影像与观看记忆。</p>
+        <a class="anime-enter" href="#series"><span data-copy="enterArchive">进入收藏</span><b aria-hidden="true">→</b></a>
       </div>
 
       <div class="anime-hero-art" aria-hidden="true">
         <div class="anime-letter-shadow"></div>
         <div class="anime-letter">
           <span class="anime-letter-index">7719 / 04</span>
-          <p class="anime-letter-title" data-copy="letterTitle" data-html>档案<br>札记</p>
+          <p class="anime-letter-title" data-copy="letterTitle" data-html>系列<br>札记</p>
           <div class="anime-letter-lines"><i></i><i></i><i></i></div>
           <span class="anime-seal">A</span>
         </div>
@@ -54,50 +55,63 @@
       <span class="anime-scroll-caption" data-copy="scroll">向下翻阅</span>
     </section>
 
-    <section id="modules" class="universe-section anime-modules">
+    <section id="series" class="universe-section anime-archive-section anime-series-section">
       <header class="anime-section-intro reveal">
         <p class="anime-section-number">01</p>
         <div>
-          <p class="anime-section-kicker" data-copy="archiveKicker">档案索引</p>
-          <h2 data-copy="moduleTitle">把真正留下来的世界，慢慢整理成册。</h2>
+          <p class="anime-section-kicker" data-copy="seriesKicker">系列收藏</p>
+          <h2 data-copy="seriesTitle">先进入一个完整的世界。</h2>
         </div>
-        <p class="anime-section-description" data-copy="moduleBody">作品、角色、场景三个入口保持克制而清晰；随着收藏增加，内容可以自然生长，而不需要重新推翻页面结构。</p>
+        <p class="anime-section-description" data-copy="seriesBody">季度、剧场版与 OVA 只作为系列内部的发行信息；人物、场景、音乐与记忆都围绕整个系列整理。</p>
       </header>
-
-      <div class="anime-folio-grid">
-        <article class="anime-folio-card reveal">
-          <div class="anime-folio-top"><small>01</small><span data-copy="file">档案</span></div>
-          <span class="anime-folio-glyph" aria-hidden="true">W</span>
-          <h3 data-copy="works">作品档案</h3>
-          <p data-copy="worksBody">记录单部作品、观看记忆、视觉素材，以及一段故事为什么会留下来。</p>
-          <span class="anime-folio-status" data-copy="building">档案已开启 / 素材待整理</span>
-        </article>
-
-        <article class="anime-folio-card reveal">
-          <div class="anime-folio-top"><small>02</small><span data-copy="file">档案</span></div>
-          <span class="anime-folio-glyph" aria-hidden="true">C</span>
-          <h3 data-copy="characters">角色档案</h3>
-          <p data-copy="charactersBody">整理人物、关系、动作与神情，以及故事结束之后仍然留在记忆里的印象。</p>
-          <span class="anime-folio-status" data-copy="building">档案已开启 / 素材待整理</span>
-        </article>
-
-        <article class="anime-folio-card reveal">
-          <div class="anime-folio-top"><small>03</small><span data-copy="file">档案</span></div>
-          <span class="anime-folio-glyph" aria-hidden="true">S</span>
-          <h3 data-copy="worlds">名场面与世界</h3>
-          <p data-copy="worldsBody">收藏画面、地点、设定、台词与细节，让那些虚构世界仍然保有真实的质感。</p>
-          <span class="anime-folio-status" data-copy="building">档案已开启 / 素材待整理</span>
-        </article>
-      </div>
+      <div id="anime-series-grid" class="anime-series-grid" aria-live="polite"></div>
     </section>
 
-    <section class="universe-section anime-principle reveal">
-      <div class="anime-principle-mark" aria-hidden="true">02</div>
-      <div class="anime-principle-copy">
-        <p class="anime-section-kicker" data-copy="principle">02 / 整理手记</p>
-        <h2 data-copy="principleTitle">只留下真正值得记住的部分。</h2>
+    <section id="characters" class="universe-section anime-archive-section">
+      <header class="anime-section-intro reveal">
+        <p class="anime-section-number">02</p>
+        <div>
+          <p class="anime-section-kicker" data-copy="charactersKicker">人物选录</p>
+          <h2 data-copy="charactersTitle">从不同世界里，先遇见几个人。</h2>
+        </div>
+        <p class="anime-section-description" data-copy="charactersBody">这里不是独立的人物库，只是跨系列的快捷入口。每个人物仍然归属于自己的系列页面。</p>
+      </header>
+      <div id="anime-character-grid" class="anime-character-grid" aria-live="polite"></div>
+    </section>
+
+    <section id="scenes" class="universe-section anime-archive-section">
+      <header class="anime-section-intro reveal">
+        <p class="anime-section-number">03</p>
+        <div>
+          <p class="anime-section-kicker" data-copy="scenesKicker">瞬间选录</p>
+          <h2 data-copy="scenesTitle">真正记住的，往往只是一个瞬间。</h2>
+        </div>
+        <p class="anime-section-description" data-copy="scenesBody">场景属于具体系列；季度、剧场版或集数只作为来源标签，不形成新的页面层级。</p>
+      </header>
+      <div id="anime-scene-grid" class="anime-scene-grid" aria-live="polite"></div>
+    </section>
+
+    <section id="sound" class="universe-section anime-archive-section">
+      <header class="anime-section-intro reveal">
+        <p class="anime-section-number">04</p>
+        <div>
+          <p class="anime-section-kicker" data-copy="soundKicker">动画之声</p>
+          <h2 data-copy="soundTitle">有些世界，是先被声音记住的。</h2>
+        </div>
+        <p class="anime-section-description" data-copy="soundBody">OP、ED、OST 与插曲继续归属于对应系列；主页只展示少量值得快速回到的声音。</p>
+      </header>
+      <div id="anime-sound-list" class="anime-sound-list" aria-live="polite"></div>
+    </section>
+
+    <section id="recent" class="universe-section anime-recent-section reveal">
+      <div class="anime-recent-heading">
+        <p class="anime-section-number">05</p>
+        <div>
+          <p class="anime-section-kicker" data-copy="recentKicker">最近观看 / 最近整理</p>
+          <h2 data-copy="recentTitle">档案会随着观看继续生长。</h2>
+        </div>
       </div>
-      <p class="anime-principle-note" data-copy="principleBody">这里不会被做成一份完整数据库。它会保持选择性、视觉性和私人感，让每段记忆之间仍然留有足够的呼吸空间。</p>
+      <div id="anime-recent-list" class="anime-recent-list" aria-live="polite"></div>
     </section>
   </main>
 
@@ -106,6 +120,6 @@
     <a href="/" data-copy="back">返回宇宙 →</a>
   </footer>
 
-  <script src="/anime/anime.js?v=20260807-2"></script>
+  <script src="/anime/anime.js?v=20260818-series-1"></script>
 </body>
 </html>
