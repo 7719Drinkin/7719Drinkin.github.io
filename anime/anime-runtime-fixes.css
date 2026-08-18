@@ -39,6 +39,41 @@ html.site-shell-frame-document .anime-page .universe-header {
   flex: 0 1 auto;
 }
 
+/* Channel identity: visually belongs with 7719, while keeping 7719 itself untouched. */
+.anime-page .anime-header-crumbs > a {
+  color: var(--anime-paper);
+  font-family: var(--anime-serif);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: none;
+}
+
+html[lang="en"] .anime-page .anime-header-crumbs > a {
+  font-family: var(--anime-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+/* Primary navigation must read as navigation, not micro-labels. */
+.anime-page .anime-primary-nav > a,
+.anime-page .anime-primary-nav > .anime-language-toggle {
+  font-family: var(--anime-ui);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: none;
+}
+
+html[lang="en"] .anime-page .anime-primary-nav > a,
+html[lang="en"] .anime-page .anime-primary-nav > .anime-language-toggle {
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
 .anime-page .anime-empty-state {
   display: none !important;
 }
@@ -167,6 +202,21 @@ html.site-shell-frame-document .anime-page .universe-header {
     height: 16px;
     margin-right: 12px;
     margin-left: 12px;
+  }
+
+  .anime-page .anime-header-crumbs > a {
+    font-size: 14px;
+  }
+
+  html[lang="en"] .anime-page .anime-header-crumbs > a {
+    font-size: 16px;
+  }
+
+  .anime-page .anime-primary-nav > a,
+  .anime-page .anime-primary-nav > .anime-language-toggle,
+  html[lang="en"] .anime-page .anime-primary-nav > a,
+  html[lang="en"] .anime-page .anime-primary-nav > .anime-language-toggle {
+    font-size: 11px;
   }
 
   .anime-page .anime-frame-field::before {
