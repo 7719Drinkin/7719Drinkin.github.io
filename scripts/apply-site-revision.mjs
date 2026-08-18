@@ -147,29 +147,24 @@ async function htmlFiles(directory) {
   return nested.flat();
 }
 
-async function stampHtmlAssets(revision) {
+async function stampBridgeAssets(revision) {
   const files = await htmlFiles(ROOT);
   let bridgeRefs = 0;
 
   for (const file of files) {
     const repositoryPath = relative(ROOT, file).split(sep).join('/');
-    const source = await readFile(file, 'utf8');
-    let output = source;
+    if (repositoryPath === 'site-shell.html') continue;
 
-    if (repositoryPath === 'site-shell.html') {
-      output = output.replace(
-        /<script src="\/js\/site-shell\.js\?v=[^"]+"><\/script>/,
-        `<script src="/js/site-shell.js?v=${revision}"></script>`
-      );
-    } else if (output.includes('data-site-frame-bridge')) {
-      output = output.replace(
-        /<script data-site-frame-bridge src="\/js\/site-frame-bridge\.js\?v=[^"]+"><\/script>/g,
-        `<script data-site-frame-bridge src="/js/site-frame-bridge.js?v=${revision}"></script>`
-      );
-      bridgeRefs += 1;
-    }
+    const source = await readFile(file, 'utf8');
+    if (!source.includes('data-site-frame-bridge')) continue;
+
+    const output = source.replace(
+      /<script data-site-frame-bridge src="\/js\/site-frame-bridge\.js\?v=[^"]+"><\/script>/g,
+      `<script data-site-frame-bridge src="/js/site-frame-bridge.js?v=${revision}"></script>`
+    );
 
     if (output !== source) await writeFile(file, output, 'utf8');
+    bridgeRefs += 1;
   }
 
   return bridgeRefs;
@@ -189,8 +184,8 @@ async function main() {
     'utf8'
   );
 
-  const bridgeRefs = await stampHtmlAssets(revision);
-  console.log(`Applied site revision ${revision}; versioned ${bridgeRefs} framed HTML page(s).`);
+  const bridgeRefs = await stampBridgeAssets(revision);
+  console.log(`Applied site revision ${revision}; versioned ${bridgeRefs} frame bridge reference(s) while keeping the shell runtime pinned.`);
 }
 
 main().catch((error) => {
