@@ -1,0 +1,96 @@
+/* Anime home background system.
+   The image layer is fixed and non-interactive; page content always stays above it. */
+
+.anime-page {
+  position: relative;
+  isolation: isolate;
+}
+
+.anime-home-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.anime-home-background__image {
+  position: absolute;
+  inset: -3%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0;
+  transform: scale(1.065);
+  filter: blur(10px) saturate(.72) brightness(.62) contrast(1.04);
+  will-change: opacity, transform, filter;
+  transition:
+    opacity 1.05s ease,
+    transform 1.55s var(--anime-ease),
+    filter 1.2s ease;
+}
+
+.anime-home-background__image.is-active {
+  opacity: .46;
+  transform: scale(1.015);
+  filter: blur(0) saturate(.72) brightness(.62) contrast(1.04);
+}
+
+.anime-home-background__veil {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 50% 42%, transparent 0 20%, rgba(9, 15, 26, .16) 58%, rgba(9, 15, 26, .48) 100%),
+    linear-gradient(180deg, rgba(9, 15, 26, .48) 0%, rgba(9, 15, 26, .62) 48%, rgba(9, 15, 26, .82) 100%);
+  transition: opacity .9s ease;
+}
+
+.anime-home-background.has-image .anime-home-background__veil {
+  opacity: 1;
+}
+
+/* The background is deliberately below every page-level content surface. */
+.anime-page > main,
+.anime-page > .universe-footer {
+  position: relative;
+  z-index: 2;
+}
+
+.anime-page > .universe-noise {
+  z-index: 20;
+}
+
+.anime-page > .universe-header {
+  z-index: 100;
+}
+
+@media (max-width: 760px) {
+  .anime-home-background__image {
+    inset: -5%;
+    transform: scale(1.085);
+  }
+
+  .anime-home-background__image.is-active {
+    opacity: .4;
+    transform: scale(1.025);
+  }
+
+  .anime-home-background__veil {
+    background:
+      linear-gradient(180deg, rgba(9, 15, 26, .58) 0%, rgba(9, 15, 26, .7) 50%, rgba(9, 15, 26, .88) 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anime-home-background__image,
+  .anime-home-background__veil {
+    transition: none;
+  }
+
+  .anime-home-background__image,
+  .anime-home-background__image.is-active {
+    transform: scale(1.02);
+    filter: saturate(.72) brightness(.62) contrast(1.04);
+  }
+}
