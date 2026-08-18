@@ -127,3 +127,9 @@ body.theme-universe .galaxy-catalog .interest-card-enter {
     letter-spacing: .035em;
   }
 }
+
+/* The /U suffix was an early placeholder mark; the brand is simply 7719. */
+body.theme-universe .universe-brand::after {
+  display: none !important;
+  content: none !important;
+}
