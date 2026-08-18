@@ -1,11 +1,160 @@
 {
   "version": 2,
   "artistPrefix": "tom-chang",
-  "generatedAt": "2026-08-14T07:37:49.125Z",
+  "generatedAt": "2026-08-18T07:06:10.526Z",
   "ordering": "disc-track-title",
-  "totalTracks": 29,
+  "totalTracks": 41,
   "ignoredObjects": 5,
   "albums": [
+    {
+      "name": "带我去月球",
+      "tracks": [
+        {
+          "title": "序曲",
+          "discNumber": 1,
+          "trackNumber": 1,
+          "orderLabel": "01",
+          "fileName": "01 - 序曲.mp3",
+          "key": "tom-chang/带我去月球/01 - 序曲.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%B8%A6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83/01%20-%20%E5%BA%8F%E6%9B%B2.mp3",
+          "type": "audio/mpeg",
+          "size": 941079,
+          "uploadedAt": "2026-08-18T02:41:10.185Z"
+        },
+        {
+          "title": "我想把整片天空打開",
+          "discNumber": 1,
+          "trackNumber": 2,
+          "orderLabel": "02",
+          "fileName": "02 - 我想把整片天空打開.mp3",
+          "key": "tom-chang/带我去月球/02 - 我想把整片天空打開.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%B8%A6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83/02%20-%20%E6%88%91%E6%83%B3%E6%8A%8A%E6%95%B4%E7%89%87%E5%A4%A9%E7%A9%BA%E6%89%93%E9%96%8B.mp3",
+          "type": "audio/mpeg",
+          "size": 4547639,
+          "uploadedAt": "2026-08-18T02:41:24.133Z"
+        },
+        {
+          "title": "無題",
+          "discNumber": 1,
+          "trackNumber": 3,
+          "orderLabel": "03",
+          "fileName": "03 - 無題.mp3",
+          "key": "tom-chang/带我去月球/03 - 無題.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%B8%A6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83/03%20-%20%E7%84%A1%E9%A1%8C.mp3",
+          "type": "audio/mpeg",
+          "size": 4450979,
+          "uploadedAt": "2026-08-18T02:41:24.648Z"
+        },
+        {
+          "title": "帶我去月球",
+          "discNumber": 1,
+          "trackNumber": 4,
+          "orderLabel": "04",
+          "fileName": "04 - 帶我去月球.mp3",
+          "key": "tom-chang/带我去月球/04 - 帶我去月球.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%B8%A6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83/04%20-%20%E5%B8%B6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83.mp3",
+          "type": "audio/mpeg",
+          "size": 7113384,
+          "uploadedAt": "2026-08-18T02:41:21.844Z"
+        },
+        {
+          "title": "這一夜我睡不著",
+          "discNumber": 1,
+          "trackNumber": 5,
+          "orderLabel": "05",
+          "fileName": "05 - 這一夜我睡不著.mp3",
+          "key": "tom-chang/带我去月球/05 - 這一夜我睡不著.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%B8%A6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83/05%20-%20%E9%80%99%E4%B8%80%E5%A4%9C%E6%88%91%E7%9D%A1%E4%B8%8D%E8%91%97.mp3",
+          "type": "audio/mpeg",
+          "size": 4745248,
+          "uploadedAt": "2026-08-18T02:41:18.797Z"
+        },
+        {
+          "title": "我就要轉彎",
+          "discNumber": 1,
+          "trackNumber": 6,
+          "orderLabel": "06",
+          "fileName": "06 - 我就要轉彎.mp3",
+          "key": "tom-chang/带我去月球/06 - 我就要轉彎.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%B8%A6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83/06%20-%20%E6%88%91%E5%B0%B1%E8%A6%81%E8%BD%89%E5%BD%8E.mp3",
+          "type": "audio/mpeg",
+          "size": 4622060,
+          "uploadedAt": "2026-08-18T02:41:21.191Z"
+        },
+        {
+          "title": "總髮遊",
+          "discNumber": 1,
+          "trackNumber": 7,
+          "orderLabel": "07",
+          "fileName": "07 - 總髮遊.mp3",
+          "key": "tom-chang/带我去月球/07 - 總髮遊.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%B8%A6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83/07%20-%20%E7%B8%BD%E9%AB%AE%E9%81%8A.mp3",
+          "type": "audio/mpeg",
+          "size": 4457973,
+          "uploadedAt": "2026-08-18T02:41:46.562Z"
+        },
+        {
+          "title": "湖心草深長",
+          "discNumber": 1,
+          "trackNumber": 8,
+          "orderLabel": "08",
+          "fileName": "08 - 湖心草深長.mp3",
+          "key": "tom-chang/带我去月球/08 - 湖心草深長.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%B8%A6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83/08%20-%20%E6%B9%96%E5%BF%83%E8%8D%89%E6%B7%B1%E9%95%B7.mp3",
+          "type": "audio/mpeg",
+          "size": 4081486,
+          "uploadedAt": "2026-08-18T02:41:24.361Z"
+        },
+        {
+          "title": "魔幻台北",
+          "discNumber": 1,
+          "trackNumber": 9,
+          "orderLabel": "09",
+          "fileName": "09 - 魔幻台北.mp3",
+          "key": "tom-chang/带我去月球/09 - 魔幻台北.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%B8%A6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83/09%20-%20%E9%AD%94%E5%B9%BB%E5%8F%B0%E5%8C%97.mp3",
+          "type": "audio/mpeg",
+          "size": 3295646,
+          "uploadedAt": "2026-08-18T02:41:29.797Z"
+        },
+        {
+          "title": "現在這樣",
+          "discNumber": 1,
+          "trackNumber": 10,
+          "orderLabel": "10",
+          "fileName": "10 - 現在這樣.mp3",
+          "key": "tom-chang/带我去月球/10 - 現在這樣.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%B8%A6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83/10%20-%20%E7%8F%BE%E5%9C%A8%E9%80%99%E6%A8%A3.mp3",
+          "type": "audio/mpeg",
+          "size": 4340952,
+          "uploadedAt": "2026-08-18T02:41:44.348Z"
+        },
+        {
+          "title": "我呼吸我感覺我存在",
+          "discNumber": 1,
+          "trackNumber": 11,
+          "orderLabel": "11",
+          "fileName": "11 - 我呼吸我感覺我存在.mp3",
+          "key": "tom-chang/带我去月球/11 - 我呼吸我感覺我存在.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%B8%A6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83/11%20-%20%E6%88%91%E5%91%BC%E5%90%B8%E6%88%91%E6%84%9F%E8%A6%BA%E6%88%91%E5%AD%98%E5%9C%A8.mp3",
+          "type": "audio/mpeg",
+          "size": 4133920,
+          "uploadedAt": "2026-08-18T02:41:28.639Z"
+        },
+        {
+          "title": "我想把整片天空打開",
+          "discNumber": 1,
+          "trackNumber": 12,
+          "orderLabel": "12",
+          "fileName": "12 - 我想把整片天空打開.mp3",
+          "key": "tom-chang/带我去月球/12 - 我想把整片天空打開.mp3",
+          "src": "https://pub-87d3791e454e4672b255abea93cc2968.r2.dev/tom-chang/%E5%B8%A6%E6%88%91%E5%8E%BB%E6%9C%88%E7%90%83/12%20-%20%E6%88%91%E6%83%B3%E6%8A%8A%E6%95%B4%E7%89%87%E5%A4%A9%E7%A9%BA%E6%89%93%E9%96%8B.mp3",
+          "type": "audio/mpeg",
+          "size": 4670947,
+          "uploadedAt": "2026-08-18T02:41:46.017Z"
+        }
+      ]
+    },
     {
       "name": "卡拉OK·台北·我",
       "tracks": [
