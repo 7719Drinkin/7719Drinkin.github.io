@@ -47,6 +47,9 @@ async function main() {
   assert(shell.includes("cache: 'no-store'"), 'site-shell.js revision request must bypass browser cache.');
   assert(shell.includes('await loadSiteRevision();'), 'site-shell.js must load the deployment revision before initial navigation.');
   assert(shell.indexOf('await loadSiteRevision();') < shell.indexOf('navigate(initialRoute, { push: false });'), 'site-shell.js navigates before revision loading finishes.');
+  assert(shell.includes('const refreshSiteRevision = () =>'), 'site-shell.js is missing live deployment revision refresh.');
+  assert(shell.includes("window.addEventListener('focus', refreshSiteRevision);"), 'site-shell.js does not revalidate revision when the tab regains focus.');
+  assert(shell.includes("document.addEventListener('visibilitychange'"), 'site-shell.js does not revalidate revision when the tab becomes visible.');
 
   assert(bridge.includes("const REV_PARAM = '__site_rev';"), 'site-frame-bridge.js is missing REV_PARAM.');
   const bridgeDeletes = bridge.match(/url\.searchParams\.delete\(REV_PARAM\);/g) || [];
