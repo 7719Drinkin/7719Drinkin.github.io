@@ -21,3 +21,151 @@ html.site-shell-frame-document .anime-page .universe-header {
 .anime-page .anime-empty-state {
   display: none !important;
 }
+
+/* Editorial section layout only. Typography remains owned by anime.css. */
+.anime-page .anime-section-intro {
+  grid-template-columns: minmax(210px, .34fr) minmax(0, 1fr);
+  gap: clamp(34px, 6vw, 96px);
+  align-items: start;
+  margin-bottom: 56px;
+  padding-bottom: 34px;
+}
+
+.anime-page .anime-chapter-mark {
+  display: grid;
+  grid-template-columns: auto auto minmax(44px, 1fr);
+  gap: 18px;
+  align-items: center;
+  align-self: start;
+  min-width: 0;
+}
+
+.anime-page .anime-chapter-mark::after {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--anime-line-strong);
+  content: "";
+}
+
+.anime-page .anime-section-kicker {
+  margin: 0;
+}
+
+.anime-page .anime-section-quote {
+  min-width: 0;
+  max-width: 980px;
+}
+
+.anime-page .anime-section-quote .anime-section-description {
+  max-width: 360px;
+  margin: 20px 0 0 auto;
+}
+
+.anime-page .anime-section-intro--right {
+  grid-template-columns: minmax(0, 1fr) minmax(210px, .34fr);
+}
+
+.anime-page .anime-section-intro--right .anime-chapter-mark {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.anime-page .anime-section-intro--right .anime-section-quote {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.anime-page .anime-section-intro--right .anime-section-quote .anime-section-description {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+.anime-page .anime-section-intro--line {
+  grid-template-columns: 1fr;
+  gap: 30px;
+}
+
+.anime-page .anime-section-intro--line .anime-chapter-mark {
+  grid-column: 1;
+  width: min(100%, 760px);
+}
+
+.anime-page .anime-section-intro--line .anime-section-quote {
+  grid-column: 1;
+  width: min(100%, 1040px);
+  margin-left: clamp(60px, 9vw, 132px);
+}
+
+.anime-page .anime-recent-section {
+  display: block;
+}
+
+.anime-page .anime-recent-heading.anime-section-intro {
+  display: grid;
+  grid-template-columns: minmax(210px, .34fr) minmax(0, 1fr);
+  gap: clamp(34px, 6vw, 96px);
+  align-items: start;
+}
+
+.anime-page .anime-recent-list {
+  margin-top: 8px;
+}
+
+@media (max-width: 1050px) {
+  .anime-page .anime-section-intro,
+  .anime-page .anime-recent-heading.anime-section-intro {
+    grid-template-columns: minmax(170px, .3fr) minmax(0, 1fr);
+    gap: clamp(26px, 5vw, 58px);
+  }
+
+  .anime-page .anime-section-intro--right {
+    grid-template-columns: minmax(0, 1fr) minmax(170px, .3fr);
+  }
+
+  .anime-page .anime-section-intro--line {
+    grid-template-columns: 1fr;
+  }
+
+  .anime-page .anime-section-intro--line .anime-section-quote {
+    margin-left: clamp(42px, 7vw, 76px);
+  }
+
+  .anime-page .anime-section-description {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .anime-page .anime-section-intro,
+  .anime-page .anime-section-intro--right,
+  .anime-page .anime-section-intro--line,
+  .anime-page .anime-recent-heading.anime-section-intro {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-bottom: 40px;
+    padding-bottom: 28px;
+  }
+
+  .anime-page .anime-section-intro--right .anime-chapter-mark,
+  .anime-page .anime-section-intro--right .anime-section-quote,
+  .anime-page .anime-section-intro--line .anime-chapter-mark,
+  .anime-page .anime-section-intro--line .anime-section-quote {
+    grid-column: 1;
+    grid-row: auto;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .anime-page .anime-chapter-mark {
+    grid-template-columns: auto auto minmax(36px, 1fr);
+    gap: 14px;
+  }
+
+  .anime-page .anime-section-quote .anime-section-description,
+  .anime-page .anime-section-intro--right .anime-section-quote .anime-section-description {
+    margin-right: 0;
+    margin-left: 0;
+    padding-left: 0;
+  }
+}

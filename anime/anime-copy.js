@@ -1,5 +1,4 @@
 Object.assign(ANIME_COPY.zh, {
-  heroEyebrow: '04 / 光影留存',
   heroCaption: '过去，不过是我们讲给自己的故事。',
   heroBody: '——《她》 / Samantha',
   enterArchive: '翻开这一册',
@@ -22,8 +21,9 @@ Object.assign(ANIME_COPY.zh, {
   soundTitle: '歌唱真好。歌声可以滋润心灵。',
   soundBody: '——《新世纪福音战士》 / 渚薰',
 
-  recentKicker: '近来 /《指环王：护戒使者》',
+  recentKicker: '近来',
   recentTitle: '我们真正能决定的，只有如何度过被给予的时间。',
+  recentBody: '——《指环王：护戒使者》 / Gandalf',
 
   seriesOpen: '进入这个世界',
   characterOpen: '去见这个人',
@@ -31,7 +31,6 @@ Object.assign(ANIME_COPY.zh, {
 });
 
 Object.assign(ANIME_COPY.en, {
-  heroEyebrow: '04 / FRAMES REMAIN',
   heroCaption: 'The past is just a story we tell ourselves.',
   heroBody: '— Her / Samantha',
   enterArchive: 'OPEN THIS VOLUME',
@@ -54,8 +53,9 @@ Object.assign(ANIME_COPY.en, {
   soundTitle: 'Singing is great. Singing enriches the soul.',
   soundBody: '— Neon Genesis Evangelion / Kaworu Nagisa',
 
-  recentKicker: 'RECENT / THE FELLOWSHIP OF THE RING',
+  recentKicker: 'RECENTLY',
   recentTitle: 'All we have to decide is what to do with the time that is given to us.',
+  recentBody: '— The Lord of the Rings: The Fellowship of the Ring / Gandalf',
 
   seriesOpen: 'ENTER THIS WORLD',
   characterOpen: 'MEET THIS CHARACTER',

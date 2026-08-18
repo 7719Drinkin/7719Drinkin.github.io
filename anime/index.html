@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/universe.css?v=20260730-1">
   <link rel="stylesheet" href="/anime/anime.css?v=20260818-series-1">
-  <link rel="stylesheet" href="/anime/anime-runtime-fixes.css?v=20260818-1">
+  <link rel="stylesheet" href="/anime/anime-runtime-fixes.css?v=20260818-layout-1">
 </head>
 <body class="theme-anime interest-page anime-page">
   <div class="universe-noise" aria-hidden="true"></div>
@@ -35,7 +35,6 @@
         <div class="breadcrumb">
           <a href="/" data-copy="home">首页</a><span>/</span><span data-copy="anime">动漫</span>
         </div>
-        <p class="anime-kicker" data-copy="heroEyebrow">04 / 光影留存</p>
         <p class="anime-title-caption" data-copy="heroCaption">过去，不过是我们讲给自己的故事。</p>
         <h1 data-copy="anime">动漫</h1>
         <p class="anime-hero-body" data-copy="heroBody">——《她》 / Samantha</p>
@@ -57,61 +56,72 @@
     </section>
 
     <section id="series" class="universe-section anime-archive-section anime-series-section">
-      <header class="anime-section-intro reveal">
-        <p class="anime-section-number">01</p>
-        <div>
+      <header class="anime-section-intro anime-section-intro--left reveal">
+        <div class="anime-chapter-mark">
+          <p class="anime-section-number">01</p>
           <p class="anime-section-kicker" data-copy="seriesKicker">世界</p>
-          <h2 data-copy="seriesTitle">这个世界很残酷……却也很美丽。</h2>
         </div>
-        <p class="anime-section-description" data-copy="seriesBody">——《进击的巨人》 / 三笠·阿克曼</p>
+        <div class="anime-section-quote">
+          <h2 data-copy="seriesTitle">这个世界很残酷……却也很美丽。</h2>
+          <p class="anime-section-description" data-copy="seriesBody">——《进击的巨人》 / 三笠·阿克曼</p>
+        </div>
       </header>
       <div id="anime-series-grid" class="anime-series-grid" aria-live="polite"></div>
     </section>
 
     <section id="characters" class="universe-section anime-archive-section">
-      <header class="anime-section-intro reveal">
-        <p class="anime-section-number">02</p>
-        <div>
+      <header class="anime-section-intro anime-section-intro--right reveal">
+        <div class="anime-chapter-mark">
+          <p class="anime-section-number">02</p>
           <p class="anime-section-kicker" data-copy="charactersKicker">人物</p>
-          <h2 data-copy="charactersTitle">所谓悲伤，不正是爱仍在延续吗？</h2>
         </div>
-        <p class="anime-section-description" data-copy="charactersBody">——《旺达幻视》 / Vision</p>
+        <div class="anime-section-quote">
+          <h2 data-copy="charactersTitle">所谓悲伤，不正是爱仍在延续吗？</h2>
+          <p class="anime-section-description" data-copy="charactersBody">——《旺达幻视》 / Vision</p>
+        </div>
       </header>
       <div id="anime-character-grid" class="anime-character-grid" aria-live="polite"></div>
     </section>
 
     <section id="scenes" class="universe-section anime-archive-section">
-      <header class="anime-section-intro reveal">
-        <p class="anime-section-number">03</p>
-        <div>
+      <header class="anime-section-intro anime-section-intro--line reveal">
+        <div class="anime-chapter-mark">
+          <p class="anime-section-number">03</p>
           <p class="anime-section-kicker" data-copy="scenesKicker">一瞬</p>
-          <h2 data-copy="scenesTitle">所有这些瞬间，终将消逝在时间里……就像雨中的泪水。</h2>
         </div>
-        <p class="anime-section-description" data-copy="scenesBody">——《银翼杀手》 / Roy Batty</p>
+        <div class="anime-section-quote">
+          <h2 data-copy="scenesTitle">所有这些瞬间，终将消逝在时间里……就像雨中的泪水。</h2>
+          <p class="anime-section-description" data-copy="scenesBody">——《银翼杀手》 / Roy Batty</p>
+        </div>
       </header>
       <div id="anime-scene-grid" class="anime-scene-grid" aria-live="polite"></div>
     </section>
 
     <section id="sound" class="universe-section anime-archive-section">
-      <header class="anime-section-intro reveal">
-        <p class="anime-section-number">04</p>
-        <div>
+      <header class="anime-section-intro anime-section-intro--right reveal">
+        <div class="anime-chapter-mark">
+          <p class="anime-section-number">04</p>
           <p class="anime-section-kicker" data-copy="soundKicker">余音</p>
-          <h2 data-copy="soundTitle">歌唱真好。歌声可以滋润心灵。</h2>
         </div>
-        <p class="anime-section-description" data-copy="soundBody">——《新世纪福音战士》 / 渚薰</p>
+        <div class="anime-section-quote">
+          <h2 data-copy="soundTitle">歌唱真好。歌声可以滋润心灵。</h2>
+          <p class="anime-section-description" data-copy="soundBody">——《新世纪福音战士》 / 渚薰</p>
+        </div>
       </header>
       <div id="anime-sound-list" class="anime-sound-list" aria-live="polite"></div>
     </section>
 
     <section id="recent" class="universe-section anime-recent-section reveal">
-      <div class="anime-recent-heading">
-        <p class="anime-section-number">05</p>
-        <div>
-          <p class="anime-section-kicker" data-copy="recentKicker">近来 /《指环王：护戒使者》</p>
-          <h2 data-copy="recentTitle">我们真正能决定的，只有如何度过被给予的时间。</h2>
+      <header class="anime-section-intro anime-section-intro--left anime-recent-heading">
+        <div class="anime-chapter-mark">
+          <p class="anime-section-number">05</p>
+          <p class="anime-section-kicker" data-copy="recentKicker">近来</p>
         </div>
-      </div>
+        <div class="anime-section-quote">
+          <h2 data-copy="recentTitle">我们真正能决定的，只有如何度过被给予的时间。</h2>
+          <p class="anime-section-description" data-copy="recentBody">——《指环王：护戒使者》 / Gandalf</p>
+        </div>
+      </header>
       <div id="anime-recent-list" class="anime-recent-list" aria-live="polite"></div>
     </section>
   </main>
@@ -122,7 +132,7 @@
   </footer>
 
   <script src="/anime/anime.js?v=20260818-series-1"></script>
-  <script src="/anime/anime-copy.js?v=20260818-quotes-3"></script>
+  <script src="/anime/anime-copy.js?v=20260818-layout-1"></script>
   <script src="/anime/anime-runtime-fixes.js?v=20260818-1"></script>
 </body>
 </html>
