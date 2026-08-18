@@ -1,0 +1,176 @@
+.music-site-header {
+  display: flex;
+  grid-template-columns: none;
+  justify-content: space-between;
+  gap: clamp(24px, 4vw, 64px);
+}
+
+.music-header-identity {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  flex: 0 1 auto;
+}
+
+.music-header-identity .music-site-brand {
+  flex: 0 0 auto;
+}
+
+.music-header-divider {
+  width: 1px;
+  height: 20px;
+  margin: 0 22px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.music-header-crumbs {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.music-header-section,
+.music-header-current,
+.music-header-slash {
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.music-header-section {
+  color: var(--music-gold-soft);
+  font-family: var(--music-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-decoration: none;
+  transition: color .2s ease, opacity .2s ease;
+}
+
+.music-header-section:hover {
+  color: var(--music-text);
+}
+
+.music-header-slash {
+  color: rgba(255, 255, 255, 0.22);
+  font-family: var(--music-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.music-header-current {
+  overflow: hidden;
+  color: var(--artist-accent-soft, var(--music-text));
+  font-family: var(--music-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .10em;
+  text-overflow: ellipsis;
+}
+
+.music-site-nav {
+  flex: 0 1 auto;
+  justify-content: flex-end;
+}
+
+html[data-music-language="zh"] .music-header-section,
+html[data-music-language="zh"] .music-header-current,
+html[data-music-language="zh"] .music-site-nav a {
+  font-family: "Noto Sans SC", var(--music-sans);
+}
+
+html[data-music-language="zh"] .music-header-section {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .16em;
+}
+
+html[data-music-language="zh"] .music-header-current {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+}
+
+html[data-music-language="zh"] .music-site-nav a {
+  letter-spacing: .08em;
+}
+
+@media (max-width: 1080px) {
+  .music-site-header {
+    grid-template-columns: none;
+  }
+
+  .music-header-middle {
+    display: none;
+  }
+
+  .music-header-identity {
+    min-width: 0;
+  }
+
+  .music-site-nav {
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .music-site-nav::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .music-site-header {
+    gap: 16px;
+  }
+
+  .music-header-divider {
+    height: 17px;
+    margin: 0 13px;
+  }
+
+  .music-header-crumbs {
+    gap: 8px;
+  }
+
+  .music-header-section {
+    font-size: 9px;
+    letter-spacing: .14em;
+  }
+
+  .music-header-current {
+    max-width: 112px;
+    font-size: 10px;
+    letter-spacing: .07em;
+  }
+
+  html[data-music-language="zh"] .music-header-section {
+    font-size: 9px;
+    letter-spacing: .12em;
+  }
+
+  html[data-music-language="zh"] .music-header-current {
+    font-size: 10px;
+    letter-spacing: .04em;
+  }
+
+  .music-site-nav {
+    gap: 14px;
+  }
+}
+
+@media (max-width: 560px) {
+  .music-header-divider {
+    margin: 0 10px;
+  }
+
+  .music-header-current {
+    max-width: 84px;
+  }
+
+  .music-site-nav a:nth-child(n+3) {
+    display: none;
+  }
+}
