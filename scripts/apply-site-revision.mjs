@@ -6,7 +6,6 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SHELL_FILE = join(ROOT, 'js', 'site-shell.js');
 const BRIDGE_FILE = join(ROOT, 'js', 'site-frame-bridge.js');
-const SHELL_HTML = join(ROOT, 'site-shell.html');
 const REVISION_FILE = join(ROOT, 'site-revision.json');
 const REVISION_LENGTH = 8;
 const SKIP_DIRECTORIES = new Set([
@@ -50,7 +49,7 @@ function patchShell(source) {
     output = replaceRequired(
       output,
       "  const FRAME_PARAM = '__site_frame';\n  const STATE_KEY = '7719:persistent-player:v2';",
-      "  const FRAME_PARAM = '__site_frame';\n  const REV_PARAM = '__site_rev';\n  const REVISION_URL = '/site-revision.json';\n  let siteRevision = '';\n  const STATE_KEY = '7719:persistent-player:v2';",
+      "  const FRAME_PARAM = '__site_frame';\n  const REV_PARAM = '__site_rev';\n  const REVISION_URL = '/site-revision.json';\n  let siteRevision = '';\n  let revisionRefreshPromise = null;\n  const STATE_KEY = '7719:persistent-player:v2';",
       'js/site-shell.js constants'
     );
   }
@@ -77,8 +76,17 @@ function patchShell(source) {
     output = replaceRequired(
       output,
       "  const isThreeDRoute = (value) => {",
-      `  const loadSiteRevision = async () => {\n    const controller = new AbortController();\n    const timeout = window.setTimeout(() => controller.abort(), 1800);\n\n    try {\n      const requestUrl = \`${'${REVISION_URL}'}?t=${'${Date.now()}'}\`;\n      const response = await fetch(requestUrl, {\n        cache: 'no-store',\n        credentials: 'same-origin',\n        signal: controller.signal\n      });\n      if (!response.ok) throw new Error(\`Revision request failed: ${'${response.status}'}\`);\n\n      const payload = await response.json();\n      const revision = String(payload?.revision || '').trim().toLowerCase();\n      if (!/^[0-9a-f]{8}$/.test(revision)) {\n        throw new Error('Revision payload is invalid.');\n      }\n      siteRevision = revision;\n    } catch (error) {\n      console.warn('[site-shell] deployment revision unavailable; continuing without HTML cache bust.', error);\n      siteRevision = '';\n    } finally {\n      window.clearTimeout(timeout);\n    }\n  };\n\n  const isThreeDRoute = (value) => {`,
+      `  const loadSiteRevision = async () => {\n    const controller = new AbortController();\n    const timeout = window.setTimeout(() => controller.abort(), 1800);\n\n    try {\n      const requestUrl = \`${'${REVISION_URL}'}?t=${'${Date.now()}'}\`;\n      const response = await fetch(requestUrl, {\n        cache: 'no-store',\n        credentials: 'same-origin',\n        signal: controller.signal\n      });\n      if (!response.ok) throw new Error(\`Revision request failed: ${'${response.status}'}\`);\n\n      const payload = await response.json();\n      const revision = String(payload?.revision || '').trim().toLowerCase();\n      if (!/^[0-9a-f]{8}$/.test(revision)) {\n        throw new Error('Revision payload is invalid.');\n      }\n      siteRevision = revision;\n    } catch (error) {\n      console.warn('[site-shell] deployment revision unavailable; keeping the current revision.', error);\n    } finally {\n      window.clearTimeout(timeout);\n    }\n  };\n\n  const refreshSiteRevision = () => {\n    if (revisionRefreshPromise) return revisionRefreshPromise;\n\n    revisionRefreshPromise = (async () => {\n      const previousRevision = siteRevision;\n      await loadSiteRevision();\n      if (!siteRevision || siteRevision === previousRevision || !state.route) return;\n\n      setLoading(true);\n      frame.src = frameUrl(state.route);\n    })().finally(() => {\n      revisionRefreshPromise = null;\n    });\n\n    return revisionRefreshPromise;\n  };\n\n  const isThreeDRoute = (value) => {`,
       'js/site-shell.js revision loader'
+    );
+  }
+
+  if (!output.includes("window.addEventListener('focus', refreshSiteRevision);")) {
+    output = replaceRequired(
+      output,
+      "  window.addEventListener('pagehide', persistState);",
+      "  window.addEventListener('pagehide', persistState);\n  window.addEventListener('focus', refreshSiteRevision);\n  document.addEventListener('visibilitychange', () => {\n    if (!document.hidden) refreshSiteRevision();\n  });",
+      'js/site-shell.js revision refresh events'
     );
   }
 
