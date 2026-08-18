@@ -9,16 +9,33 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/music.css?v=20260805-2">
+  <link rel="stylesheet" href="/css/music-header.css?v=20260818-2">
   <link rel="stylesheet" href="/css/music-player.css?v=20260805-4">
 </head>
 <body class="music-page music-artist-page"
   style="--artist-accent:#6ed4cc;--artist-accent-soft:#bcece6;--artist-bg:#07141a;--artist-fg:#eef8f6">
   <header class="music-site-header">
-    <a class="music-site-brand" href="/" aria-label="返回 7719 Universe">
-      <span>77</span><strong>19</strong>
-    </a>
-    <div class="music-header-middle"><a href="/music/" class="music-header-context">MUSIC / ALAN TAM</a></div>
-    <nav class="music-site-nav" aria-label="音乐收藏导航"><a href="#overview">OVERVIEW</a><a href="#songs">SONGS</a><a href="#albums">ALBUMS</a><a href="#gallery">VISUAL</a></nav>
+    <div class="music-header-identity">
+      <a class="music-site-brand" href="/" aria-label="返回 7719 Universe">
+        <span>77</span><strong>19</strong>
+      </a>
+      <span class="music-header-divider" aria-hidden="true"></span>
+      <nav class="music-header-crumbs" aria-label="音乐页面层级">
+        <a class="music-header-section" href="/music/">
+          <span class="music-lang-zh">音乐</span><span class="music-lang-en">MUSIC</span>
+        </a>
+        <span class="music-header-slash" aria-hidden="true">/</span>
+        <span class="music-header-current">
+          <span class="music-lang-zh">谭咏麟</span><span class="music-lang-en">ALAN TAM</span>
+        </span>
+      </nav>
+    </div>
+    <nav class="music-site-nav" aria-label="谭咏麟收藏导航">
+      <a href="#overview"><span class="music-lang-zh">概览</span><span class="music-lang-en">OVERVIEW</span></a>
+      <a href="#songs"><span class="music-lang-zh">歌曲</span><span class="music-lang-en">SONGS</span></a>
+      <a href="#albums"><span class="music-lang-zh">专辑</span><span class="music-lang-en">ALBUMS</span></a>
+      <a href="#gallery"><span class="music-lang-zh">影像</span><span class="music-lang-en">VISUAL</span></a>
+    </nav>
   </header>
   <main>
     <section class="artist-hero">
@@ -139,6 +156,7 @@
   </aside>
   <footer class="music-site-footer"><a href="/music/">← MUSIC COLLECTION</a><span>ALAN TAM / 7719</span></footer>
   <script src="/js/music.js?v=20260805-2"></script>
+  <script src="/js/music-header.js?v=20260818-2"></script>
   <script src="/js/music-player.js?v=20260805-2"></script>
 </body>
 </html>
