@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const REVISION_LENGTH = 8;
+const PINNED_SHELL_RUNTIME = '/js/site-shell.js?v=20260814-minimized-dock-1';
 
 function resolveExpectedRevision() {
   let raw = String(process.env.SITE_REVISION || process.env.GITHUB_SHA || '').trim();
@@ -55,10 +56,8 @@ async function main() {
   const bridgeDeletes = bridge.match(/url\.searchParams\.delete\(REV_PARAM\);/g) || [];
   assert(bridgeDeletes.length >= 2, 'site-frame-bridge.js must remove the revision from both route reporting and internal navigation.');
 
-  assert(
-    shellHtml.includes(`/js/site-shell.js?v=${expected}`),
-    `site-shell.html does not reference the current shell revision ${expected}.`
-  );
+  assert(shellHtml.includes(PINNED_SHELL_RUNTIME), 'site-shell.html must keep the persistent player base runtime pinned.');
+  assert(!shellHtml.includes(`/js/site-shell.js?v=${expected}`), 'site-shell.html must not use the deployment revision as the persistent player asset version.');
 
   for (const path of ['index.html', 'anime/index.html', 'music/index.html', 'basketball/index.html']) {
     const html = await read(path);
@@ -71,7 +70,7 @@ async function main() {
   execFileSync(process.execPath, ['--check', join(ROOT, 'js', 'site-shell.js')], { stdio: 'inherit' });
   execFileSync(process.execPath, ['--check', join(ROOT, 'js', 'site-frame-bridge.js')], { stdio: 'inherit' });
 
-  console.log(`Validated site revision ${expected}. Public routes stay clean while framed HTML is revisioned.`);
+  console.log(`Validated site revision ${expected}. Shell runtime stays pinned; framed HTML stays revisioned.`);
 }
 
 main().catch((error) => {
