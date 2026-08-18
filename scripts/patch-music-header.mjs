@@ -1,8 +1,8 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = join(fileURLToPath(new URL('..', import.meta.url)), '..');
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MUSIC_ROOT = join(ROOT, 'music');
 const HEADER_STYLE_HREF = '/css/music-header.css?v=20260818-4';
 const HEADER_SCRIPT_SRC = '/js/music-header.js?v=20260818-4';
