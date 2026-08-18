@@ -61,6 +61,7 @@ jobs:
           node --check scripts/validate-music-runtime.mjs
           node --check scripts/sync-music-catalog.mjs
           node --check scripts/install-site-shell.mjs
+          node --check scripts/patch-music-header.mjs
           node --check scripts/build-music-i18n.mjs
           node --check scripts/embed-music-i18n-data.mjs
           node --check scripts/music/music-collection-repository.mjs
@@ -109,6 +110,7 @@ jobs:
           node scripts/embed-music-i18n-data.mjs
           node scripts/apply-basketball-design-system.mjs
           node scripts/install-site-shell.mjs
+          node scripts/patch-music-header.mjs
           node scripts/validate-music-recent-listening.mjs
           node scripts/validate-music-runtime.mjs
 
