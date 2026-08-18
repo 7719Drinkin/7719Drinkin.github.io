@@ -112,6 +112,11 @@ html.site-shell-frame-document .anime-page .universe-header {
   margin-top: 8px;
 }
 
+/* Keep the decorative hero guide outside the breadcrumb/content column. */
+.anime-page .anime-frame-field::before {
+  left: clamp(18px, 3vw, 48px);
+}
+
 @media (max-width: 1050px) {
   .anime-page .anime-section-intro,
   .anime-page .anime-recent-heading.anime-section-intro {
@@ -137,6 +142,10 @@ html.site-shell-frame-document .anime-page .universe-header {
 }
 
 @media (max-width: 760px) {
+  .anime-page .anime-frame-field::before {
+    left: 10px;
+  }
+
   .anime-page .anime-section-intro,
   .anime-page .anime-section-intro--right,
   .anime-page .anime-section-intro--line,
