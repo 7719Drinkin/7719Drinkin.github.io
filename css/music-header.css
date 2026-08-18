@@ -20,6 +20,7 @@
   width: 1px;
   height: 20px;
   margin: 0 22px;
+  flex: 0 0 auto;
   background: rgba(255, 255, 255, 0.14);
 }
 
@@ -75,6 +76,18 @@
   justify-content: flex-end;
 }
 
+.music-lang-en {
+  display: none;
+}
+
+html[data-music-language="en"] .music-lang-en {
+  display: inline;
+}
+
+html[data-music-language="en"] .music-lang-zh {
+  display: none;
+}
+
 html[data-music-language="zh"] .music-header-section,
 html[data-music-language="zh"] .music-header-current,
 html[data-music-language="zh"] .music-site-nav a {
@@ -100,10 +113,6 @@ html[data-music-language="zh"] .music-site-nav a {
 @media (max-width: 1080px) {
   .music-site-header {
     grid-template-columns: none;
-  }
-
-  .music-header-middle {
-    display: none;
   }
 
   .music-header-identity {
