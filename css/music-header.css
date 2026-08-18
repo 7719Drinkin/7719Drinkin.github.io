@@ -1,22 +1,52 @@
 .music-site-header {
   display: flex;
+  height: 76px;
   grid-template-columns: none;
+  align-items: center;
   justify-content: space-between;
   gap: clamp(24px, 4vw, 64px);
+  padding: 0 clamp(20px, 4vw, 68px);
 }
 
-.music-header-identity {
+/*
+ * The identity block is invariant across the music landing page and every
+ * artist page. Artist-specific content may only be appended after MUSIC/音乐.
+ */
+body.music-page .music-site-header .music-header-identity {
   display: inline-flex;
   min-width: 0;
+  height: 100%;
   align-items: center;
   flex: 0 1 auto;
 }
 
-.music-header-identity .music-site-brand {
+body.music-page .music-site-header .music-header-identity .music-site-brand {
+  display: inline-flex;
+  align-items: baseline;
   flex: 0 0 auto;
+  color: inherit;
+  letter-spacing: -0.08em;
+  text-decoration: none;
 }
 
-.music-header-divider {
+body.music-page .music-site-header .music-header-identity .music-site-brand span,
+body.music-page .music-site-header .music-header-identity .music-site-brand strong {
+  font-family: var(--music-sans);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+body.music-page .music-site-header .music-header-identity .music-site-brand span {
+  color: var(--music-text);
+}
+
+body.music-page .music-site-header .music-header-identity .music-site-brand strong {
+  color: var(--music-gold);
+}
+
+body.music-page .music-site-header .music-header-divider {
+  display: block;
   width: 1px;
   height: 20px;
   margin: 0 22px;
@@ -24,7 +54,7 @@
   background: rgba(255, 255, 255, 0.14);
 }
 
-.music-header-crumbs {
+body.music-page .music-site-header .music-header-crumbs {
   display: inline-flex;
   min-width: 0;
   align-items: center;
@@ -32,36 +62,43 @@
   white-space: nowrap;
 }
 
-.music-header-section,
-.music-header-current,
-.music-header-slash {
+body.music-page .music-site-header .music-header-section,
+body.music-page .music-site-header .music-header-current,
+body.music-page .music-site-header .music-header-slash {
   line-height: 1;
   text-transform: uppercase;
 }
 
-.music-header-section {
+/* MUSIC/音乐 is the fixed section identity and must look identical everywhere. */
+body.music-page .music-site-header .music-header-section {
   color: var(--music-gold-soft);
   font-family: var(--music-mono);
   font-size: 10px;
   font-weight: 500;
   letter-spacing: .18em;
   text-decoration: none;
-  transition: color .2s ease, opacity .2s ease;
+  transition: color .2s ease;
 }
 
-.music-header-section:hover {
+body.music-page .music-site-header .music-header-section:visited {
+  color: var(--music-gold-soft);
+}
+
+body.music-page .music-site-header .music-header-section:hover,
+body.music-page .music-site-header .music-header-section:focus-visible {
   color: var(--music-text);
 }
 
-.music-header-slash {
-  color: rgba(255, 255, 255, 0.22);
+/* Only these two nodes are artist-page additions. */
+body.music-page .music-site-header .music-header-slash {
+  color: rgba(255, 255, 255, 0.24);
   font-family: var(--music-mono);
   font-size: 10px;
   font-weight: 400;
   letter-spacing: 0;
 }
 
-.music-header-current {
+body.music-page .music-site-header .music-header-current {
   overflow: hidden;
   color: var(--artist-accent-soft, var(--music-text));
   font-family: var(--music-sans);
@@ -71,7 +108,7 @@
   text-overflow: ellipsis;
 }
 
-.music-site-nav {
+body.music-page .music-site-header .music-site-nav {
   flex: 0 1 auto;
   justify-content: flex-end;
 }
@@ -88,25 +125,30 @@ html[data-music-language="en"] .music-lang-zh {
   display: none;
 }
 
-html[data-music-language="zh"] .music-header-section,
-html[data-music-language="zh"] .music-header-current,
-html[data-music-language="zh"] .music-site-nav a {
+html[data-music-language="zh"] body.music-page .music-site-header .music-header-section,
+html[data-music-language="zh"] body.music-page .music-site-header .music-header-current,
+html[data-music-language="zh"] body.music-page .music-site-header .music-site-nav a {
   font-family: "Noto Sans SC", var(--music-sans);
 }
 
-html[data-music-language="zh"] .music-header-section {
+html[data-music-language="zh"] body.music-page .music-site-header .music-header-section {
+  color: var(--music-gold-soft);
   font-size: 10px;
   font-weight: 500;
   letter-spacing: .16em;
 }
 
-html[data-music-language="zh"] .music-header-current {
+html[data-music-language="zh"] body.music-page .music-site-header .music-header-section:visited {
+  color: var(--music-gold-soft);
+}
+
+html[data-music-language="zh"] body.music-page .music-site-header .music-header-current {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: .06em;
 }
 
-html[data-music-language="zh"] .music-site-nav a {
+html[data-music-language="zh"] body.music-page .music-site-header .music-site-nav a {
   letter-spacing: .08em;
 }
 
@@ -115,71 +157,73 @@ html[data-music-language="zh"] .music-site-nav a {
     grid-template-columns: none;
   }
 
-  .music-header-identity {
+  body.music-page .music-site-header .music-header-identity {
     min-width: 0;
   }
 
-  .music-site-nav {
+  body.music-page .music-site-header .music-site-nav {
     min-width: 0;
     overflow-x: auto;
     scrollbar-width: none;
   }
 
-  .music-site-nav::-webkit-scrollbar {
+  body.music-page .music-site-header .music-site-nav::-webkit-scrollbar {
     display: none;
   }
 }
 
 @media (max-width: 760px) {
   .music-site-header {
+    height: 66px;
     gap: 16px;
+    padding: 0 18px;
   }
 
-  .music-header-divider {
+  body.music-page .music-site-header .music-header-divider {
     height: 17px;
     margin: 0 13px;
   }
 
-  .music-header-crumbs {
+  body.music-page .music-site-header .music-header-crumbs {
     gap: 8px;
   }
 
-  .music-header-section {
+  body.music-page .music-site-header .music-header-section {
     font-size: 9px;
     letter-spacing: .14em;
   }
 
-  .music-header-current {
+  body.music-page .music-site-header .music-header-current {
     max-width: 112px;
     font-size: 10px;
     letter-spacing: .07em;
   }
 
-  html[data-music-language="zh"] .music-header-section {
+  html[data-music-language="zh"] body.music-page .music-site-header .music-header-section {
     font-size: 9px;
     letter-spacing: .12em;
   }
 
-  html[data-music-language="zh"] .music-header-current {
+  html[data-music-language="zh"] body.music-page .music-site-header .music-header-current {
     font-size: 10px;
     letter-spacing: .04em;
   }
 
-  .music-site-nav {
+  body.music-page .music-site-header .music-site-nav {
     gap: 14px;
   }
 }
 
 @media (max-width: 560px) {
-  .music-header-divider {
+  body.music-page .music-site-header .music-header-divider {
     margin: 0 10px;
   }
 
-  .music-header-current {
+  body.music-page .music-site-header .music-header-current {
     max-width: 84px;
   }
 
-  .music-site-nav a:nth-child(n+3) {
+  body.music-page .music-site-header .music-site-nav a:nth-child(n+3) {
     display: none;
   }
 }
