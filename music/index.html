@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/music.css?v=20260805-2">
+  <link rel="stylesheet" href="/css/music-header.css?v=20260818-2">
   <style>
     body.music-collection-page .collection-hero-impression {
       max-width: 26em;
@@ -64,11 +65,21 @@
 </head>
 <body class="music-page music-collection-page">
   <header class="music-site-header">
-    <a class="music-site-brand" href="/" aria-label="返回 7719 Universe">
-      <span>77</span><strong>19</strong>
-    </a>
-    <div class="music-header-middle"><a href="/music/" class="music-header-context is-current">COLLECTIONS / MUSIC</a></div>
-    <nav class="music-site-nav" aria-label="音乐收藏导航"><a href="/">HOME</a><a class="is-current" href="/music/">COLLECTIONS</a><a href="#artists">ARTISTS</a><a href="#listening">LISTENING</a></nav>
+    <div class="music-header-identity">
+      <a class="music-site-brand" href="/" aria-label="返回 7719 Universe">
+        <span>77</span><strong>19</strong>
+      </a>
+      <span class="music-header-divider" aria-hidden="true"></span>
+      <nav class="music-header-crumbs" aria-label="音乐页面层级">
+        <a class="music-header-section" href="/music/">
+          <span class="music-lang-zh">音乐</span><span class="music-lang-en">MUSIC</span>
+        </a>
+      </nav>
+    </div>
+    <nav class="music-site-nav" aria-label="音乐收藏导航">
+      <a href="#artists"><span class="music-lang-zh">歌手</span><span class="music-lang-en">ARTISTS</span></a>
+      <a href="#listening"><span class="music-lang-zh">聆听</span><span class="music-lang-en">LISTENING</span></a>
+    </nav>
   </header>
   <main>
     <section class="collection-hero">
@@ -197,6 +208,7 @@
   </main>
   <footer class="music-site-footer"><span>7719 / MUSIC COLLECTION</span><span>CURATED, NOT COMPLETE.</span></footer>
   <script src="/js/music.js?v=20260805-2"></script>
+  <script src="/js/music-header.js?v=20260818-2"></script>
   <script type="module" src="/js/music-home.js?v=20260817-2"></script>
 </body>
 </html>
