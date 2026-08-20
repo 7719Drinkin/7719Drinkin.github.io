@@ -297,17 +297,21 @@ function enhancePage(html, gallery) {
     '视频与照片分区展示；支持 YouTube、哔哩哔哩及本地图片。'
   );
 
+  const hasVisualArchive = gallery.length > 0;
   const hasVideo = gallery.some(isVideo);
-  if (!hasVideo) return output;
 
-  if (!output.includes('/css/music-visual-video.css')) {
-    output = output.replace(
-      '</head>',
-      '  <link rel="stylesheet" href="/css/music-visual-video.css?v=20260806-3">\n</head>'
-    );
-  } else {
-    output = output.replace(/\/css\/music-visual-video\.css\?v=[^"]+/, '/css/music-visual-video.css?v=20260806-3');
+  if (hasVisualArchive) {
+    if (!output.includes('/css/music-visual-video.css')) {
+      output = output.replace(
+        '</head>',
+        '  <link rel="stylesheet" href="/css/music-visual-video.css?v=20260806-3">\n</head>'
+      );
+    } else {
+      output = output.replace(/\/css\/music-visual-video\.css\?v=[^"]+/, '/css/music-visual-video.css?v=20260806-3');
+    }
   }
+
+  if (!hasVideo) return output;
 
   if (!output.includes('/js/music-visual-video.js')) {
     output = output.replace(
