@@ -1,0 +1,47 @@
+/* Photo archives are display frames, not cover crops. Keep portraits fully visible
+   and reduce the wall's visual scale without changing video presentation. */
+.visual-archive-group--photos .visual-photo-grid {
+  width: min(1040px, 100%);
+  margin-inline: auto;
+  gap: 14px;
+}
+
+.visual-photo-grid .visual-card--photo {
+  display: grid;
+  min-height: 0;
+  aspect-ratio: 4 / 5;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 34%, color-mix(in srgb, var(--artist-accent) 7%, transparent), transparent 52%),
+    color-mix(in srgb, var(--artist-bg) 94%, black);
+}
+
+.visual-photo-grid .visual-card--photo:nth-child(4n+1) {
+  aspect-ratio: 16 / 10;
+}
+
+.visual-photo-grid .visual-card--photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+  object-position: center;
+  background: rgba(0, 0, 0, .12);
+}
+
+/* A photo archive should never crop an edge merely for a hover effect. */
+.visual-photo-grid .visual-card--photo:hover img {
+  transform: none;
+}
+
+@media (max-width: 760px) {
+  .visual-archive-group--photos .visual-photo-grid {
+    width: min(100%, 520px);
+  }
+
+  .visual-photo-grid .visual-card--photo,
+  .visual-photo-grid .visual-card--photo:nth-child(4n+1) {
+    aspect-ratio: 4 / 5;
+  }
+}

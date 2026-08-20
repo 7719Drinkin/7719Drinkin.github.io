@@ -6,6 +6,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const REGISTRY_PATH = join(ROOT, 'data/music/artists.json');
 const DETAILS_ROOT = join(ROOT, 'data/music/artists');
 const MUSIC_ROOT = join(ROOT, 'music', 'artists');
+const PHOTO_STYLE_HREF = '/css/music-photo-archive.css?v=20260820-1';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;')
@@ -299,6 +300,7 @@ function enhancePage(html, gallery) {
 
   const hasVisualArchive = gallery.length > 0;
   const hasVideo = gallery.some(isVideo);
+  const hasPhoto = gallery.some((item) => !isVideo(item));
 
   if (hasVisualArchive) {
     if (!output.includes('/css/music-visual-video.css')) {
@@ -308,6 +310,17 @@ function enhancePage(html, gallery) {
       );
     } else {
       output = output.replace(/\/css\/music-visual-video\.css\?v=[^"]+/, '/css/music-visual-video.css?v=20260806-3');
+    }
+  }
+
+  if (hasPhoto) {
+    if (!output.includes('/css/music-photo-archive.css')) {
+      output = output.replace(
+        '</head>',
+        `  <link rel="stylesheet" href="${PHOTO_STYLE_HREF}">\n</head>`
+      );
+    } else {
+      output = output.replace(/\/css\/music-photo-archive\.css\?v=[^"]+/, PHOTO_STYLE_HREF);
     }
   }
 
