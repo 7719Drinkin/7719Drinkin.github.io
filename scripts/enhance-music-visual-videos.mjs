@@ -6,7 +6,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const REGISTRY_PATH = join(ROOT, 'data/music/artists.json');
 const DETAILS_ROOT = join(ROOT, 'data/music/artists');
 const MUSIC_ROOT = join(ROOT, 'music', 'artists');
-const PHOTO_STYLE_HREF = '/css/music-photo-archive.css?v=20260820-1';
+const PHOTO_STYLE_HREF = '/css/music-photo-archive.css?v=20260820-2';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;')
@@ -280,7 +280,7 @@ function renderGallery(gallery = []) {
 
   if (photos.length) {
     sections.push(`<section class="visual-archive-group visual-archive-group--photos">
-      ${renderArchiveHeader(videos.length ? '03B' : '03A', 'PHOTO ARCHIVE', '照片记录', '人物照片继续使用不对称画廊进行陈列。')}
+      ${renderArchiveHeader(videos.length ? '03B' : '03A', 'PHOTO ARCHIVE', '照片记录', '人物照片使用多列照片墙，保持原始比例完整陈列。')}
       <div class="visual-photo-grid">${photos.map(renderImage).join('')}</div>
     </section>`);
   }

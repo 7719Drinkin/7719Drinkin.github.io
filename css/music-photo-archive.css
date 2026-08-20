@@ -1,47 +1,90 @@
-/* Photo archives are display frames, not cover crops. Keep portraits fully visible
-   and reduce the wall's visual scale without changing video presentation. */
+/* Shared Music artist photo archive.
+   Photos keep their native aspect ratio and form a compact editorial masonry wall. */
 .visual-archive-group--photos .visual-photo-grid {
-  width: min(1040px, 100%);
+  display: block;
+  width: min(1180px, 100%);
   margin-inline: auto;
-  gap: 14px;
+  column-count: 4;
+  column-gap: 14px;
 }
 
-.visual-photo-grid .visual-card--photo {
-  display: grid;
-  min-height: 0;
-  aspect-ratio: 4 / 5;
-  place-items: center;
-  background:
-    radial-gradient(circle at 50% 34%, color-mix(in srgb, var(--artist-accent) 7%, transparent), transparent 52%),
-    color-mix(in srgb, var(--artist-bg) 94%, black);
-}
-
+.visual-photo-grid .visual-card--photo,
 .visual-photo-grid .visual-card--photo:nth-child(4n+1) {
-  aspect-ratio: 16 / 10;
+  display: block;
+  width: 100%;
+  min-height: 0;
+  margin: 0 0 14px;
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  grid-column: auto;
+  aspect-ratio: auto;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--music-line) 72%, transparent);
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
+  transition:
+    transform .32s cubic-bezier(.16, 1, .3, 1),
+    border-color .28s ease,
+    box-shadow .32s ease;
 }
 
 .visual-photo-grid .visual-card--photo img {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
   min-height: 0;
-  object-fit: contain;
-  object-position: center;
-  background: rgba(0, 0, 0, .12);
+  object-fit: initial;
+  object-position: initial;
+  background: transparent;
+  transform: none;
 }
 
-/* A photo archive should never crop an edge merely for a hover effect. */
+.visual-photo-grid .visual-card--photo:hover {
+  border-color: color-mix(in srgb, var(--artist-accent) 36%, var(--music-line));
+  box-shadow: 0 16px 38px rgba(0, 0, 0, .16);
+  transform: translateY(-2px);
+}
+
+/* Photo hover keeps the complete frame visible; only the card itself may lift. */
 .visual-photo-grid .visual-card--photo:hover img {
   transform: none;
 }
 
+.visual-photo-grid .visual-card--photo figcaption {
+  padding: 10px 12px 11px;
+  border-top: 1px solid var(--music-line);
+  background: color-mix(in srgb, var(--artist-bg) 94%, black);
+}
+
+@media (max-width: 1180px) {
+  .visual-archive-group--photos .visual-photo-grid {
+    column-count: 3;
+  }
+}
+
 @media (max-width: 760px) {
   .visual-archive-group--photos .visual-photo-grid {
-    width: min(100%, 520px);
+    width: 100%;
+    column-count: 2;
+    column-gap: 10px;
   }
 
   .visual-photo-grid .visual-card--photo,
   .visual-photo-grid .visual-card--photo:nth-child(4n+1) {
-    aspect-ratio: 4 / 5;
+    margin-bottom: 10px;
+    border-radius: 9px;
+  }
+}
+
+@media (max-width: 480px) {
+  .visual-archive-group--photos .visual-photo-grid {
+    column-count: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visual-photo-grid .visual-card--photo {
+    transition: none;
   }
 }
