@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "home": {
+    "heroBackground": null,
+    "heroPosition": "50% 50%"
+  },
+  "games": [],
+  "featured": {
+    "explore": [],
+    "moments": [],
+    "sound": [],
+    "memory": []
+  },
+  "recent": []
+}

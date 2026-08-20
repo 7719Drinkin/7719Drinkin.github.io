@@ -3,39 +3,129 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Games collection in 7719 Universe.">
-  <meta name="theme-color" content="#10283a">
+  <meta name="description" content="Games archive in 7719 Universe.">
+  <meta name="theme-color" content="#081824">
   <title>Games · 7719 Universe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/universe.css?v=20260730-1">
-  <link rel="stylesheet" href="/css/games-system.css?v=20260807-5">
+  <link rel="stylesheet" href="/css/games-system.css?v=20260820-structure-1">
 </head>
 <body class="theme-games interest-page games-page games-landing-page" data-site-module="games">
   <div class="games-hero-media" aria-hidden="true"></div>
 
-  <header class="universe-header">
-    <a class="universe-brand" href="/" aria-label="返回 7719 Universe">7719</a>
-    <nav class="universe-nav" aria-label="游戏收藏导航">
-      <a href="/">UNIVERSE</a>
-      <a href="/basketball/">BASKETBALL</a>
-      <a href="/music/">MUSIC</a>
+  <header class="universe-header games-site-header">
+    <div class="games-header-identity">
+      <a class="universe-brand" href="/" aria-label="返回 7719 Universe">7719</a>
+      <span class="games-header-divider" aria-hidden="true"></span>
+      <a class="games-header-channel" href="/games/" data-games-copy="channel">游戏</a>
+    </div>
+    <nav class="universe-nav games-primary-nav" aria-label="游戏页面导航">
+      <a href="#library" data-games-copy="navLibrary">游戏</a>
+      <a href="#explore" data-games-copy="navExplore">探索</a>
+      <a href="#moments" data-games-copy="navMoments">瞬间</a>
+      <a href="#sound" data-games-copy="navSound">声音</a>
+      <a href="#memory" data-games-copy="navMemory">足迹</a>
+      <a href="#recent" data-games-copy="navRecent">近来</a>
+      <button id="games-language-toggle" class="games-language-toggle" type="button" aria-label="切换语言">EN</button>
     </nav>
   </header>
 
   <main>
     <section class="games-hero" data-games-hero>
       <div class="games-hero-copy reveal">
-        <p class="games-eyebrow">02 / INTEREST</p>
+        <p class="games-hero-kicker">PERSONAL GAME ARCHIVE</p>
         <h1>GAMES</h1>
-        <span class="coming-soon-mark">COLLECTION IN DEVELOPMENT</span>
+        <p class="games-hero-lead" data-games-copy="heroLead">记录玩过的游戏、探索过的内容与留下的游玩记忆。</p>
+        <div class="games-hero-stats" aria-label="游戏档案统计">
+          <span><b data-games-count="games">00</b><i data-games-copy="statLibrary">游戏</i></span>
+          <span><b data-games-count="recent">00</b><i data-games-copy="statRecent">近来</i></span>
+        </div>
       </div>
+      <a class="games-enter-link" href="#library" data-games-copy="enterArchive">进入档案 ↓</a>
+    </section>
+
+    <section id="library" class="games-section games-section--library">
+      <div class="games-section-head reveal">
+        <div class="games-section-index"><span>01</span><b>LIBRARY</b></div>
+        <div class="games-section-title">
+          <h2 data-games-copy="libraryTitle">游戏</h2>
+          <p data-games-copy="libraryDescription">进入个人档案的游戏。具体作品是整个 Games 模块的核心入口。</p>
+        </div>
+        <strong data-games-count="games">00</strong>
+      </div>
+      <div class="games-library-grid" data-games-slot="library"></div>
+    </section>
+
+    <section id="explore" class="games-section games-section--explore">
+      <div class="games-section-head reveal">
+        <div class="games-section-index"><span>02</span><b>EXPLORE</b></div>
+        <div class="games-section-title">
+          <h2 data-games-copy="exploreTitle">探索</h2>
+          <p data-games-copy="exploreDescription">世界、人物、系统、车辆、阵营、地图或任何值得继续进入的内容。</p>
+        </div>
+        <strong data-games-count="explore">00</strong>
+      </div>
+      <div class="games-explore-grid" data-games-slot="explore"></div>
+    </section>
+
+    <section id="moments" class="games-section games-section--moments">
+      <div class="games-section-head reveal">
+        <div class="games-section-index"><span>03</span><b>MOMENTS</b></div>
+        <div class="games-section-title">
+          <h2 data-games-copy="momentsTitle">瞬间</h2>
+          <p data-games-copy="momentsDescription">剧情、战斗、风景与偶然截下来的画面。这里记录时间，而不是百科条目。</p>
+        </div>
+        <strong data-games-count="moments">00</strong>
+      </div>
+      <div class="games-moments-rail" data-games-slot="moments"></div>
+    </section>
+
+    <section id="sound" class="games-section games-section--sound">
+      <div class="games-section-head reveal">
+        <div class="games-section-index"><span>04</span><b>SOUND</b></div>
+        <div class="games-section-title">
+          <h2 data-games-copy="soundTitle">声音</h2>
+          <p data-games-copy="soundDescription">OST、主题曲、广播与游戏中反复听到的声音。</p>
+        </div>
+        <strong data-games-count="sound">00</strong>
+      </div>
+      <div class="games-sound-list" data-games-slot="sound"></div>
+    </section>
+
+    <section id="memory" class="games-section games-section--memory">
+      <div class="games-section-head reveal">
+        <div class="games-section-index"><span>05</span><b>MEMORY</b></div>
+        <div class="games-section-title">
+          <h2 data-games-copy="memoryTitle">足迹</h2>
+          <p data-games-copy="memoryDescription">完成、暂停、重返，以及真正属于自己的游玩记录。</p>
+        </div>
+        <strong data-games-count="memory">00</strong>
+      </div>
+      <div class="games-memory-list" data-games-slot="memory"></div>
+    </section>
+
+    <section id="recent" class="games-section games-section--recent">
+      <div class="games-section-head reveal">
+        <div class="games-section-index"><span>06</span><b>RECENT</b></div>
+        <div class="games-section-title">
+          <h2 data-games-copy="recentTitle">近来</h2>
+          <p data-games-copy="recentDescription">最近开始、完成、重返或留下新记录的游戏。</p>
+        </div>
+        <strong data-games-count="recent">00</strong>
+      </div>
+      <div class="games-recent-list" data-games-slot="recent"></div>
     </section>
   </main>
 
-  <footer class="universe-footer"><span>7719 / GAMES</span><a href="/">BACK TO UNIVERSE →</a></footer>
+  <footer class="universe-footer games-footer">
+    <span>7719 / GAMES</span>
+    <a href="/" data-games-copy="backUniverse">返回 UNIVERSE →</a>
+  </footer>
+
   <script src="/js/universe.js?v=20260730-1"></script>
+  <script src="/js/games.js?v=20260820-structure-1"></script>
   <script src="/js/games-motion.js?v=20260807-5"></script>
 </body>
 </html>
