@@ -19,7 +19,10 @@
     "status": "published",
     "order": 1,
     "cover": "/assets/Music/Artists/ZhangYusheng/hero/SingerPortrait_142_-7592093631785922030210.jpg",
-    "tags": ["华语流行", "创作歌手"],
+    "tags": [
+      "华语流行",
+      "创作歌手"
+    ],
     "theme": {
       "accent": "#d8a84e",
       "accentSoft": "#f1ddb0",
@@ -47,7 +50,10 @@
     "status": "published",
     "order": 2,
     "cover": "/assets/Music/Artists/TanYonglin/hero/SingerPortrait_149_-2694000341785996801988.jpg",
-    "tags": ["粤语流行", "经典流行"],
+    "tags": [
+      "粤语流行",
+      "经典流行"
+    ],
     "theme": {
       "accent": "#6ed4cc",
       "accentSoft": "#bcece6",
@@ -74,8 +80,11 @@
     "route": "/music/artists/zhang-guorong/",
     "status": "published",
     "order": 3,
-    "cover": null,
-    "tags": ["粤语流行", "舞台艺术"],
+    "cover": "/assets/Music/Artists/ZhangGuorong/hero/SingerPortrait_87_-16260585441787188441129.jpg",
+    "tags": [
+      "粤语流行",
+      "舞台艺术"
+    ],
     "theme": {
       "accent": "#d8879a",
       "accentSoft": "#f0c8d2",

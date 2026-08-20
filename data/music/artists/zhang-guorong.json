@@ -10,11 +10,45 @@
     "en": "A growing personal archive of Leslie Cheung's music, performances and visual memories."
   },
   "personalNote": {
-    "zh": "作品内容会随着素材整理逐步加入。",
-    "en": "Songs, albums and visual material will be added as the archive grows."
+    "zh": "目前先从人物影像开始整理；歌曲与专辑会在素材准备完成后逐步加入。",
+    "en": "The archive currently begins with portraits; songs and albums will be added as their materials are prepared."
   },
-  "heroImage": null,
+  "heroImage": "/assets/Music/Artists/ZhangGuorong/hero/SingerPortrait_87_-16260585441787188441129.jpg",
   "selectedSongs": [],
   "albums": [],
-  "gallery": []
+  "gallery": [
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-10788524771787188475080.jpg","alt":"张国荣人物影像收藏 01"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-1159097371787188476025.jpg","alt":"张国荣人物影像收藏 02"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-13816607641787188486827.jpg","alt":"张国荣人物影像收藏 03"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-16544364131787188442554.jpg","alt":"张国荣人物影像收藏 04"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-18929343561787188462362.jpg","alt":"张国荣人物影像收藏 05"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-20384392761787188453726.jpg","alt":"张国荣人物影像收藏 06"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-20608441001787188493965.jpg","alt":"张国荣人物影像收藏 07"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-3385625061787188463526.jpg","alt":"张国荣人物影像收藏 08"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-4016980601787188452458.jpg","alt":"张国荣人物影像收藏 09"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-4854291451787188488369.jpg","alt":"张国荣人物影像收藏 10"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-4997213361787188490927.jpg","alt":"张国荣人物影像收藏 11"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-6512584141787188469126.jpg","alt":"张国荣人物影像收藏 12"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-7234658111787188450600.jpg","alt":"张国荣人物影像收藏 13"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_-9828920571787188455971.jpg","alt":"张国荣人物影像收藏 14"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_10066087811787188445024.jpg","alt":"张国荣人物影像收藏 15"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_11257856921787188446779.jpg","alt":"张国荣人物影像收藏 16"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_11412746271787188491900.jpg","alt":"张国荣人物影像收藏 17"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_11530271221787188449510.jpg","alt":"张国荣人物影像收藏 18"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_11848174681787188470335.jpg","alt":"张国荣人物影像收藏 19"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_155710941787188457316.jpg","alt":"张国荣人物影像收藏 20"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_15732868271787188477847.jpg","alt":"张国荣人物影像收藏 21"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_17025719341787188454985.jpg","alt":"张国荣人物影像收藏 22"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_17307486451787188471404.jpg","alt":"张国荣人物影像收藏 23"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_17951018401787188492932.jpg","alt":"张国荣人物影像收藏 24"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_19556354081787188474223.jpg","alt":"张国荣人物影像收藏 25"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_3822055571787188459694.jpg","alt":"张国荣人物影像收藏 26"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_4016424351787188448364.jpg","alt":"张国荣人物影像收藏 27"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_4064880791787188476904.jpg","alt":"张国荣人物影像收藏 28"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_5218795341787188464633.jpg","alt":"张国荣人物影像收藏 29"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_6722013231787188465795.jpg","alt":"张国荣人物影像收藏 30"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_7296009591787188458187.jpg","alt":"张国荣人物影像收藏 31"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_7729635561787188472382.jpg","alt":"张国荣人物影像收藏 32"},
+    {"src":"/assets/Music/Artists/ZhangGuorong/gallery/SingerPortrait_87_8695984281787188473308.jpg","alt":"张国荣人物影像收藏 33"}
+  ]
 }
