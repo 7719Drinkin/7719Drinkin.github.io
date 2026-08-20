@@ -69,6 +69,8 @@ jobs:
           node --check scripts/build-music-i18n.mjs
           node --check scripts/embed-music-i18n-data.mjs
           node --check scripts/music/music-collection-repository.mjs
+          node --check scripts/music/music-library-repository.mjs
+          node --check scripts/validate-music-library.mjs
           node --check scripts/music/recent-listening-selector.mjs
           node --check scripts/music/runtime-playability-resolver.mjs
           node --check scripts/music/recent-listening-presenter.mjs
@@ -77,6 +79,8 @@ jobs:
           node --check scripts/update-music-recent-listening.mjs
           node --check scripts/validate-music-recent-listening.mjs
           node --test scripts/music/recent-listening.test.mjs
+          node --test scripts/music/music-library-repository.test.mjs
+          node scripts/validate-music-library.mjs
 
       - name: Select deployment path
         shell: bash
