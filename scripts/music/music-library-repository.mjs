@@ -76,6 +76,39 @@ export function createMusicLibraryRepository({ root, placeholderArtwork = null }
     return requireEntity(library.songById, songOrId, 'song');
   };
 
+  const materializeAlbum = async (albumOrId, language = 'zh') => {
+    const library = await loadLibrary();
+    const album = typeof albumOrId === 'string'
+      ? requireEntity(library.albumById, albumOrId, 'album')
+      : albumOrId;
+    if (!album) return album;
+    return {
+      ...album,
+      title: localized(album.title, language)
+    };
+  };
+
+  const materializeSong = async (songOrId, language = 'zh') => {
+    const library = await loadLibrary();
+    const song = typeof songOrId === 'string'
+      ? requireEntity(library.songById, songOrId, 'song')
+      : songOrId;
+    if (!song) return song;
+    const album = song.albumId ? library.albumById.get(song.albumId) ?? null : null;
+    return {
+      ...song,
+      title: localized(song.title, language),
+      album: album ? localized(album.title, language) : '',
+      year: song.year ?? song.releaseDate ?? null
+    };
+  };
+
+  const hydrateArtistDetail = async (detail, language = 'zh') => ({
+    ...detail,
+    selectedSongs: await Promise.all((detail?.selectedSongs ?? []).map((song) => materializeSong(song, language))),
+    albums: await Promise.all((detail?.albums ?? []).map((album) => materializeAlbum(album, language)))
+  });
+
   return {
     async getAllSongs() {
       return (await loadLibrary()).songs;
@@ -101,6 +134,18 @@ export function createMusicLibraryRepository({ root, placeholderArtwork = null }
     async getAlbums(ids = []) {
       const library = await loadLibrary();
       return ids.map((id) => requireEntity(library.albumById, id, 'album'));
+    },
+
+    async materializeSong(songOrId, language = 'zh') {
+      return materializeSong(songOrId, language);
+    },
+
+    async materializeAlbum(albumOrId, language = 'zh') {
+      return materializeAlbum(albumOrId, language);
+    },
+
+    async hydrateArtistDetail(detail, language = 'zh') {
+      return hydrateArtistDetail(detail, language);
     },
 
     async getArtistProfile(artistKey) {

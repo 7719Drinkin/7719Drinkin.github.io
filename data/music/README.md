@@ -23,6 +23,6 @@ A missing profile is therefore valid and does not make the song or album incompl
 
 ## Migration state
 
-Phase 1 introduces the canonical `songs.json` / `albums.json`, repository and validator only. Existing artist detail files still contain legacy inline `selectedSongs` and `albums` objects during this phase. `scripts/validate-music-library.mjs` accepts those objects in compatibility mode and reports them as migration warnings. `--strict-references` will be enabled after the artist details are migrated to ID references.
+Phase 2 has migrated all current artist detail files to canonical song/album ID references. `scripts/validate-music-library.mjs --strict-references` is now the source-data gate. The current page-generation scripts still consume the historical inline shape, so `scripts/materialize-music-artist-details.mjs` temporarily projects canonical IDs into renderer-compatible objects during the build and restores the canonical source files immediately afterward. This projection is a migration boundary only; canonical JSON remains the source of truth.
 
 See `docs/music-library-refactor.md` for the staged plan and round-by-round review log.

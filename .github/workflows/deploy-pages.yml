@@ -70,6 +70,7 @@ jobs:
           node --check scripts/embed-music-i18n-data.mjs
           node --check scripts/music/music-collection-repository.mjs
           node --check scripts/music/music-library-repository.mjs
+          node --check scripts/materialize-music-artist-details.mjs
           node --check scripts/validate-music-library.mjs
           node --check scripts/music/recent-listening-selector.mjs
           node --check scripts/music/runtime-playability-resolver.mjs
@@ -80,7 +81,7 @@ jobs:
           node --check scripts/validate-music-recent-listening.mjs
           node --test scripts/music/recent-listening.test.mjs
           node --test scripts/music/music-library-repository.test.mjs
-          node scripts/validate-music-library.mjs
+          node scripts/validate-music-library.mjs --strict-references
 
       - name: Select deployment path
         shell: bash
@@ -103,6 +104,7 @@ jobs:
         run: |
           node scripts/build-music-i18n.mjs
           node --check js/music-i18n.js
+          node scripts/materialize-music-artist-details.mjs apply
           cp music/index.html /tmp/music-index.manual.html
           node scripts/build-music-pages.mjs
           cp /tmp/music-index.manual.html music/index.html
@@ -124,6 +126,8 @@ jobs:
           node scripts/validate-anime-catalog.mjs
           node scripts/validate-music-recent-listening.mjs
           node scripts/validate-music-runtime.mjs
+          node scripts/materialize-music-artist-details.mjs restore
+          node scripts/validate-music-library.mjs --strict-references
 
       - name: Publish pull request preview
         if: github.event_name == 'pull_request'

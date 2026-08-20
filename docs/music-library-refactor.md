@@ -27,9 +27,10 @@ These rules must hold throughout the refactor:
 | --- | --- | --- |
 | `scripts/build-music-pages.mjs` | Reads artist detail `selectedSongs`, `albums`, `gallery` | Phase 2: resolve song/album IDs through shared library repository; gallery remains artist-owned |
 | `scripts/enhance-music-albums.mjs` | Reads inline `selectedSongs` and `albums`; generates existing artist album routes | Phase 2: resolve canonical IDs while preserving generated routes and DOM |
-| `scripts/music/music-collection-repository.mjs` | Walks profile artists and flattens each detail's `selectedSongs` | Phase 3: switch LISTENING/recent selection to global song library |
-| `scripts/update-music-recent-listening.mjs` + recent-listening modules | Consume collection repository output | Phase 3: behavior changes only after global LISTENING exists |
+| `scripts/music/music-collection-repository.mjs` | Walks profile artists and flattens each detail's `selectedSongs` | Phase 2 build projection keeps its current input stable; Phase 3 switches LISTENING/recent selection to the global song library |
+| `scripts/update-music-recent-listening.mjs` + recent-listening modules | Consume collection repository output | Phase 2 build projection preserves current behavior; Phase 3 changes the source only after global LISTENING exists |
 | `data/music/catalog.json` / `js/music-catalog.js` | Runtime prefix lookup is currently keyed by artist slug/key | Preserve through Phases 1–3; later formalize as artist-key mapping without requiring a profile |
+| `scripts/embed-music-i18n-data.mjs` | Reads inline song/album fields for embedded page data | Phase 2 build projection preserves the legacy input shape until the compatibility boundary is removed |
 | `scripts/enhance-music-visual-videos.mjs` | Uses artist `gallery` | No canonical song/album migration required |
 | `scripts/patch-music-header.mjs` | Uses artist registry/profile data | No canonical song/album migration required |
 | `assets/Music/Artists/<Artist>/albums/` | Current album-cover location | Phase 4: copy to `assets/Music/Albums/...`, verify, then delete legacy copies in a later deployment |
@@ -95,7 +96,7 @@ Scope:
 - [x] Add tests proving an artist reference can exist without a profile page.
 - [x] Add tests for artwork fallback and broken album references.
 - [x] Add CI syntax/test/validation commands.
-- [ ] PR workflow passes on the branch.
+- [x] PR workflow passes on the branch (run 601).
 
 Must not happen in Round 1:
 
@@ -105,15 +106,32 @@ Must not happen in Round 1:
 - [x] No `/music/listening/` page.
 - [x] No catalog/R2 behavior change.
 
+#### Round 1 review
+
+Result: **PASS**. PR workflow run 601 completed successfully. The branch diff contained only the canonical empty library, repository, validator/tests, documentation and CI checks. No artist detail, assets, page markup, catalog mapping or runtime behavior changed. `main` remained on the pre-refactor commit after the PR preview step.
+
 ### Round 2 — Phase 2: migrate existing artist data
 
-- Extract current inline albums into `albums.json`.
-- Extract current selected songs into `songs.json`.
-- Convert the three current artist detail files to ID references.
-- Update page builders/enhancers to resolve IDs through the shared repository.
-- Preserve current artist routes, album routes, Header, player, R2 behavior and visual output.
-- Enable `--strict-references` only after all three profiles contain IDs rather than inline objects.
-- Compare generated behavior and branch diff against the invariants before proceeding.
+After the Round 1 audit, one implementation detail was adjusted: four independent build consumers still expect inline song/album objects. Patching all of them in the same migration round would widen the visual/regression surface. Round 2 therefore introduces one temporary build projection: canonical ID-based artist details are materialized into the old renderer shape only inside the build workspace, then restored before final validation. This preserves the planned canonical source model while keeping current page generators unchanged. The projection is reviewed for removal in Round 5.
+
+- [x] Extract current inline albums into `albums.json`.
+- [x] Extract current selected songs into `songs.json`.
+- [x] Convert all three current artist detail files to ID references.
+- [x] Preserve existing Tan album fallback slugs/routes (`7890`, `lorelei`, `album-XX`) through canonical IDs/projection.
+- [x] Add canonical → legacy build projection using the shared repository.
+- [x] Restore canonical detail JSON after Music generation.
+- [x] Enable `--strict-references` for source validation.
+- [x] Preserve current artist routes, album routes, Header, player, R2 behavior and visual archive inputs.
+- [x] Unit-test canonical detail hydration and strict reference validation.
+- [ ] PR workflow passes for Round 2.
+
+Must not happen in Round 2:
+
+- [x] No album asset move.
+- [x] No `/music/listening/` page.
+- [x] No global recent-listening semantic change.
+- [x] No catalog/R2 mapping change.
+- [x] No Music visual redesign.
 
 ### Round 3 — Phase 3: global LISTENING
 

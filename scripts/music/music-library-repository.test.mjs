@@ -109,10 +109,22 @@ test('validator accepts canonical references and rejects unknown album reference
   assert.deepEqual(valid.errors, []);
 
   const songsPath = join(root, 'data/music/songs.json');
-  const document = JSON.parse(await readFile(songsPath, 'utf8'));
+  const document = JSON.parse(await (await import('node:fs/promises')).readFile(songsPath, 'utf8'));
   document.songs[0].albumId = 'missing-album';
   await writeJson(songsPath, document);
 
   const invalid = await validateMusicLibrary({ root, strictReferences: true });
   assert.ok(invalid.errors.some((error) => error.includes('unknown albumId: missing-album')));
+});
+
+test('artist detail hydration projects canonical ids back to legacy renderer objects', async () => {
+  const root = await createFixture();
+  const repository = createMusicLibraryRepository({ root });
+  const detail = JSON.parse(await readFile(join(root, 'data/music/artists/zhang-guorong.json'), 'utf8'));
+  const hydrated = await repository.hydrateArtistDetail(detail);
+
+  assert.equal(hydrated.selectedSongs[0].title, '歌曲一');
+  assert.equal(hydrated.selectedSongs[0].album, '专辑一');
+  assert.equal(hydrated.albums[0].title, '专辑一');
+  assert.equal(hydrated.albums[0].slug, undefined);
 });
