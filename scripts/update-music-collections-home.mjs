@@ -6,7 +6,7 @@ import { createMusicLibraryRepository } from './music/music-library-repository.m
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const INDEX_PATH = join(ROOT, 'music/index.html');
-const STYLE_HREF = '/css/music-home-collections.css?v=20260821-3';
+const STYLE_HREF = '/css/music-home-collections.css?v=20260821-4';
 const SECTION_PATTERN = /<section id="(?:listening|collections)" class="music-content-section (?:collection-listening|collection-curations)">[\s\S]*?<\/section>/;
 
 const escapeHtml = (value = '') => String(value)
