@@ -6,7 +6,7 @@ import { createMusicLibraryRepository } from './music/music-library-repository.m
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const INDEX_PATH = join(ROOT, 'music/index.html');
-const STYLE_HREF = '/css/music-home-collections.css?v=20260821-5';
+const STYLE_HREF = '/css/music-home-collections.css?v=20260821-6';
 const SECTION_PATTERN = /<section id="(?:listening|collections)" class="music-content-section (?:collection-listening|collection-curations)">[\s\S]*?<\/section>/;
 
 const escapeHtml = (value = '') => String(value)
@@ -25,6 +25,12 @@ const renderLocalized = (value) => {
   const zh = localized(value, 'zh');
   const en = localized(value, 'en') || zh;
   return `<span class="music-lang-zh">${escapeHtml(zh)}</span><span class="music-lang-en">${escapeHtml(en)}</span>`;
+};
+
+const renderBilingualPrimaryAttributes = (value) => {
+  const zh = localized(value, 'zh');
+  const en = localized(value, 'en') || zh;
+  return `data-music-bilingual-role="primary" data-music-zh="${escapeHtml(zh)}" data-music-en="${escapeHtml(en)}" lang="zh-CN"`;
 };
 
 function installStyle(html) {
@@ -58,7 +64,7 @@ async function renderCollectionCard({ registryEntry, repository, library }) {
 
   return `<a class="collection-curation-card reveal" href="${escapeHtml(collection.route)}" data-music-collection-card="${escapeHtml(collection.id)}">
     <div class="collection-curation-copy">
-      <h3>${renderLocalized(collection.title)}</h3>
+      <h3 ${renderBilingualPrimaryAttributes(collection.title)}>${renderLocalized(collection.title)}</h3>
     </div>
     ${renderArtworkStack(artworks)}
     <div class="collection-curation-meta">

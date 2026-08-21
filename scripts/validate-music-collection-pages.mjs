@@ -22,11 +22,11 @@ async function main() {
   assert(collections.length === 1, `Current Music scope expects exactly one published collection; got ${collections.length}.`);
   assert(collections[0].id === 'recently-curated', `Published collection must be recently-curated; got ${collections[0].id}.`);
 
-  const [home, listening, homeCollectionStyles, designSystemStyles] = await Promise.all([
+  const [home, listening, homeCollectionStyles, i18nStyles] = await Promise.all([
     read('music/index.html'),
     read('music/listening/index.html'),
     read('css/music-home-collections.css'),
-    read('css/music-design-system.css')
+    read('css/music-i18n.css')
   ]);
 
   assert(home.includes('id="collections"'), 'Music home must expose the Collections section.');
@@ -35,28 +35,32 @@ async function main() {
   assert(home.includes('>COLLECTIONS<'), 'Music home header must identify COLLECTIONS.');
   assert(home.includes('data-music-collection-card="recently-curated"'), 'Music home must render the Recently Curated collection entry.');
   assert(home.includes('href="/music/collections/recently-curated/"'), 'Music home collection entry must link to Recently Curated.');
-  assert(home.includes('/css/music-home-collections.css?v=20260821-5'), 'Music home must load the current Collections stylesheet version.');
+  assert(home.includes('/css/music-home-collections.css?v=20260821-6'), 'Music home must load the current Collections stylesheet version.');
+  assert(home.includes('data-music-i18n-runtime'), 'Music home must load the Music i18n runtime that styles bilingual artist names.');
+  assert(home.includes('data-music-i18n-style'), 'Music home must load the Music i18n stylesheet that defines the artist-name Chinese display font.');
   assert(home.includes('<h2><span class="music-lang-zh">专栏</span><span class="music-lang-en">COLLECTIONS</span></h2>'), 'Music home Collections heading must be language-aware.');
-  assert(home.includes('<h3><span class="music-lang-zh">最近整理</span><span class="music-lang-en">Recently Curated</span></h3>'), 'Music home collection title must be language-aware.');
+  assert(home.includes('data-music-bilingual-role="primary" data-music-zh="最近整理" data-music-en="Recently Curated" lang="zh-CN"'), 'Music home collection title must use the same bilingual runtime path as artist names.');
+  assert(home.includes('<span class="music-lang-zh">最近整理</span><span class="music-lang-en">Recently Curated</span>'), 'Music home collection title must preserve no-JS bilingual fallback content.');
   assert(!home.includes('02 / COLLECTIONS'), 'Music home must not retain decorative Collections numbering.');
   assert(!home.includes('歌曲不单独陈列，而是在专栏里形成自己的次序与语境。'), 'Music home must not retain the redundant Collections manifesto copy.');
   assert(!home.includes('DYNAMIC COLLECTION'), 'Music home must not expose implementation-type microcopy.');
   assert(!home.includes('VIEW ALL SONGS'), 'Music home must not retain the all-songs Listening CTA.');
   assert(!home.includes('href="/music/listening/"'), 'Music home must not expose the retired Listening archive route.');
 
-  const artistTitleRule = cssRuleBody(designSystemStyles, '.collection-artist-copy h3');
   const collectionTitleRule = cssRuleBody(homeCollectionStyles, 'body.music-page .collection-curation-copy h3');
-  assert(artistTitleRule, 'Music design system must define the homepage artist-name typography rule.');
-  assert(collectionTitleRule, 'Music Collections stylesheet must define the higher-specificity Collection title rule.');
-  for (const declaration of [
-    'font-family: var(--music-serif-zh);',
-    'font-weight: 600;',
-    'letter-spacing: -.035em;'
-  ]) {
-    assert(artistTitleRule.includes(declaration), `Artist-name typography is missing ${declaration}`);
-    assert(collectionTitleRule.includes(declaration), `Collection title must match artist-name typography: missing ${declaration}`);
-  }
-  assert(!collectionTitleRule.includes('font-family: var(--music-serif);'), 'Collection title must not fall back to the old mixed Latin/Sans font token.');
+  assert(collectionTitleRule, 'Music Collections stylesheet must define the Collection title fallback rule.');
+  assert(
+    collectionTitleRule.includes('font-family: var(--music-font-zh-display, var(--music-serif-zh, "Noto Serif SC", "Cormorant Garamond", serif));'),
+    'Collection title fallback must resolve through the same Chinese display font token used by Music i18n.'
+  );
+  assert(collectionTitleRule.includes('font-size: clamp(30px, 3.4vw, 44px);'), 'Collection title desktop size must stay within the revised editorial scale.');
+  assert(collectionTitleRule.includes('font-weight: 600;'), 'Collection title must preserve the artist-name weight.');
+  assert(collectionTitleRule.includes('letter-spacing: .01em;'), 'Collection title fallback tracking must match the final Music i18n primary style.');
+
+  const primaryZhRule = cssRuleBody(i18nStyles, '.music-page [data-music-bilingual-role="primary"][lang="zh-CN"]');
+  assert(primaryZhRule, 'Music i18n must define the primary Chinese bilingual typography rule used by artist names.');
+  assert(primaryZhRule.includes('font-family: var(--music-font-zh-display) !important;'), 'Primary Chinese bilingual typography must force the Music Chinese display font.');
+  assert(primaryZhRule.includes('letter-spacing: .01em !important;'), 'Primary Chinese bilingual typography must preserve the artist-name tracking.');
 
   assert(listening.includes('data-listening-compat="collections"'), 'Legacy /music/listening/ must be a Collections compatibility route.');
   assert(listening.includes('href="/music/collections/recently-curated/"'), 'Listening compatibility route must link to Recently Curated.');
@@ -98,7 +102,7 @@ async function main() {
   }
   assert(!directoryIndexExists, 'Do not create a /music/collections/ directory page while only one collection exists.');
 
-  console.log(`Validated Music Collection pages: ${collections.map((collection) => collection.id).join(', ')}; language-aware UI, artist-matched Collection typography, and reveal runtime confirmed.`);
+  console.log(`Validated Music Collection pages: ${collections.map((collection) => collection.id).join(', ')}; Collection title now shares the artist-name bilingual typography runtime.`);
 }
 
 main().catch((error) => {
