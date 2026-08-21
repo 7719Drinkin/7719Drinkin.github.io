@@ -15,17 +15,19 @@ Current scope is deliberately narrow: only `RECENTLY CURATED / 最近整理` exi
 - Do not change existing `curatedAt` values or song ordering during the migration.
 - Do not change Artist, Album, Visual Archive, catalog/R2, or unrelated site behavior.
 
-## Round 1 — Collection foundation
+## Round 1 — Collection foundation — PASS
 
-- [ ] Add `data/music/collections.json` with only `recently-curated`.
-- [ ] Add `data/music/collections/recently-curated.json`.
-- [ ] Extend `music-collection-repository.mjs` with collection registry/detail access.
-- [ ] Add a small dynamic collection resolver.
-- [ ] Preserve current Recently Curated semantics: `curatedAt desc`, primary-artist distinctness, legacy fallback, limit 3.
-- [ ] Add parity tests against the existing Recent Listening selector.
-- [ ] Add collection validation and CI checks.
-- [ ] Keep Music homepage, Header, `/music/listening/`, and all visual output unchanged.
-- [ ] Run complete PR workflow and review this round against the plan.
+- [x] Add `data/music/collections.json` with only `recently-curated`.
+- [x] Add `data/music/collections/recently-curated.json`.
+- [x] Extend `music-collection-repository.mjs` with collection registry/detail access.
+- [x] Add a small dynamic collection resolver.
+- [x] Preserve current Recently Curated semantics: `curatedAt desc`, primary-artist distinctness, legacy fallback, limit 3.
+- [x] Add parity tests against the existing Recent Listening selector.
+- [x] Add collection validation and CI checks.
+- [x] Keep Music homepage, Header, `/music/listening/`, and all visual output unchanged.
+- [x] Run complete PR workflow and review this round against the plan.
+
+Validation: PR workflow #614 PASS. The new dynamic resolver and the old Recent Listening selector produce the same selected song IDs for the guarded parity fixture. Existing Recent Listening, Listening archive, Music runtime, canonical library, album asset, and catalog checks also continue to pass.
 
 ## Round 2 — Public Collections switch
 
