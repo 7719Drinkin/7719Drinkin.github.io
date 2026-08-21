@@ -54,11 +54,13 @@ Validation: workflow #616 reached the fully generated Collections state but fail
 
 Validation: PR workflow #619 PASS. The Collection generator now owns the legacy `/music/listening/` compatibility page and points it to `/music/collections/recently-curated/`; the 11-song archive renderer is no longer generated. The old Listening and Recent Listening generator/selector/presenter/renderer/validator/test chain was removed after dependency audit. The dynamic resolver test now freezes the preserved Recently Curated behavior directly, so no legacy selector remains as a test dependency. Music runtime, canonical library, Collection validation, album assets, catalog identity/config, generated pages, site revision, and persistent shell validation all continue to pass.
 
-## Final audit
+## Final audit — PASS
 
-- [ ] Compare the final branch against the then-current `main`.
-- [ ] Confirm only planned Music Collections changes are present.
-- [ ] Confirm no song/album/artist/catalog data was invented or silently reclassified.
-- [ ] Confirm existing Artist and Album routes remain valid.
-- [ ] Confirm the final PR workflow passes.
-- [ ] Merge only after all checks pass.
+- [x] Compare the final branch against the then-current `main`.
+- [x] Confirm only planned Music Collections changes are present.
+- [x] Confirm no song/album/artist/catalog data was invented or silently reclassified.
+- [x] Confirm existing Artist and Album routes remain valid.
+- [x] Confirm the final PR workflow passes.
+- [x] Merge only after all checks pass.
+
+Validation: final branch-vs-main comparison is a clean forward series from `e74552c9ed023079711b091dacf4478ab24910a5`; the diff contains only the planned Collections data/config, Music presentation/build/validation changes, documentation, and retirement of the old Listening/Recent chain. Canonical `songs.json` is byte-identical to `main`, and `albums.json`, `artists.json`, and `catalog.json` are absent from the diff. The current branch head differs from workflow-validated code commit `6c9448ab850e9445db74b3ae6ac9eb264974856f` only by validation documentation. PR #89 is mergeable; the merge gate is satisfied.
