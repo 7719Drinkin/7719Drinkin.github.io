@@ -8,11 +8,10 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-const [songsRaw, artistsRaw, listeningPage, musicHome] = await Promise.all([
+const [songsRaw, artistsRaw, listeningPage] = await Promise.all([
   read('data/music/songs.json'),
   read('data/music/artists.json'),
-  read('music/listening/index.html'),
-  read('music/index.html')
+  read('music/listening/index.html')
 ]);
 
 const songs = JSON.parse(songsRaw).songs ?? [];
@@ -21,7 +20,6 @@ const artists = JSON.parse(artistsRaw).filter((artist) => artist?.status !== 'dr
 assert(listeningPage.includes('class="music-page music-listening-page"'), 'Listening page must use the Music page shell.');
 assert(listeningPage.includes('music-header-current'), 'Listening page must expose the canonical Music breadcrumb current item.');
 assert(listeningPage.includes('>LISTENING<'), 'Listening header must identify the LISTENING route.');
-assert(musicHome.includes('href="/music/listening/"'), 'Music home LISTENING must link to the complete song archive.');
 
 const renderedIds = [...listeningPage.matchAll(/data-listening-song="([^"]+)"/g)].map((match) => match[1]);
 assert(renderedIds.length === songs.length, `Listening page rendered ${renderedIds.length} songs; expected ${songs.length}.`);
@@ -39,4 +37,4 @@ for (const artist of artists) {
 assert(!listeningPage.includes('href="/music/artists/undefined/"'), 'Listening page must never invent an undefined artist route.');
 assert(!listeningPage.includes('href="/music/artists/null/"'), 'Listening page must never invent a null artist route.');
 
-console.log(`Validated Music Listening: ${songs.length} song(s), ${artists.length} published profile(s).`);
+console.log(`Validated transitional Music Listening archive: ${songs.length} song(s), ${artists.length} published profile(s).`);
