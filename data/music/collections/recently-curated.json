@@ -1,0 +1,18 @@
+{
+  "id": "recently-curated",
+  "title": {
+    "zh": "最近整理",
+    "en": "Recently Curated"
+  },
+  "description": {
+    "zh": "最近加入音乐收藏的记录。",
+    "en": "Recently added to the music collection."
+  },
+  "source": {
+    "field": "curatedAt",
+    "order": "desc",
+    "limit": 3,
+    "distinctBy": "primaryArtist",
+    "legacyFallback": true
+  }
+}

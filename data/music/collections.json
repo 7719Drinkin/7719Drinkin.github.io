@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "collections": [
+    {
+      "id": "recently-curated",
+      "route": "/music/collections/recently-curated/",
+      "type": "dynamic",
+      "status": "published",
+      "order": 1
+    }
+  ]
+}
