@@ -163,15 +163,30 @@ Result: **PASS**. PR workflow run 604 completed successfully. The global collect
 
 Deployment A:
 
-- Create `assets/Music/Albums/<artist-key>/`, `soundtracks/`, and `various-artists/` as actually needed.
-- Copy existing covers to their canonical locations.
-- Point `albums.json` to the new paths.
-- Keep old artist-owned album files temporarily.
+- [x] Create only the actually needed canonical directories: `assets/Music/Albums/zhang-yusheng/` and `assets/Music/Albums/tan-yonglin/`.
+- [x] Copy all 55 existing covers to their canonical locations by reusing the exact existing Git blobs.
+- [x] Point all canonical `albums.json` cover paths to `assets/Music/Albums/...`.
+- [x] Keep old artist-owned album files during Deployment A.
+- [x] Add album-asset validation that requires both canonical covers and legacy copies during Deployment A.
+- [x] PR workflow passes for Deployment A (run 606).
 
 Deployment B, only after verification:
 
-- Delete legacy `assets/Music/Artists/<Artist>/albums/` copies.
-- Keep `Artists/` for person-specific `hero/` and `gallery/` assets.
+- [x] Delete legacy `assets/Music/Artists/ZhangYusheng/albums/` and `assets/Music/Artists/TanYonglin/albums/` after Deployment A passed.
+- [x] Keep canonical `assets/Music/Albums/...` trees unchanged.
+- [x] Change validation to forbid legacy album copies from returning.
+- [x] PR workflow passes for Deployment B (run 607).
+
+Must not happen in Round 4:
+
+- [x] No lossy re-upload or transformation of album images.
+- [x] No empty `soundtracks/` or `various-artists/` directory created without actual content.
+- [x] No song data, artist profile or catalog/R2 mapping change.
+- [x] No Music visual redesign.
+
+#### Round 4 review
+
+Result: **PASS**. Deployment A workflow run 606 proved the copy stage with all 55 canonical covers present while every legacy copy still existed. Deployment B was created only after that success; workflow run 607 then passed with the legacy directories removed and CI switched to `--forbid-legacy-copies`. The canonical directories reuse the exact original Git blobs, so image bytes did not change. No empty soundtrack/compilation directories, song content, artist profile, catalog mapping, R2 behavior or visual redesign was introduced.
 
 ### Round 5 — Phase 5: cleanup
 
