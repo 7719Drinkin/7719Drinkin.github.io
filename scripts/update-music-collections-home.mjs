@@ -6,7 +6,7 @@ import { createMusicLibraryRepository } from './music/music-library-repository.m
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const INDEX_PATH = join(ROOT, 'music/index.html');
-const STYLE_HREF = '/css/music-home-collections.css?v=20260821-1';
+const STYLE_HREF = '/css/music-home-collections.css?v=20260821-2';
 const SECTION_PATTERN = /<section id="(?:listening|collections)" class="music-content-section (?:collection-listening|collection-curations)">[\s\S]*?<\/section>/;
 
 const escapeHtml = (value = '') => String(value)
@@ -19,6 +19,12 @@ const escapeHtml = (value = '') => String(value)
 const localized = (value, language = 'zh') => {
   if (typeof value === 'string') return value;
   return value?.[language] ?? value?.zh ?? value?.en ?? '';
+};
+
+const renderLocalized = (value) => {
+  const zh = localized(value, 'zh');
+  const en = localized(value, 'en') || zh;
+  return `<span class="music-lang-zh">${escapeHtml(zh)}</span><span class="music-lang-en">${escapeHtml(en)}</span>`;
 };
 
 function installStyle(html) {
@@ -40,7 +46,7 @@ function renderArtworkStack(artworks) {
     .join('')}</div>`;
 }
 
-async function renderCollectionCard({ registryEntry, repository, library, index }) {
+async function renderCollectionCard({ registryEntry, repository, library }) {
   const collection = await repository.getCollection(registryEntry.id);
   const songs = await repository.resolveCollectionSongs(collection.id);
   const artworks = [];
@@ -50,24 +56,13 @@ async function renderCollectionCard({ registryEntry, repository, library, index 
     if (artwork) artworks.push(artwork);
   }
 
-  const titleEn = localized(collection.title, 'en') || collection.id;
-  const titleZh = localized(collection.title, 'zh') || titleEn;
-  const descriptionZh = localized(collection.description, 'zh');
-  const descriptionEn = localized(collection.description, 'en') || descriptionZh;
-  const typeLabel = collection.type === 'dynamic' ? 'DYNAMIC COLLECTION' : 'EDITORIAL COLLECTION';
-
   return `<a class="collection-curation-card reveal" href="${escapeHtml(collection.route)}" data-music-collection-card="${escapeHtml(collection.id)}">
-    <span class="collection-curation-index">${String(index + 1).padStart(2, '0')}</span>
     <div class="collection-curation-copy">
-      <p>${typeLabel}</p>
-      <h3>${escapeHtml(titleEn)}</h3>
-      <strong>${escapeHtml(titleZh)}</strong>
-      <span><span class="music-lang-zh">${escapeHtml(descriptionZh)}</span><span class="music-lang-en">${escapeHtml(descriptionEn)}</span></span>
+      <h3>${renderLocalized(collection.title)}</h3>
     </div>
     ${renderArtworkStack(artworks)}
     <div class="collection-curation-meta">
-      <span>${String(songs.length).padStart(2, '0')} TRACKS</span>
-      <em>${collection.type === 'dynamic' ? 'LIVE' : 'EDIT'}</em>
+      <span><span class="music-lang-zh">${songs.length} 首</span><span class="music-lang-en">${String(songs.length).padStart(2, '0')} TRACKS</span></span>
       <b aria-hidden="true">↗</b>
     </div>
   </a>`;
@@ -80,17 +75,13 @@ export async function buildCollectionsHomeSection({ root = ROOT } = {}) {
   if (!collections.length) throw new Error('Music Collections home requires at least one published collection.');
 
   const cards = [];
-  for (const [index, collection] of collections.entries()) {
-    cards.push(await renderCollectionCard({ registryEntry: collection, repository, library, index }));
+  for (const collection of collections) {
+    cards.push(await renderCollectionCard({ registryEntry: collection, repository, library }));
   }
 
   return `<section id="collections" class="music-content-section collection-curations">
       <header class="collection-curations-header reveal">
-        <div>
-          <p>02 / COLLECTIONS</p>
-          <h2>专栏</h2>
-        </div>
-        <span><span class="music-lang-zh">歌曲不单独陈列，而是在专栏里形成自己的次序与语境。</span><span class="music-lang-en">Songs are organized through collections, each with its own order and context.</span></span>
+        <h2><span class="music-lang-zh">专栏</span><span class="music-lang-en">COLLECTIONS</span></h2>
       </header>
       <div class="collection-curation-list">
         ${cards.join('\n        ')}

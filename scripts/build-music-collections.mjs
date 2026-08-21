@@ -1,12 +1,13 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { MUSIC_BOOTSTRAP_SRC } from './music-runtime-config.mjs';
 import { createMusicCollectionRepository } from './music/music-collection-repository.mjs';
 import { createMusicLibraryRepository } from './music/music-library-repository.mjs';
 import { createRuntimePlayabilityResolver } from './music/runtime-playability-resolver.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const STYLE_HREF = '/css/music-collections.css?v=20260821-1';
+const STYLE_HREF = '/css/music-collections.css?v=20260821-2';
 const LISTENING_COMPAT_ROUTE = '/music/listening/';
 const RECENT_COLLECTION_ID = 'recently-curated';
 
@@ -29,12 +30,6 @@ const renderLocalized = (value) => {
 };
 
 const routeOutputPath = (root, route) => join(root, String(route).replace(/^\/+/, ''), 'index.html');
-
-function renderHeroTitle(title) {
-  const words = String(title || '').trim().split(/\s+/).filter(Boolean);
-  if (words.length < 2) return `<span>${escapeHtml(words[0] || 'Collection')}</span>`;
-  return `<span>${escapeHtml(words[0])}</span><strong>${escapeHtml(words.slice(1).join(' '))}</strong>`;
-}
 
 async function prepareSongRow({ entry, index, library, resolvePlayable }) {
   const song = await library.getSong(entry.songId);
@@ -68,7 +63,10 @@ export function renderCollectionSongRow(row) {
     : null;
   const action = primaryProfile?.route
     ? `<a class="collection-track-action" href="${escapeHtml(primaryProfile.route)}#songs"><span class="music-lang-zh">进入歌手页</span><span class="music-lang-en">OPEN ARTIST</span><b aria-hidden="true">↗</b></a>`
-    : `<span class="collection-track-state"><span class="music-lang-zh">收藏记录</span><span class="music-lang-en">ARCHIVE</span></span>`;
+    : `<span class="collection-track-state"><span class="music-lang-zh">收藏</span><span class="music-lang-en">ARCHIVE</span></span>`;
+  const state = row.playable
+    ? '<span class="music-lang-zh">可播放</span><span class="music-lang-en">PLAYABLE</span>'
+    : '<span class="music-lang-zh">收藏</span><span class="music-lang-en">ARCHIVE</span>';
 
   return `<article class="collection-track-row reveal" data-collection-song="${escapeHtml(row.song.id)}">
     <span class="collection-track-index">${String(row.index + 1).padStart(2, '0')}</span>
@@ -78,12 +76,12 @@ export function renderCollectionSongRow(row) {
       <div class="collection-track-artists">${artistHtml}</div>
     </div>
     <div class="collection-track-album">
-      <small>ALBUM</small>
+      <small><span class="music-lang-zh">专辑</span><span class="music-lang-en">ALBUM</span></small>
       <p>${albumTitle}</p>
     </div>
     <p class="collection-track-note">${escapeHtml(row.song.note ?? '')}</p>
     <div class="collection-track-meta">
-      <em>${row.playable ? 'PLAYABLE' : 'ARCHIVE'}</em>
+      <em>${state}</em>
       ${action}
     </div>
   </article>`;
@@ -178,22 +176,17 @@ export async function buildMusicCollections({ root = ROOT } = {}) {
   <main>
     <section class="collection-detail-hero">
       <div class="collection-detail-hero-copy reveal">
-        <p class="music-eyebrow">02 / COLLECTION</p>
-        <h1>${renderHeroTitle(titleEn)}</h1>
-        <h2>${escapeHtml(titleZh)}</h2>
+        <h1>${renderLocalized(collection.title)}</h1>
         <p class="collection-detail-description">${description}</p>
       </div>
       <aside class="collection-detail-stats reveal" aria-label="专栏统计">
-        <div><strong>${songs.length}</strong><span>TRACKS</span></div>
-        <div><strong>${collection.type === 'dynamic' ? 'LIVE' : 'EDIT'}</strong><span>CURATION</span></div>
-        <p>CURATED, NOT COMPLETE.</p>
+        <div><strong>${songs.length}</strong><span><span class="music-lang-zh">首歌曲</span><span class="music-lang-en">TRACKS</span></span></div>
       </aside>
     </section>
 
     <section id="tracks" class="music-content-section collection-detail-tracks">
       <header class="collection-detail-section-header reveal">
-        <div><p>TRACK LIST</p><h2><span class="music-lang-zh">歌曲</span><span class="music-lang-en">TRACKS</span></h2></div>
-        <span>${description}</span>
+        <h2><span class="music-lang-zh">歌曲</span><span class="music-lang-en">TRACKS</span></h2>
       </header>
       <div class="collection-track-list">
         ${rows.map(renderCollectionSongRow).join('\n        ')}
@@ -205,7 +198,8 @@ export async function buildMusicCollections({ root = ROOT } = {}) {
     </section>
   </main>
 
-  <footer class="music-site-footer"><span>7719 / MUSIC / COLLECTIONS</span><span>${escapeHtml(titleEn.toUpperCase())}</span></footer>
+  <footer class="music-site-footer"><span>7719 / MUSIC / COLLECTIONS</span><span>${renderLocalized(collection.title)}</span></footer>
+  <script src="${MUSIC_BOOTSTRAP_SRC}"></script>
   <script src="/js/music-header.js?v=20260818-5"></script>
 </body>
 </html>
