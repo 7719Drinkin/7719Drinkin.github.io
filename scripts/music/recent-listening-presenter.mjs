@@ -11,9 +11,11 @@ export async function presentRecentListening(entries, {
   return Promise.all(entries.map(async (entry, index) => ({
     index: String(index + 1).padStart(2, '0'),
     title: entry.title,
-    artist: entry.artistNameEn,
+    artist: entry.artistNameEn || entry.artistNameZh,
     note: entry.note,
-    href: `${entry.artistRoute}#songs`,
+    href: entry.artistRoute
+      ? `${entry.artistRoute}#songs`
+      : `/music/listening/#${encodeURIComponent(entry.songId)}`,
     status: await resolvePlayable(entry) ? 'PLAYABLE' : 'ARCHIVE',
     curatedAt: entry.curatedAt
   })));

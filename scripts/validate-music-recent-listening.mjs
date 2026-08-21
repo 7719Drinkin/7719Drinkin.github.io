@@ -21,26 +21,26 @@ async function main() {
 
   for (const song of datedSongs) {
     if (!Number.isFinite(curatedTimestamp(song))) {
-      throw new Error(`Invalid curatedAt: ${song.artistId} / ${song.title} / ${song.curatedAt}`);
+      throw new Error(`Invalid curatedAt: ${song.artistKey} / ${song.title} / ${song.curatedAt}`);
     }
   }
 
   const identities = new Set();
   for (const song of selectedSongs) {
-    const identity = `${song.artistId}\u0000${song.album}\u0000${song.title}`;
-    if (identities.has(identity)) throw new Error(`Duplicate selected song: ${song.artistId} / ${song.title}`);
+    const identity = `${song.artistKey}\u0000${song.album}\u0000${song.title}`;
+    if (identities.has(identity)) throw new Error(`Duplicate selected song: ${song.artistKey} / ${song.title}`);
     identities.add(identity);
   }
 
   const recent = selectRecentListening(selectedSongs, { limit: RECENT_LIMIT });
-  const artistIds = new Set(selectedSongs.map((song) => song.artistId));
-  if (recent.length !== Math.min(RECENT_LIMIT, artistIds.size)) {
+  const artistKeys = new Set(selectedSongs.map((song) => song.artistKey));
+  if (recent.length !== Math.min(RECENT_LIMIT, artistKeys.size)) {
     throw new Error('Recent Listening selector returned an unexpected number of artist rows.');
   }
 
-  const recentArtistIds = recent.map((song) => song.artistId);
-  if (new Set(recentArtistIds).size !== recentArtistIds.length) {
-    throw new Error('Recent Listening must contain at most one song per artist.');
+  const recentArtistKeys = recent.map((song) => song.artistKey);
+  if (new Set(recentArtistKeys).size !== recentArtistKeys.length) {
+    throw new Error('Recent Listening must contain at most one song per artist identity key.');
   }
 
   const source = await readFile(INDEX_PATH, 'utf8');

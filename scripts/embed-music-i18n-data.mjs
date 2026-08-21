@@ -1,12 +1,14 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createMusicLibraryRepository } from './music/music-library-repository.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MUSIC_ROOT = join(ROOT, 'music');
 const DETAILS_ROOT = join(ROOT, 'data', 'music', 'artists');
 const REGISTRY_PATH = join(ROOT, 'data', 'music', 'artists.json');
 const MUSIC_I18N_VERSION = '20260807-3';
+const library = createMusicLibraryRepository({ root: ROOT });
 
 const fallbackAlbumSlug = (album, index) => {
   const ascii = String(album.title || '')
@@ -103,7 +105,8 @@ async function main() {
   let albumPages = 0;
 
   for (const artist of registry) {
-    const detail = JSON.parse(await readFile(join(DETAILS_ROOT, `${artist.slug}.json`), 'utf8'));
+    const canonicalDetail = JSON.parse(await readFile(join(DETAILS_ROOT, `${artist.slug}.json`), 'utf8'));
+    const detail = await library.hydrateArtistDetail(canonicalDetail, 'zh');
     const artistData = compactArtist(artist);
     const detailData = compactDetail(detail);
 
@@ -133,7 +136,7 @@ async function main() {
     }
   }
 
-  console.log(`Embedded Music i18n data into 1 collection page, ${artistPages} artist page(s) and ${albumPages} album page(s).`);
+  console.log(`Embedded Music i18n data into 1 collection page, ${artistPages} artist page(s) and ${albumPages} album page(s) from canonical references.`);
 }
 
 main().catch((error) => {

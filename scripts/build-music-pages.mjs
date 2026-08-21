@@ -1,11 +1,13 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createMusicLibraryRepository } from './music/music-library-repository.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const registryPath = join(ROOT, 'data/music/artists.json');
 const detailsDir = join(ROOT, 'data/music/artists');
 const musicRoot = join(ROOT, 'music');
+const library = createMusicLibraryRepository({ root: ROOT });
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;')
@@ -387,9 +389,9 @@ async function main() {
 
   const detailsById = new Map();
   for (const artist of published) {
-    const detail = JSON.parse(await readFile(join(detailsDir, `${artist.slug}.json`), 'utf8'));
-    if (detail.id !== artist.id) throw new Error(`Detail id mismatch for ${artist.id}`);
-    detailsById.set(artist.id, detail);
+    const canonicalDetail = JSON.parse(await readFile(join(detailsDir, `${artist.slug}.json`), 'utf8'));
+    if (canonicalDetail.id !== artist.id) throw new Error(`Detail id mismatch for ${artist.id}`);
+    detailsById.set(artist.id, await library.hydrateArtistDetail(canonicalDetail, 'zh'));
   }
 
   await mkdir(musicRoot, { recursive: true });
@@ -401,7 +403,7 @@ async function main() {
     await writeFile(output, renderArtistPage(artist, detailsById.get(artist.id), published), 'utf8');
   }
 
-  console.log(`Generated Music collection and ${published.length} artist pages.`);
+  console.log(`Generated Music collection and ${published.length} artist pages from canonical song/album references.`);
 }
 
 main().catch((error) => {

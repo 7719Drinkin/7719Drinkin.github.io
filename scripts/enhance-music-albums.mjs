@@ -1,11 +1,13 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createMusicLibraryRepository } from './music/music-library-repository.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MUSIC_ROOT = join(ROOT, 'music');
 const DETAILS_ROOT = join(ROOT, 'data/music/artists');
 const REGISTRY_PATH = join(ROOT, 'data/music/artists.json');
+const library = createMusicLibraryRepository({ root: ROOT });
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;')
@@ -120,7 +122,7 @@ function enhanceArtistPage(html, artist, detail) {
 
   html = html.replace(
     /<body class="music-page music-artist-page"/,
-    `<body class="music-page music-artist-page" data-music-catalog-page="artist" data-artist-slug="${escapeHtml(artist.slug)}"`
+    `<body class="music-page music-artist-page" data-music-catalog-page="artist" data-artist-key="${escapeHtml(artist.id)}" data-artist-slug="${escapeHtml(artist.slug)}"`
   );
 
   html = html.replace(
@@ -192,6 +194,7 @@ function renderAlbumPage(artist, album, index) {
 </head>
 <body class="music-page music-artist-page music-album-page"
   data-music-catalog-page="album"
+  data-artist-key="${escapeHtml(artist.id)}"
   data-artist-slug="${escapeHtml(artist.slug)}"
   data-album-name="${escapeHtml(catalogName)}"
   style="--artist-accent:${escapeHtml(artist.theme.accent)};--artist-accent-soft:${escapeHtml(artist.theme.accentSoft)};--artist-bg:${escapeHtml(artist.theme.background)};--artist-fg:${escapeHtml(artist.theme.foreground)}">
@@ -242,7 +245,8 @@ async function main() {
   let albumPageCount = 0;
 
   for (const artist of registry.filter((entry) => entry.status !== 'draft')) {
-    const detail = JSON.parse(await readFile(join(DETAILS_ROOT, `${artist.slug}.json`), 'utf8'));
+    const canonicalDetail = JSON.parse(await readFile(join(DETAILS_ROOT, `${artist.slug}.json`), 'utf8'));
+    const detail = await library.hydrateArtistDetail(canonicalDetail, 'zh');
     const artistPagePath = join(MUSIC_ROOT, 'artists', artist.slug, 'index.html');
     let artistHtml = await readFile(artistPagePath, 'utf8');
     artistHtml = enhanceArtistPage(artistHtml, artist, detail);
@@ -256,7 +260,7 @@ async function main() {
     }
   }
 
-  console.log(`Enhanced Music artist pages and generated ${albumPageCount} album pages.`);
+  console.log(`Enhanced Music artist pages and generated ${albumPageCount} album pages from canonical album references.`);
 }
 
 main().catch((error) => {

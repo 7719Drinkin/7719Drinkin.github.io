@@ -67,8 +67,17 @@ jobs:
           node --check scripts/install-site-shell.mjs
           node --check scripts/patch-music-header.mjs
           node --check scripts/build-music-i18n.mjs
+          node --check scripts/build-music-pages.mjs
+          node --check scripts/build-music-listening-page.mjs
+          node --check scripts/enhance-music-albums.mjs
           node --check scripts/embed-music-i18n-data.mjs
           node --check scripts/music/music-collection-repository.mjs
+          node --check scripts/music/music-library-repository.mjs
+          node --check scripts/validate-music-library.mjs
+          node --check scripts/validate-music-listening.mjs
+          node --check scripts/validate-music-album-assets.mjs
+          node --check scripts/validate-music-catalog-config.mjs
+          node --check scripts/validate-music-catalog-identity.mjs
           node --check scripts/music/recent-listening-selector.mjs
           node --check scripts/music/runtime-playability-resolver.mjs
           node --check scripts/music/recent-listening-presenter.mjs
@@ -77,6 +86,13 @@ jobs:
           node --check scripts/update-music-recent-listening.mjs
           node --check scripts/validate-music-recent-listening.mjs
           node --test scripts/music/recent-listening.test.mjs
+          node --test scripts/music/music-library-repository.test.mjs
+          node --test scripts/music/music-collection-repository.test.mjs
+          node --test scripts/music/music-listening.test.mjs
+          node --test scripts/music/runtime-playability-resolver.test.mjs
+          node scripts/validate-music-library.mjs
+          node scripts/validate-music-album-assets.mjs --forbid-legacy-copies
+          node scripts/validate-music-catalog-config.mjs
 
       - name: Select deployment path
         shell: bash
@@ -103,6 +119,7 @@ jobs:
           node scripts/build-music-pages.mjs
           cp /tmp/music-index.manual.html music/index.html
           node scripts/update-music-recent-listening.mjs
+          node scripts/build-music-listening-page.mjs
           node scripts/enhance-music-albums.mjs
           node scripts/enhance-music-visual-videos.mjs
           node scripts/refine-music-playlists.mjs
@@ -119,7 +136,12 @@ jobs:
           node scripts/validate-site-revision.mjs
           node scripts/validate-anime-catalog.mjs
           node scripts/validate-music-recent-listening.mjs
+          node scripts/validate-music-listening.mjs
           node scripts/validate-music-runtime.mjs
+          node scripts/validate-music-catalog-identity.mjs
+          node scripts/validate-music-library.mjs
+          node scripts/validate-music-album-assets.mjs --forbid-legacy-copies
+          node scripts/validate-music-catalog-config.mjs
 
       - name: Publish pull request preview
         if: github.event_name == 'pull_request'

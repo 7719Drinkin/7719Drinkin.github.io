@@ -29,7 +29,7 @@ const sortDatedEntries = (entries, compare) => entries
 export function selectRecentListening(entries, {
   limit = 3,
   compare = byCuratedAtDescending,
-  distinctBy = (entry) => entry?.artistId
+  distinctBy = (entry) => entry?.artistKey
 } = {}) {
   if (!Array.isArray(entries)) {
     throw new TypeError('RecentListeningSelector expects an array.');
@@ -54,15 +54,11 @@ export function selectRecentListening(entries, {
       continue;
     }
     if (!Number.isFinite(timestamp)) {
-      throw new Error(`Invalid curatedAt for ${entry?.artistId ?? 'unknown artist'} / ${entry?.title ?? 'unknown song'}: ${entry?.curatedAt}`);
+      throw new Error(`Invalid curatedAt for ${entry?.artistKey ?? 'unknown artist'} / ${entry?.title ?? 'unknown song'}: ${entry?.curatedAt}`);
     }
     dated.push(entry);
   }
 
-  // Recent Listening is artist-diverse by design. Dated entries are ranked first;
-  // legacy undated artists remain eligible as a migration fallback so one newly
-  // timestamped artist cannot monopolize the homepage while older curation data
-  // is being backfilled.
   const ordered = [
     ...sortDatedEntries(dated, compare),
     ...legacy.slice().sort(bySourceOrder)
