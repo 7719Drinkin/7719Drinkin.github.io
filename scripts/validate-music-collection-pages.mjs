@@ -28,6 +28,11 @@ async function main() {
   assert(home.includes('>COLLECTIONS<'), 'Music home header must identify COLLECTIONS.');
   assert(home.includes('data-music-collection-card="recently-curated"'), 'Music home must render the Recently Curated collection entry.');
   assert(home.includes('href="/music/collections/recently-curated/"'), 'Music home collection entry must link to Recently Curated.');
+  assert(home.includes('<h2><span class="music-lang-zh">专栏</span><span class="music-lang-en">COLLECTIONS</span></h2>'), 'Music home Collections heading must be language-aware.');
+  assert(home.includes('<h3><span class="music-lang-zh">最近整理</span><span class="music-lang-en">Recently Curated</span></h3>'), 'Music home collection title must be language-aware.');
+  assert(!home.includes('02 / COLLECTIONS'), 'Music home must not retain decorative Collections numbering.');
+  assert(!home.includes('歌曲不单独陈列，而是在专栏里形成自己的次序与语境。'), 'Music home must not retain the redundant Collections manifesto copy.');
+  assert(!home.includes('DYNAMIC COLLECTION'), 'Music home must not expose implementation-type microcopy.');
   assert(!home.includes('VIEW ALL SONGS'), 'Music home must not retain the all-songs Listening CTA.');
   assert(!home.includes('href="/music/listening/"'), 'Music home must not expose the retired Listening archive route.');
 
@@ -46,6 +51,11 @@ async function main() {
     assert(page.includes('music-header-current'), `Collection ${collection.id} must expose the canonical Music breadcrumb.`);
     assert(page.includes('>RECENTLY CURATED<'), `Collection ${collection.id} header must identify RECENTLY CURATED.`);
     assert(page.includes('href="/music/#collections"'), `Collection ${collection.id} must return to the Music Collections section.`);
+    assert(page.includes('/js/music.js?v='), `Collection ${collection.id} must load the Music reveal runtime.`);
+    assert(page.includes('<h1><span class="music-lang-zh">最近整理</span><span class="music-lang-en">Recently Curated</span></h1>'), `Collection ${collection.id} hero title must be language-aware.`);
+    assert(!page.includes('02 / COLLECTION'), `Collection ${collection.id} must not retain decorative Collection numbering.`);
+    assert(!page.includes('CURATED, NOT COMPLETE.'), `Collection ${collection.id} must not retain editorial filler copy.`);
+    assert(!page.includes('TRACK LIST'), `Collection ${collection.id} must not retain redundant track-list microcopy.`);
 
     const renderedIds = [...page.matchAll(/data-collection-song="([^"]+)"/g)].map((match) => match[1]);
     assert(renderedIds.length === resolvedSongs.length, `Collection ${collection.id} rendered ${renderedIds.length} songs; expected ${resolvedSongs.length}.`);
@@ -66,7 +76,7 @@ async function main() {
   }
   assert(!directoryIndexExists, 'Do not create a /music/collections/ directory page while only one collection exists.');
 
-  console.log(`Validated Music Collection pages: ${collections.map((collection) => collection.id).join(', ')}; legacy Listening route redirects to Collections.`);
+  console.log(`Validated Music Collection pages: ${collections.map((collection) => collection.id).join(', ')}; language-aware UI and reveal runtime confirmed.`);
 }
 
 main().catch((error) => {
