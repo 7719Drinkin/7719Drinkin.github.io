@@ -74,6 +74,7 @@ jobs:
           node --check scripts/materialize-music-artist-details.mjs
           node --check scripts/validate-music-library.mjs
           node --check scripts/validate-music-listening.mjs
+          node --check scripts/validate-music-album-assets.mjs
           node --check scripts/music/recent-listening-selector.mjs
           node --check scripts/music/runtime-playability-resolver.mjs
           node --check scripts/music/recent-listening-presenter.mjs
@@ -86,6 +87,7 @@ jobs:
           node --test scripts/music/music-collection-repository.test.mjs
           node --test scripts/music/music-listening.test.mjs
           node scripts/validate-music-library.mjs --strict-references
+          node scripts/validate-music-album-assets.mjs --require-legacy-copies
 
       - name: Select deployment path
         shell: bash
@@ -134,6 +136,7 @@ jobs:
           node scripts/validate-music-runtime.mjs
           node scripts/materialize-music-artist-details.mjs restore
           node scripts/validate-music-library.mjs --strict-references
+          node scripts/validate-music-album-assets.mjs --require-legacy-copies
 
       - name: Publish pull request preview
         if: github.event_name == 'pull_request'
