@@ -7,6 +7,8 @@ import { createRuntimePlayabilityResolver } from './music/runtime-playability-re
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const STYLE_HREF = '/css/music-collections.css?v=20260821-1';
+const LISTENING_COMPAT_ROUTE = '/music/listening/';
+const RECENT_COLLECTION_ID = 'recently-curated';
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;')
@@ -85,6 +87,43 @@ export function renderCollectionSongRow(row) {
       ${action}
     </div>
   </article>`;
+}
+
+function renderListeningCompatibilityPage(targetRoute) {
+  const target = escapeHtml(targetRoute);
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="0; url=${target}">
+  <meta name="robots" content="noindex">
+  <title>Listening moved · Music · 7719 Universe</title>
+  <link rel="stylesheet" href="/css/music.css?v=20260805-2">
+  <link rel="stylesheet" href="${STYLE_HREF}">
+  <style>
+    .music-listening-compat-page main{display:grid;min-height:100svh;place-content:center;padding:96px 24px;text-align:center}.music-listening-compat-page h1{margin:20px 0 0;font-family:var(--music-serif);font-size:clamp(58px,10vw,132px);font-weight:600;line-height:.86;letter-spacing:-.06em}.music-listening-compat-page h2{margin:22px 0 0;color:var(--music-gold-soft);font-family:var(--music-serif);font-size:clamp(22px,3vw,38px);font-weight:500}.music-listening-compat-page p:not(.music-eyebrow){max-width:34em;margin:20px auto 0;color:var(--music-muted);font-size:13px;line-height:1.8}.music-listening-compat-page a{display:inline-flex;margin:28px auto 0;padding-bottom:7px;border-bottom:1px solid rgba(216,168,78,.5);color:var(--music-gold-soft);font:10px/1.4 var(--music-mono);letter-spacing:.1em;text-decoration:none}
+  </style>
+</head>
+<body class="music-page music-listening-compat-page" data-listening-compat="collections">
+  <main>
+    <p class="music-eyebrow">LISTENING / MOVED</p>
+    <h1>Collections</h1>
+    <h2>歌曲已整理至专栏</h2>
+    <p>Listening 不再作为完整歌曲目录展示。歌曲现在从专栏进入。</p>
+    <a href="${target}">进入最近整理 <b aria-hidden="true">↗</b></a>
+  </main>
+  <script>window.location.replace(${JSON.stringify(targetRoute)});</script>
+</body>
+</html>
+`;
+}
+
+async function writeListeningCompatibilityPage(root, targetRoute) {
+  const outputPath = routeOutputPath(root, LISTENING_COMPAT_ROUTE);
+  await mkdir(dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, renderListeningCompatibilityPage(targetRoute), 'utf8');
+  return outputPath;
 }
 
 export async function buildMusicCollections({ root = ROOT } = {}) {
@@ -178,8 +217,12 @@ export async function buildMusicCollections({ root = ROOT } = {}) {
     outputs.push({ collection, songs, outputPath });
   }
 
-  console.log(`Built ${outputs.length} Music Collection page(s): ${outputs.map(({ collection, songs }) => `${collection.id} (${songs.length})`).join(', ')}`);
-  return outputs;
+  const recent = outputs.find(({ collection }) => collection.id === RECENT_COLLECTION_ID);
+  if (!recent) throw new Error(`Music Collections requires published ${RECENT_COLLECTION_ID} for the Listening compatibility route.`);
+  const compatibilityPath = await writeListeningCompatibilityPage(root, recent.collection.route);
+
+  console.log(`Built ${outputs.length} Music Collection page(s): ${outputs.map(({ collection, songs }) => `${collection.id} (${songs.length})`).join(', ')}; Listening compatibility route -> ${recent.collection.route}`);
+  return { outputs, compatibilityPath };
 }
 
 async function main() {

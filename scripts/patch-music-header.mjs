@@ -41,10 +41,6 @@ function renderArtistHeader(artist) {
   return `<header class="music-site-header">\n    ${renderIdentity(nameZh, nameEn)}\n    <nav class="music-site-nav" aria-label="${escapeHtml(nameZh)}收藏导航">\n      <a href="#overview"><span class="music-lang-zh">概览</span><span class="music-lang-en">OVERVIEW</span></a>\n      <a href="#songs"><span class="music-lang-zh">歌曲</span><span class="music-lang-en">SONGS</span></a>\n      <a href="#albums"><span class="music-lang-zh">专辑</span><span class="music-lang-en">ALBUMS</span></a>\n      <a href="#gallery"><span class="music-lang-zh">影像</span><span class="music-lang-en">VISUAL</span></a>\n    </nav>\n  </header>`;
 }
 
-function renderListeningHeader() {
-  return `<header class="music-site-header">\n    ${renderIdentity('聆听', 'Listening')}\n    <nav class="music-site-nav" aria-label="聆听页面导航">\n      <a href="#tracks"><span class="music-lang-zh">歌曲</span><span class="music-lang-en">SONGS</span></a>\n      <a href="/music/#artists"><span class="music-lang-zh">歌手</span><span class="music-lang-en">ARTISTS</span></a>\n    </nav>\n  </header>`;
-}
-
 function renderCollectionHeader(collection) {
   const titleZh = localized(collection.title, 'zh');
   const titleEn = localized(collection.title, 'en');
@@ -90,12 +86,6 @@ async function main() {
     'music/index.html'
   );
 
-  await patchFile(
-    join(MUSIC_ROOT, 'listening', 'index.html'),
-    renderListeningHeader(),
-    'music/listening/index.html'
-  );
-
   for (const artist of artists) {
     const file = join(MUSIC_ROOT, 'artists', artist.slug, 'index.html');
     await patchFile(file, renderArtistHeader(artist), artist.route || artist.slug);
@@ -107,7 +97,7 @@ async function main() {
     await patchFile(file, renderCollectionHeader(detail), collection.route || collection.id);
   }
 
-  console.log(`Patched canonical Music header on landing, listening, ${artists.length} artist page(s), and ${collections.length} collection page(s).`);
+  console.log(`Patched canonical Music header on landing, ${artists.length} artist page(s), and ${collections.length} collection page(s). Listening remains a compatibility redirect outside the public Music IA.`);
 }
 
 main().catch((error) => {

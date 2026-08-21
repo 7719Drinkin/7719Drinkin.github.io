@@ -31,7 +31,9 @@ Collections are the public organization layer for songs. They never duplicate ca
 - `editorial` collections store an ordered array of canonical song IDs.
 - collection membership does not determine whether an artist profile exists.
 
-The first published collection is `recently-curated`. During the migration it intentionally preserves the existing Recent Listening contract: sort by `curatedAt` descending, keep at most one song per primary artist, use legacy source order as fallback, and limit the result to three songs. The public Music homepage is not switched to Collections until this new resolver is proven equivalent to the current Recent Listening selector.
+The first published collection is `recently-curated`. Its dynamic resolver owns the frozen Recently Curated contract: sort by `curatedAt` descending, keep at most one song per primary artist, use legacy source order as fallback, and limit the result to three songs. The Music homepage exposes Collections instead of a standalone song-listing concept.
+
+`/music/listening/` is retained only as a compatibility URL and redirects to `/music/collections/recently-curated/`; it is not part of the public Music information architecture and does not render the complete canonical song library.
 
 ## Canonical reference boundary
 

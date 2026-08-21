@@ -14,8 +14,8 @@ const routePath = (route) => join(String(route).replace(/^\/+/, ''), 'index.html
 async function main() {
   const repository = createMusicCollectionRepository({ root: ROOT });
   const collections = await repository.getVisibleCollections();
-  assert(collections.length === 1, `Round 2 expects exactly one published collection; got ${collections.length}.`);
-  assert(collections[0].id === 'recently-curated', `Round 2 published collection must be recently-curated; got ${collections[0].id}.`);
+  assert(collections.length === 1, `Current Music scope expects exactly one published collection; got ${collections.length}.`);
+  assert(collections[0].id === 'recently-curated', `Published collection must be recently-curated; got ${collections[0].id}.`);
 
   const [home, listening] = await Promise.all([
     read('music/index.html'),
@@ -23,15 +23,19 @@ async function main() {
   ]);
 
   assert(home.includes('id="collections"'), 'Music home must expose the Collections section.');
-  assert(!home.includes('id="listening"'), 'Music home must no longer expose the old Listening section.');
+  assert(!home.includes('id="listening"'), 'Music home must not expose the old Listening section.');
   assert(home.includes('href="#collections"'), 'Music home header must link to #collections.');
   assert(home.includes('>COLLECTIONS<'), 'Music home header must identify COLLECTIONS.');
   assert(home.includes('data-music-collection-card="recently-curated"'), 'Music home must render the Recently Curated collection entry.');
   assert(home.includes('href="/music/collections/recently-curated/"'), 'Music home collection entry must link to Recently Curated.');
   assert(!home.includes('VIEW ALL SONGS'), 'Music home must not retain the all-songs Listening CTA.');
+  assert(!home.includes('href="/music/listening/"'), 'Music home must not expose the retired Listening archive route.');
 
-  assert(listening.includes('class="music-page music-listening-page"'), 'Round 2 must keep the existing Listening archive available.');
-  assert(listening.includes('>LISTENING<'), 'Round 2 Listening compatibility archive must retain its current header.');
+  assert(listening.includes('data-listening-compat="collections"'), 'Legacy /music/listening/ must be a Collections compatibility route.');
+  assert(listening.includes('href="/music/collections/recently-curated/"'), 'Listening compatibility route must link to Recently Curated.');
+  assert(listening.includes('window.location.replace("/music/collections/recently-curated/")'), 'Listening compatibility route must redirect to Recently Curated.');
+  assert(!listening.includes('data-listening-song='), 'Listening compatibility route must not render the retired all-songs archive.');
+  assert(!listening.includes('music-listening-page'), 'Listening compatibility route must not retain the old Listening page shell.');
 
   for (const collectionEntry of collections) {
     const collection = await repository.getCollection(collectionEntry.id);
@@ -60,9 +64,9 @@ async function main() {
   } catch {
     directoryIndexExists = false;
   }
-  assert(!directoryIndexExists, 'Round 2 must not create a /music/collections/ directory page while only one collection exists.');
+  assert(!directoryIndexExists, 'Do not create a /music/collections/ directory page while only one collection exists.');
 
-  console.log(`Validated Music Collection pages: ${collections.map((collection) => collection.id).join(', ')}; Listening archive retained for transition.`);
+  console.log(`Validated Music Collection pages: ${collections.map((collection) => collection.id).join(', ')}; legacy Listening route redirects to Collections.`);
 }
 
 main().catch((error) => {

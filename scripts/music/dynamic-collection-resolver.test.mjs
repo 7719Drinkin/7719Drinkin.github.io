@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { resolveDynamicCollection, validateDynamicCollectionSource } from './dynamic-collection-resolver.mjs';
-import { selectRecentListening } from './recent-listening-selector.mjs';
 
 const RECENT_SOURCE = {
   field: 'curatedAt',
@@ -11,7 +10,7 @@ const RECENT_SOURCE = {
   legacyFallback: true
 };
 
-test('dynamic Recently Curated resolver preserves the current Recent Listening selection contract', () => {
+test('dynamic Recently Curated resolver preserves the frozen selection contract', () => {
   const entries = [
     { songId: 'dated-a-1', artistKey: 'artist-a', title: 'dated a first', curatedAt: '2026-08-14T14:00:00+08:00', sourceOrder: 0 },
     { songId: 'dated-a-2', artistKey: 'artist-a', title: 'dated a second', curatedAt: '2026-08-14T14:00:00+08:00', sourceOrder: 1 },
@@ -20,11 +19,10 @@ test('dynamic Recently Curated resolver preserves the current Recent Listening s
     { songId: 'legacy-c', artistKey: 'artist-c', title: 'legacy c', curatedAt: '', sourceOrder: 4 }
   ];
 
-  const oldResult = selectRecentListening(entries, { limit: RECENT_SOURCE.limit });
-  const newResult = resolveDynamicCollection(entries, RECENT_SOURCE);
+  const result = resolveDynamicCollection(entries, RECENT_SOURCE);
   assert.deepEqual(
-    newResult.map((entry) => entry.songId),
-    oldResult.map((entry) => entry.songId)
+    result.map((entry) => entry.songId),
+    ['dated-a-1', 'legacy-b-1', 'legacy-c']
   );
 });
 
