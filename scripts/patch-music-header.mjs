@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MUSIC_ROOT = join(ROOT, 'music');
 const ARTIST_REGISTRY = join(ROOT, 'data/music/artists.json');
+const COLLECTION_REGISTRY = join(ROOT, 'data/music/collections.json');
+const COLLECTION_DETAILS_ROOT = join(ROOT, 'data/music/collections');
 const HEADER_STYLE_HREF = '/css/music-header.css?v=20260818-5';
 const HEADER_SCRIPT_SRC = '/js/music-header.js?v=20260818-5';
 
@@ -29,7 +31,7 @@ function renderIdentity(currentZh = '', currentEn = '') {
 }
 
 function renderLandingHeader() {
-  return `<header class="music-site-header">\n    ${renderIdentity()}\n    <nav class="music-site-nav" aria-label="音乐收藏导航">\n      <a href="#artists"><span class="music-lang-zh">歌手</span><span class="music-lang-en">ARTISTS</span></a>\n      <a href="#listening"><span class="music-lang-zh">聆听</span><span class="music-lang-en">LISTENING</span></a>\n    </nav>\n  </header>`;
+  return `<header class="music-site-header">\n    ${renderIdentity()}\n    <nav class="music-site-nav" aria-label="音乐收藏导航">\n      <a href="#artists"><span class="music-lang-zh">歌手</span><span class="music-lang-en">ARTISTS</span></a>\n      <a href="#collections"><span class="music-lang-zh">专栏</span><span class="music-lang-en">COLLECTIONS</span></a>\n    </nav>\n  </header>`;
 }
 
 function renderArtistHeader(artist) {
@@ -41,6 +43,12 @@ function renderArtistHeader(artist) {
 
 function renderListeningHeader() {
   return `<header class="music-site-header">\n    ${renderIdentity('聆听', 'Listening')}\n    <nav class="music-site-nav" aria-label="聆听页面导航">\n      <a href="#tracks"><span class="music-lang-zh">歌曲</span><span class="music-lang-en">SONGS</span></a>\n      <a href="/music/#artists"><span class="music-lang-zh">歌手</span><span class="music-lang-en">ARTISTS</span></a>\n    </nav>\n  </header>`;
+}
+
+function renderCollectionHeader(collection) {
+  const titleZh = localized(collection.title, 'zh');
+  const titleEn = localized(collection.title, 'en');
+  return `<header class="music-site-header">\n    ${renderIdentity(titleZh, titleEn)}\n    <nav class="music-site-nav" aria-label="${escapeHtml(titleZh)}专栏导航">\n      <a href="#tracks"><span class="music-lang-zh">歌曲</span><span class="music-lang-en">TRACKS</span></a>\n      <a href="/music/#artists"><span class="music-lang-zh">歌手</span><span class="music-lang-en">ARTISTS</span></a>\n    </nav>\n  </header>`;
 }
 
 function replaceHeader(html, replacement, label) {
@@ -57,8 +65,6 @@ function installHeaderAssets(html) {
   if (!output.includes('</head>')) throw new Error('Cannot install Music header stylesheet: </head> missing.');
   if (!output.includes('</body>')) throw new Error('Cannot install Music header script: </body> missing.');
 
-  // Deliberately install these last so music-design-system.css cannot override
-  // the canonical header dimensions, typography or spacing.
   output = output.replace('</head>', `  <link rel="stylesheet" href="${HEADER_STYLE_HREF}">\n</head>`);
   output = output.replace('</body>', `  <script src="${HEADER_SCRIPT_SRC}"></script>\n</body>`);
   return output;
@@ -70,9 +76,13 @@ async function patchFile(file, header, label) {
   await writeFile(file, output, 'utf8');
 }
 
+const collectionOutputPath = (route) => join(ROOT, String(route).replace(/^\/+/, ''), 'index.html');
+
 async function main() {
   const registry = JSON.parse(await readFile(ARTIST_REGISTRY, 'utf8'));
   const artists = registry.filter((artist) => artist.status !== 'draft');
+  const collectionDocument = JSON.parse(await readFile(COLLECTION_REGISTRY, 'utf8'));
+  const collections = (collectionDocument.collections ?? []).filter((collection) => collection.status !== 'draft');
 
   await patchFile(
     join(MUSIC_ROOT, 'index.html'),
@@ -91,7 +101,13 @@ async function main() {
     await patchFile(file, renderArtistHeader(artist), artist.route || artist.slug);
   }
 
-  console.log(`Patched canonical Music header on landing, listening and ${artists.length} artist page(s).`);
+  for (const collection of collections) {
+    const detail = JSON.parse(await readFile(join(COLLECTION_DETAILS_ROOT, `${collection.id}.json`), 'utf8'));
+    const file = collectionOutputPath(collection.route);
+    await patchFile(file, renderCollectionHeader(detail), collection.route || collection.id);
+  }
+
+  console.log(`Patched canonical Music header on landing, listening, ${artists.length} artist page(s), and ${collections.length} collection page(s).`);
 }
 
 main().catch((error) => {

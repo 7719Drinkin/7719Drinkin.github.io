@@ -68,6 +68,8 @@ jobs:
           node --check scripts/patch-music-header.mjs
           node --check scripts/build-music-i18n.mjs
           node --check scripts/build-music-pages.mjs
+          node --check scripts/build-music-collections.mjs
+          node --check scripts/update-music-collections-home.mjs
           node --check scripts/build-music-listening-page.mjs
           node --check scripts/enhance-music-albums.mjs
           node --check scripts/embed-music-i18n-data.mjs
@@ -76,6 +78,7 @@ jobs:
           node --check scripts/music/dynamic-collection-resolver.mjs
           node --check scripts/validate-music-library.mjs
           node --check scripts/validate-music-collections.mjs
+          node --check scripts/validate-music-collection-pages.mjs
           node --check scripts/validate-music-listening.mjs
           node --check scripts/validate-music-album-assets.mjs
           node --check scripts/validate-music-catalog-config.mjs
@@ -122,7 +125,8 @@ jobs:
           cp music/index.html /tmp/music-index.manual.html
           node scripts/build-music-pages.mjs
           cp /tmp/music-index.manual.html music/index.html
-          node scripts/update-music-recent-listening.mjs
+          node scripts/build-music-collections.mjs
+          node scripts/update-music-collections-home.mjs
           node scripts/build-music-listening-page.mjs
           node scripts/enhance-music-albums.mjs
           node scripts/enhance-music-visual-videos.mjs
@@ -139,12 +143,12 @@ jobs:
           node scripts/apply-site-revision.mjs
           node scripts/validate-site-revision.mjs
           node scripts/validate-anime-catalog.mjs
-          node scripts/validate-music-recent-listening.mjs
           node scripts/validate-music-listening.mjs
           node scripts/validate-music-runtime.mjs
           node scripts/validate-music-catalog-identity.mjs
           node scripts/validate-music-library.mjs
           node scripts/validate-music-collections.mjs
+          node scripts/validate-music-collection-pages.mjs
           node scripts/validate-music-album-assets.mjs --forbid-legacy-copies
           node scripts/validate-music-catalog-config.mjs
 
