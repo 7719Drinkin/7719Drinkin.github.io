@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { selectRecentListening } from './recent-listening-selector.mjs';
+import { presentRecentListening } from './recent-listening-presenter.mjs';
 import { replaceHtmlRegion } from './html-region-updater.mjs';
 import { renderRecentListening } from './recent-listening-renderer.mjs';
 
@@ -47,6 +48,22 @@ test('selectRecentListening rejects malformed timestamps', () => {
   assert.throws(() => selectRecentListening([
     { artistId: 'artist-a', title: 'broken', curatedAt: '2026/08/14 14:00', sourceOrder: 0 }
   ]), /Invalid curatedAt/);
+});
+
+test('presentRecentListening links standalone songs to the listening archive instead of inventing an artist route', async () => {
+  const [item] = await presentRecentListening([{
+    songId: 'standalone-song',
+    artistId: 'standalone-artist',
+    artistRoute: null,
+    artistNameZh: '无档案歌手',
+    artistNameEn: 'Standalone Artist',
+    title: 'Standalone Song',
+    note: 'note',
+    curatedAt: ''
+  }]);
+
+  assert.equal(item.href, '/music/listening/#standalone-song');
+  assert.equal(item.artist, 'Standalone Artist');
 });
 
 test('replaceHtmlRegion changes only the guarded region', () => {

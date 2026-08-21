@@ -39,6 +39,10 @@ function renderArtistHeader(artist) {
   return `<header class="music-site-header">\n    ${renderIdentity(nameZh, nameEn)}\n    <nav class="music-site-nav" aria-label="${escapeHtml(nameZh)}收藏导航">\n      <a href="#overview"><span class="music-lang-zh">概览</span><span class="music-lang-en">OVERVIEW</span></a>\n      <a href="#songs"><span class="music-lang-zh">歌曲</span><span class="music-lang-en">SONGS</span></a>\n      <a href="#albums"><span class="music-lang-zh">专辑</span><span class="music-lang-en">ALBUMS</span></a>\n      <a href="#gallery"><span class="music-lang-zh">影像</span><span class="music-lang-en">VISUAL</span></a>\n    </nav>\n  </header>`;
 }
 
+function renderListeningHeader() {
+  return `<header class="music-site-header">\n    ${renderIdentity('聆听', 'Listening')}\n    <nav class="music-site-nav" aria-label="聆听页面导航">\n      <a href="#tracks"><span class="music-lang-zh">歌曲</span><span class="music-lang-en">SONGS</span></a>\n      <a href="/music/#artists"><span class="music-lang-zh">歌手</span><span class="music-lang-en">ARTISTS</span></a>\n    </nav>\n  </header>`;
+}
+
 function replaceHeader(html, replacement, label) {
   const headerPattern = /<header class="music-site-header"[^>]*>[\s\S]*?<\/header>/;
   if (!headerPattern.test(html)) throw new Error(`Music header not found in ${label}`);
@@ -76,12 +80,18 @@ async function main() {
     'music/index.html'
   );
 
+  await patchFile(
+    join(MUSIC_ROOT, 'listening', 'index.html'),
+    renderListeningHeader(),
+    'music/listening/index.html'
+  );
+
   for (const artist of artists) {
     const file = join(MUSIC_ROOT, 'artists', artist.slug, 'index.html');
     await patchFile(file, renderArtistHeader(artist), artist.route || artist.slug);
   }
 
-  console.log(`Patched canonical Music header on landing page and ${artists.length} artist page(s).`);
+  console.log(`Patched canonical Music header on landing, listening and ${artists.length} artist page(s).`);
 }
 
 main().catch((error) => {

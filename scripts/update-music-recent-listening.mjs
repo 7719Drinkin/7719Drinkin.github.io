@@ -13,6 +13,10 @@ const MUSIC_INDEX = join(ROOT, 'music/index.html');
 const START_MARKER = '<!-- RECENT-LISTENING:START -->';
 const END_MARKER = '<!-- RECENT-LISTENING:END -->';
 const RECENT_LIMIT = 3;
+const VIEW_ALL = `<a class="music-text-link collection-listening-all" href="/music/listening/">
+  <span class="music-lang-zh">查看全部歌曲</span><span class="music-lang-en">VIEW ALL SONGS</span>
+  <b aria-hidden="true">↗</b>
+</a>`;
 
 export async function buildRecentListeningRegion({ root = ROOT } = {}) {
   const repository = createMusicCollectionRepository({ root });
@@ -28,7 +32,7 @@ export async function buildRecentListeningRegion({ root = ROOT } = {}) {
   return {
     recent,
     viewModels,
-    html: renderRecentListening(viewModels)
+    html: `${renderRecentListening(viewModels)}\n${VIEW_ALL}`
   };
 }
 
@@ -59,4 +63,4 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   });
 }
 
-export { START_MARKER, END_MARKER, RECENT_LIMIT, MUSIC_INDEX };
+export { START_MARKER, END_MARKER, RECENT_LIMIT, MUSIC_INDEX, VIEW_ALL };
