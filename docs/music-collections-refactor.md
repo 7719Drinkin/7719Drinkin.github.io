@@ -29,16 +29,18 @@ Current scope is deliberately narrow: only `RECENTLY CURATED / 最近整理` exi
 
 Validation: PR workflow #614 PASS. The new dynamic resolver and the old Recent Listening selector produce the same selected song IDs for the guarded parity fixture. Existing Recent Listening, Listening archive, Music runtime, canonical library, album asset, and catalog checks also continue to pass.
 
-## Round 2 — Public Collections switch
+## Round 2 — Public Collections switch — PASS
 
-- [ ] Add one shared collection-page generator.
-- [ ] Generate only `/music/collections/recently-curated/`.
-- [ ] Replace homepage `SELECTED LISTENING` song rows with one `COLLECTIONS` entry for Recently Curated.
-- [ ] Change landing Header `LISTENING` to `COLLECTIONS`.
-- [ ] Keep the existing `/music/listening/` archive temporarily available during the transition.
-- [ ] Do not create a `/music/collections/` directory page while only one collection exists.
-- [ ] Do not create any future editorial collection placeholders.
-- [ ] Run complete PR workflow and review this round against the plan.
+- [x] Add one shared collection-page generator.
+- [x] Generate only `/music/collections/recently-curated/`.
+- [x] Replace homepage `SELECTED LISTENING` song rows with one `COLLECTIONS` entry for Recently Curated.
+- [x] Change landing Header `LISTENING` to `COLLECTIONS`.
+- [x] Keep the existing `/music/listening/` archive temporarily available during the transition.
+- [x] Do not create a `/music/collections/` directory page while only one collection exists.
+- [x] Do not create any future editorial collection placeholders.
+- [x] Run complete PR workflow and review this round against the plan.
+
+Validation: workflow #616 reached the fully generated Collections state but failed because the legacy Listening validator still required the Music homepage to expose `/music/listening/`. The transitional validator was then decoupled from homepage IA while retaining strict validation of the 11-song archive. PR workflow #617 PASS. The generated Recently Curated page resolves 2 songs under the preserved selection contract; the Music homepage exposes Collections instead of naked recent-song rows; the Header exposes ARTISTS / COLLECTIONS; and the old Listening archive remains available only for the Round 2 transition.
 
 ## Round 3 — Retire legacy Listening/Recent presentation
 
