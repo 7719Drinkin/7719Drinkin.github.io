@@ -1,11 +1,13 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createMusicLibraryRepository } from './music/music-library-repository.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const registryPath = join(ROOT, 'data/music/artists.json');
 const detailsDir = join(ROOT, 'data/music/artists');
 const musicRoot = join(ROOT, 'music');
+const library = createMusicLibraryRepository({ root: ROOT });
 
 const escapeHtml = (value = '') => String(value)
   .replaceAll('&', '&amp;')
@@ -110,9 +112,7 @@ function flattenSongs(artists, detailsById) {
   const rows = [];
   for (const artist of artists) {
     const detail = detailsById.get(artist.id);
-    for (const song of detail?.selectedSongs ?? []) {
-      rows.push({ artist, song });
-    }
+    for (const song of detail?.selectedSongs ?? []) rows.push({ artist, song });
   }
   return rows.slice(0, 5);
 }
@@ -221,16 +221,12 @@ function renderSongRow(song, index, artistName) {
 }
 
 function renderSongs(songs = [], artistName = '') {
-  if (!songs.length) {
-    return `<div class="music-empty"><span>SELECTED SONGS</span><p>精选歌曲将在整理后加入。</p></div>`;
-  }
+  if (!songs.length) return `<div class="music-empty"><span>SELECTED SONGS</span><p>精选歌曲将在整理后加入。</p></div>`;
   return songs.map((song, index) => renderSongRow(song, index, artistName)).join('');
 }
 
 function renderAlbums(albums = []) {
-  if (!albums.length) {
-    return `<div class="music-empty music-empty--line"><span>ALBUM ARCHIVE / RESERVED</span><p>专辑封面和个人选曲会在素材准备完成后进入这里。</p></div>`;
-  }
+  if (!albums.length) return `<div class="music-empty music-empty--line"><span>ALBUM ARCHIVE / RESERVED</span><p>专辑封面和个人选曲会在素材准备完成后进入这里。</p></div>`;
   return albums.map((album) => `<article class="album-card">
     ${album.cover ? `<img src="${escapeHtml(album.cover)}" alt="${escapeHtml(album.title)} album cover" loading="lazy" decoding="async">` : '<div class="album-placeholder" aria-hidden="true"><i></i></div>'}
     <div><span>${escapeHtml(album.year ?? 'YEAR TBD')}</span><h3>${escapeHtml(album.title)}</h3><p>${escapeHtml(album.note ?? '')}</p></div>
@@ -238,9 +234,7 @@ function renderAlbums(albums = []) {
 }
 
 function renderGallery(gallery = []) {
-  if (!gallery.length) {
-    return `<div class="music-empty music-empty--visual"><span>VISUAL ARCHIVE / RESERVED</span><p>照片、GIF 与演出影像将从对应的素材目录读取。</p></div>`;
-  }
+  if (!gallery.length) return `<div class="music-empty music-empty--visual"><span>VISUAL ARCHIVE / RESERVED</span><p>照片、GIF 与演出影像将从对应的素材目录读取。</p></div>`;
   return gallery.map((item, index) => `<figure class="visual-card">
     <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.alt ?? `Artist archive image ${index + 1}`)}" loading="lazy" decoding="async">
     ${item.caption ? `<figcaption>${escapeHtml(item.caption)}</figcaption>` : ''}
@@ -248,10 +242,7 @@ function renderGallery(gallery = []) {
 }
 
 function renderRelated(current, artists) {
-  return artists
-    .filter((artist) => artist.id !== current.id)
-    .slice(0, 3)
-    .map((artist) => `<a class="related-artist" href="${escapeHtml(artist.route)}">
+  return artists.filter((artist) => artist.id !== current.id).slice(0, 3).map((artist) => `<a class="related-artist" href="${escapeHtml(artist.route)}">
       <span>${escapeHtml(localized(artist.name, 'en'))}</span>
       <strong>${escapeHtml(localized(artist.name, 'zh'))}</strong>
       <b>↗</b>
@@ -295,9 +286,7 @@ function renderArtistPage(artist, detail, artists) {
   const heroImage = detail.heroImage ?? artist.cover;
   const hero = heroImage
     ? `<img class="artist-hero-image" src="${escapeHtml(heroImage)}" alt="${escapeHtml(nameZh)} artist portrait" fetchpriority="high">`
-    : `<div class="artist-hero-placeholder" aria-hidden="true">
-        <span>${escapeHtml(initials(nameEn))}</span><i></i><b></b><em></em>
-      </div>`;
+    : `<div class="artist-hero-placeholder" aria-hidden="true"><span>${escapeHtml(initials(nameEn))}</span><i></i><b></b><em></em></div>`;
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -312,16 +301,12 @@ function renderArtistPage(artist, detail, artists) {
   <link rel="stylesheet" href="/css/music.css?v=20260805-2">
   <link rel="stylesheet" href="/css/music-player.css?v=20260805-4">
 </head>
-<body class="music-page music-artist-page"
-  style="--artist-accent:${escapeHtml(artist.theme.accent)};--artist-accent-soft:${escapeHtml(artist.theme.accentSoft)};--artist-bg:${escapeHtml(artist.theme.background)};--artist-fg:${escapeHtml(artist.theme.foreground)}">
+<body class="music-page music-artist-page" style="--artist-accent:${escapeHtml(artist.theme.accent)};--artist-accent-soft:${escapeHtml(artist.theme.accentSoft)};--artist-bg:${escapeHtml(artist.theme.background)};--artist-fg:${escapeHtml(artist.theme.foreground)}">
   ${renderHeader({ artist })}
   <main>
     <section class="artist-hero">
       <div class="artist-hero-copy reveal">
-        <p class="music-eyebrow">${escapeHtml(detail.eyebrow)}</p>
-        <h1>${escapeHtml(nameZh)}</h1>
-        <h2>${escapeHtml(nameEn)}</h2>
-        <span></span>
+        <p class="music-eyebrow">${escapeHtml(detail.eyebrow)}</p><h1>${escapeHtml(nameZh)}</h1><h2>${escapeHtml(nameEn)}</h2><span></span>
         <blockquote>${escapeHtml(localized(detail.headline, 'zh'))}</blockquote>
         <a class="music-text-link" href="#overview">进入收藏 <b>↓</b></a>
       </div>
@@ -329,10 +314,7 @@ function renderArtistPage(artist, detail, artists) {
     </section>
 
     <nav class="artist-tabs" aria-label="${escapeHtml(nameZh)}收藏分区">
-      <a class="is-current" href="#overview">OVERVIEW</a>
-      <a href="#songs">SONGS</a>
-      <a href="#albums">ALBUMS</a>
-      <a href="#gallery">VISUAL ARCHIVE</a>
+      <a class="is-current" href="#overview">OVERVIEW</a><a href="#songs">SONGS</a><a href="#albums">ALBUMS</a><a href="#gallery">VISUAL ARCHIVE</a>
     </nav>
 
     <section id="overview" class="artist-overview music-content-section">
@@ -340,13 +322,7 @@ function renderArtistPage(artist, detail, artists) {
         ${renderSectionHeader('01 / SELECTED SONGS', '反复聆听', '只有配置了音频源的条目才显示播放控制。')}
         <div class="song-list reveal">${renderSongs(detail.selectedSongs, nameEn)}</div>
       </div>
-      <aside class="artist-note reveal">
-        <p>ABOUT THE COLLECTION</p>
-        <h2>${escapeHtml(localized(detail.headline, 'en'))}</h2>
-        <div>${escapeHtml(localized(detail.introduction, 'zh'))}</div>
-        <blockquote>${escapeHtml(localized(detail.personalNote, 'zh'))}</blockquote>
-        <span>${(artist.tags ?? []).map((tag) => `<i>${escapeHtml(tag)}</i>`).join('')}</span>
-      </aside>
+      <aside class="artist-note reveal"><p>ABOUT THE COLLECTION</p><h2>${escapeHtml(localized(detail.headline, 'en'))}</h2><div>${escapeHtml(localized(detail.introduction, 'zh'))}</div><blockquote>${escapeHtml(localized(detail.personalNote, 'zh'))}</blockquote><span>${(artist.tags ?? []).map((tag) => `<i>${escapeHtml(tag)}</i>`).join('')}</span></aside>
     </section>
 
     <section id="albums" class="music-content-section">
@@ -381,15 +357,12 @@ async function main() {
   const seenSlugs = new Set();
   registry.forEach((artist) => assertArtist(artist, seenIds, seenSlugs));
 
-  const published = registry
-    .filter((artist) => artist.status !== 'draft')
-    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
-
+  const published = registry.filter((artist) => artist.status !== 'draft').sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
   const detailsById = new Map();
   for (const artist of published) {
-    const detail = JSON.parse(await readFile(join(detailsDir, `${artist.slug}.json`), 'utf8'));
-    if (detail.id !== artist.id) throw new Error(`Detail id mismatch for ${artist.id}`);
-    detailsById.set(artist.id, detail);
+    const canonicalDetail = JSON.parse(await readFile(join(detailsDir, `${artist.slug}.json`), 'utf8'));
+    if (canonicalDetail.id !== artist.id) throw new Error(`Detail id mismatch for ${artist.id}`);
+    detailsById.set(artist.id, await library.hydrateArtistDetail(canonicalDetail, 'zh'));
   }
 
   await mkdir(musicRoot, { recursive: true });
@@ -401,7 +374,7 @@ async function main() {
     await writeFile(output, renderArtistPage(artist, detailsById.get(artist.id), published), 'utf8');
   }
 
-  console.log(`Generated Music collection and ${published.length} artist pages.`);
+  console.log(`Generated Music collection and ${published.length} artist pages from canonical song/album references.`);
 }
 
 main().catch((error) => {

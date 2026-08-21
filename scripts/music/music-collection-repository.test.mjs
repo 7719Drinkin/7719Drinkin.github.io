@@ -61,8 +61,10 @@ test('global collection includes songs whose artists have no profile page', asyn
     const songs = await repository.getSelectedSongs();
     assert.equal(songs.length, 2);
     assert.deepEqual(songs.map((song) => song.songId), ['profile-song', 'standalone-song']);
+    assert.equal(songs[0].artistKey, 'profile-artist');
     assert.equal(songs[0].artistRoute, '/music/artists/profile-artist/');
     assert.equal(songs[0].album, 'Album A');
+    assert.equal(songs[1].artistKey, 'standalone-artist');
     assert.equal(songs[1].artistRoute, null);
     assert.equal(songs[1].artistSlug, null);
     assert.equal(songs[1].artistNameZh, '无档案歌手');

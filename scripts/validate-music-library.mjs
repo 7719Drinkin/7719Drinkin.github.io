@@ -49,9 +49,8 @@ async function validateLocalAsset(root, value, label, errors) {
   if (!(await pathExists(filePath))) errors.push(`${label} does not exist: ${value}`);
 }
 
-export async function validateMusicLibrary({ root = ROOT, strictReferences = false } = {}) {
+export async function validateMusicLibrary({ root = ROOT } = {}) {
   const errors = [];
-  const warnings = [];
 
   const registryPath = join(root, 'data/music/artists.json');
   const detailsDir = join(root, 'data/music/artists');
@@ -118,9 +117,6 @@ export async function validateMusicLibrary({ root = ROOT, strictReferences = fal
     errors.push('data/music/artists directory is missing.');
   }
 
-  let legacySongReferences = 0;
-  let legacyAlbumReferences = 0;
-
   for (const fileName of detailFiles) {
     const detail = await readJson(join(detailsDir, fileName));
     const expectedId = fileName.replace(/\.json$/i, '');
@@ -133,22 +129,14 @@ export async function validateMusicLibrary({ root = ROOT, strictReferences = fal
       }
       const seen = new Set();
       for (const item of items) {
-        if (typeof item === 'string') {
-          if (seen.has(item)) errors.push(`${fileName}.${kind} contains duplicate id: ${item}`);
-          seen.add(item);
-          const targetSet = kind === 'selectedSongs' ? songIds : albumIds;
-          if (!targetSet.has(item)) errors.push(`${fileName}.${kind} references unknown id: ${item}`);
+        if (typeof item !== 'string') {
+          errors.push(`${fileName}.${kind} must contain canonical id references only.`);
           continue;
         }
-        if (item && typeof item === 'object') {
-          if (kind === 'selectedSongs') legacySongReferences += 1;
-          else legacyAlbumReferences += 1;
-          const message = `${fileName}.${kind} still contains legacy inline objects.`;
-          if (strictReferences) errors.push(message);
-          else warnings.push(message);
-          continue;
-        }
-        errors.push(`${fileName}.${kind} contains an unsupported value.`);
+        if (seen.has(item)) errors.push(`${fileName}.${kind} contains duplicate id: ${item}`);
+        seen.add(item);
+        const targetSet = kind === 'selectedSongs' ? songIds : albumIds;
+        if (!targetSet.has(item)) errors.push(`${fileName}.${kind} references unknown id: ${item}`);
       }
     };
 
@@ -158,23 +146,19 @@ export async function validateMusicLibrary({ root = ROOT, strictReferences = fal
 
   return {
     errors,
-    warnings: [...new Set(warnings)],
+    warnings: [],
     stats: {
       artists: artists.length,
       songs: songs.length,
       albums: albums.length,
-      artistDetails: detailFiles.length,
-      legacySongReferences,
-      legacyAlbumReferences
+      artistDetails: detailFiles.length
     }
   };
 }
 
 async function main() {
-  const strictReferences = process.argv.includes('--strict-references');
-  const result = await validateMusicLibrary({ strictReferences });
+  const result = await validateMusicLibrary();
 
-  for (const warning of result.warnings) console.warn(`WARN: ${warning}`);
   if (result.errors.length) {
     for (const error of result.errors) console.error(`ERROR: ${error}`);
     process.exitCode = 1;
@@ -186,12 +170,6 @@ async function main() {
     `Music library valid: ${stats.artists} artist profile(s), ${stats.songs} canonical song(s), `
     + `${stats.albums} canonical album(s), ${stats.artistDetails} artist detail file(s).`
   );
-  if (stats.legacySongReferences || stats.legacyAlbumReferences) {
-    console.log(
-      `Migration compatibility active: ${stats.legacySongReferences} legacy song reference(s), `
-      + `${stats.legacyAlbumReferences} legacy album reference(s).`
-    );
-  }
 }
 
 const isDirectRun = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);

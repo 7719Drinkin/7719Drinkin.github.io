@@ -50,7 +50,7 @@ export function createMusicCollectionRepository({ root }) {
 
         selectedSongs.push({
           songId: String(song.id ?? '').trim(),
-          artistId: artistReference.key,
+          artistKey: artistReference.key,
           artistSlug: profile?.slug ?? null,
           artistRoute: profile?.route ?? null,
           artistNameZh: localized(artistReference.name, 'zh'),

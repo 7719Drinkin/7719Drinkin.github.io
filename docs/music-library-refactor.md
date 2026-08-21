@@ -190,10 +190,21 @@ Result: **PASS**. Deployment A workflow run 606 proved the copy stage with all 5
 
 ### Round 5 — Phase 5: cleanup
 
-- Remove migration compatibility for inline song/album objects.
-- Make strict canonical reference validation permanent.
-- Formalize catalog keys as artist identity keys independent of profile existence.
-- Update remaining documentation and remove dead compatibility code.
+- [ ] Remove migration compatibility for inline song/album objects.
+- [ ] Make strict canonical reference validation permanent.
+- [ ] Make the three mature page-data consumers hydrate canonical IDs in memory.
+- [ ] Formalize catalog keys as artist identity keys independent of profile existence.
+- [ ] Keep current browser `data-artist-slug` as a compatibility alias while exposing canonical `data-artist-key` on generated pages.
+- [ ] Update remaining documentation and remove dead compatibility code.
+- [ ] PR workflow passes for Round 5.
+
+Must not happen in Round 5:
+
+- [ ] No song/album content changes.
+- [ ] No artist profile or route changes.
+- [ ] No album asset changes.
+- [ ] No R2 prefix changes.
+- [ ] No Music visual redesign.
 
 ## Round review rule
 

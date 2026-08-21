@@ -86,7 +86,7 @@ export function createRuntimePlayabilityResolver({ root }) {
 
   return async (entry) => {
     const config = await loadConfig();
-    const prefix = config?.artists?.[entry.artistId]?.prefix;
+    const prefix = config?.artists?.[entry.artistKey]?.prefix;
     if (!prefix) return false;
 
     const runtime = await loadRuntime(prefix);

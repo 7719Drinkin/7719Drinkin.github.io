@@ -97,9 +97,9 @@ export async function buildMusicListeningPage({ root = ROOT } = {}) {
   for (const [index, song] of songs.entries()) {
     const primary = primaryArtist(song);
     const album = song.albumId ? await library.getAlbum(song.albumId) : null;
-    const materialized = await library.materializeSong(song, 'zh');
+    const materialized = await library.materializeSong(song.id, 'zh');
     const playable = primary?.key
-      ? await resolvePlayable({ artistId: primary.key, title: materialized.title, album: materialized.album })
+      ? await resolvePlayable({ artistKey: primary.key, title: materialized.title, album: materialized.album })
       : false;
     rows.push(renderListeningSongRow({ song, index, album, artistProfiles, playable }));
   }

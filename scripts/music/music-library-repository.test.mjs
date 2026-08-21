@@ -105,19 +105,19 @@ test('song artwork follows song -> album -> artist -> placeholder precedence', a
 
 test('validator accepts canonical references and rejects unknown album references', async () => {
   const root = await createFixture();
-  const valid = await validateMusicLibrary({ root, strictReferences: true });
+  const valid = await validateMusicLibrary({ root });
   assert.deepEqual(valid.errors, []);
 
   const songsPath = join(root, 'data/music/songs.json');
-  const document = JSON.parse(await (await import('node:fs/promises')).readFile(songsPath, 'utf8'));
+  const document = JSON.parse(await readFile(songsPath, 'utf8'));
   document.songs[0].albumId = 'missing-album';
   await writeJson(songsPath, document);
 
-  const invalid = await validateMusicLibrary({ root, strictReferences: true });
+  const invalid = await validateMusicLibrary({ root });
   assert.ok(invalid.errors.some((error) => error.includes('unknown albumId: missing-album')));
 });
 
-test('artist detail hydration projects canonical ids back to legacy renderer objects', async () => {
+test('artist detail hydration resolves canonical ids and rejects legacy inline objects', async () => {
   const root = await createFixture();
   const repository = createMusicLibraryRepository({ root });
   const detail = JSON.parse(await readFile(join(root, 'data/music/artists/zhang-guorong.json'), 'utf8'));
@@ -127,4 +127,13 @@ test('artist detail hydration projects canonical ids back to legacy renderer obj
   assert.equal(hydrated.selectedSongs[0].album, '专辑一');
   assert.equal(hydrated.albums[0].title, '专辑一');
   assert.equal(hydrated.albums[0].slug, undefined);
+
+  await assert.rejects(
+    repository.hydrateArtistDetail({ ...detail, selectedSongs: [{ id: 'zhang-guorong--song-one' }] }),
+    /song reference must be a canonical id reference/
+  );
+  await assert.rejects(
+    repository.hydrateArtistDetail({ ...detail, albums: [{ id: 'zhang-guorong--album-one' }] }),
+    /album reference must be a canonical id reference/
+  );
 });

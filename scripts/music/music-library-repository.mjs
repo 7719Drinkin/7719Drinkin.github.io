@@ -20,6 +20,13 @@ function indexById(items, label) {
   return map;
 }
 
+function requireReferenceId(value, label) {
+  if (typeof value !== 'string' || !value.trim()) {
+    throw new Error(`${label} must be a canonical id reference.`);
+  }
+  return value.trim();
+}
+
 export function createMusicLibraryRepository({ root, placeholderArtwork = null }) {
   if (!root) throw new Error('MusicLibraryRepository requires a root path.');
 
@@ -70,30 +77,20 @@ export function createMusicLibraryRepository({ root, placeholderArtwork = null }
     return entity;
   };
 
-  const resolveSongInput = async (songOrId) => {
-    if (typeof songOrId !== 'string') return songOrId;
+  const materializeAlbum = async (albumId, language = 'zh') => {
     const library = await loadLibrary();
-    return requireEntity(library.songById, songOrId, 'song');
-  };
-
-  const materializeAlbum = async (albumOrId, language = 'zh') => {
-    const library = await loadLibrary();
-    const album = typeof albumOrId === 'string'
-      ? requireEntity(library.albumById, albumOrId, 'album')
-      : albumOrId;
-    if (!album) return album;
+    const id = requireReferenceId(albumId, 'album reference');
+    const album = requireEntity(library.albumById, id, 'album');
     return {
       ...album,
       title: localized(album.title, language)
     };
   };
 
-  const materializeSong = async (songOrId, language = 'zh') => {
+  const materializeSong = async (songId, language = 'zh') => {
     const library = await loadLibrary();
-    const song = typeof songOrId === 'string'
-      ? requireEntity(library.songById, songOrId, 'song')
-      : songOrId;
-    if (!song) return song;
+    const id = requireReferenceId(songId, 'song reference');
+    const song = requireEntity(library.songById, id, 'song');
     const album = song.albumId ? library.albumById.get(song.albumId) ?? null : null;
     return {
       ...song,
@@ -105,8 +102,8 @@ export function createMusicLibraryRepository({ root, placeholderArtwork = null }
 
   const hydrateArtistDetail = async (detail, language = 'zh') => ({
     ...detail,
-    selectedSongs: await Promise.all((detail?.selectedSongs ?? []).map((song) => materializeSong(song, language))),
-    albums: await Promise.all((detail?.albums ?? []).map((album) => materializeAlbum(album, language)))
+    selectedSongs: await Promise.all((detail?.selectedSongs ?? []).map((songId) => materializeSong(songId, language))),
+    albums: await Promise.all((detail?.albums ?? []).map((albumId) => materializeAlbum(albumId, language)))
   });
 
   return {
@@ -136,12 +133,12 @@ export function createMusicLibraryRepository({ root, placeholderArtwork = null }
       return ids.map((id) => requireEntity(library.albumById, id, 'album'));
     },
 
-    async materializeSong(songOrId, language = 'zh') {
-      return materializeSong(songOrId, language);
+    async materializeSong(songId, language = 'zh') {
+      return materializeSong(songId, language);
     },
 
-    async materializeAlbum(albumOrId, language = 'zh') {
-      return materializeAlbum(albumOrId, language);
+    async materializeAlbum(albumId, language = 'zh') {
+      return materializeAlbum(albumId, language);
     },
 
     async hydrateArtistDetail(detail, language = 'zh') {
@@ -165,7 +162,9 @@ export function createMusicLibraryRepository({ root, placeholderArtwork = null }
     },
 
     async resolveSongArtwork(songOrId) {
-      const song = await resolveSongInput(songOrId);
+      const song = typeof songOrId === 'string'
+        ? requireEntity((await loadLibrary()).songById, songOrId, 'song')
+        : songOrId;
       if (!song) return placeholderArtwork;
       if (song.artwork) return song.artwork;
 
