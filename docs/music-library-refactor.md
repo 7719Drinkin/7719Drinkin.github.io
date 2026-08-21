@@ -139,11 +139,25 @@ Result: **PASS**. PR workflow run 602 completed successfully. Canonical source n
 
 ### Round 3 — Phase 3: global LISTENING
 
-- Make the global song library the source for cross-artist listening/recent selection.
-- Add `/music/listening/`.
-- Keep homepage LISTENING intentionally small and link to the complete collection.
-- Render profile artists as links and non-profile artists as plain text using the same song schema.
-- Do not generate empty artist or album pages for standalone songs.
+- [x] Make the global song library the source for cross-artist listening/recent selection.
+- [x] Add `/music/listening/`.
+- [x] Keep homepage LISTENING intentionally small and link to the complete collection.
+- [x] Render profile artists as links and non-profile artists as plain text using the same song schema.
+- [x] Do not generate empty artist or album pages for standalone songs.
+- [x] Add tests/validation for standalone songs and profile-aware artist links.
+- [x] PR workflow passes for Round 3 (run 604).
+
+Must not happen in Round 3:
+
+- [x] No new song content invented or added for the refactor.
+- [x] No new artist profile created for a standalone song reference.
+- [x] No new album detail page generated merely because a song references an album.
+- [x] No album asset migration yet.
+- [x] No catalog/R2 mapping change.
+
+#### Round 3 review
+
+Result: **PASS**. PR workflow run 604 completed successfully. The global collection and homepage Recent Listening now read canonical `songs.json`; `/music/listening/` is generated from the same library and distinguishes profile-backed artists from metadata-only artists without changing the song schema. The homepage remains a small recent selection with a link to the complete archive. Tests verified that a song whose artist has no profile is still included and never receives an invented `/music/artists/...` route. No song content, artist profile, album asset, catalog mapping or R2 behavior changed.
 
 ### Round 4 — Phase 4: album asset migration
 
