@@ -42,15 +42,17 @@ Validation: PR workflow #614 PASS. The new dynamic resolver and the old Recent L
 
 Validation: workflow #616 reached the fully generated Collections state but failed because the legacy Listening validator still required the Music homepage to expose `/music/listening/`. The transitional validator was then decoupled from homepage IA while retaining strict validation of the 11-song archive. PR workflow #617 PASS. The generated Recently Curated page resolves 2 songs under the preserved selection contract; the Music homepage exposes Collections instead of naked recent-song rows; the Header exposes ARTISTS / COLLECTIONS; and the old Listening archive remains available only for the Round 2 transition.
 
-## Round 3 — Retire legacy Listening/Recent presentation
+## Round 3 — Retire legacy Listening/Recent presentation — PASS
 
-- [ ] Remove the all-songs Listening archive from the public IA.
-- [ ] Keep `/music/listening/` only as a compatibility route pointing users to Recently Curated.
-- [ ] Remove obsolete Listening page generator/CSS/validator/tests after dependency audit.
-- [ ] Remove obsolete Recent Listening selector/presenter/renderer/updater/validator after Collection resolver fully owns the behavior.
-- [ ] Keep shared utilities that are still used elsewhere.
-- [ ] Simplify workflow to Collections-based generation/validation.
-- [ ] Run complete PR workflow and review this round against the plan.
+- [x] Remove the all-songs Listening archive from the public IA.
+- [x] Keep `/music/listening/` only as a compatibility route pointing users to Recently Curated.
+- [x] Remove obsolete Listening page generator/CSS/validator/tests after dependency audit.
+- [x] Remove obsolete Recent Listening selector/presenter/renderer/updater/validator after Collection resolver fully owns the behavior.
+- [x] Keep shared utilities that are still used elsewhere.
+- [x] Simplify workflow to Collections-based generation/validation.
+- [x] Run complete PR workflow and review this round against the plan.
+
+Validation: PR workflow #619 PASS. The Collection generator now owns the legacy `/music/listening/` compatibility page and points it to `/music/collections/recently-curated/`; the 11-song archive renderer is no longer generated. The old Listening and Recent Listening generator/selector/presenter/renderer/validator/test chain was removed after dependency audit. The dynamic resolver test now freezes the preserved Recently Curated behavior directly, so no legacy selector remains as a test dependency. Music runtime, canonical library, Collection validation, album assets, catalog identity/config, generated pages, site revision, and persistent shell validation all continue to pass.
 
 ## Final audit
 
