@@ -190,21 +190,25 @@ Result: **PASS**. Deployment A workflow run 606 proved the copy stage with all 5
 
 ### Round 5 — Phase 5: cleanup
 
-- [ ] Remove migration compatibility for inline song/album objects.
-- [ ] Make strict canonical reference validation permanent.
-- [ ] Make the three mature page-data consumers hydrate canonical IDs in memory.
-- [ ] Formalize catalog keys as artist identity keys independent of profile existence.
-- [ ] Keep current browser `data-artist-slug` as a compatibility alias while exposing canonical `data-artist-key` on generated pages.
-- [ ] Update remaining documentation and remove dead compatibility code.
-- [ ] PR workflow passes for Round 5.
+- [x] Remove migration compatibility for inline song/album objects.
+- [x] Make strict canonical reference validation permanent.
+- [x] Make the three mature page-data consumers hydrate canonical IDs in memory.
+- [x] Formalize catalog keys as artist identity keys independent of profile existence.
+- [x] Keep current browser `data-artist-slug` as a compatibility alias while exposing canonical `data-artist-key` on generated pages.
+- [x] Update remaining documentation and remove dead compatibility code.
+- [x] PR workflow passes for Round 5 (run 609).
 
 Must not happen in Round 5:
 
-- [ ] No song/album content changes.
-- [ ] No artist profile or route changes.
-- [ ] No album asset changes.
-- [ ] No R2 prefix changes.
-- [ ] No Music visual redesign.
+- [x] No song/album content changes.
+- [x] No artist profile or route changes.
+- [x] No album asset changes.
+- [x] No R2 prefix changes.
+- [x] No Music visual redesign.
+
+#### Round 5 review
+
+Result: **PASS**. PR workflow run 609 completed successfully with the disk-rewriting compatibility projection removed. `build-music-pages.mjs`, `enhance-music-albums.mjs`, and `embed-music-i18n-data.mjs` now hydrate canonical song/album IDs in memory. The permanent library validator rejects inline detail objects; the build generated 3 artist pages and 55 album pages directly from canonical references, then passed Recent Listening, LISTENING, i18n, visual archive, Header, site revision and Music runtime validation. Catalog configuration and server-side playability now use artist identity keys independently of profile existence, with an explicit metadata-only artist test. Generated artist/album pages expose `data-artist-key`; `data-artist-slug` remains as the current browser catalog-runtime compatibility alias because all existing profile IDs equal their slugs, avoiding an unnecessary rewrite of the mature browser cache/player runtime in this data migration. Canonical content remained at 11 songs, 55 albums and 3 profiles; 55/55 album covers remained valid and the R2 prefixes were unchanged.
 
 ## Round review rule
 
