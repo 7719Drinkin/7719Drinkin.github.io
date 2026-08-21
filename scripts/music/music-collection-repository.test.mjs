@@ -8,7 +8,8 @@ import { createMusicCollectionRepository } from './music-collection-repository.m
 async function createFixture() {
   const root = await mkdtemp(join(tmpdir(), 'music-collection-'));
   const dataRoot = join(root, 'data/music');
-  await mkdir(dataRoot, { recursive: true });
+  const collectionRoot = join(dataRoot, 'collections');
+  await mkdir(collectionRoot, { recursive: true });
   await writeFile(join(dataRoot, 'artists.json'), JSON.stringify([
     {
       id: 'profile-artist',
@@ -51,6 +52,27 @@ async function createFixture() {
       }
     ]
   }));
+  await writeFile(join(dataRoot, 'collections.json'), JSON.stringify({
+    schemaVersion: 1,
+    collections: [{
+      id: 'recently-curated',
+      route: '/music/collections/recently-curated/',
+      type: 'dynamic',
+      status: 'published',
+      order: 1
+    }]
+  }));
+  await writeFile(join(collectionRoot, 'recently-curated.json'), JSON.stringify({
+    id: 'recently-curated',
+    title: { zh: '最近整理', en: 'Recently Curated' },
+    source: {
+      field: 'curatedAt',
+      order: 'desc',
+      limit: 3,
+      distinctBy: 'primaryArtist',
+      legacyFallback: true
+    }
+  }));
   return root;
 }
 
@@ -79,6 +101,31 @@ test('visible artist registry remains independent from song ownership', async ()
     const repository = createMusicCollectionRepository({ root });
     const artists = await repository.getVisibleArtists();
     assert.deepEqual(artists.map((artist) => artist.id), ['profile-artist', 'empty-profile']);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('collection registry exposes only published collection identities', async () => {
+  const root = await createFixture();
+  try {
+    const repository = createMusicCollectionRepository({ root });
+    const collections = await repository.getVisibleCollections();
+    assert.deepEqual(collections.map((collection) => collection.id), ['recently-curated']);
+    const collection = await repository.getCollection('recently-curated');
+    assert.equal(collection.route, '/music/collections/recently-curated/');
+    assert.equal(collection.title.zh, '最近整理');
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('dynamic collection resolves dated songs before legacy fallbacks without requiring artist profiles', async () => {
+  const root = await createFixture();
+  try {
+    const repository = createMusicCollectionRepository({ root });
+    const songs = await repository.resolveCollectionSongs('recently-curated');
+    assert.deepEqual(songs.map((song) => song.songId), ['profile-song', 'standalone-song']);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

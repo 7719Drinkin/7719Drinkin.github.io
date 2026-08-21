@@ -73,7 +73,9 @@ jobs:
           node --check scripts/embed-music-i18n-data.mjs
           node --check scripts/music/music-collection-repository.mjs
           node --check scripts/music/music-library-repository.mjs
+          node --check scripts/music/dynamic-collection-resolver.mjs
           node --check scripts/validate-music-library.mjs
+          node --check scripts/validate-music-collections.mjs
           node --check scripts/validate-music-listening.mjs
           node --check scripts/validate-music-album-assets.mjs
           node --check scripts/validate-music-catalog-config.mjs
@@ -88,9 +90,11 @@ jobs:
           node --test scripts/music/recent-listening.test.mjs
           node --test scripts/music/music-library-repository.test.mjs
           node --test scripts/music/music-collection-repository.test.mjs
+          node --test scripts/music/dynamic-collection-resolver.test.mjs
           node --test scripts/music/music-listening.test.mjs
           node --test scripts/music/runtime-playability-resolver.test.mjs
           node scripts/validate-music-library.mjs
+          node scripts/validate-music-collections.mjs
           node scripts/validate-music-album-assets.mjs --forbid-legacy-copies
           node scripts/validate-music-catalog-config.mjs
 
@@ -140,6 +144,7 @@ jobs:
           node scripts/validate-music-runtime.mjs
           node scripts/validate-music-catalog-identity.mjs
           node scripts/validate-music-library.mjs
+          node scripts/validate-music-collections.mjs
           node scripts/validate-music-album-assets.mjs --forbid-legacy-copies
           node scripts/validate-music-catalog-config.mjs
 
