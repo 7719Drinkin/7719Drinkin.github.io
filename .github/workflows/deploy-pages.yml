@@ -87,7 +87,7 @@ jobs:
           node --test scripts/music/music-collection-repository.test.mjs
           node --test scripts/music/music-listening.test.mjs
           node scripts/validate-music-library.mjs --strict-references
-          node scripts/validate-music-album-assets.mjs --require-legacy-copies
+          node scripts/validate-music-album-assets.mjs --forbid-legacy-copies
 
       - name: Select deployment path
         shell: bash
@@ -136,7 +136,7 @@ jobs:
           node scripts/validate-music-runtime.mjs
           node scripts/materialize-music-artist-details.mjs restore
           node scripts/validate-music-library.mjs --strict-references
-          node scripts/validate-music-album-assets.mjs --require-legacy-copies
+          node scripts/validate-music-album-assets.mjs --forbid-legacy-copies
 
       - name: Publish pull request preview
         if: github.event_name == 'pull_request'
