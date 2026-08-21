@@ -10,6 +10,11 @@ const assert = (condition, message) => {
 };
 
 const routePath = (route) => join(String(route).replace(/^\/+/, ''), 'index.html');
+const escapeRegExp = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const cssRuleBody = (css, selector) => {
+  const match = css.match(new RegExp(`${escapeRegExp(selector)}\\s*\\{([\\s\\S]*?)\\}`));
+  return match?.[1] ?? '';
+};
 
 async function main() {
   const repository = createMusicCollectionRepository({ root: ROOT });
@@ -17,9 +22,11 @@ async function main() {
   assert(collections.length === 1, `Current Music scope expects exactly one published collection; got ${collections.length}.`);
   assert(collections[0].id === 'recently-curated', `Published collection must be recently-curated; got ${collections[0].id}.`);
 
-  const [home, listening] = await Promise.all([
+  const [home, listening, homeCollectionStyles, designSystemStyles] = await Promise.all([
     read('music/index.html'),
-    read('music/listening/index.html')
+    read('music/listening/index.html'),
+    read('css/music-home-collections.css'),
+    read('css/music-design-system.css')
   ]);
 
   assert(home.includes('id="collections"'), 'Music home must expose the Collections section.');
@@ -28,6 +35,7 @@ async function main() {
   assert(home.includes('>COLLECTIONS<'), 'Music home header must identify COLLECTIONS.');
   assert(home.includes('data-music-collection-card="recently-curated"'), 'Music home must render the Recently Curated collection entry.');
   assert(home.includes('href="/music/collections/recently-curated/"'), 'Music home collection entry must link to Recently Curated.');
+  assert(home.includes('/css/music-home-collections.css?v=20260821-5'), 'Music home must load the current Collections stylesheet version.');
   assert(home.includes('<h2><span class="music-lang-zh">专栏</span><span class="music-lang-en">COLLECTIONS</span></h2>'), 'Music home Collections heading must be language-aware.');
   assert(home.includes('<h3><span class="music-lang-zh">最近整理</span><span class="music-lang-en">Recently Curated</span></h3>'), 'Music home collection title must be language-aware.');
   assert(!home.includes('02 / COLLECTIONS'), 'Music home must not retain decorative Collections numbering.');
@@ -35,6 +43,20 @@ async function main() {
   assert(!home.includes('DYNAMIC COLLECTION'), 'Music home must not expose implementation-type microcopy.');
   assert(!home.includes('VIEW ALL SONGS'), 'Music home must not retain the all-songs Listening CTA.');
   assert(!home.includes('href="/music/listening/"'), 'Music home must not expose the retired Listening archive route.');
+
+  const artistTitleRule = cssRuleBody(designSystemStyles, '.collection-artist-copy h3');
+  const collectionTitleRule = cssRuleBody(homeCollectionStyles, 'body.music-page .collection-curation-copy h3');
+  assert(artistTitleRule, 'Music design system must define the homepage artist-name typography rule.');
+  assert(collectionTitleRule, 'Music Collections stylesheet must define the higher-specificity Collection title rule.');
+  for (const declaration of [
+    'font-family: var(--music-serif-zh);',
+    'font-weight: 600;',
+    'letter-spacing: -.035em;'
+  ]) {
+    assert(artistTitleRule.includes(declaration), `Artist-name typography is missing ${declaration}`);
+    assert(collectionTitleRule.includes(declaration), `Collection title must match artist-name typography: missing ${declaration}`);
+  }
+  assert(!collectionTitleRule.includes('font-family: var(--music-serif);'), 'Collection title must not fall back to the old mixed Latin/Sans font token.');
 
   assert(listening.includes('data-listening-compat="collections"'), 'Legacy /music/listening/ must be a Collections compatibility route.');
   assert(listening.includes('href="/music/collections/recently-curated/"'), 'Listening compatibility route must link to Recently Curated.');
@@ -76,7 +98,7 @@ async function main() {
   }
   assert(!directoryIndexExists, 'Do not create a /music/collections/ directory page while only one collection exists.');
 
-  console.log(`Validated Music Collection pages: ${collections.map((collection) => collection.id).join(', ')}; language-aware UI and reveal runtime confirmed.`);
+  console.log(`Validated Music Collection pages: ${collections.map((collection) => collection.id).join(', ')}; language-aware UI, artist-matched Collection typography, and reveal runtime confirmed.`);
 }
 
 main().catch((error) => {
