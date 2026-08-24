@@ -231,7 +231,7 @@ html[data-music-language="zh"] .collection-track-artist {
   gap: 9px;
 }
 
-.collection-track-meta em,
+.collection-track-play,
 .collection-track-action,
 .collection-track-state {
   color: var(--music-muted);
@@ -240,15 +240,37 @@ html[data-music-language="zh"] .collection-track-artist {
   text-decoration: none;
 }
 
-html[data-music-language="zh"] .collection-track-meta em,
+.collection-track-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  color: var(--music-gold-soft);
+  background: transparent;
+  cursor: pointer;
+}
+
+.collection-track-play b {
+  display: grid;
+  width: 15px;
+  height: 15px;
+  place-items: center;
+  color: var(--music-gold);
+}
+
+.collection-track-play:hover,
+.collection-track-play.is-active,
+.collection-track-play.is-playing {
+  color: var(--music-text);
+}
+
+html[data-music-language="zh"] .collection-track-play,
 html[data-music-language="zh"] .collection-track-action,
 html[data-music-language="zh"] .collection-track-state {
   font-family: "Noto Sans SC", var(--music-ui, sans-serif);
   letter-spacing: .03em;
-}
-
-.collection-track-meta em {
-  color: var(--music-gold-soft);
 }
 
 .collection-track-action b {
@@ -333,13 +355,10 @@ html[data-music-language="zh"] .collection-detail-return a {
     gap: 7px;
   }
 
-  .collection-track-meta em {
-    display: none;
-  }
-
+  .collection-track-play,
   .collection-track-action,
   .collection-track-state {
-    max-width: 72px;
+    max-width: 78px;
     text-align: right;
   }
 }
