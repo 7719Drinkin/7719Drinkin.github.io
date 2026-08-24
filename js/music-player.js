@@ -29,14 +29,14 @@
     }
 
     .site-music-player.is-idle {
-      border-color: color-mix(in srgb, var(--artist-accent) 20%, rgba(255,255,255,.1));
+      border-color: color-mix(in srgb, var(--player-accent) 20%, rgba(255,255,255,.1));
       box-shadow: 0 14px 42px rgba(0,0,0,.3);
       opacity: .78;
     }
 
     .site-music-player.is-idle:hover {
       opacity: .96;
-      border-color: color-mix(in srgb, var(--artist-accent) 34%, rgba(255,255,255,.13));
+      border-color: color-mix(in srgb, var(--player-accent) 34%, rgba(255,255,255,.13));
     }
 
     .site-music-player.is-idle .site-player-cover {
@@ -52,7 +52,7 @@
     }
 
     .site-music-player.is-idle .site-player-copy strong {
-      color: color-mix(in srgb, var(--artist-fg) 76%, transparent);
+      color: color-mix(in srgb, var(--player-fg) 76%, transparent);
     }
 
     .site-music-player.is-idle .site-player-copy small {
