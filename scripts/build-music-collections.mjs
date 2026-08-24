@@ -1,9 +1,14 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MUSIC_BOOTSTRAP_SRC } from './music-runtime-config.mjs';
+import {
+  MUSIC_BOOTSTRAP_SRC,
+  MUSIC_PLAYER_SCRIPT_SRC,
+  MUSIC_PLAYER_STYLE_HREF
+} from './music-runtime-config.mjs';
 import { createMusicCollectionRepository } from './music/music-collection-repository.mjs';
 import { createMusicLibraryRepository } from './music/music-library-repository.mjs';
+import { renderMusicPlayer } from './music/music-player-view.mjs';
 import { createPlaybackTrackView } from './music/playback-track-view.mjs';
 import { createRuntimeTrackResolver } from './music/runtime-playability-resolver.mjs';
 
@@ -168,6 +173,8 @@ export async function buildMusicCollections({ root = ROOT } = {}) {
     const titleZh = localized(collection.title, 'zh') || titleEn;
     const description = renderLocalized(collection.description ?? '');
     const queueId = `collection:${collection.id}`;
+    const defaultCover = rows.find((row) => row.playbackTrack?.playback && row.playbackTrack?.artwork)
+      ?.playbackTrack?.artwork || '';
     const html = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -180,6 +187,7 @@ export async function buildMusicCollections({ root = ROOT } = {}) {
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/music.css?v=20260805-2">
   <link rel="stylesheet" href="${STYLE_HREF}">
+  <link rel="stylesheet" href="${MUSIC_PLAYER_STYLE_HREF}">
   <link rel="stylesheet" href="/css/music-header.css?v=20260818-5">
 </head>
 <body class="music-page music-collection-detail-page" data-music-collection="${escapeHtml(collection.id)}">
@@ -228,9 +236,11 @@ export async function buildMusicCollections({ root = ROOT } = {}) {
     </section>
   </main>
 
+  ${renderMusicPlayer({ fallbackLabel: '77', defaultArtist: '7719 Music', defaultCover })}
   <footer class="music-site-footer"><span>7719 / MUSIC / COLLECTIONS</span><span>${renderLocalized(collection.title)}</span></footer>
   <script src="${MUSIC_BOOTSTRAP_SRC}"></script>
   <script src="/js/music-header.js?v=20260818-5"></script>
+  <script src="${MUSIC_PLAYER_SCRIPT_SRC}"></script>
 </body>
 </html>
 `;
