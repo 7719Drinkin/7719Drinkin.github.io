@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { MUSIC_BOOTSTRAP_SRC } from './music-runtime-config.mjs';
 import { createMusicCollectionRepository } from './music/music-collection-repository.mjs';
 import { createMusicLibraryRepository } from './music/music-library-repository.mjs';
-import { createRuntimePlayabilityResolver } from './music/runtime-playability-resolver.mjs';
+import { createPlaybackTrackView } from './music/playback-track-view.mjs';
+import { createRuntimeTrackResolver } from './music/runtime-playability-resolver.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const STYLE_HREF = '/css/music-collections.css?v=20260821-2';
@@ -31,7 +32,7 @@ const renderLocalized = (value) => {
 
 const routeOutputPath = (root, route) => join(root, String(route).replace(/^\/+/, ''), 'index.html');
 
-async function prepareSongRow({ entry, index, library, resolvePlayable }) {
+async function prepareSongRow({ entry, index, library, resolveRuntimeTrack }) {
   const song = await library.getSong(entry.songId);
   const album = song.albumId ? await library.getAlbum(song.albumId) : null;
   const artwork = await library.resolveSongArtwork(song.id);
@@ -40,12 +41,39 @@ async function prepareSongRow({ entry, index, library, resolvePlayable }) {
     profile: artist?.key ? await library.getArtistProfile(artist.key) : null
   })));
   const primary = song.artists?.find((artist) => artist?.role === 'primary') ?? song.artists?.[0] ?? null;
-  const playable = primary?.key
-    ? await resolvePlayable({ artistKey: primary.key, title: entry.title, album: entry.album })
-    : false;
+  const runtimeMatch = primary?.key
+    ? await resolveRuntimeTrack({ artistKey: primary.key, title: entry.title, album: entry.album })
+    : null;
+  const playbackTrack = createPlaybackTrackView({
+    song,
+    album,
+    artwork,
+    primary,
+    runtimeMatch
+  });
 
-  return { entry, index, song, album, artwork, artists, primary, playable };
+  return { entry, index, song, album, artwork, artists, primary, playbackTrack };
 }
+
+const renderPlaybackTrigger = (row) => {
+  const track = row.playbackTrack;
+  if (!track?.playback) {
+    return '<span class="collection-track-state"><span class="music-lang-zh">收藏</span><span class="music-lang-en">ARCHIVE</span></span>';
+  }
+
+  const cover = track.artwork ? ` data-cover-src="${escapeHtml(track.artwork)}"` : '';
+  return `<button class="collection-track-play" type="button"
+      data-player-track
+      data-audio-src="${escapeHtml(track.playback.src)}"
+      data-audio-type="${escapeHtml(track.playback.type)}"
+      data-song-title="${escapeHtml(track.title)}"
+      data-song-artist="${escapeHtml(track.artist)}"
+      data-song-album="${escapeHtml(track.album)}"${cover}
+      aria-label="播放 ${escapeHtml(track.title)}">
+    <b data-player-action aria-hidden="true">▶</b>
+    <span class="music-lang-zh">播放</span><span class="music-lang-en">PLAY</span>
+  </button>`;
+};
 
 export function renderCollectionSongRow(row) {
   const artistHtml = row.artists.map(({ reference, profile }) => {
@@ -61,12 +89,9 @@ export function renderCollectionSongRow(row) {
   const primaryProfile = row.primary?.key
     ? row.artists.find(({ reference }) => reference?.key === row.primary.key)?.profile ?? null
     : null;
-  const action = primaryProfile?.route
+  const artistAction = primaryProfile?.route
     ? `<a class="collection-track-action" href="${escapeHtml(primaryProfile.route)}#songs"><span class="music-lang-zh">进入歌手页</span><span class="music-lang-en">OPEN ARTIST</span><b aria-hidden="true">↗</b></a>`
-    : `<span class="collection-track-state"><span class="music-lang-zh">收藏</span><span class="music-lang-en">ARCHIVE</span></span>`;
-  const state = row.playable
-    ? '<span class="music-lang-zh">可播放</span><span class="music-lang-en">PLAYABLE</span>'
-    : '<span class="music-lang-zh">收藏</span><span class="music-lang-en">ARCHIVE</span>';
+    : '';
 
   return `<article class="collection-track-row reveal" data-collection-song="${escapeHtml(row.song.id)}">
     <span class="collection-track-index">${String(row.index + 1).padStart(2, '0')}</span>
@@ -81,8 +106,8 @@ export function renderCollectionSongRow(row) {
     </div>
     <p class="collection-track-note">${escapeHtml(row.song.note ?? '')}</p>
     <div class="collection-track-meta">
-      <em>${state}</em>
-      ${action}
+      ${renderPlaybackTrigger(row)}
+      ${artistAction}
     </div>
   </article>`;
 }
@@ -127,7 +152,7 @@ async function writeListeningCompatibilityPage(root, targetRoute) {
 export async function buildMusicCollections({ root = ROOT } = {}) {
   const collections = createMusicCollectionRepository({ root });
   const library = createMusicLibraryRepository({ root });
-  const resolvePlayable = createRuntimePlayabilityResolver({ root });
+  const resolveRuntimeTrack = createRuntimeTrackResolver({ root });
   const visibleCollections = await collections.getVisibleCollections();
   const outputs = [];
 
@@ -136,12 +161,13 @@ export async function buildMusicCollections({ root = ROOT } = {}) {
     const songs = await collections.resolveCollectionSongs(collection.id);
     const rows = [];
     for (const [index, entry] of songs.entries()) {
-      rows.push(await prepareSongRow({ entry, index, library, resolvePlayable }));
+      rows.push(await prepareSongRow({ entry, index, library, resolveRuntimeTrack }));
     }
 
     const titleEn = localized(collection.title, 'en') || collection.id;
     const titleZh = localized(collection.title, 'zh') || titleEn;
     const description = renderLocalized(collection.description ?? '');
+    const queueId = `collection:${collection.id}`;
     const html = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -188,7 +214,11 @@ export async function buildMusicCollections({ root = ROOT } = {}) {
       <header class="collection-detail-section-header reveal">
         <h2><span class="music-lang-zh">歌曲</span><span class="music-lang-en">TRACKS</span></h2>
       </header>
-      <div class="collection-track-list">
+      <div class="collection-track-list"
+        data-playback-queue
+        data-queue-id="${escapeHtml(queueId)}"
+        data-queue-kind="collection"
+        data-queue-title="${escapeHtml(titleEn)}">
         ${rows.map(renderCollectionSongRow).join('\n        ')}
       </div>
     </section>
@@ -208,7 +238,7 @@ export async function buildMusicCollections({ root = ROOT } = {}) {
     const outputPath = routeOutputPath(root, collection.route);
     await mkdir(dirname(outputPath), { recursive: true });
     await writeFile(outputPath, html, 'utf8');
-    outputs.push({ collection, songs, outputPath });
+    outputs.push({ collection, songs, rows, outputPath });
   }
 
   const recent = outputs.find(({ collection }) => collection.id === RECENT_COLLECTION_ID);
