@@ -447,3 +447,116 @@
     gap: 5px;
   }
 }
+
+@media (max-width: 520px) {
+  .music-artist-page,
+  .music-collection-detail-page { padding-bottom: 88px; }
+
+  .site-music-player {
+    right: 8px;
+    bottom: 8px;
+    width: calc(100% - 16px);
+    height: 62px;
+  }
+
+  .site-music-player:not(.is-collapsed) {
+    grid-template-columns: minmax(0,1fr) 42px 0fr 0fr 34px;
+    gap: 7px;
+    padding: 7px;
+    border-radius: 18px;
+  }
+
+  .site-music-player:not(.is-collapsed) .site-player-progress,
+  .site-music-player:not(.is-collapsed) .site-player-volume {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .site-music-player.is-collapsed {
+    right: 8px;
+    bottom: 8px;
+    width: min(286px, calc(100% - 16px));
+    height: 60px;
+  }
+
+  .site-player-track {
+    grid-template-columns: 44px minmax(0,1fr);
+    gap: 8px;
+  }
+
+  .site-player-cover {
+    width: 44px;
+    height: 44px;
+  }
+
+  .site-player-copy strong {
+    font-size: 14px;
+  }
+
+  .site-player-copy small {
+    font-size: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-music-player,
+  .site-player-track,
+  .site-player-cover,
+  .site-player-copy,
+  .site-player-copy > span,
+  .site-player-copy strong,
+  .site-player-copy small,
+  .site-player-controls,
+  .site-player-controls button,
+  .site-player-progress,
+  .site-player-volume,
+  .site-player-expand {
+    transition-duration: .01ms !important;
+  }
+
+  .site-music-player.is-playing .site-player-cover,
+  .site-music-player.is-playing .site-player-toggle::after {
+    animation: none;
+  }
+}
+
+.site-player-cover.has-cover-art {
+  isolation: isolate;
+  font-size: 0;
+}
+
+.site-player-cover.has-cover-art > img[data-player-cover-art] {
+  position: relative;
+  z-index: 1;
+  width: 64%;
+  height: 64%;
+  border: 1px solid color-mix(in srgb, var(--player-accent-soft) 38%, rgba(255,255,255,.2));
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  box-shadow:
+    0 0 0 3px rgba(0,0,0,.5),
+    0 1px 8px rgba(0,0,0,.42);
+  pointer-events: none;
+  user-select: none;
+}
+
+.site-player-cover.has-cover-art::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: 5px;
+  height: 5px;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--player-bg) 72%, black);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.55);
+  content: "";
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.site-music-player.is-idle .site-player-cover.has-cover-art > img[data-player-cover-art] {
+  filter: saturate(.72) brightness(.9);
+}
