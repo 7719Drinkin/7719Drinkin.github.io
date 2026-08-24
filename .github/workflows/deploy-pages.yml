@@ -63,6 +63,7 @@ jobs:
           node --check scripts/validate-anime-catalog.mjs
           node --check scripts/music-runtime-config.mjs
           node --check scripts/validate-music-runtime.mjs
+          node --check scripts/validate-music-playback-queues.mjs
           node --check scripts/sync-music-catalog.mjs
           node --check scripts/install-site-shell.mjs
           node --check scripts/patch-music-header.mjs
@@ -75,6 +76,8 @@ jobs:
           node --check scripts/music/music-collection-repository.mjs
           node --check scripts/music/music-library-repository.mjs
           node --check scripts/music/dynamic-collection-resolver.mjs
+          node --check scripts/music/playback-track-view.mjs
+          node --check scripts/music/music-player-view.mjs
           node --check scripts/validate-music-library.mjs
           node --check scripts/validate-music-collections.mjs
           node --check scripts/validate-music-collection-pages.mjs
@@ -86,6 +89,7 @@ jobs:
           node --test scripts/music/music-collection-repository.test.mjs
           node --test scripts/music/dynamic-collection-resolver.test.mjs
           node --test scripts/music/runtime-playability-resolver.test.mjs
+          node --test scripts/music/playback-track-view.test.mjs
           node scripts/validate-music-library.mjs
           node scripts/validate-music-collections.mjs
           node scripts/validate-music-album-assets.mjs --forbid-legacy-copies
@@ -136,6 +140,7 @@ jobs:
           node scripts/validate-music-catalog-identity.mjs
           node scripts/validate-music-library.mjs
           node scripts/validate-music-collections.mjs
+          node scripts/validate-music-playback-queues.mjs
           node scripts/validate-music-collection-pages.mjs
           node scripts/validate-music-album-assets.mjs --forbid-legacy-copies
           node scripts/validate-music-catalog-config.mjs
