@@ -207,13 +207,14 @@ function renderSongRow(song, index, artistName) {
 
   if (song.audio?.src) {
     return `<button class="song-row song-row--playable" type="button"
+      data-player-track
       data-audio-src="${escapeHtml(song.audio.src)}"
       data-audio-type="${escapeHtml(song.audio.type ?? 'audio/mpeg')}"
       data-song-title="${escapeHtml(song.title)}"
       data-song-artist="${escapeHtml(artistName)}"
       data-song-album="${escapeHtml(song.album ?? '')}"
       aria-label="播放 ${escapeHtml(song.title)}">
-      ${core}<b class="song-row-action" aria-hidden="true">▶</b>
+      ${core}<b class="song-row-action" data-player-action aria-hidden="true">▶</b>
     </button>`;
   }
 
@@ -340,7 +341,11 @@ function renderArtistPage(artist, detail, artists) {
     <section id="overview" class="artist-overview music-content-section">
       <div id="songs" class="artist-song-column">
         ${renderSectionHeader('01 / SELECTED SONGS', '反复聆听', '只有配置了音频源的条目才显示播放控制。')}
-        <div class="song-list reveal">${renderSongs(detail.selectedSongs, nameEn)}</div>
+        <div class="song-list reveal"
+          data-playback-queue
+          data-queue-id="artist-selection:${escapeHtml(artist.slug)}"
+          data-queue-kind="artist-selection"
+          data-queue-title="${escapeHtml(nameEn)}">${renderSongs(detail.selectedSongs, nameEn)}</div>
       </div>
       <aside class="artist-note reveal">
         <p>ABOUT THE COLLECTION</p>
