@@ -13,7 +13,7 @@ import { createPlaybackTrackView } from './music/playback-track-view.mjs';
 import { createRuntimeTrackResolver } from './music/runtime-playability-resolver.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const STYLE_HREF = '/css/music-collections.css?v=20260827-play-control-1';
+const STYLE_HREF = '/css/music-collections.css?v=20260827-play-control-2';
 const LISTENING_COMPAT_ROUTE = '/music/listening/';
 const RECENT_COLLECTION_ID = 'recently-curated';
 
