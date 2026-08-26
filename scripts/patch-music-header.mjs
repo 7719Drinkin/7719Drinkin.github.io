@@ -46,7 +46,7 @@ function renderAlbumHeader(artist) {
   const nameEn = localized(artist.name, 'en');
   const artistRoute = artist.route || `/music/artists/${artist.slug}/`;
 
-  return `<header class="music-site-header">\n    ${renderIdentity(nameZh, nameEn)}\n    <nav class="music-site-nav" aria-label="${escapeHtml(nameZh)}专辑导航">\n      <a href="${escapeHtml(artistRoute)}#overview"><span class="music-lang-zh">歌手</span><span class="music-lang-en">ARTIST</span></a>\n      <a href="${escapeHtml(artistRoute)}#albums"><span class="music-lang-zh">专辑</span><span class="music-lang-en">ALBUMS</span></a>\n      <a href="#tracks"><span class="music-lang-zh">曲目</span><span class="music-lang-en">TRACKS</span></a>\n    </nav>\n  </header>`;
+  return `<header class="music-site-header">\n    ${renderIdentity(nameZh, nameEn)}\n    <nav class="music-site-nav" aria-label="${escapeHtml(nameZh)}专辑导航">\n      <a href="#tracks"><span class="music-lang-zh">曲目</span><span class="music-lang-en">TRACKS</span></a>\n      <a href="${escapeHtml(artistRoute)}#albums"><span class="music-lang-zh">专辑</span><span class="music-lang-en">ALBUMS</span></a>\n      <a href="${escapeHtml(artistRoute)}#overview"><span class="music-lang-zh">歌手</span><span class="music-lang-en">ARTIST</span></a>\n    </nav>\n  </header>`;
 }
 
 function renderCollectionHeader(collection) {
