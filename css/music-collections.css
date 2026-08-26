@@ -227,8 +227,9 @@ html[data-music-language="zh"] .collection-track-artist {
 
 .collection-track-meta {
   display: grid;
+  min-width: 92px;
   justify-items: end;
-  gap: 9px;
+  gap: 10px;
 }
 
 .collection-track-play,
@@ -242,28 +243,97 @@ html[data-music-language="zh"] .collection-track-artist {
 
 .collection-track-play {
   display: inline-flex;
+  min-width: 78px;
+  min-height: 34px;
   align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  padding: 0;
-  border: 0;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px 0 10px;
+  border: 1px solid rgba(216,168,78,.28);
+  border-radius: 999px;
   color: var(--music-gold-soft);
-  background: transparent;
+  background:
+    linear-gradient(180deg, rgba(216,168,78,.07), rgba(216,168,78,.025));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.015);
   cursor: pointer;
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    color .2s ease,
+    background .2s ease,
+    box-shadow .2s ease;
 }
 
 .collection-track-play b {
   display: grid;
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
   place-items: center;
   color: var(--music-gold);
 }
 
-.collection-track-play:hover,
-.collection-track-play.is-active,
-.collection-track-play.is-playing {
+.collection-track-play b svg {
+  width: 13px;
+  height: 13px;
+  stroke-width: 1.9;
+}
+
+.collection-track-play .player-icon-fallback {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.collection-track-play:hover {
+  transform: translateY(-1px);
+  border-color: rgba(216,168,78,.58);
   color: var(--music-text);
+  background:
+    linear-gradient(180deg, rgba(216,168,78,.14), rgba(216,168,78,.055));
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.02),
+    0 8px 24px rgba(0,0,0,.18);
+}
+
+.collection-track-play:focus-visible {
+  outline: 2px solid var(--music-gold);
+  outline-offset: 3px;
+}
+
+.collection-track-play.is-active {
+  border-color: rgba(216,168,78,.7);
+  color: var(--music-text);
+  background:
+    linear-gradient(180deg, rgba(216,168,78,.13), rgba(216,168,78,.05));
+}
+
+.collection-track-play.is-playing {
+  transform: translateY(-1px);
+  border-color: var(--music-gold);
+  color: #07101e;
+  background: var(--music-gold);
+  box-shadow: 0 9px 28px rgba(216,168,78,.17);
+}
+
+.collection-track-play.is-playing b {
+  color: #07101e;
+}
+
+.collection-track-play.is-playing > .music-lang-zh,
+.collection-track-play.is-playing > .music-lang-en {
+  display: none;
+}
+
+.collection-track-play.is-playing::after {
+  content: "暂停";
+}
+
+html[data-music-language="en"] .collection-track-play.is-playing::after {
+  content: "PAUSE";
 }
 
 html[data-music-language="zh"] .collection-track-play,
@@ -273,6 +343,11 @@ html[data-music-language="zh"] .collection-track-state {
   letter-spacing: .03em;
 }
 
+.collection-track-action {
+  opacity: .72;
+  transition: color .2s ease, opacity .2s ease;
+}
+
 .collection-track-action b {
   margin-left: 6px;
   color: var(--music-gold);
@@ -280,6 +355,7 @@ html[data-music-language="zh"] .collection-track-state {
 
 .collection-track-action:hover {
   color: var(--music-text);
+  opacity: 1;
 }
 
 .collection-detail-return {
@@ -352,7 +428,24 @@ html[data-music-language="zh"] .collection-detail-return a {
   }
 
   .collection-track-meta {
-    gap: 7px;
+    min-width: 72px;
+    gap: 8px;
+  }
+
+  .collection-track-play {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    min-height: 36px;
+    gap: 0;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  .collection-track-play > .music-lang-zh,
+  .collection-track-play > .music-lang-en,
+  .collection-track-play.is-playing::after {
+    display: none !important;
   }
 
   .collection-track-play,
@@ -360,5 +453,16 @@ html[data-music-language="zh"] .collection-detail-return a {
   .collection-track-state {
     max-width: 78px;
     text-align: right;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collection-track-play {
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+  }
+
+  .collection-track-play:hover,
+  .collection-track-play.is-playing {
+    transform: none;
   }
 }
