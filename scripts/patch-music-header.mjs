@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -41,6 +41,14 @@ function renderArtistHeader(artist) {
   return `<header class="music-site-header">\n    ${renderIdentity(nameZh, nameEn)}\n    <nav class="music-site-nav" aria-label="${escapeHtml(nameZh)}收藏导航">\n      <a href="#overview"><span class="music-lang-zh">概览</span><span class="music-lang-en">OVERVIEW</span></a>\n      <a href="#songs"><span class="music-lang-zh">歌曲</span><span class="music-lang-en">SONGS</span></a>\n      <a href="#albums"><span class="music-lang-zh">专辑</span><span class="music-lang-en">ALBUMS</span></a>\n      <a href="#gallery"><span class="music-lang-zh">影像</span><span class="music-lang-en">VISUAL</span></a>\n    </nav>\n  </header>`;
 }
 
+function renderAlbumHeader(artist) {
+  const nameZh = localized(artist.name, 'zh');
+  const nameEn = localized(artist.name, 'en');
+  const artistRoute = artist.route || `/music/artists/${artist.slug}/`;
+
+  return `<header class="music-site-header">\n    ${renderIdentity(nameZh, nameEn)}\n    <nav class="music-site-nav" aria-label="${escapeHtml(nameZh)}专辑导航">\n      <a href="${escapeHtml(artistRoute)}#overview"><span class="music-lang-zh">歌手</span><span class="music-lang-en">ARTIST</span></a>\n      <a href="${escapeHtml(artistRoute)}#albums"><span class="music-lang-zh">专辑</span><span class="music-lang-en">ALBUMS</span></a>\n      <a href="#tracks"><span class="music-lang-zh">曲目</span><span class="music-lang-en">TRACKS</span></a>\n    </nav>\n  </header>`;
+}
+
 function renderCollectionHeader(collection) {
   const titleZh = localized(collection.title, 'zh');
   const titleEn = localized(collection.title, 'en');
@@ -72,6 +80,25 @@ async function patchFile(file, header, label) {
   await writeFile(file, output, 'utf8');
 }
 
+async function patchAlbumHeaders(artist) {
+  const albumsRoot = join(MUSIC_ROOT, 'artists', artist.slug, 'albums');
+  let entries;
+  try {
+    entries = await readdir(albumsRoot, { withFileTypes: true });
+  } catch (error) {
+    if (error?.code === 'ENOENT') return 0;
+    throw error;
+  }
+
+  let count = 0;
+  for (const entry of entries.filter((candidate) => candidate.isDirectory())) {
+    const file = join(albumsRoot, entry.name, 'index.html');
+    await patchFile(file, renderAlbumHeader(artist), `${artist.route || artist.slug}albums/${entry.name}/`);
+    count += 1;
+  }
+  return count;
+}
+
 const collectionOutputPath = (route) => join(ROOT, String(route).replace(/^\/+/, ''), 'index.html');
 
 async function main() {
@@ -86,9 +113,11 @@ async function main() {
     'music/index.html'
   );
 
+  let albumPageCount = 0;
   for (const artist of artists) {
     const file = join(MUSIC_ROOT, 'artists', artist.slug, 'index.html');
     await patchFile(file, renderArtistHeader(artist), artist.route || artist.slug);
+    albumPageCount += await patchAlbumHeaders(artist);
   }
 
   for (const collection of collections) {
@@ -97,7 +126,7 @@ async function main() {
     await patchFile(file, renderCollectionHeader(detail), collection.route || collection.id);
   }
 
-  console.log(`Patched canonical Music header on landing, ${artists.length} artist page(s), and ${collections.length} collection page(s). Listening remains a compatibility redirect outside the public Music IA.`);
+  console.log(`Patched canonical Music header on landing, ${artists.length} artist page(s), ${albumPageCount} album page(s), and ${collections.length} collection page(s). Listening remains a compatibility redirect outside the public Music IA.`);
 }
 
 main().catch((error) => {
