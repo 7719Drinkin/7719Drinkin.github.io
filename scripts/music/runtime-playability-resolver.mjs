@@ -50,7 +50,7 @@ const findTrack = (albums, entry) => {
 
   for (const album of searchAlbums) {
     const exact = album.tracks.find((track) => normalizeMusicKey(track?.title || track?.fileName) === title);
-    if (exact) return exact;
+    if (exact) return { album, track: exact };
   }
 
   for (const album of searchAlbums) {
@@ -58,14 +58,14 @@ const findTrack = (albums, entry) => {
       const candidate = normalizeMusicKey(track?.title || track?.fileName);
       return candidate.length >= 2 && (candidate.includes(title) || title.includes(candidate));
     });
-    if (partial) return partial;
+    if (partial) return { album, track: partial };
   }
 
   return null;
 };
 
-export function createRuntimePlayabilityResolver({ root }) {
-  if (!root) throw new Error('RuntimePlayabilityResolver requires a root path.');
+export function createRuntimeTrackResolver({ root }) {
+  if (!root) throw new Error('RuntimeTrackResolver requires a root path.');
 
   const configPath = join(root, 'data/music/catalog.json');
   const runtimeDir = join(root, 'data/music/runtime');
@@ -87,11 +87,29 @@ export function createRuntimePlayabilityResolver({ root }) {
   return async (entry) => {
     const config = await loadConfig();
     const prefix = config?.artists?.[entry.artistKey]?.prefix;
-    if (!prefix) return false;
+    if (!prefix) return null;
 
     const runtime = await loadRuntime(prefix);
-    if (!runtime || runtime.artistPrefix !== prefix) return false;
+    if (!runtime || runtime.artistPrefix !== prefix) return null;
 
-    return Boolean(findTrack(catalogAlbums(runtime), entry));
+    const match = findTrack(catalogAlbums(runtime), entry);
+    if (!match?.track?.src) return null;
+
+    return {
+      artistKey: entry.artistKey,
+      prefix,
+      album: {
+        name: match.album.name
+      },
+      track: {
+        ...match.track,
+        type: match.track.type || 'audio/mpeg'
+      }
+    };
   };
+}
+
+export function createRuntimePlayabilityResolver({ root }) {
+  const resolveRuntimeTrack = createRuntimeTrackResolver({ root });
+  return async (entry) => Boolean(await resolveRuntimeTrack(entry));
 }

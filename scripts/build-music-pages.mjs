@@ -1,7 +1,13 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  MUSIC_BOOTSTRAP_SRC,
+  MUSIC_PLAYER_SCRIPT_SRC,
+  MUSIC_PLAYER_STYLE_HREF
+} from './music-runtime-config.mjs';
 import { createMusicLibraryRepository } from './music/music-library-repository.mjs';
+import { renderMusicPlayer } from './music/music-player-view.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const registryPath = join(ROOT, 'data/music/artists.json');
@@ -207,13 +213,14 @@ function renderSongRow(song, index, artistName) {
 
   if (song.audio?.src) {
     return `<button class="song-row song-row--playable" type="button"
+      data-player-track
       data-audio-src="${escapeHtml(song.audio.src)}"
       data-audio-type="${escapeHtml(song.audio.type ?? 'audio/mpeg')}"
       data-song-title="${escapeHtml(song.title)}"
       data-song-artist="${escapeHtml(artistName)}"
       data-song-album="${escapeHtml(song.album ?? '')}"
       aria-label="播放 ${escapeHtml(song.title)}">
-      ${core}<b class="song-row-action" aria-hidden="true">▶</b>
+      ${core}<b class="song-row-action" data-player-action aria-hidden="true">▶</b>
     </button>`;
   }
 
@@ -260,37 +267,6 @@ function renderRelated(current, artists) {
     </a>`).join('');
 }
 
-function renderPlayer(artist) {
-  const nameEn = localized(artist.name, 'en');
-  return `<aside class="site-music-player is-collapsed" data-music-player hidden aria-label="网站音乐播放器">
-    <audio data-player-audio preload="metadata"></audio>
-    <div class="site-player-track">
-      <div class="site-player-cover" aria-hidden="true">${escapeHtml(initials(nameEn))}</div>
-      <div class="site-player-copy">
-        <span>NOW PLAYING</span>
-        <strong data-player-title>尚未选择歌曲</strong>
-        <small><span data-player-artist>${escapeHtml(nameEn)}</span><span data-player-album></span></small>
-      </div>
-    </div>
-    <div class="site-player-controls">
-      <button type="button" data-player-prev aria-label="上一首">‹</button>
-      <button class="site-player-toggle" type="button" data-player-toggle aria-label="播放">▶</button>
-      <button type="button" data-player-next aria-label="下一首">›</button>
-    </div>
-    <div class="site-player-progress">
-      <time data-player-current>0:00</time>
-      <input data-player-seek type="range" min="0" max="100" value="0" step="0.1" aria-label="播放进度">
-      <time data-player-duration>0:00</time>
-      <p data-player-status aria-live="polite"></p>
-    </div>
-    <div class="site-player-volume">
-      <span>VOL</span>
-      <input data-player-volume type="range" min="0" max="1" value="0.8" step="0.05" aria-label="音量">
-    </div>
-    <button class="site-player-expand" type="button" data-player-expand aria-expanded="false" aria-label="展开播放器">⌃</button>
-  </aside>`;
-}
-
 function renderArtistPage(artist, detail, artists) {
   const nameZh = localized(artist.name, 'zh');
   const nameEn = localized(artist.name, 'en');
@@ -312,7 +288,7 @@ function renderArtistPage(artist, detail, artists) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/music.css?v=20260805-2">
-  <link rel="stylesheet" href="/css/music-player.css?v=20260805-4">
+  <link rel="stylesheet" href="${MUSIC_PLAYER_STYLE_HREF}">
 </head>
 <body class="music-page music-artist-page"
   style="--artist-accent:${escapeHtml(artist.theme.accent)};--artist-accent-soft:${escapeHtml(artist.theme.accentSoft)};--artist-bg:${escapeHtml(artist.theme.background)};--artist-fg:${escapeHtml(artist.theme.foreground)}">
@@ -340,7 +316,11 @@ function renderArtistPage(artist, detail, artists) {
     <section id="overview" class="artist-overview music-content-section">
       <div id="songs" class="artist-song-column">
         ${renderSectionHeader('01 / SELECTED SONGS', '反复聆听', '只有配置了音频源的条目才显示播放控制。')}
-        <div class="song-list reveal">${renderSongs(detail.selectedSongs, nameEn)}</div>
+        <div class="song-list reveal"
+          data-playback-queue
+          data-queue-id="artist-selection:${escapeHtml(artist.slug)}"
+          data-queue-kind="artist-selection"
+          data-queue-title="${escapeHtml(nameEn)}">${renderSongs(detail.selectedSongs, nameEn)}</div>
       </div>
       <aside class="artist-note reveal">
         <p>ABOUT THE COLLECTION</p>
@@ -367,10 +347,10 @@ function renderArtistPage(artist, detail, artists) {
     </section>
   </main>
 
-  ${renderPlayer(artist)}
+  ${renderMusicPlayer({ fallbackLabel: initials(nameEn), defaultArtist: nameEn })}
   <footer class="music-site-footer"><a href="/music/">← MUSIC COLLECTION</a><span>${escapeHtml(nameEn.toUpperCase())} / 7719</span></footer>
-  <script src="/js/music.js?v=20260805-2"></script>
-  <script src="/js/music-player.js?v=20260805-2"></script>
+  <script src="${MUSIC_BOOTSTRAP_SRC}"></script>
+  <script src="${MUSIC_PLAYER_SCRIPT_SRC}"></script>
 </body>
 </html>`;
 }

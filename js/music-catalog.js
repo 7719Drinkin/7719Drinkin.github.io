@@ -33,6 +33,15 @@
     note: row.dataset.featuredNote || ''
   }));
 
+  songList.dataset.playbackQueue = '';
+  songList.dataset.queueKind = pageType === 'album' ? 'album' : 'artist-selection';
+  songList.dataset.queueId = pageType === 'album'
+    ? `album:${artistSlug}:${requestedAlbumName}`
+    : `artist-selection:${artistSlug}`;
+  songList.dataset.queueTitle = pageType === 'album' && requestedAlbumName
+    ? requestedAlbumName
+    : artistName;
+
   if (playerAudio) {
     playerAudio.preload = 'none';
     playerAudio.removeAttribute('src');
@@ -274,6 +283,7 @@
     const row = document.createElement('button');
     row.className = 'song-row song-row--playable';
     row.type = 'button';
+    row.dataset.playerTrack = '';
     row.dataset.audioSrc = track.src;
     row.dataset.audioType = track.type || 'audio/mpeg';
     row.dataset.songTitle = track.title || track.fileName || 'Untitled';
@@ -300,6 +310,7 @@
 
     const action = document.createElement('b');
     action.className = 'song-row-action';
+    action.dataset.playerAction = '';
     action.setAttribute('aria-hidden', 'true');
     action.textContent = '▶';
 
@@ -430,7 +441,7 @@
   };
 
   const ensurePlayer = () => {
-    if (!playerRoot || !document.querySelector('.song-row--playable')) return;
+    if (!playerRoot || !document.querySelector('[data-player-track]')) return;
     if (playerRoot.dataset.playerReady === 'true') return;
     if (document.querySelector('script[data-dynamic-music-player]')) return;
 

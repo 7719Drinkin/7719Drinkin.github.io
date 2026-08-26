@@ -1,6 +1,7 @@
 (() => {
   const FRAME_PARAM = '__site_frame';
   const THREE_D_PATH = /^\/(?:preview\/)?solar-universe(?:\/|$)/;
+  const PLAYABLE_TRACK_SELECTOR = '[data-player-track][data-audio-src], .song-row--playable[data-audio-src]';
   const params = new URLSearchParams(window.location.search);
   const hasParentShell = () => {
     try {
@@ -85,7 +86,17 @@
     };
   };
 
-  const queueFromPage = () => [...document.querySelectorAll('.song-row--playable[data-audio-src]')]
+  const playableRows = () => {
+    const queueRoot = document.querySelector('[data-playback-queue]');
+    const queueRows = queueRoot
+      ? [...queueRoot.querySelectorAll('[data-player-track][data-audio-src]')]
+      : [];
+    return queueRows.length
+      ? queueRows
+      : [...document.querySelectorAll('.song-row--playable[data-audio-src]')];
+  };
+
+  const queueFromPage = () => playableRows()
     .map(trackFromRow)
     .filter(Boolean);
 
@@ -117,14 +128,14 @@
     const activeSource = message.track?.src || '';
     const playing = Boolean(message.playing);
 
-    document.querySelectorAll('.song-row--playable[data-audio-src]').forEach((row) => {
+    playableRows().forEach((row) => {
       const rowSource = new URL(row.dataset.audioSrc, window.location.href).href;
       const active = Boolean(activeSource && rowSource === activeSource);
       row.classList.toggle('is-active', active);
       row.classList.toggle('is-playing', active && playing);
       row.setAttribute('aria-pressed', String(active && playing));
 
-      const action = row.querySelector('.song-row-action');
+      const action = row.querySelector('[data-player-action], .song-row-action');
       const nextLabel = active && playing ? 'Ⅱ' : '▶';
       if (action && action.textContent !== nextLabel) action.textContent = nextLabel;
     });
@@ -136,7 +147,7 @@
     const target = event.target instanceof Element ? event.target : event.target?.parentElement;
     if (!target) return;
 
-    const row = target.closest('.song-row--playable[data-audio-src]');
+    const row = target.closest(PLAYABLE_TRACK_SELECTOR);
     if (row) {
       event.preventDefault();
       event.stopImmediatePropagation();

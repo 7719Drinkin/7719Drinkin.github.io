@@ -29,14 +29,14 @@
     }
 
     .site-music-player.is-idle {
-      border-color: color-mix(in srgb, var(--artist-accent) 20%, rgba(255,255,255,.1));
+      border-color: color-mix(in srgb, var(--player-accent) 20%, rgba(255,255,255,.1));
       box-shadow: 0 14px 42px rgba(0,0,0,.3);
       opacity: .78;
     }
 
     .site-music-player.is-idle:hover {
       opacity: .96;
-      border-color: color-mix(in srgb, var(--artist-accent) 34%, rgba(255,255,255,.13));
+      border-color: color-mix(in srgb, var(--player-accent) 34%, rgba(255,255,255,.13));
     }
 
     .site-music-player.is-idle .site-player-cover {
@@ -52,7 +52,7 @@
     }
 
     .site-music-player.is-idle .site-player-copy strong {
-      color: color-mix(in srgb, var(--artist-fg) 76%, transparent);
+      color: color-mix(in srgb, var(--player-fg) 76%, transparent);
     }
 
     .site-music-player.is-idle .site-player-copy small {
@@ -162,6 +162,10 @@
       });
     }
 
+    trackAction(row) {
+      return row?.querySelector('[data-player-action], .song-row-action') || null;
+    }
+
     initializeIdleDock() {
       this.root.classList.add('is-idle');
       this.root.classList.remove('is-mounted');
@@ -260,7 +264,7 @@
       }
 
       this.rows.forEach((row) => {
-        const action = row.querySelector('.song-row-action');
+        const action = this.trackAction(row);
         if (!action) return;
         action.dataset.playerIcon = 'play';
         action.dataset.playerFallback = '▶';
@@ -312,7 +316,7 @@
         const active = index === this.activeIndex;
         row.classList.toggle('is-active', active);
         row.classList.toggle('is-playing', active && isPlaying);
-        const action = row.querySelector('.song-row-action');
+        const action = this.trackAction(row);
         if (!action) return;
         action.dataset.playerIcon = active && isPlaying ? 'pause' : 'play';
         action.dataset.playerFallback = active && isPlaying ? 'Ⅱ' : '▶';
@@ -465,9 +469,17 @@
     }
   }
 
-  const rows = [...document.querySelectorAll('.song-row--playable')];
+  const queueRoot = document.querySelector('[data-playback-queue]');
+  let rows = queueRoot ? [...queueRoot.querySelectorAll('[data-player-track]')] : [];
+  if (!rows.length) rows = [...document.querySelectorAll('.song-row--playable')];
+
   const root = document.querySelector('[data-music-player]');
   if (!rows.length || !root) return;
+
+  if (queueRoot) {
+    root.dataset.queueId = queueRoot.dataset.queueId || '';
+    root.dataset.queueKind = queueRoot.dataset.queueKind || '';
+  }
 
   new MusicPlayer(root, rows);
 })();
