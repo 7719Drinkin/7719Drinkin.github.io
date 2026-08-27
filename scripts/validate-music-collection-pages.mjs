@@ -74,7 +74,7 @@ async function main() {
     const page = await read(routePath(collection.route));
     assert(page.includes('class="music-page music-collection-detail-page"'), `Collection ${collection.id} must use the collection detail shell.`);
     assert(page.includes(`data-music-collection="${collection.id}"`), `Collection ${collection.id} must expose its identity on body.`);
-    assert(page.includes('music-header-current'), `Collection ${collection.id} must expose the canonical Music breadcrumb.`);
+    assert(page.includes('class="music-header-crumb music-header-crumb--current"'), `Collection ${collection.id} must expose the canonical Music breadcrumb.`);
     assert(page.includes('>RECENTLY CURATED<'), `Collection ${collection.id} header must identify RECENTLY CURATED.`);
     assert(page.includes('href="/music/#collections"'), `Collection ${collection.id} must return to the Music Collections section.`);
     assert(page.includes('/js/music.js?v='), `Collection ${collection.id} must load the Music reveal runtime.`);
