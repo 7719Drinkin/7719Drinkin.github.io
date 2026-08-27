@@ -64,6 +64,7 @@ jobs:
           node --check scripts/music-runtime-config.mjs
           node --check scripts/validate-music-runtime.mjs
           node --check scripts/validate-music-playback-queues.mjs
+          node --check scripts/validate-music-headers.mjs
           node --check scripts/sync-music-catalog.mjs
           node --check scripts/install-site-shell.mjs
           node --check scripts/patch-music-header.mjs
@@ -73,6 +74,7 @@ jobs:
           node --check scripts/update-music-collections-home.mjs
           node --check scripts/enhance-music-albums.mjs
           node --check scripts/embed-music-i18n-data.mjs
+          node --check scripts/music/music-album-route.mjs
           node --check scripts/music/music-collection-repository.mjs
           node --check scripts/music/music-library-repository.mjs
           node --check scripts/music/dynamic-collection-resolver.mjs
@@ -133,6 +135,7 @@ jobs:
           node scripts/apply-basketball-design-system.mjs
           node scripts/install-site-shell.mjs
           node scripts/patch-music-header.mjs
+          node scripts/validate-music-headers.mjs
           node scripts/apply-site-revision.mjs
           node scripts/validate-site-revision.mjs
           node scripts/validate-anime-catalog.mjs
