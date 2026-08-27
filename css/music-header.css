@@ -1,4 +1,5 @@
 .music-site-header {
+  --music-header-crumb-size: 10px;
   display: flex;
   height: 76px;
   grid-template-columns: none;
@@ -67,6 +68,7 @@ body.music-page .music-site-header .music-header-section,
 body.music-page .music-site-header .music-header-crumb,
 body.music-page .music-site-header .music-header-current,
 body.music-page .music-site-header .music-header-slash {
+  font-size: var(--music-header-crumb-size);
   line-height: 1;
   text-transform: uppercase;
 }
@@ -79,7 +81,6 @@ body.music-page .music-site-header .music-header-current {
   min-width: 0;
   overflow: hidden;
   font-family: var(--music-mono);
-  font-size: 10px;
   font-weight: 500;
   letter-spacing: .14em;
   text-decoration: none;
@@ -125,7 +126,6 @@ body.music-page .music-site-header .music-header-slash {
   flex: 0 0 auto;
   color: rgba(255, 255, 255, 0.24);
   font-family: var(--music-mono);
-  font-size: 10px;
   font-weight: 400;
   letter-spacing: 0;
 }
@@ -157,7 +157,6 @@ html[data-music-language="zh"] body.music-page .music-site-header .music-site-na
 html[data-music-language="zh"] body.music-page .music-site-header .music-header-section,
 html[data-music-language="zh"] body.music-page .music-site-header .music-header-crumb,
 html[data-music-language="zh"] body.music-page .music-site-header .music-header-current {
-  font-size: 10px;
   letter-spacing: .08em;
 }
 
@@ -198,6 +197,7 @@ html[data-music-language="zh"] body.music-page .music-site-header .music-site-na
 
 @media (max-width: 760px) {
   .music-site-header {
+    --music-header-crumb-size: 9px;
     height: 66px;
     gap: 16px;
     padding: 0 18px;
@@ -212,13 +212,6 @@ html[data-music-language="zh"] body.music-page .music-site-header .music-site-na
     gap: 8px;
   }
 
-  body.music-page .music-site-header .music-header-section,
-  body.music-page .music-site-header .music-header-crumb,
-  body.music-page .music-site-header .music-header-current,
-  body.music-page .music-site-header .music-header-slash {
-    font-size: 9px;
-  }
-
   body.music-page .music-site-header .music-header-crumb--ancestor {
     max-width: 86px;
   }
@@ -231,7 +224,6 @@ html[data-music-language="zh"] body.music-page .music-site-header .music-site-na
   html[data-music-language="zh"] body.music-page .music-site-header .music-header-section,
   html[data-music-language="zh"] body.music-page .music-site-header .music-header-crumb,
   html[data-music-language="zh"] body.music-page .music-site-header .music-header-current {
-    font-size: 9px;
     letter-spacing: .06em;
   }
 
