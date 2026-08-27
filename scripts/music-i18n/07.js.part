@@ -1,0 +1,124 @@
+function collectionDetailTrackMap() {
+  if (musicPageData?.pageType !== 'collection-detail') return new Map();
+  return new Map((musicPageData.tracks ?? []).map((track) => [String(track.id ?? ''), track]));
+}
+
+function collectionPrimaryArtist(track) {
+  return track?.artists?.find((artist) => artist?.role === 'primary')
+    ?? track?.artists?.[0]
+    ?? null;
+}
+
+function setTrackLocalizedDataset(element, key, value) {
+  if (!element || value == null) return;
+  const zh = localized(value, 'zh');
+  const en = localized(value, 'en') || zh;
+  element.dataset[`${key}Zh`] = zh || en;
+  element.dataset[`${key}En`] = en || zh;
+}
+
+function localizedTrackDataset(element, key) {
+  if (!element) return '';
+  const suffix = musicLanguage === 'zh' ? 'Zh' : 'En';
+  return element.dataset[`${key}${suffix}`] || element.dataset[key] || '';
+}
+
+function syncCollectionTrackMetadataLanguage() {
+  if (musicPageData?.pageType !== 'collection-detail') return;
+  const tracks = collectionDetailTrackMap();
+
+  document.querySelectorAll('.collection-track-row[data-collection-song]').forEach((row) => {
+    const track = tracks.get(row.dataset.collectionSong || '');
+    if (!track) return;
+
+    const note = row.querySelector('.collection-track-note');
+    if (note && track.note != null) {
+      note.dataset.musicLocalizedZh = localized(track.note, 'zh');
+      note.dataset.musicLocalizedEn = localized(track.note, 'en');
+      applyLocalizedDataElement(note);
+    }
+
+    const trigger = row.querySelector('[data-player-track]');
+    if (!trigger) return;
+
+    setTrackLocalizedDataset(trigger, 'songTitle', track.title);
+    setTrackLocalizedDataset(trigger, 'songArtist', collectionPrimaryArtist(track)?.name);
+    setTrackLocalizedDataset(trigger, 'songAlbum', track.album?.title);
+
+    trigger.dataset.songTitle = localizedTrackDataset(trigger, 'songTitle');
+    trigger.dataset.songArtist = localizedTrackDataset(trigger, 'songArtist');
+    trigger.dataset.songAlbum = localizedTrackDataset(trigger, 'songAlbum');
+    trigger.setAttribute(
+      'aria-label',
+      musicLanguage === 'zh'
+        ? `播放 ${trigger.dataset.songTitle}`
+        : `Play ${trigger.dataset.songTitle}`
+    );
+  });
+
+  const active = document.querySelector('[data-player-track].is-active, .song-row--playable.is-active');
+  const player = document.querySelector('[data-music-player]');
+  if (!active || !player) return;
+
+  const title = player.querySelector('[data-player-title]');
+  const artist = player.querySelector('[data-player-artist]');
+  const album = player.querySelector('[data-player-album]');
+  if (title) title.textContent = localizedTrackDataset(active, 'songTitle') || active.dataset.songTitle || '';
+  if (artist) artist.textContent = localizedTrackDataset(active, 'songArtist') || active.dataset.songArtist || '';
+  if (album) {
+    const value = localizedTrackDataset(active, 'songAlbum') || active.dataset.songAlbum || '';
+    album.textContent = value ? ` · ${value}` : '';
+  }
+}
+
+function applyCollectionDetailMetadata() {
+  if (musicPageData?.pageType !== 'collection-detail') return;
+  const title = localized(musicPageData.collection?.title, musicLanguage);
+  const description = localized(musicPageData.collection?.description, musicLanguage);
+  if (title) {
+    document.title = musicLanguage === 'zh'
+      ? `${title} · 音乐专栏 · 7719 Universe`
+      : `${title} · Music Collection · 7719 Universe`;
+  }
+  const descriptionNode = document.querySelector('meta[name="description"]');
+  if (descriptionNode && description) descriptionNode.content = description;
+}
+
+function syncMusicLanguageDataset(language = musicLanguage) {
+  if (language !== 'zh' && language !== 'en') return;
+  document.documentElement.dataset.musicLanguage = language;
+}
+
+function adoptExternalMusicLanguage(event) {
+  const language = event?.detail?.language;
+  if (language !== 'zh' && language !== 'en') return;
+  if (language === musicLanguage) {
+    syncMusicLanguageDataset(language);
+    return;
+  }
+  musicLanguage = language;
+  try { localStorage.setItem(MUSIC_LANGUAGE_KEY, language); } catch {}
+  applyMusicLanguage({ dispatch: false });
+  syncMusicLanguageDataset(language);
+  syncCollectionTrackMetadataLanguage();
+  applyCollectionDetailMetadata();
+}
+
+syncMusicLanguageDataset();
+syncCollectionTrackMetadataLanguage();
+applyCollectionDetailMetadata();
+applyMusicLanguage({ dispatch: false });
+syncCollectionTrackMetadataLanguage();
+
+window.addEventListener('music:language-change', (event) => {
+  syncMusicLanguageDataset(event.detail?.language || musicLanguage);
+  syncCollectionTrackMetadataLanguage();
+  applyCollectionDetailMetadata();
+});
+
+window.addEventListener('7719:languagechange', adoptExternalMusicLanguage);
+document.addEventListener('universe:languagechange', adoptExternalMusicLanguage);
+window.addEventListener('storage', (event) => {
+  if (event.key !== MUSIC_LANGUAGE_KEY || (event.newValue !== 'zh' && event.newValue !== 'en')) return;
+  adoptExternalMusicLanguage({ detail: { language: event.newValue } });
+});

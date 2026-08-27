@@ -66,15 +66,28 @@ const renderPlaybackTrigger = (row) => {
     return '<span class="collection-track-state"><span class="music-lang-zh">收藏</span><span class="music-lang-en">ARCHIVE</span></span>';
   }
 
+  const titleZh = localized(row.song.title, 'zh') || track.title;
+  const titleEn = localized(row.song.title, 'en') || titleZh;
+  const artistZh = localized(row.primary?.name, 'zh') || track.artist;
+  const artistEn = localized(row.primary?.name, 'en') || artistZh;
+  const albumZh = localized(row.album?.title, 'zh') || track.album;
+  const albumEn = localized(row.album?.title, 'en') || albumZh;
   const cover = track.artwork ? ` data-cover-src="${escapeHtml(track.artwork)}"` : '';
+
   return `<button class="collection-track-play" type="button"
       data-player-track
       data-audio-src="${escapeHtml(track.playback.src)}"
       data-audio-type="${escapeHtml(track.playback.type)}"
-      data-song-title="${escapeHtml(track.title)}"
-      data-song-artist="${escapeHtml(track.artist)}"
-      data-song-album="${escapeHtml(track.album)}"${cover}
-      aria-label="播放 ${escapeHtml(track.title)}">
+      data-song-title="${escapeHtml(titleZh)}"
+      data-song-title-zh="${escapeHtml(titleZh)}"
+      data-song-title-en="${escapeHtml(titleEn)}"
+      data-song-artist="${escapeHtml(artistZh)}"
+      data-song-artist-zh="${escapeHtml(artistZh)}"
+      data-song-artist-en="${escapeHtml(artistEn)}"
+      data-song-album="${escapeHtml(albumZh)}"
+      data-song-album-zh="${escapeHtml(albumZh)}"
+      data-song-album-en="${escapeHtml(albumEn)}"${cover}
+      aria-label="播放 ${escapeHtml(titleZh)}">
     <b data-player-action aria-hidden="true">▶</b>
     <span class="music-lang-zh">播放</span><span class="music-lang-en">PLAY</span>
   </button>`;
@@ -109,7 +122,7 @@ export function renderCollectionSongRow(row) {
       <small><span class="music-lang-zh">专辑</span><span class="music-lang-en">ALBUM</span></small>
       <p>${albumTitle}</p>
     </div>
-    <p class="collection-track-note">${escapeHtml(row.song.note ?? '')}</p>
+    <p class="collection-track-note">${renderLocalized(row.song.note ?? '')}</p>
     <div class="collection-track-meta">
       ${renderPlaybackTrigger(row)}
       ${artistAction}
