@@ -83,9 +83,17 @@ async function validateAlbums(artist) {
   const canonicalDetail = JSON.parse(await readFile(join(ARTIST_DETAILS_ROOT, `${artist.slug}.json`), 'utf8'));
   const albums = await library.getAlbums(canonicalDetail.albums ?? []);
   const albumsRoot = join(MUSIC_ROOT, 'artists', artist.slug, 'albums');
-  const actualDirectories = (await readdir(albumsRoot, { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name);
+  let actualDirectories = [];
+
+  try {
+    actualDirectories = (await readdir(albumsRoot, { withFileTypes: true }))
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name);
+  } catch (error) {
+    if (error?.code === 'ENOENT' && !albums.length) return 0;
+    throw error;
+  }
+
   const expectedSlugs = albums.map((album, index) => albumSlug(album, index));
   const expectedSet = new Set(expectedSlugs);
   const actualSet = new Set(actualDirectories);
