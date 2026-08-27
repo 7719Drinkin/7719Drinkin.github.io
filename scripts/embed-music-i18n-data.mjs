@@ -1,25 +1,17 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { albumSlug } from './music/music-album-route.mjs';
+import { createMusicCollectionRepository } from './music/music-collection-repository.mjs';
 import { createMusicLibraryRepository } from './music/music-library-repository.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const MUSIC_ROOT = join(ROOT, 'music');
 const DETAILS_ROOT = join(ROOT, 'data', 'music', 'artists');
 const REGISTRY_PATH = join(ROOT, 'data', 'music', 'artists.json');
-const MUSIC_I18N_VERSION = '20260807-3';
+const MUSIC_I18N_VERSION = '20260827-collection-1';
 const library = createMusicLibraryRepository({ root: ROOT });
-
-const fallbackAlbumSlug = (album, index) => {
-  const ascii = String(album.title || '')
-    .normalize('NFKD')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-  return ascii || `album-${String(index + 1).padStart(2, '0')}`;
-};
-
-const albumSlug = (album, index) => album.slug || fallbackAlbumSlug(album, index);
+const collections = createMusicCollectionRepository({ root: ROOT });
 
 function safeJson(data) {
   return JSON.stringify(data)
@@ -62,6 +54,29 @@ function compactDetail(detail) {
   };
 }
 
+async function compactCollectionTrack(entry) {
+  const song = await library.getSong(entry.songId);
+  const album = song.albumId ? await library.getAlbum(song.albumId) : null;
+  return {
+    id: song.id,
+    title: song.title,
+    note: song.note,
+    artists: (song.artists ?? []).map((artist) => ({
+      key: artist.key,
+      role: artist.role,
+      name: artist.name
+    })),
+    album: album
+      ? {
+          id: album.id,
+          title: album.title
+        }
+      : null
+  };
+}
+
+const routeOutputPath = (route) => join(ROOT, String(route).replace(/^\/+/, ''), 'index.html');
+
 function injectData(html, data) {
   const dataScript = `<script id="music-i18n-page-data" type="application/json">${safeJson(data)}</script>`;
   const runtimeScript = `<script src="/js/music-i18n.js?v=${MUSIC_I18N_VERSION}" data-music-i18n-runtime></script>`;
@@ -101,6 +116,27 @@ async function main() {
     artists: collectionArtists
   });
 
+  let collectionPages = 0;
+  const visibleCollections = await collections.getVisibleCollections();
+  for (const registryEntry of visibleCollections) {
+    const collection = await collections.getCollection(registryEntry.id);
+    const resolvedSongs = await collections.resolveCollectionSongs(collection.id);
+    const tracks = [];
+    for (const entry of resolvedSongs) tracks.push(await compactCollectionTrack(entry));
+
+    await updatePage(routeOutputPath(collection.route), {
+      pageType: 'collection-detail',
+      collection: {
+        id: collection.id,
+        route: collection.route,
+        title: collection.title,
+        description: collection.description
+      },
+      tracks
+    });
+    collectionPages += 1;
+  }
+
   let artistPages = 0;
   let albumPages = 0;
 
@@ -136,7 +172,7 @@ async function main() {
     }
   }
 
-  console.log(`Embedded Music i18n data into 1 collection page, ${artistPages} artist page(s) and ${albumPages} album page(s) from canonical references.`);
+  console.log(`Embedded Music i18n data into landing, ${collectionPages} collection detail page(s), ${artistPages} artist page(s) and ${albumPages} album page(s) from canonical references.`);
 }
 
 main().catch((error) => {
