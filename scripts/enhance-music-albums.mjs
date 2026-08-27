@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { albumCatalogName, albumSlug } from './music/music-album-route.mjs';
 import { createMusicLibraryRepository } from './music/music-library-repository.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -28,18 +29,6 @@ const initials = (name = '') => name
   .join('')
   .slice(0, 3)
   .toUpperCase();
-
-const fallbackAlbumSlug = (album, index) => {
-  const ascii = String(album.title || '')
-    .normalize('NFKD')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-  return ascii || `album-${String(index + 1).padStart(2, '0')}`;
-};
-
-const albumSlug = (album, index) => album.slug || fallbackAlbumSlug(album, index);
-const albumCatalogName = (album) => album.catalogName || album.title;
 
 function renderPlayer(artist) {
   const nameEn = localized(artist.name, 'en');

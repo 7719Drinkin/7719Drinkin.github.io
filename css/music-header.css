@@ -1,4 +1,5 @@
 .music-site-header {
+  --music-header-crumb-size: 10px;
   display: flex;
   height: 76px;
   grid-template-columns: none;
@@ -9,8 +10,8 @@
 }
 
 /*
- * The identity block is invariant across the music landing page and every
- * artist page. Artist-specific content may only be appended after MUSIC/音乐.
+ * The identity block is invariant across the Music landing, artist, album and
+ * collection pages. Page hierarchy is expressed as one breadcrumb system.
  */
 body.music-page .music-site-header .music-header-identity {
   display: inline-flex;
@@ -57,55 +58,76 @@ body.music-page .music-site-header .music-header-divider {
 body.music-page .music-site-header .music-header-crumbs {
   display: inline-flex;
   min-width: 0;
+  overflow: hidden;
   align-items: center;
   gap: 12px;
   white-space: nowrap;
 }
 
 body.music-page .music-site-header .music-header-section,
+body.music-page .music-site-header .music-header-crumb,
 body.music-page .music-site-header .music-header-current,
 body.music-page .music-site-header .music-header-slash {
+  font-size: var(--music-header-crumb-size);
   line-height: 1;
   text-transform: uppercase;
 }
 
-/* MUSIC/音乐 is the fixed section identity and must look identical everywhere. */
-body.music-page .music-site-header .music-header-section {
-  color: var(--music-gold-soft);
+/* Every breadcrumb label shares one typographic scale. Hierarchy is expressed
+ * with color and current-state weight, never a different font size. */
+body.music-page .music-site-header .music-header-section,
+body.music-page .music-site-header .music-header-crumb,
+body.music-page .music-site-header .music-header-current {
+  min-width: 0;
+  overflow: hidden;
   font-family: var(--music-mono);
-  font-size: 10px;
   font-weight: 500;
-  letter-spacing: .18em;
+  letter-spacing: .14em;
   text-decoration: none;
-  transition: color .2s ease;
+  text-overflow: ellipsis;
 }
 
-body.music-page .music-site-header .music-header-section:visited {
+body.music-page .music-site-header .music-header-section,
+body.music-page .music-site-header .music-header-crumb--section {
   color: var(--music-gold-soft);
+}
+
+body.music-page .music-site-header .music-header-crumb--ancestor {
+  max-width: 148px;
+  color: color-mix(in srgb, var(--artist-accent-soft, var(--music-text)) 72%, var(--music-muted));
+}
+
+body.music-page .music-site-header .music-header-crumb--current,
+body.music-page .music-site-header .music-header-current {
+  max-width: 220px;
+  color: var(--artist-accent-soft, var(--music-text));
+  font-weight: 600;
+}
+
+body.music-page .music-site-header .music-header-section:visited,
+body.music-page .music-site-header .music-header-crumb--section:visited {
+  color: var(--music-gold-soft);
+}
+
+body.music-page .music-site-header .music-header-crumb--ancestor:visited {
+  color: color-mix(in srgb, var(--artist-accent-soft, var(--music-text)) 72%, var(--music-muted));
 }
 
 body.music-page .music-site-header .music-header-section:hover,
-body.music-page .music-site-header .music-header-section:focus-visible {
+body.music-page .music-site-header .music-header-section:focus-visible,
+body.music-page .music-site-header .music-header-crumb--section:hover,
+body.music-page .music-site-header .music-header-crumb--section:focus-visible,
+body.music-page .music-site-header .music-header-crumb--ancestor:hover,
+body.music-page .music-site-header .music-header-crumb--ancestor:focus-visible {
   color: var(--music-text);
 }
 
-/* Only these two nodes are artist-page additions. */
 body.music-page .music-site-header .music-header-slash {
+  flex: 0 0 auto;
   color: rgba(255, 255, 255, 0.24);
   font-family: var(--music-mono);
-  font-size: 10px;
   font-weight: 400;
   letter-spacing: 0;
-}
-
-body.music-page .music-site-header .music-header-current {
-  overflow: hidden;
-  color: var(--artist-accent-soft, var(--music-text));
-  font-family: var(--music-sans);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .10em;
-  text-overflow: ellipsis;
 }
 
 body.music-page .music-site-header .music-site-nav {
@@ -126,26 +148,27 @@ html[data-music-language="en"] .music-lang-zh {
 }
 
 html[data-music-language="zh"] body.music-page .music-site-header .music-header-section,
+html[data-music-language="zh"] body.music-page .music-site-header .music-header-crumb,
 html[data-music-language="zh"] body.music-page .music-site-header .music-header-current,
 html[data-music-language="zh"] body.music-page .music-site-header .music-site-nav a {
   font-family: "Noto Sans SC", var(--music-sans);
 }
 
-html[data-music-language="zh"] body.music-page .music-site-header .music-header-section {
-  color: var(--music-gold-soft);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: .16em;
-}
-
-html[data-music-language="zh"] body.music-page .music-site-header .music-header-section:visited {
-  color: var(--music-gold-soft);
-}
-
+html[data-music-language="zh"] body.music-page .music-site-header .music-header-section,
+html[data-music-language="zh"] body.music-page .music-site-header .music-header-crumb,
 html[data-music-language="zh"] body.music-page .music-site-header .music-header-current {
-  font-size: 11px;
+  letter-spacing: .08em;
+}
+
+html[data-music-language="zh"] body.music-page .music-site-header .music-header-section,
+html[data-music-language="zh"] body.music-page .music-site-header .music-header-crumb--section {
+  color: var(--music-gold-soft);
+  font-weight: 500;
+}
+
+html[data-music-language="zh"] body.music-page .music-site-header .music-header-crumb--current,
+html[data-music-language="zh"] body.music-page .music-site-header .music-header-current {
   font-weight: 600;
-  letter-spacing: .06em;
 }
 
 html[data-music-language="zh"] body.music-page .music-site-header .music-site-nav a {
@@ -174,6 +197,7 @@ html[data-music-language="zh"] body.music-page .music-site-header .music-site-na
 
 @media (max-width: 760px) {
   .music-site-header {
+    --music-header-crumb-size: 9px;
     height: 66px;
     gap: 16px;
     padding: 0 18px;
@@ -188,25 +212,19 @@ html[data-music-language="zh"] body.music-page .music-site-header .music-site-na
     gap: 8px;
   }
 
-  body.music-page .music-site-header .music-header-section {
-    font-size: 9px;
-    letter-spacing: .14em;
+  body.music-page .music-site-header .music-header-crumb--ancestor {
+    max-width: 86px;
   }
 
+  body.music-page .music-site-header .music-header-crumb--current,
   body.music-page .music-site-header .music-header-current {
     max-width: 112px;
-    font-size: 10px;
-    letter-spacing: .07em;
   }
 
-  html[data-music-language="zh"] body.music-page .music-site-header .music-header-section {
-    font-size: 9px;
-    letter-spacing: .12em;
-  }
-
+  html[data-music-language="zh"] body.music-page .music-site-header .music-header-section,
+  html[data-music-language="zh"] body.music-page .music-site-header .music-header-crumb,
   html[data-music-language="zh"] body.music-page .music-site-header .music-header-current {
-    font-size: 10px;
-    letter-spacing: .04em;
+    letter-spacing: .06em;
   }
 
   body.music-page .music-site-header .music-site-nav {
@@ -219,6 +237,11 @@ html[data-music-language="zh"] body.music-page .music-site-header .music-site-na
     margin: 0 10px;
   }
 
+  body.music-page .music-site-header .music-header-crumb--ancestor {
+    max-width: 64px;
+  }
+
+  body.music-page .music-site-header .music-header-crumb--current,
   body.music-page .music-site-header .music-header-current {
     max-width: 84px;
   }
