@@ -48,19 +48,19 @@ for (const entry of visibleCollections) {
     `Collection ${collection.id} must load the shared player stylesheet.`);
   assert(page.includes(MUSIC_PLAYER_SCRIPT_SRC),
     `Collection ${collection.id} must load the shared player runtime.`);
-  assert(!page.includes('song-row--playable'),
-    `Collection ${collection.id} must not impersonate the legacy Artist song-row UI.`);
+  assert(!page.includes('collection-track-play'),
+    `Collection ${collection.id} must not reintroduce a Collection-specific playback control.`);
 
-  const triggerTags = [...page.matchAll(/<button class="collection-track-play"[\s\S]*?<\/button>/g)]
+  const triggerTags = [...page.matchAll(/<button class="song-row song-row--playable collection-song-row reveal"[\s\S]*?<\/button>/g)]
     .map((match) => match[0]);
   assert(triggerTags.length === expectedPlayable,
-    `Collection ${collection.id} play-trigger count must match its runtime-resolved queue.`);
+    `Collection ${collection.id} canonical song-row trigger count must match its runtime-resolved queue.`);
   triggerTags.forEach((tag, index) => {
     assert(tag.includes('data-player-track'), `Collection ${collection.id} trigger ${index + 1} is missing data-player-track.`);
     assert(tag.includes('data-audio-src='), `Collection ${collection.id} trigger ${index + 1} is missing audio src.`);
     assert(tag.includes('data-song-title='), `Collection ${collection.id} trigger ${index + 1} is missing song title.`);
     assert(tag.includes('data-song-artist='), `Collection ${collection.id} trigger ${index + 1} is missing artist metadata.`);
-    assert(tag.includes('data-player-action'), `Collection ${collection.id} trigger ${index + 1} is missing the generic player action hook.`);
+    assert(tag.includes('class="song-row-action" data-player-action'), `Collection ${collection.id} trigger ${index + 1} must use the canonical song-row action hook.`);
   });
 }
 
@@ -81,6 +81,8 @@ assert(catalogRuntime.includes("songList.dataset.playbackQueue = '';"),
   'Runtime catalog pages must identify their generated song list as a playback queue.');
 assert(catalogRuntime.includes("row.dataset.playerTrack = '';"),
   'Runtime catalog rows must expose the generic playback track contract.');
+assert(catalogRuntime.includes("row.className = 'song-row song-row--playable';"),
+  'Runtime Album catalog rows must use the canonical song-row component.');
 assert(frameBridge.includes("document.querySelector('[data-playback-queue]')"),
   'Site frame bridge must scope persistent-player queues through the playback queue contract.');
 assert(frameBridge.includes("queueRoot.querySelectorAll('[data-player-track][data-audio-src]')"),
@@ -92,4 +94,4 @@ assert(frameBridge.includes('html.site-shell-frame-document .site-music-player')
 assert(count(playerView, /\bdata-player-audio\b/g) === 1,
   'Shared player view must own exactly one audio element.');
 
-console.log(`Music playback queue contract validated for ${visibleCollections.length} collection(s).`);
+console.log(`Music playback queue contract validated for ${visibleCollections.length} collection(s); Album and Collection queues share the canonical song-row trigger.`);

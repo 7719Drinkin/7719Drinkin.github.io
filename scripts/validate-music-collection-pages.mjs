@@ -36,12 +36,14 @@ async function main() {
   assert(collections.length === 1, `Current Music scope expects exactly one published collection; got ${collections.length}.`);
   assert(collections[0].id === 'recently-curated', `Published collection must be recently-curated; got ${collections[0].id}.`);
 
-  const [home, listening, homeCollectionStyles, i18nStyles, i18nRuntime] = await Promise.all([
+  const [home, listening, homeCollectionStyles, collectionStyles, i18nStyles, i18nRuntime, catalogRuntime] = await Promise.all([
     read('music/index.html'),
     read('music/listening/index.html'),
     read('css/music-home-collections.css'),
+    read('css/music-collections.css'),
     read('css/music-i18n.css'),
-    read('js/music-i18n.js')
+    read('js/music-i18n.js'),
+    read('js/music-catalog.js')
   ]);
 
   assert(home.includes('id="collections"'), 'Music home must expose the Collections section.');
@@ -82,6 +84,12 @@ async function main() {
   assert(i18nRuntime.includes("window.addEventListener('7719:languagechange', adoptExternalMusicLanguage);"), 'Music i18n runtime must consume the site-level language event.');
   assert(i18nRuntime.includes("document.addEventListener('universe:languagechange', adoptExternalMusicLanguage);"), 'Music i18n runtime must consume the Universe language event.');
 
+  assert(catalogRuntime.includes("row.className = 'song-row song-row--playable';"), 'Album catalog runtime must expose the canonical playable .song-row contract.');
+  assert(catalogRuntime.includes("action.className = 'song-row-action';"), 'Album catalog runtime must expose the canonical circular song action contract.');
+  assert(!collectionStyles.includes('.collection-track-row'), 'Collection stylesheet must not define a second track-row component.');
+  assert(!collectionStyles.includes('.collection-track-play'), 'Collection stylesheet must not define a second playback-button component.');
+  assert(collectionStyles.includes('--artist-accent: var(--music-gold);'), 'Collection track list must supply the shared song-row accent token.');
+
   assert(listening.includes('data-listening-compat="collections"'), 'Legacy /music/listening/ must be a Collections compatibility route.');
   assert(listening.includes('href="/music/collections/recently-curated/"'), 'Listening compatibility route must link to Recently Curated.');
   assert(listening.includes('window.location.replace("/music/collections/recently-curated/")'), 'Listening compatibility route must redirect to Recently Curated.');
@@ -106,8 +114,14 @@ async function main() {
     assert(page.includes('/js/music.js?v='), `Collection ${collection.id} must load the Music reveal runtime.`);
     assert(page.includes('data-music-i18n-runtime'), `Collection ${collection.id} must load the Music i18n runtime.`);
     assert(page.includes('data-music-i18n-style'), `Collection ${collection.id} must load the Music i18n stylesheet.`);
+    assert(page.includes('/css/music-collections.css?v=20260827-song-row-1'), `Collection ${collection.id} must load the shared-song-row Collection stylesheet revision.`);
     assert(page.includes(`<h1><span class="music-lang-zh">${titleZh}</span><span class="music-lang-en">${titleEn}</span></h1>`), `Collection ${collection.id} hero title must be language-aware.`);
     assert(page.includes(`<p class="collection-detail-description"><span class="music-lang-zh">${descriptionZh}</span><span class="music-lang-en">${descriptionEn}</span></p>`), `Collection ${collection.id} description must preserve both languages.`);
+    assert(page.includes('class="song-list collection-track-list"'), `Collection ${collection.id} must use the canonical song-list wrapper.`);
+    assert(!page.includes('collection-track-row'), `Collection ${collection.id} must not render the retired Collection-specific track row.`);
+    assert(!page.includes('collection-track-artwork'), `Collection ${collection.id} must not render Collection-specific track artwork.`);
+    assert(!page.includes('collection-track-play'), `Collection ${collection.id} must not render a separate Collection play control.`);
+    assert(!page.includes('collection-track-action'), `Collection ${collection.id} must not render a separate OPEN ARTIST control inside track rows.`);
     assert(!page.includes('02 / COLLECTION'), `Collection ${collection.id} must not retain decorative Collection numbering.`);
     assert(!page.includes('CURATED, NOT COMPLETE.'), `Collection ${collection.id} must not retain editorial filler copy.`);
     assert(!page.includes('TRACK LIST'), `Collection ${collection.id} must not retain redundant track-list microcopy.`);
@@ -127,17 +141,24 @@ async function main() {
     assert(JSON.stringify(renderedIds) === JSON.stringify(expectedIds), `Collection ${collection.id} rendered song order differs from its resolver.`);
     assert(JSON.stringify(pageDataIds) === JSON.stringify(expectedIds), `Collection ${collection.id} i18n track order differs from its resolver.`);
 
-    const notePairs = [...page.matchAll(/<p class="collection-track-note"><span class="music-lang-zh">[\s\S]*?<\/span><span class="music-lang-en">[\s\S]*?<\/span><\/p>/g)];
-    assert(notePairs.length === resolvedSongs.length, `Collection ${collection.id} must render a bilingual note contract for every track.`);
+    const collectionRows = [...page.matchAll(/<(?:button|article) class="song-row[^\"]*collection-song-row reveal"[\s\S]*?<\/(?:button|article)>/g)].map((match) => match[0]);
+    assert(collectionRows.length === resolvedSongs.length, `Collection ${collection.id} must render every resolved track through the canonical .song-row component.`);
+    collectionRows.forEach((row, index) => {
+      assert(row.includes('<span class="song-index">'), `Collection ${collection.id} song row ${index + 1} must use the canonical song-index element.`);
+      assert(row.includes('<div class="song-primary">'), `Collection ${collection.id} song row ${index + 1} must use the canonical song-primary element.`);
+      assert(row.includes('<small>'), `Collection ${collection.id} song row ${index + 1} must expose the canonical auxiliary text column.`);
+    });
 
-    const playButtons = [...page.matchAll(/<button class="collection-track-play"[\s\S]*?<\/button>/g)].map((match) => match[0]);
+    const playButtons = [...page.matchAll(/<button class="song-row song-row--playable collection-song-row reveal"[\s\S]*?<\/button>/g)].map((match) => match[0]);
     playButtons.forEach((button, index) => {
-      assert(button.includes('data-song-title-zh='), `Collection ${collection.id} playable trigger ${index + 1} is missing Chinese title metadata.`);
-      assert(button.includes('data-song-title-en='), `Collection ${collection.id} playable trigger ${index + 1} is missing English title metadata.`);
-      assert(button.includes('data-song-artist-zh='), `Collection ${collection.id} playable trigger ${index + 1} is missing Chinese artist metadata.`);
-      assert(button.includes('data-song-artist-en='), `Collection ${collection.id} playable trigger ${index + 1} is missing English artist metadata.`);
-      assert(button.includes('data-song-album-zh='), `Collection ${collection.id} playable trigger ${index + 1} is missing Chinese album metadata.`);
-      assert(button.includes('data-song-album-en='), `Collection ${collection.id} playable trigger ${index + 1} is missing English album metadata.`);
+      assert(button.includes('data-player-track'), `Collection ${collection.id} playable row ${index + 1} must use the shared player trigger contract.`);
+      assert(button.includes('class="song-row-action" data-player-action'), `Collection ${collection.id} playable row ${index + 1} must use the same circular action element as Album rows.`);
+      assert(button.includes('data-song-title-zh='), `Collection ${collection.id} playable row ${index + 1} is missing Chinese title metadata.`);
+      assert(button.includes('data-song-title-en='), `Collection ${collection.id} playable row ${index + 1} is missing English title metadata.`);
+      assert(button.includes('data-song-artist-zh='), `Collection ${collection.id} playable row ${index + 1} is missing Chinese artist metadata.`);
+      assert(button.includes('data-song-artist-en='), `Collection ${collection.id} playable row ${index + 1} is missing English artist metadata.`);
+      assert(button.includes('data-song-album-zh='), `Collection ${collection.id} playable row ${index + 1} is missing Chinese album metadata.`);
+      assert(button.includes('data-song-album-en='), `Collection ${collection.id} playable row ${index + 1} is missing English album metadata.`);
     });
 
     assert(!page.includes('/music/artists/undefined/'), `Collection ${collection.id} must never invent an undefined artist route.`);
@@ -152,7 +173,7 @@ async function main() {
   }
   assert(!directoryIndexExists, 'Do not create a /music/collections/ directory page while only one collection exists.');
 
-  console.log(`Validated Music Collection pages: ${collections.map((collection) => collection.id).join(', ')}; Collection detail pages now share the canonical Music i18n runtime, language state and bilingual playback metadata.`);
+  console.log(`Validated Music Collection pages: ${collections.map((collection) => collection.id).join(', ')}; Collection and Album tracks now share the canonical song-row and player-action contracts.`);
 }
 
 main().catch((error) => {

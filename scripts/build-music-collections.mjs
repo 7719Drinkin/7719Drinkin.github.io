@@ -13,7 +13,7 @@ import { createPlaybackTrackView } from './music/playback-track-view.mjs';
 import { createRuntimeTrackResolver } from './music/runtime-playability-resolver.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const STYLE_HREF = '/css/music-collections.css?v=20260827-play-control-2';
+const STYLE_HREF = '/css/music-collections.css?v=20260827-song-row-1';
 const LISTENING_COMPAT_ROUTE = '/music/listening/';
 const RECENT_COLLECTION_ID = 'recently-curated';
 
@@ -41,10 +41,6 @@ async function prepareSongRow({ entry, index, library, resolveRuntimeTrack }) {
   const song = await library.getSong(entry.songId);
   const album = song.albumId ? await library.getAlbum(song.albumId) : null;
   const artwork = await library.resolveSongArtwork(song.id);
-  const artists = await Promise.all((song.artists ?? []).map(async (artist) => ({
-    reference: artist,
-    profile: artist?.key ? await library.getArtistProfile(artist.key) : null
-  })));
   const primary = song.artists?.find((artist) => artist?.role === 'primary') ?? song.artists?.[0] ?? null;
   const runtimeMatch = primary?.key
     ? await resolveRuntimeTrack({ artistKey: primary.key, title: entry.title, album: entry.album })
@@ -57,77 +53,73 @@ async function prepareSongRow({ entry, index, library, resolveRuntimeTrack }) {
     runtimeMatch
   });
 
-  return { entry, index, song, album, artwork, artists, primary, playbackTrack };
+  return { entry, index, song, album, artwork, primary, playbackTrack };
 }
 
-const renderPlaybackTrigger = (row) => {
+const trackPresentation = (row) => {
   const track = row.playbackTrack;
-  if (!track?.playback) {
-    return '<span class="collection-track-state"><span class="music-lang-zh">收藏</span><span class="music-lang-en">ARCHIVE</span></span>';
-  }
-
-  const titleZh = localized(row.song.title, 'zh') || track.title;
+  const titleZh = localized(row.song.title, 'zh') || track?.title || '';
   const titleEn = localized(row.song.title, 'en') || titleZh;
-  const artistZh = localized(row.primary?.name, 'zh') || track.artist;
+  const artistZh = localized(row.primary?.name, 'zh') || track?.artist || '';
   const artistEn = localized(row.primary?.name, 'en') || artistZh;
-  const albumZh = localized(row.album?.title, 'zh') || track.album;
+  const albumZh = localized(row.album?.title, 'zh') || track?.album || '';
   const albumEn = localized(row.album?.title, 'en') || albumZh;
-  const cover = track.artwork ? ` data-cover-src="${escapeHtml(track.artwork)}"` : '';
+  const contextZh = [artistZh, albumZh].filter(Boolean).join(' · ') || '7719 Music';
+  const contextEn = [artistEn, albumEn].filter(Boolean).join(' · ') || contextZh;
+  const fileName = String(track?.playback?.fileName || '').trim();
+  const note = row.song.note ?? '';
 
-  return `<button class="collection-track-play" type="button"
-      data-player-track
-      data-audio-src="${escapeHtml(track.playback.src)}"
-      data-audio-type="${escapeHtml(track.playback.type)}"
-      data-song-title="${escapeHtml(titleZh)}"
-      data-song-title-zh="${escapeHtml(titleZh)}"
-      data-song-title-en="${escapeHtml(titleEn)}"
-      data-song-artist="${escapeHtml(artistZh)}"
-      data-song-artist-zh="${escapeHtml(artistZh)}"
-      data-song-artist-en="${escapeHtml(artistEn)}"
-      data-song-album="${escapeHtml(albumZh)}"
-      data-song-album-zh="${escapeHtml(albumZh)}"
-      data-song-album-en="${escapeHtml(albumEn)}"${cover}
-      aria-label="播放 ${escapeHtml(titleZh)}">
-    <b data-player-action aria-hidden="true">▶</b>
-    <span class="music-lang-zh">播放</span><span class="music-lang-en">PLAY</span>
-  </button>`;
+  return {
+    track,
+    titleZh,
+    titleEn,
+    artistZh,
+    artistEn,
+    albumZh,
+    albumEn,
+    context: { zh: contextZh, en: contextEn },
+    description: fileName || localized(note, 'zh') || 'ARCHIVE'
+  };
 };
 
 export function renderCollectionSongRow(row) {
-  const artistHtml = row.artists.map(({ reference, profile }) => {
-    const label = renderLocalized(reference?.name ?? reference?.key ?? '');
-    if (!profile?.route) return `<span class="collection-track-artist">${label}</span>`;
-    return `<a class="collection-track-artist collection-track-artist--linked" href="${escapeHtml(profile.route)}">${label}</a>`;
-  }).join('<span class="collection-track-artist-separator" aria-hidden="true">·</span>');
+  const presentation = trackPresentation(row);
+  const core = `<span class="song-index">${String(row.index + 1).padStart(2, '0')}</span>
+    <div class="song-primary">
+      <h3>${renderLocalized(row.song.title)}</h3>
+      <p>${renderLocalized(presentation.context)}</p>
+    </div>
+    <small>${escapeHtml(presentation.description)}</small>`;
 
-  const artwork = row.artwork
-    ? `<img src="${escapeHtml(row.artwork)}" alt="" loading="lazy" decoding="async" aria-hidden="true">`
-    : '<span class="collection-track-artwork-placeholder" aria-hidden="true"></span>';
-  const albumTitle = row.album ? renderLocalized(row.album.title) : '<span aria-hidden="true">—</span>';
-  const primaryProfile = row.primary?.key
-    ? row.artists.find(({ reference }) => reference?.key === row.primary.key)?.profile ?? null
-    : null;
-  const artistAction = primaryProfile?.route
-    ? `<a class="collection-track-action" href="${escapeHtml(primaryProfile.route)}#songs"><span class="music-lang-zh">进入歌手页</span><span class="music-lang-en">OPEN ARTIST</span><b aria-hidden="true">↗</b></a>`
+  if (!presentation.track?.playback) {
+    return `<article class="song-row collection-song-row reveal" data-collection-song="${escapeHtml(row.song.id)}">
+      ${core}
+      <b aria-hidden="true">—</b>
+    </article>`;
+  }
+
+  const cover = presentation.track.artwork
+    ? ` data-cover-src="${escapeHtml(presentation.track.artwork)}"`
     : '';
 
-  return `<article class="collection-track-row reveal" data-collection-song="${escapeHtml(row.song.id)}">
-    <span class="collection-track-index">${String(row.index + 1).padStart(2, '0')}</span>
-    <div class="collection-track-artwork">${artwork}</div>
-    <div class="collection-track-primary">
-      <h3>${renderLocalized(row.song.title)}</h3>
-      <div class="collection-track-artists">${artistHtml}</div>
-    </div>
-    <div class="collection-track-album">
-      <small><span class="music-lang-zh">专辑</span><span class="music-lang-en">ALBUM</span></small>
-      <p>${albumTitle}</p>
-    </div>
-    <p class="collection-track-note">${renderLocalized(row.song.note ?? '')}</p>
-    <div class="collection-track-meta">
-      ${renderPlaybackTrigger(row)}
-      ${artistAction}
-    </div>
-  </article>`;
+  return `<button class="song-row song-row--playable collection-song-row reveal" type="button"
+      data-collection-song="${escapeHtml(row.song.id)}"
+      data-player-track
+      data-audio-src="${escapeHtml(presentation.track.playback.src)}"
+      data-audio-type="${escapeHtml(presentation.track.playback.type)}"
+      data-song-title="${escapeHtml(presentation.titleZh)}"
+      data-song-title-zh="${escapeHtml(presentation.titleZh)}"
+      data-song-title-en="${escapeHtml(presentation.titleEn)}"
+      data-song-artist="${escapeHtml(presentation.artistZh)}"
+      data-song-artist-zh="${escapeHtml(presentation.artistZh)}"
+      data-song-artist-en="${escapeHtml(presentation.artistEn)}"
+      data-song-album="${escapeHtml(presentation.albumZh)}"
+      data-song-album-zh="${escapeHtml(presentation.albumZh)}"
+      data-song-album-en="${escapeHtml(presentation.albumEn)}"${cover}
+      aria-label="播放 ${escapeHtml(presentation.titleZh)}">
+    ${core}
+    <b class="song-row-action" data-player-action aria-hidden="true">▶</b>
+  </button>`;
 }
 
 function renderListeningCompatibilityPage(targetRoute) {
@@ -235,7 +227,7 @@ export async function buildMusicCollections({ root = ROOT } = {}) {
       <header class="collection-detail-section-header reveal">
         <h2><span class="music-lang-zh">歌曲</span><span class="music-lang-en">TRACKS</span></h2>
       </header>
-      <div class="collection-track-list"
+      <div class="song-list collection-track-list"
         data-playback-queue
         data-queue-id="${escapeHtml(queueId)}"
         data-queue-kind="collection"
